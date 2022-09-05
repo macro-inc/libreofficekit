@@ -911,6 +911,7 @@ cygwin*|wsl*)
     enable_cairo_canvas=yes
     using_headless_plugin=yes
     DISABLE_GUI=TRUE
+    DISABLE_PYTHON=TRUE
     test_openldap=no
     build_skia=no
     _os=WINNT

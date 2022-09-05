@@ -11,6 +11,7 @@ $(eval $(call gb_ExternalPackage_ExternalPackage,python3,python3))
 
 $(eval $(call gb_ExternalPackage_use_external_project,python3,python3))
 
+ifneq ($(DISABLE_PYTHON),TRUE)
 ifeq ($(OS),WNT)
 ifeq ($(CPUNAME),X86_64)
 python_arch_subdir=amd64/
@@ -894,5 +895,6 @@ $(eval $(call gb_ExternalPackage_add_unpacked_files,python3,$(LIBO_BIN_FOLDER)/p
 $(eval $(call gb_ExternalPackage_add_unpacked_files,python3,$(LIBO_BIN_FOLDER)/python-core-$(PYTHON_VERSION)/lib/site-packages,\
 	Lib/site-packages/README.txt \
 ))
+endif
 
 # vim: set noet sw=4 ts=4:
