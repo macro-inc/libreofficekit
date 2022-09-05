@@ -21,7 +21,9 @@ $(eval $(call gb_Library_Library,vcl))
 
 $(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.common))
 
-ifeq ($(OS),MACOSX)
+ifeq ($(DISABLE_GUI),TRUE)
+$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.headless))
+else ifeq ($(OS),MACOSX)
 $(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.macosx))
 else ifeq ($(OS),WNT)
 $(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.windows))
@@ -29,8 +31,6 @@ else ifeq ($(OS),ANDROID)
 $(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.android))
 else ifeq ($(OS),iOS)
 $(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.ios))
-else ifeq ($(DISABLE_GUI),TRUE)
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.headless))
 else
 $(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.unx))
 endif
@@ -540,28 +540,30 @@ vcl_headless_code= \
     vcl/unx/generic/app/gensys \
 
 vcl_headless_freetype_code=\
+$(if $(filter-out WNT,$(OS)), \
     vcl/headless/svpprn \
-    vcl/headless/svptext \
+) \
     vcl/unx/generic/app/gendata \
-    vcl/unx/generic/gdi/cairotextrender \
-    vcl/unx/generic/gdi/freetypetextrender \
-    vcl/unx/generic/glyphs/freetype_glyphcache \
+    vcl/headless/svptext \
     vcl/unx/generic/glyphs/glyphcache \
+    vcl/unx/generic/glyphs/freetype_glyphcache \
+    vcl/unx/generic/gdi/freetypetextrender \
+    vcl/unx/generic/gdi/cairotextrender \
+    vcl/headless/svpcairotextrender \
     vcl/unx/generic/fontmanager/fontsubst \
     vcl/unx/generic/fontmanager/fontconfig \
     vcl/unx/generic/fontmanager/fontmanager \
     vcl/unx/generic/fontmanager/helper \
-    vcl/headless/svpcairotextrender \
-    vcl/unx/generic/print/bitmap_gfx \
-    vcl/unx/generic/print/common_gfx \
+    vcl/unx/generic/print/genpspgraphics \
+$(if $(filter-out WNT,$(OS)), \
+    vcl/unx/generic/print/GenPspGfxBackend \
     vcl/unx/generic/print/glyphset \
     vcl/unx/generic/print/printerjob \
     vcl/unx/generic/print/psputil \
-    vcl/unx/generic/print/GenPspGfxBackend \
-    vcl/unx/generic/print/genpspgraphics \
     vcl/unx/generic/print/genprnpsp \
     vcl/unx/generic/print/prtsetup \
     vcl/unx/generic/print/text_gfx \
+) \
 
 vcl_headless_freetype_libs = \
     cairo \
@@ -615,15 +617,23 @@ endif
 
 ifeq ($(DISABLE_GUI),TRUE)
 $(eval $(call gb_Library_add_exception_objects,vcl,\
+$(if $(filter WNT,$(OS)), \
+    vcl/source/opengl/DeviceInfo \
+    vcl/win/dummies \
+) \
+    vcl/null/printerinfomanager \
+$(if $(filter-out WNT,$(OS)), \
     vcl/unx/generic/printer/jobdata \
     vcl/unx/generic/printer/ppdparser \
-    vcl/null/printerinfomanager \
+) \
     vcl/headless/headlessinst \
     $(vcl_headless_code) \
     $(vcl_headless_freetype_code) \
 ))
 
 $(eval $(call gb_Library_use_externals,vcl,\
+    boost_headers \
+    boost_filesystem \
     $(vcl_headless_freetype_libs) \
 ))
 
@@ -738,7 +748,9 @@ endif
 ifeq ($(OS),WNT)
 $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/opengl/win/WinDeviceInfo \
-    vcl/source/app/salplug \
+    $(if $(filter-out TRUE,$(DISABLE_GUI)), \
+      vcl/source/app/salplug \
+    ) \
     vcl/win/app/fileregistration \
 ))
 

@@ -477,7 +477,7 @@ class TrueTypeFont;
  */
     SFErrCodes VCL_DLLPUBLIC OpenTTFontBuffer(const void* pBuffer, sal_uInt32 nLen, sal_uInt32 facenum,
                                               TrueTypeFont** ttf, const FontCharMapRef xCharMap = nullptr);
-#if !defined(_WIN32)
+
 /**
  * TrueTypeFont constructor.
  * Reads the font file and allocates the memory for the structure.
@@ -492,7 +492,6 @@ class TrueTypeFont;
  */
     SFErrCodes VCL_DLLPUBLIC OpenTTFontFile(const char *fname, sal_uInt32 facenum, TrueTypeFont** ttf,
                                             const FontCharMapRef xCharMap = nullptr);
-#endif
 
     bool VCL_DLLPUBLIC getTTCoverage(
         std::optional<std::bitset<UnicodeCoverage::MAX_UC_ENUM>> & rUnicodeCoverage,

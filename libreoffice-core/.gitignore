@@ -188,3 +188,7 @@ LibreOffice.VC.VC.opendb
 # Android builds
 /android/jniLibs/
 /android/obj/
+
+# Clangd
+/.cache
+/dictionaries

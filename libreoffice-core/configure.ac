@@ -903,10 +903,16 @@ cygwin*|wsl*)
     # look at $host etc that much, it mostly uses its own $_os
     # variable, set here in this case statement.
 
-    using_freetype_fontconfig=no
-    using_x11=no
+    using_freetype_fontconfig=yes
+    test_system_freetype=no
+    test_system_fontconfig=no
+    test_cairo=yes
+    with_system_cairo=no
+    enable_cairo_canvas=yes
+    using_headless_plugin=yes
+    DISABLE_GUI=TRUE
     test_openldap=no
-    build_skia=yes
+    build_skia=no
     _os=WINNT
 
     DLLPOST=".dll"
@@ -1119,7 +1125,7 @@ esac
 
 AC_SUBST(HOST_PLATFORM)
 
-if test -z "$using_x11" -o -z "$using_freetype_fontconfig"; then
+if test "$using_headless_plugin" != yes -a -z "$using_x11" -o -z "$using_freetype_fontconfig"; then
     AC_MSG_ERROR([You must set \$using_freetype_fontconfig and \$using_x11 for your platform])
 fi
 
@@ -5294,9 +5300,6 @@ fi
 
 DISABLE_GUI=""
 if test "$enable_gui" = "no"; then
-    if test "$using_x11" != yes; then
-        AC_MSG_ERROR([$host_os operating system is not suitable to build LibreOffice with --disable-gui.])
-    fi
     USING_X11=
     DISABLE_GUI=TRUE
 else
@@ -9417,6 +9420,10 @@ dnl ===================================================================
 dnl Check for system expat
 dnl ===================================================================
 libo_CHECK_SYSTEM_MODULE([expat], [EXPAT], [expat])
+if test "$COM" = "MSC"; then # override the above
+    EXPAT_CFLAGS="-I${WORKDIR}/UnpackedTarball/expat/lib"
+    EXPAT_LIBS="${WORKDIR}/LinkTarget/StaticLibrary/expat.lib"
+fi
 
 dnl ===================================================================
 dnl Check for system xmlsec
@@ -11966,7 +11973,7 @@ AC_SUBST(ENABLE_GSTREAMER_1_0)
 
 ENABLE_OPENGL_TRANSITIONS=
 ENABLE_OPENGL_CANVAS=
-if test $_os = iOS -o $_os = Android -o "$ENABLE_FUZZERS" = "TRUE"; then
+if test $_os = iOS -o $_os = Android -o "$ENABLE_FUZZERS" = "TRUE" -o "$using_headless_plugin" = "yes"; then
    : # disable
 elif test "$_os" = "Darwin"; then
     # We use frameworks on macOS, no need for detail checks
@@ -13502,37 +13509,37 @@ dnl ===================================================================
 if test "$test_cairo" = "yes"; then
     AC_MSG_CHECKING([whether to use the system cairo])
 
-    : ${with_system_cairo:=$with_system_libs}
-    if test "$with_system_cairo" = "yes"; then
-        SYSTEM_CAIRO=TRUE
-        AC_MSG_RESULT([yes])
+#     : ${with_system_cairo:=$with_system_libs}
+#     if test "$with_system_cairo" = "yes"; then
+#         SYSTEM_CAIRO=TRUE
+#         AC_MSG_RESULT([yes])
 
-        PKG_CHECK_MODULES( CAIRO, cairo >= 1.8.0 )
-        CAIRO_CFLAGS=$(printf '%s' "$CAIRO_CFLAGS" | sed -e "s/-I/${ISYSTEM?}/g")
-        FilterLibs "${CAIRO_LIBS}"
-        CAIRO_LIBS="${filteredlibs}"
+#         PKG_CHECK_MODULES( CAIRO, cairo >= 1.8.0 )
+#         CAIRO_CFLAGS=$(printf '%s' "$CAIRO_CFLAGS" | sed -e "s/-I/${ISYSTEM?}/g")
+#         FilterLibs "${CAIRO_LIBS}"
+#         CAIRO_LIBS="${filteredlibs}"
 
-        if test "$test_xrender" = "yes"; then
-            AC_MSG_CHECKING([whether Xrender.h defines PictStandardA8])
-            AC_LANG_PUSH([C])
-            AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <X11/extensions/Xrender.h>]],[[
-#ifdef PictStandardA8
-#else
-      return fail;
-#endif
-]])],[AC_MSG_RESULT([yes])],[AC_MSG_ERROR([no, X headers too old.])])
+#         if test "$test_xrender" = "yes"; then
+#             AC_MSG_CHECKING([whether Xrender.h defines PictStandardA8])
+#             AC_LANG_PUSH([C])
+#             AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <X11/extensions/Xrender.h>]],[[
+# #ifdef PictStandardA8
+# #else
+#       return fail;
+# #endif
+# ]])],[AC_MSG_RESULT([yes])],[AC_MSG_ERROR([no, X headers too old.])])
 
-            AC_LANG_POP([C])
-        fi
-    else
+#             AC_LANG_POP([C])
+#         fi
+#     else
         AC_MSG_RESULT([no])
         BUILD_TYPE="$BUILD_TYPE CAIRO"
-    fi
+    # fi
 
-    if test "$enable_cairo_canvas" != no; then
+    # if test "$enable_cairo_canvas" != no; then
         AC_DEFINE(ENABLE_CAIRO_CANVAS)
         ENABLE_CAIRO_CANVAS=TRUE
-    fi
+    # fi
 fi
 
 AC_SUBST(CAIRO_CFLAGS)

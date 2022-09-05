@@ -10,9 +10,19 @@
 $(eval $(call gb_ExternalProject_ExternalProject,expat))
 
 $(eval $(call gb_ExternalProject_register_targets,expat,\
-	configure \
+	$(if $(filter WNT,$(OS)),Release,configure) \
 ))
 
+ifeq ($(OS),WNT)
+$(call gb_ExternalProject_get_state_target,expat,Release) :
+	$(call gb_Trace_StartRange,expat,EXTERNAL)
+	$(call gb_ExternalProject_run,Release,\
+		'$(DEVENV)' "expat.sln" -upgrade && \
+		unset UCRTVersion && \
+		'$(DEVENV)' "expat.sln" -build "Release|x64" && \
+		cp -rf "Release/expat.lib" "$(call gb_StaticLibrary_WORKDIR)/expat.lib") \
+	$(call gb_Trace_EndRange,expat,EXTERNAL)
+else # !WINDOWS
 $(call gb_ExternalProject_get_state_target,expat,configure) :
 	$(call gb_Trace_StartRange,expat,EXTERNAL)
 	$(call gb_ExternalProject_run,configure,\
@@ -21,5 +31,6 @@ $(call gb_ExternalProject_get_state_target,expat,configure) :
 			$(if $(filter INTEL ARM,$(CPUNAME)),ac_cv_c_bigendian=no)) \
 	,,expat_configure.log)
 	$(call gb_Trace_EndRange,expat,EXTERNAL)
+endif
 
 # vim: set noet sw=4 ts=4:

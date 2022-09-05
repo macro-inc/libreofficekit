@@ -52,6 +52,7 @@
 #include <com/sun/star/accessibility/MSAAService.hpp>
 
 #include <config_features.h>
+#include <config_vclplug.h>
 #include <basegfx/utils/systemdependentdata.hxx>
 #include <cppuhelper/basemutex.hxx>
 
@@ -332,6 +333,7 @@ BlendFrameCache* ImplGetBlendFrameCache()
 #ifdef _WIN32
 bool ImplInitAccessBridge()
 {
+#if !ENABLE_HEADLESS
     ImplSVData* pSVData = ImplGetSVData();
     if( ! pSVData->mxAccessBridge.is() )
     {
@@ -359,6 +361,9 @@ bool ImplInitAccessBridge()
     }
 
     return true;
+#else
+    return false;
+#endif
 }
 #endif
 

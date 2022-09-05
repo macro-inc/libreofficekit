@@ -95,19 +95,19 @@ $(eval $(call gb_Library_add_exception_objects,vclplug_win,\
     vcl/win/dtrans/WinClipboard \
     vcl/win/dtrans/XNotifyingDataObject \
     vcl/win/dtrans/XTDataObject \
-    vcl/win/gdi/gdiimpl \
-    vcl/win/gdi/salbmp \
-    vcl/win/gdi/salfont \
-    vcl/win/gdi/salgdi \
-    vcl/win/gdi/salgdi2 \
-    vcl/win/gdi/salgdi_gdiplus \
-    vcl/win/gdi/salnativewidgets-luna \
-    vcl/win/gdi/salprn \
-    vcl/win/gdi/salvd \
-    vcl/win/gdi/winlayout \
-    vcl/win/gdi/DWriteTextRenderer \
+	vcl/win/gdi/gdiimpl \
+	vcl/win/gdi/salbmp \
+	vcl/win/gdi/salfont \
+	vcl/win/gdi/salgdi \
+	vcl/win/gdi/salgdi2 \
+	vcl/win/gdi/salgdi_gdiplus \
+	vcl/win/gdi/salnativewidgets-luna \
+	vcl/win/gdi/salprn \
+	vcl/win/gdi/salvd \
+	vcl/win/gdi/winlayout \
+	vcl/win/gdi/DWriteTextRenderer \
     vcl/win/window/keynames \
-    vcl/win/window/salframe \
+	vcl/win/window/salframe \
     vcl/win/window/salmenu \
     vcl/win/window/salobj \
     $(if $(filter SKIA,$(BUILD_TYPE)), \

@@ -24,10 +24,19 @@
 
 #include <sal/types.h>
 
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
+#ifdef _WIN32
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+# include <stdlib.h>
+# include <io.h>
+# include <process.h>
+# include <string.h>
+#else
+# include <sys/stat.h>
+# include <unistd.h>
+# include <fcntl.h>
+# include <sys/mman.h>
+#endif
 
 #include <i18nlangtag/mslangid.hxx>
 #include <jobdata.hxx>
@@ -41,7 +50,9 @@
 #include <unx/freetype_glyphcache.hxx>
 #include <unx/geninst.h>
 #include <unx/genpspgraphics.h>
-#include <unx/printergfx.hxx>
+#ifndef _WIN32
+# include <unx/printergfx.hxx>
+#endif
 #include <langboost.hxx>
 #include <fontinstance.hxx>
 #include <fontattributes.hxx>
@@ -58,16 +69,23 @@ using namespace psp;
  *******************************************************/
 
 GenPspGraphics::GenPspGraphics()
+#ifndef _WIN32
     : m_pJobData( nullptr )
     , m_pPrinterGfx( nullptr )
+#endif
 {
 }
 
 void GenPspGraphics::Init(psp::JobData* pJob, psp::PrinterGfx* pGfx)
 {
+#ifndef _WIN32
     m_pBackend = std::make_unique<GenPspGfxBackend>(pGfx);
     m_pJobData = pJob;
     m_pPrinterGfx = pGfx;
+#else
+    (void)pJob;
+    (void)pGfx;
+#endif
     SetLayout( SalLayoutFlags::NONE );
 }
 
@@ -78,6 +96,7 @@ GenPspGraphics::~GenPspGraphics()
 
 void GenPspGraphics::GetResolution( sal_Int32 &rDPIX, sal_Int32 &rDPIY )
 {
+#ifndef _WIN32
     if (m_pJobData != nullptr)
     {
         int x = m_pJobData->m_aContext.getRenderResolution();
@@ -85,6 +104,10 @@ void GenPspGraphics::GetResolution( sal_Int32 &rDPIX, sal_Int32 &rDPIY )
         rDPIX = x;
         rDPIY = x;
     }
+#else
+    (void)rDPIX;
+    (void)rDPIY;
+#endif
 }
 
 namespace {
@@ -106,6 +129,7 @@ ImplPspFontData::ImplPspFontData(const psp::FastPrintFontInfo& rInfo)
     mnFontId( rInfo.m_nID )
 {}
 
+#ifndef _WIN32
 namespace {
 
 class PspSalLayout : public GenericSalLayout
@@ -153,7 +177,9 @@ void GenPspGraphics::DrawTextLayout(const GenericSalLayout& rLayout)
     int nStart = 0;
     while (rLayout.GetNextGlyph(&pGlyph, aPos, nStart))
         m_pPrinterGfx->DrawGlyph(Point(aPos.getX(), aPos.getY()), *pGlyph);
+    (void)rLayout;
 }
+#endif
 
 FontCharMapRef GenPspGraphics::GetFontCharMap() const
 {
@@ -180,6 +206,7 @@ void GenPspGraphics::SetFont(LogicalFontInstance *pFontInstance, int nFallbackLe
         m_pFreetypeFont[i] = nullptr;
     }
 
+#ifndef _WIN32
     // return early if there is no new font
     if (!pFontInstance)
         return;
@@ -222,14 +249,22 @@ void GenPspGraphics::SetFont(LogicalFontInstance *pFontInstance, int nFallbackLe
                             bArtItalic,
                             bArtBold
                             );
+#else
+    (void)pFontInstance;
+    (void)nFallbackLevel;
+#endif
 }
 
 void GenPspGraphics::SetTextColor( Color nColor )
 {
+#ifndef _WIN32
     psp::PrinterColor aColor (nColor.GetRed(),
                               nColor.GetGreen(),
                               nColor.GetBlue());
     m_pPrinterGfx->SetTextColor (aColor);
+#else
+    (void)nColor;
+#endif
 }
 
 bool GenPspGraphics::AddTempDevFont( vcl::font::PhysicalFontCollection*, const OUString&,const OUString& )
@@ -301,6 +336,7 @@ void GenPspGraphics::GetFontMetric(ImplFontMetricDataRef& rxFontMetric, int nFal
         m_pFreetypeFont[nFallbackLevel]->GetFreetypeFont().GetFontMetric(rxFontMetric);
 }
 
+#ifndef _WIN32
 std::unique_ptr<GenericSalLayout> GenPspGraphics::GetTextLayout(int nFallbackLevel)
 {
     assert(m_pFreetypeFont[nFallbackLevel]);
@@ -308,6 +344,7 @@ std::unique_ptr<GenericSalLayout> GenPspGraphics::GetTextLayout(int nFallbackLev
         return nullptr;
     return std::make_unique<PspSalLayout>(*m_pPrinterGfx, *m_pFreetypeFont[nFallbackLevel]);
 }
+#endif
 
 bool GenPspGraphics::CreateFontSubset(
                                    const OUString& rToFile,
@@ -473,16 +510,51 @@ css::uno::Any GenPspGraphics::GetNativeSurfaceHandle(cairo::SurfaceSharedPtr& /*
 void GenPspGraphics::DoFreeEmbedFontData( const void* pData, tools::Long nLen )
 {
     if( pData )
+#if !defined( _WIN32 )
         munmap( const_cast<void *>(pData), nLen );
+#else
+        (void)nLen;
+        UnmapViewOfFile(pData);
+#endif
 }
 
 const void* GenPspGraphics::DoGetEmbedFontData(psp::fontID aFont, tools::Long* pDataLen)
 {
-
     psp::PrintFontManager& rMgr = psp::PrintFontManager::get();
 
     OString aSysPath = rMgr.getFontFileSysPath( aFont );
+#if defined ( _WIN32 )
+    void *hFile = CreateFileA(aSysPath.getStr(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL, nullptr);
+    if( hFile == INVALID_HANDLE_VALUE )
+    {
+        SAL_WARN("vcl.unx.genpspgraphics", "mmap of '" << aSysPath << "' failed: unable to get handle");
+        return nullptr;
+    }
+    DWORD dwSizeHigh = 0;
+    DWORD dwSizeLow = ::GetFileSize(hFile, &dwSizeHigh);
+    if (dwSizeLow == INVALID_FILE_SIZE) {
+        SAL_WARN("vcl.unx.genpspgraphics", "mmap of '" << aSysPath << "' failed: unable to get file size");
+        CloseHandle(hFile);
+        return nullptr;
+    }
 
+    void *hFileMapping = CreateFileMapping(hFile, nullptr, PAGE_READONLY, dwSizeHigh, dwSizeLow,
+        nullptr);
+    if (hFileMapping == nullptr) {
+        SAL_WARN("vcl.unx.genpspgraphics", "mmap of '" << aSysPath << "' failed: unable to get file mapping");
+        CloseHandle(hFile);
+        return nullptr;
+    }
+    size_t szLen = (dwSizeHigh << sizeof(DWORD)) & dwSizeLow;
+    *pDataLen = szLen;
+    void *pFile = static_cast<void *>(MapViewOfFile(hFile, FILE_MAP_READ, 0, 0, szLen));
+    CloseHandle(hFile);
+
+    if (pFile == nullptr) {
+        SAL_WARN("vcl.unx.genpspgraphics", "mmap of '" << aSysPath << "' failed: " << GetLastError());
+    }
+#else
     int fd = open( aSysPath.getStr(), O_RDONLY );
     if( fd < 0 )
         return nullptr;
@@ -497,6 +569,7 @@ const void* GenPspGraphics::DoGetEmbedFontData(psp::fontID aFont, tools::Long* p
     if( pFile == MAP_FAILED )
         return nullptr;
     *pDataLen = aStat.st_size;
+#endif
 
     return pFile;
 }

@@ -22,6 +22,14 @@ $(eval $(call gb_ExternalProject_register_targets,cairo,\
 	build \
 ))
 
+ifeq ($(COM),MSC)
+$(call gb_ExternalProject_get_state_target,cairo,build) :
+	$(call gb_Trace_StartRange,cairo,EXTERNAL)
+	$(call gb_ExternalProject_run,build,\
+		$(MAKE) -B -f Makefile.win32 cairo "CFG=release" LD="$(shell cygpath $(COMPATH)/bin/Hostx64/x64/link.exe)" \
+	)
+	$(call gb_Trace_EndRange,cairo,EXTERNAL)
+else
 # Including -rtlib=compiler-rt in pixman_LIBS is a BAD HACK:  At least when compiling with Clang
 # -fsanitize=undefined on Linux x86-64, the generated code references __muloti4, which is an
 # extension provided by libclang_rt.builtins-x86_64.a runtime, but not by GCC's libgcc_s.so.1 (which
@@ -65,17 +73,18 @@ $(call gb_ExternalProject_get_state_target,cairo,build) :
 		$(if $(SYSTEM_FREETYPE),,FREETYPE_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,freetype)/include") \
 		$(if $(SYSTEM_FONTCONFIG),,FONTCONFIG_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,fontconfig)") \
 		$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
-		$(if $(filter TRUE,$(DISABLE_DYNLOADING)),--disable-shared,--disable-static) \
+		$(if $(filter WNT,$(OS)),--disable-shared,$(if $(filter TRUE,$(DISABLE_DYNLOADING)),--disable-shared,--disable-static)) \
 		$(if $(filter EMSCRIPTEN ANDROID iOS,$(OS)),--disable-xlib --disable-xcb,$(if $(filter TRUE,$(DISABLE_GUI)),--disable-xlib --disable-xcb,--enable-xlib --enable-xcb)) \
 		$(if $(filter iOS,$(OS)),--enable-quartz --enable-quartz-font) \
 		--disable-valgrind \
 		$(if $(filter iOS,$(OS)),--disable-ft,--enable-ft --enable-fc) \
 		--disable-svg --enable-gtk-doc=no --enable-test-surfaces=no \
-		$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
-		$(if $(filter INTEL ARM,$(CPUNAME)),ac_cv_c_bigendian=no ax_cv_c_float_words_bigendian=no)) \
+		$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+		$(if $(filter INTEL ARM X86_64,$(CPUNAME)),ac_cv_c_bigendian=no ax_cv_c_float_words_bigendian=no) \
 		$(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________OOO) \
 	&& cd src && $(MAKE) \
 	)
 	$(call gb_Trace_EndRange,cairo,EXTERNAL)
+endif
 
 # vim: set noet sw=4 ts=4:

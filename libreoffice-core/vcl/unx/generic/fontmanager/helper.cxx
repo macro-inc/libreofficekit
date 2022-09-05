@@ -29,6 +29,7 @@
 #include <sal/log.hxx>
 #include <tools/urlobj.hxx>
 #include <unx/helper.hxx>
+#include <boost/filesystem/operations.hpp>
 
 #include <tuple>
 
@@ -139,8 +140,11 @@ void psp::getPrinterPathList( std::vector< OUString >& rPathList, const char* pS
         {
             aDir += OString::Concat("/") + pSubDir;
         }
-        struct stat aStat;
-        if( stat( aDir.getStr(), &aStat ) || ! S_ISDIR( aStat.st_mode ) )
+
+        // TODO: switch to OSL checks, see strmunx.cxx:375
+        boost::system::error_code ec;
+        auto status = boost::filesystem::status(aDir.getStr(), ec);
+        if (ec || !boost::filesystem::exists(status) || !boost::filesystem::is_directory(status))
             continue;
 
         rPathList.push_back( OStringToOUString( aDir, aEncoding ) );
@@ -194,14 +198,11 @@ OUString const & psp::getFontPath()
             // replace net share and user paths if the path exists
             OUString sPath = aConfigPath + "/" LIBO_SHARE_FOLDER "/fonts";
             // check existence of config path
-            struct stat aStat;
-            if( 0 != stat( OUStringToOString( sPath, osl_getThreadTextEncoding() ).getStr(), &aStat )
-                || ! S_ISDIR( aStat.st_mode ) )
+            auto status = boost::filesystem::status(OUStringToOString( sPath, osl_getThreadTextEncoding() ).getStr());
+            if (!boost::filesystem::exists(status) || !boost::filesystem::is_directory(status))
                 aConfigPath.clear();
             else
-            {
                 aPathBuffer.append(sPath);
-            }
         }
         if( aConfigPath.isEmpty() )
         {
@@ -225,8 +226,6 @@ OUString const & psp::getFontPath()
 
 void psp::normPath( OString& rPath )
 {
-    char buf[PATH_MAX];
-
     // double slashes and slash at end are probably
     // removed by realpath anyway, but since this runs
     // on many different platforms let's play it safe
@@ -235,15 +234,15 @@ void psp::normPath( OString& rPath )
     if( aPath.endsWith("/") )
         aPath = aPath.copy(0, aPath.getLength()-1);
 
-    if( ( aPath.indexOf("./") != -1 ||
-          aPath.indexOf( '~' ) != -1 )
-        && realpath( aPath.getStr(), buf ) )
+    boost::system::error_code ec;
+    auto boostPath = boost::filesystem::system_complete(boost::filesystem::path(aPath.getStr()), ec);
+    if (ec)
     {
-        rPath = buf;
+        rPath = aPath;
     }
     else
     {
-        rPath = aPath;
+        rPath = OString(boostPath.string().c_str());
     }
 }
 

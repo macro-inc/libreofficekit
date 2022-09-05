@@ -24,6 +24,7 @@
  *
  */
 
+#include "sal/types.h"
 #include <assert.h>
 
 #include <stdlib.h>
@@ -33,6 +34,11 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#endif
+#ifdef _WIN32
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+# include <io.h>
 #endif
 #include <sft.hxx>
 #include <impfontcharmap.hxx>
@@ -1135,13 +1141,20 @@ int CountTTCFonts(const char* fname)
     return nFonts;
 }
 
-#if !defined(_WIN32)
 SFErrCodes OpenTTFontFile(const char* fname, sal_uInt32 facenum, TrueTypeFont** ttf,
                           const FontCharMapRef xCharMap)
 {
     SFErrCodes ret;
     int fd = -1;
+#ifdef _WIN32
+    struct _stat64 st;
+    HANDLE hFile;
+    DWORD dwSizeLow;
+    DWORD dwSizeHigh;
+    void *hFileMapping;
+#else
     struct stat st;
+#endif
 
     if (!fname || !*fname) return SFErrCodes::BadFile;
 
@@ -1155,14 +1168,22 @@ SFErrCodes OpenTTFontFile(const char* fname, sal_uInt32 facenum, TrueTypeFont** 
         goto cleanup;
     }
 
+#ifdef _WIN32
+    fd = _open(fname, _O_RDONLY);
+#else
     fd = open(fname, O_RDONLY);
+#endif
 
     if (fd == -1) {
         ret = SFErrCodes::BadFile;
         goto cleanup;
     }
 
+#ifdef _WIN32
+    if (_fstat64(fd, &st) == -1) {
+#else
     if (fstat(fd, &st) == -1) {
+#endif
         ret = SFErrCodes::FileIo;
         goto cleanup;
     }
@@ -1178,15 +1199,32 @@ SFErrCodes OpenTTFontFile(const char* fname, sal_uInt32 facenum, TrueTypeFont** 
         goto cleanup;
     }
 
+#ifdef _WIN32
+    hFile = reinterpret_cast<HANDLE>(_get_osfhandle(fd));
+    dwSizeLow = st.st_size & 0xFFFFFFFFL;
+    dwSizeHigh = (st.st_size >> 32) & 0xFFFFFFFFL;
+    hFileMapping = CreateFileMapping(hFile, nullptr, PAGE_READONLY,
+        dwSizeHigh, dwSizeLow, nullptr);
+    if (hFileMapping == nullptr) {
+        ret = SFErrCodes::Memory;
+        goto cleanup;
+    }
+    (*ttf)->ptr = static_cast<sal_uInt8 *>(hFileMapping);
+#else
     if (((*ttf)->ptr = static_cast<sal_uInt8 *>(mmap(nullptr, (*ttf)->fsize, PROT_READ, MAP_SHARED, fd, 0))) == MAP_FAILED) {
         ret = SFErrCodes::Memory;
         goto cleanup;
     }
+#endif
 
     ret = (*ttf)->open(facenum);
 
 cleanup:
+#ifdef _WIN32
+    if (fd != -1) _close(fd);
+#else
     if (fd != -1) close(fd);
+#endif
     if (ret != SFErrCodes::Ok)
     {
         delete *ttf;
@@ -1194,7 +1232,6 @@ cleanup:
     }
     return ret;
 }
-#endif
 
 SFErrCodes OpenTTFontBuffer(const void* pBuffer, sal_uInt32 nLen, sal_uInt32 facenum, TrueTypeFont** ttf,
                             const FontCharMapRef xCharMap)
@@ -1258,7 +1295,10 @@ TrueTypeFont::TrueTypeFont(const char* pFileName, const FontCharMapRef xCharMap)
 
 TrueTypeFont::~TrueTypeFont()
 {
-#if !defined(_WIN32)
+#if defined(_WIN32)
+    if (!fileName().empty())
+        UnmapViewOfFile(ptr);
+#else
     if (!fileName().empty())
         munmap(ptr, fsize);
 #endif

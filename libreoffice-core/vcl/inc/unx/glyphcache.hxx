@@ -22,6 +22,7 @@
 #include <sal/config.h>
 
 #include <memory>
+#include <unordered_map>
 #include <freetype/config/ftheader.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -35,8 +36,6 @@
 #include <fontattributes.hxx>
 #include <fontinstance.hxx>
 #include <impfontmetricdata.hxx>
-
-#include <unordered_map>
 
 class FreetypeFont;
 class FreetypeFontFile;
@@ -102,7 +101,13 @@ private:
     FreetypeFontFile* FindFontFile(const OString& rNativeFileName);
 
     typedef std::unordered_map<sal_IntPtr, std::shared_ptr<FreetypeFontInfo>> FontInfoList;
+#ifdef _MSC_VER
+    typedef std::unique_ptr<FreetypeFontFile> FreetypeFontFilePtr;
+    std::unique_ptr<FreetypeFontFile> _stub; // workaround to build on MSVC, https://stackoverflow.com/a/59496238
+    typedef std::unordered_map<const char*, FreetypeFontFilePtr, rtl::CStringHash, rtl::CStringEqual> FontFileList;
+#else
     typedef std::unordered_map<const char*, std::unique_ptr<FreetypeFontFile>, rtl::CStringHash, rtl::CStringEqual> FontFileList;
+#endif
 
     FontInfoList            m_aFontInfoList;
     sal_IntPtr              m_nMaxFontId;

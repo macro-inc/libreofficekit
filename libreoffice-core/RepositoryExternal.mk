@@ -1295,7 +1295,7 @@ endef
 
 else # !SYSTEM_CAIRO
 
-ifneq ($(filter-out MACOSX WNT,$(OS)),)
+ifneq ($(filter-out MACOSX,$(OS)),)
 
 $(eval $(call gb_Helper_register_packages_for_install,ooo,\
 	cairo \
@@ -1312,10 +1312,18 @@ $(call gb_LinkTarget_set_include,$(1),\
 	-I$(call gb_UnpackedTarball_get_dir,pixman)/pixman \
 	$$(INCLUDE) \
 )
+
+ifeq ($(OS),WNT)
+$(call gb_LinkTarget_add_libs,$(1),\
+    $(call gb_UnpackedTarball_get_dir,cairo)/src/release/cairo.lib \
+    $(call gb_UnpackedTarball_get_dir,pixman)/pixman/release/pixman-1.lib \
+)
+else
 $(call gb_LinkTarget_add_libs,$(1),\
 	-L$(call gb_UnpackedTarball_get_dir,cairo)/src/.libs -lcairo \
 		-L$(call gb_UnpackedTarball_get_dir,pixman)/pixman/.libs -lpixman-1 \
 )
+endif
 
 endef
 
@@ -1355,8 +1363,13 @@ endif # SYSTEM_FREETYPE
 
 define gb_LinkTarget__use_freetype
 $(call gb_LinkTarget_use_external,$(1),freetype_headers)
+ifeq ($(OS),WNT)
+$(call gb_LinkTarget_add_libs,$(1),\
+    $(call gb_UnpackedTarball_get_dir,freetype)/instdir/lib/freetype.lib \
+)
+else
 $(call gb_LinkTarget_add_libs,$(1),$(FREETYPE_LIBS))
-
+endif
 endef
 
 ifneq ($(SYSTEM_FONTCONFIG),)
@@ -1382,9 +1395,15 @@ $(call gb_LinkTarget_set_include,$(1),\
 	$$(INCLUDE) \
 )
 
+ifeq ($(OS),WNT)
+$(call gb_LinkTarget_add_libs,$(1),\
+    $(call gb_UnpackedTarball_get_dir,fontconfig)/src/.libs/fontconfig.lib \
+)
+else
 $(call gb_LinkTarget_add_libs,$(1),\
     -L$(call gb_UnpackedTarball_get_dir,fontconfig)/src/.libs -lfontconfig \
 )
+endif
 
 endef
 
@@ -3988,7 +4007,9 @@ $(call gb_Executable_add_runtime_dependencies,gengal,\
 	$(call gb_Library_get_target_for_build,$(CPPU_ENV_FOR_BUILD)_uno) \
 	$(call gb_Library_get_target_for_build,localedata_en) \
 	$(if $(filter MACOSX,$(OS_FOR_BUILD)),$(call gb_Library_get_target_for_build,vclplug_osx)) \
+	$(if $(DISABLE_GUI),, \
 	$(if $(filter WNT,$(OS_FOR_BUILD)),$(call gb_Library_get_target_for_build,vclplug_win)) \
+	) \
 	$(if $(filter host,$(gb_Side)),$(call gb_Package_get_target,postprocess_images)) \
 	$(call gb_Package_get_target_for_build,postprocess_registry) \
 	$(INSTROOT_FOR_BUILD)/$(LIBO_URE_ETC_FOLDER)/$(call gb_Helper_get_rcfile,uno) \

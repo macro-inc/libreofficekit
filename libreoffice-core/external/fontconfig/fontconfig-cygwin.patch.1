@@ -1,0 +1,40 @@
+# gperf will complain about junk characters if CRLF is not transformed into LF, cygwin changes the line endings of < files to CRLF
+diff -ur fontconfig.org/src/Makefile.am fontconfig/src/Makefile.am
+--- fontconfig.org/src/Makefile.am	2022-08-23 20:38:52.724145800 +0800
++++ fontconfig/src/Makefile.am	2022-08-24 00:21:52.566825400 +0800
+@@ -109,7 +109,7 @@
+ 	@$(MAKE) stamp-fcobjshash.gperf
+ 	@touch -r stamp-fcobjshash.gperf $@
+ stamp-fcobjshash.gperf: fcobjshash.gperf.h fcobjs.h
+-	$(AM_V_GEN) $(CPP) -I$(top_srcdir) $(CPPFLAGS) $< | \
++	$(AM_V_GEN) $(CPP) -I$(top_srcdir) $(CPPFLAGS) $< | tr -d '\15\32' | \
+ 	$(SED) 's/^ *//;s/ *, */,/' | \
+ 	awk ' \
+ 		/CUT_OUT_BEGIN/ { no_write=1; next; }; \
+diff -ur fontconfig.org/src/Makefile.in fontconfig/src/Makefile.in
+--- fontconfig.org/src/Makefile.in	2022-08-23 20:38:52.732646300 +0800
++++ fontconfig/src/Makefile.in	2022-08-24 00:21:50.522826700 +0800
+@@ -1015,7 +1015,7 @@
+ 	@$(MAKE) stamp-fcobjshash.gperf
+ 	@touch -r stamp-fcobjshash.gperf $@
+ stamp-fcobjshash.gperf: fcobjshash.gperf.h fcobjs.h
+-	$(AM_V_GEN) $(CPP) -I$(top_srcdir) $(CPPFLAGS) $< | \
++	$(AM_V_GEN) $(CPP) -I$(top_srcdir) $(CPPFLAGS) $< | tr -d '\15\32' | \
+ 	$(SED) 's/^ *//;s/ *, */,/' | \
+ 	awk ' \
+ 		/CUT_OUT_BEGIN/ { no_write=1; next; }; \
+
+# For some unknown reason, the wrong archive command is used _only_ when CL is available under cygwin but now with MSVC directly
+diff -ur fontconfig.org/configure fontconfig/configure
+--- fontconfig.org/configure	2022-08-26 17:48:38.842506000 +0800
++++ fontconfig/configure	2022-08-26 23:46:04.289132000 +0800
+@@ -11161,6 +11161,9 @@
+           linknames='
+ 	# The linker will not automatically build a static lib if we build a DLL.
+ 	# _LT_TAGVAR(old_archive_from_new_cmds, )='true'
++	old_archive_from_new_cmds='true'
++	# FIXME: Should let the user specify the lib program.
++	old_archive_cmds='lib -OUT:$oldlib$oldobjs$old_deplibs'
+ 	enable_shared_with_static_runtimes=yes
+ 	exclude_expsyms='_NULL_IMPORT_DESCRIPTOR|_IMPORT_DESCRIPTOR_.*'
+ 	export_symbols_cmds='$NM $libobjs $convenience | $global_symbol_pipe | $SED -e '\''/^[BCDGRS][ ]/s/.*[ ]\([^ ]*\)/\1,DATA/'\'' | $SED -e '\''/^[AITW][ ]/s/.*[ ]//'\'' | sort | uniq > $export_symbols'

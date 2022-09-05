@@ -15,8 +15,10 @@ $(eval $(call gb_UnpackedTarball_update_autoconf_configs,expat,conftools))
 
 $(eval $(call gb_UnpackedTarball_add_patches,expat,\
 	external/expat/expat-winapi.patch \
+	$(if $(filter WNT,$(OS)),external/expat/expat-msvc.patch) \
 ))
 
+ifneq ($(OS),WNT)
 # This is a bit hackish.
 
 # When building for Windows (as 32-bit) we need to build it twice: as
@@ -30,5 +32,6 @@ $(eval $(call gb_UnpackedTarball_set_post_action,expat,\
 	  cp lib/xmltok.c lib/xmltok_x64.c     && \
 	  cp lib/xmlrole.c lib/xmlrole_x64.c) \
 ))
+endif
 
 # vim: set noet sw=4 ts=4:

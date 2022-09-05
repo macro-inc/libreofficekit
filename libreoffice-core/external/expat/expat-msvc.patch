@@ -1,0 +1,286 @@
+# Generated using:
+# cmake -D EXPAT_SHARED_LIBS=OFF -D EXPAT_MSVC_STATIC_CRT=ON -D EXPAT_BUILD_EXAMPLES=OFF -D EXPAT_BUILD_TESTS=OFF -D EXPAT_BUILD_TOOLS=OFF -D EXPAT_ENABLE_INSTALL=OFF -D CMAKE_CONFIGURATION_TYPES=Release -D CMAKE_SUPPRESS_REGENERATION=1 ..
+# and then all absolute paths were changed to SolutionDir relative paths and all extraneous files removed
+diff -urN expat.org/build/expat.sln expat/build/expat.sln
+--- expat.org/build/expat.sln	1970-01-01 08:00:00.000000000 +0800
++++ expat/build/expat.sln	2022-08-22 05:22:03.704030100 +0800
+@@ -0,0 +1,21 @@
++﻿
++Microsoft Visual Studio Solution File, Format Version 12.00
++# Visual Studio Version 16
++Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "expat", "expat.vcxproj", "{F4D824DF-DF1A-3B6D-8477-FD70296FDD65}"
++	ProjectSection(ProjectDependencies) = postProject
++	EndProjectSection
++EndProject
++Global
++	GlobalSection(SolutionConfigurationPlatforms) = preSolution
++		Release|x64 = Release|x64
++	EndGlobalSection
++	GlobalSection(ProjectConfigurationPlatforms) = postSolution
++		{F4D824DF-DF1A-3B6D-8477-FD70296FDD65}.Release|x64.ActiveCfg = Release|x64
++		{F4D824DF-DF1A-3B6D-8477-FD70296FDD65}.Release|x64.Build.0 = Release|x64
++	EndGlobalSection
++	GlobalSection(ExtensibilityGlobals) = postSolution
++		SolutionGuid = {C088EE57-2837-3B57-81E5-D7F492098C6F}
++	EndGlobalSection
++	GlobalSection(ExtensibilityAddIns) = postSolution
++	EndGlobalSection
++EndGlobal
+diff -urN expat.org/build/expat.vcxproj expat/build/expat.vcxproj
+--- expat.org/build/expat.vcxproj	1970-01-01 08:00:00.000000000 +0800
++++ expat/build/expat.vcxproj	2022-08-22 05:10:38.124530200 +0800
+@@ -0,0 +1,84 @@
++﻿<?xml version="1.0" encoding="utf-8"?>
++<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++  <PropertyGroup>
++    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
++  </PropertyGroup>
++  <ItemGroup Label="ProjectConfigurations">
++    <ProjectConfiguration Include="Release|x64">
++      <Configuration>Release</Configuration>
++      <Platform>x64</Platform>
++    </ProjectConfiguration>
++  </ItemGroup>
++  <PropertyGroup Label="Globals">
++    <ProjectGuid>{F4D824DF-DF1A-3B6D-8477-FD70296FDD65}</ProjectGuid>
++    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
++    <Keyword>Win32Proj</Keyword>
++    <Platform>x64</Platform>
++    <ProjectName>expat</ProjectName>
++    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
++  </PropertyGroup>
++  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
++    <ConfigurationType>StaticLibrary</ConfigurationType>
++    <CharacterSet>MultiByte</CharacterSet>
++    <PlatformToolset>v142</PlatformToolset>
++  </PropertyGroup>
++  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
++  <ImportGroup Label="ExtensionSettings">
++  </ImportGroup>
++  <ImportGroup Label="PropertySheets">
++    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
++  </ImportGroup>
++  <PropertyGroup Label="UserMacros" />
++  <PropertyGroup>
++    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\Release\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">expat.dir\Release\</IntDir>
++    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">expat</TargetName>
++    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
++  </PropertyGroup>
++  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
++    <ClCompile>
++      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
++      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
++      <ExceptionHandling>
++      </ExceptionHandling>
++      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
++      <Optimization>MaxSpeed</Optimization>
++      <PrecompiledHeader>NotUsing</PrecompiledHeader>
++      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
++      <UseFullPaths>false</UseFullPaths>
++      <WarningLevel>Level3</WarningLevel>
++      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;XML_STATIC;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <ObjectFileName>$(IntDir)</ObjectFileName>
++      <DebugInformationFormat>
++      </DebugInformationFormat>
++    </ClCompile>
++    <ResourceCompile>
++      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;XML_STATIC;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
++      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++    </ResourceCompile>
++    <Midl>
++      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\lib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
++      <HeaderFileName>%(Filename).h</HeaderFileName>
++      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
++      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
++      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
++    </Midl>
++    <Lib>
++      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
++    </Lib>
++  </ItemDefinitionGroup>
++  <ItemGroup>
++    <ClCompile Include="$(SolutionDir)\lib\xmlparse.c" />
++    <ClCompile Include="$(SolutionDir)\lib\xmlrole.c" />
++    <ClCompile Include="$(SolutionDir)\lib\xmltok.c" />
++  </ItemGroup>
++  <ItemGroup>
++  </ItemGroup>
++  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
++  <ImportGroup Label="ExtensionTargets">
++  </ImportGroup>
++</Project>
+\ No newline at end of file
+diff -urN expat.org/build/expat.vcxproj.filters expat/build/expat.vcxproj.filters
+--- expat.org/build/expat.vcxproj.filters	1970-01-01 08:00:00.000000000 +0800
++++ expat/build/expat.vcxproj.filters	2022-08-22 05:05:48.843028300 +0800
+@@ -0,0 +1,19 @@
++﻿<?xml version="1.0" encoding="utf-8"?>
++<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
++  <ItemGroup>
++    <ClCompile Include="$(SolutionDir)\lib\xmlparse.c">
++      <Filter>Source Files</Filter>
++    </ClCompile>
++    <ClCompile Include="$(SolutionDir)\lib\xmlrole.c">
++      <Filter>Source Files</Filter>
++    </ClCompile>
++    <ClCompile Include="$(SolutionDir)\lib\xmltok.c">
++      <Filter>Source Files</Filter>
++    </ClCompile>
++  </ItemGroup>
++  <ItemGroup>
++    <Filter Include="Source Files">
++      <UniqueIdentifier>{DA2EBEDD-634B-356D-9234-FDC06DE071B9}</UniqueIdentifier>
++    </Filter>
++  </ItemGroup>
++</Project>
+diff -urN expat.org/build/expat_config.h expat/build/expat_config.h
+--- expat.org/build/expat_config.h	1970-01-01 08:00:00.000000000 +0800
++++ expat/build/expat_config.h	2022-08-22 05:03:03.013026500 +0800
+@@ -14,58 +10,52 @@
+ /* #undef HAVE_ARC4RANDOM_BUF */
+
+ /* Define to 1 if you have the <dlfcn.h> header file. */
+-#define HAVE_DLFCN_H 1
++/* #undef HAVE_DLFCN_H */
+
+ /* Define to 1 if you have the <fcntl.h> header file. */
+-#define HAVE_FCNTL_H 1
++#define HAVE_FCNTL_H
+
+ /* Define to 1 if you have the `getpagesize' function. */
+-#define HAVE_GETPAGESIZE 1
++/* #undef HAVE_GETPAGESIZE */
+
+ /* Define to 1 if you have the `getrandom' function. */
+-#define HAVE_GETRANDOM 1
++/* #undef HAVE_GETRANDOM */
+
+ /* Define to 1 if you have the <inttypes.h> header file. */
+-#define HAVE_INTTYPES_H 1
++#define HAVE_INTTYPES_H
+
+ /* Define to 1 if you have the `bsd' library (-lbsd). */
+ /* #undef HAVE_LIBBSD */
+
++/* Define to 1 if you have the <memory.h> header file. */
++#define HAVE_MEMORY_H
++
+ /* Define to 1 if you have a working `mmap' system call. */
+-#define HAVE_MMAP 1
++/* #undef HAVE_MMAP */
+
+ /* Define to 1 if you have the <stdint.h> header file. */
+-#define HAVE_STDINT_H 1
+-
+-/* Define to 1 if you have the <stdio.h> header file. */
+-#define HAVE_STDIO_H 1
++#define HAVE_STDINT_H
+
+ /* Define to 1 if you have the <stdlib.h> header file. */
+-#define HAVE_STDLIB_H 1
++#define HAVE_STDLIB_H
+
+ /* Define to 1 if you have the <strings.h> header file. */
+-#define HAVE_STRINGS_H 1
++/* #undef HAVE_STRINGS_H */
+
+ /* Define to 1 if you have the <string.h> header file. */
+-#define HAVE_STRING_H 1
++#define HAVE_STRING_H
+
+ /* Define to 1 if you have `syscall' and `SYS_getrandom'. */
+-#define HAVE_SYSCALL_GETRANDOM 1
+-
+-/* Define to 1 if you have the <sys/param.h> header file. */
+-#define HAVE_SYS_PARAM_H 1
++/* #undef HAVE_SYSCALL_GETRANDOM */
+
+ /* Define to 1 if you have the <sys/stat.h> header file. */
+-#define HAVE_SYS_STAT_H 1
++#define HAVE_SYS_STAT_H
+
+ /* Define to 1 if you have the <sys/types.h> header file. */
+-#define HAVE_SYS_TYPES_H 1
++#define HAVE_SYS_TYPES_H
+
+ /* Define to 1 if you have the <unistd.h> header file. */
+-#define HAVE_UNISTD_H 1
+-
+-/* Define to the sub-directory where libtool stores uninstalled libraries. */
+-#define LT_OBJDIR ".libs/"
++/* #undef HAVE_UNISTD_H */
+
+ /* Name of package */
+ #define PACKAGE "expat"
+@@ -88,48 +78,38 @@
+ /* Define to the version of this package. */
+ #define PACKAGE_VERSION "2.4.8"
+
+-/* Define to 1 if all of the C90 standard headers exist (not just the ones
+-   required in a freestanding environment). This macro is provided for
+-   backward compatibility; new code need not use it. */
+-#define STDC_HEADERS 1
+-
+-/* Version number of package */
+-#define VERSION "2.4.8"
+-
+-/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+-   significant byte first (like Motorola and SPARC, unlike Intel). */
+-#if defined AC_APPLE_UNIVERSAL_BUILD
+-# if defined __BIG_ENDIAN__
+-#  define WORDS_BIGENDIAN 1
+-# endif
+-#else
+-# ifndef WORDS_BIGENDIAN
+-/* #  undef WORDS_BIGENDIAN */
+-# endif
+-#endif
++/* Define to 1 if you have the ANSI C header files. */
++#define STDC_HEADERS
++
++/* whether byteorder is bigendian */
++/* #undef WORDS_BIGENDIAN */
+
+ /* Define to allow retrieving the byte offsets for attribute names and values.
+-   */
++ */
+ /* #undef XML_ATTR_INFO */
+
+ /* Define to specify how much context to retain around the current parse
+    point. */
+ #define XML_CONTEXT_BYTES 1024
+
++#if ! defined(_WIN32)
+ /* Define to include code reading entropy from `/dev/urandom'. */
+-#define XML_DEV_URANDOM 1
++/* #undef XML_DEV_URANDOM */
++#endif
+
+ /* Define to make parameter entity parsing functionality available. */
+-#define XML_DTD 1
++#define XML_DTD
+
+ /* Define to make XML Namespaces functionality available. */
+-#define XML_NS 1
++#define XML_NS
+
+-/* Define to empty if `const' does not conform to ANSI C. */
+-/* #undef const */
++/* Define to __FUNCTION__ or "" if `__func__' does not conform to ANSI C. */
++#ifdef _MSC_VER
++#  define __func__ __FUNCTION__
++#endif
+
+-/* Define to `long int' if <sys/types.h> does not define. */
++/* Define to `long' if <sys/types.h> does not define. */
+ /* #undef off_t */
+
+-/* Define to `unsigned int' if <sys/types.h> does not define. */
+-/* #undef size_t */
++/* Define to `unsigned' if <sys/types.h> does not define. */
++/* #undef size_t */

@@ -28,7 +28,7 @@ MERGE_LIBRARY_LIST := \
 	deploymentmisc \
 	$(if $(filter-out MACOSX WNT,$(OS)),desktopbe1) \
 	$(if $(USING_X11),desktop_detector) \
-	$(if $(filter WNT,$(OS)),directx9canvas) \
+	$(if $(DISABLE_GUI),,$(if $(filter WNT,$(OS)),directx9canvas)) \
 	drawinglayer \
 	editeng \
 	emfio \
@@ -41,9 +41,9 @@ MERGE_LIBRARY_LIST := \
 	frm \
 	fsstorage \
 	fwk \
-	$(if $(filter WNT,$(OS)),gdipluscanvas) \
+	$(if $(DISABLE_GUI),,$(if $(filter WNT,$(OS)),gdipluscanvas)) \
 	guesslang \
-	$(call gb_Helper_optional,DESKTOP,helplinker) \
+    $(call gb_Helper_optionals_or,HELPTOOLS XMLHELP,helplinker) \
 	hyphen \
 	i18nsearch \
 	i18npool \

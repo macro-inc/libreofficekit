@@ -49,7 +49,14 @@
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <comphelper/lok.hxx>
 #include <unx/gendata.hxx>
-#include <dlfcn.h>
+
+
+#ifdef _WIN32
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+#else
+# include <dlfcn.h>
+#endif
 
 #if ENABLE_CAIRO_CANVAS
 #   if defined CAIRO_VERSION && CAIRO_VERSION < CAIRO_VERSION_ENCODE(1, 10, 0)
@@ -2698,12 +2705,16 @@ void dl_cairo_surface_set_device_scale(cairo_surface_t *surface, double x_scale,
 {
 #ifdef ANDROID
     cairo_surface_set_device_scale(surface, x_scale, y_scale);
+#elif defined( _WIN32 )
+    HMODULE mod = GetModuleHandle(nullptr);
+    static auto func = reinterpret_cast<void(*)(cairo_surface_t*, double, double)>(
+        GetProcAddress(mod, "cairo_surface_set_device_scale"));
 #else
     static auto func = reinterpret_cast<void(*)(cairo_surface_t*, double, double)>(
         dlsym(nullptr, "cairo_surface_set_device_scale"));
+#endif
     if (func)
         func(surface, x_scale, y_scale);
-#endif
 }
 
 void dl_cairo_surface_get_device_scale(cairo_surface_t *surface, double* x_scale, double* y_scale)
@@ -2711,8 +2722,14 @@ void dl_cairo_surface_get_device_scale(cairo_surface_t *surface, double* x_scale
 #ifdef ANDROID
     cairo_surface_get_device_scale(surface, x_scale, y_scale);
 #else
+# if defined( _WIN32 )
+    HMODULE mod = GetModuleHandle(nullptr);
+    static auto func = reinterpret_cast<void(*)(cairo_surface_t*, double*, double*)>(
+        GetProcAddress(mod, "cairo_surface_get_device_scale"));
+# else
     static auto func = reinterpret_cast<void(*)(cairo_surface_t*, double*, double*)>(
         dlsym(nullptr, "cairo_surface_get_device_scale"));
+# endif
     if (func)
         func(surface, x_scale, y_scale);
     else

@@ -13,6 +13,19 @@ $(eval $(call gb_ExternalProject_register_targets,freetype,\
 	build \
 ))
 
+ifeq ($(OS),WNT)
+$(call gb_ExternalProject_get_state_target,freetype,build) :
+	$(call gb_Trace_StartRange,freetype,EXTERNAL)
+	$(call gb_ExternalProject_run,build,\
+		'$(DEVENV)' "builds/windows/vc2010/freetype.sln" -upgrade && \
+		unset UCRTVersion && \
+		sed -i 's/MultiThreaded</MultiThreadedDLL</g' builds/windows/vc2010/freetype.vcxproj && \
+		'$(DEVENV)' "builds/windows/vc2010/freetype.sln" -build "Release Static|x64" && \
+		mkdir -p "$(call gb_UnpackedTarball_get_dir,freetype/instdir/lib)" && \
+		cp -rf "objs/x64/Release Static/freetype.lib" "$(call gb_UnpackedTarball_get_dir,freetype/instdir/lib)" && \
+		touch $@ )
+	$(call gb_Trace_EndRange,freetype,EXTERNAL)
+else # !WINDOWS
 $(call gb_ExternalProject_get_state_target,freetype,build) :
 	$(call gb_Trace_StartRange,freetype,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
@@ -28,5 +41,6 @@ $(call gb_ExternalProject_get_state_target,freetype,build) :
 		&& $(MAKE) install \
 		&& touch $@	)
 	$(call gb_Trace_EndRange,freetype,EXTERNAL)
+endif
 
 # vim: set noet sw=4 ts=4:

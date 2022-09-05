@@ -1,0 +1,57 @@
+diff -ur cairo.org/build/Makefile.win32.common cairo/build/Makefile.win32.common
+--- cairo.org/build/Makefile.win32.common	2020-11-27 07:20:59.000000000 +0800
++++ cairo/build/Makefile.win32.common	2022-08-26 16:22:00.434078100 +0800
+@@ -23,20 +23,22 @@
+ CFG_LDFLAGS :=
+ endif
+
++STATIC_LIB_PATH = $(top_builddir)/../../LinkTarget/StaticLibrary
++
+ ifeq ($(PIXMAN_PATH),)
+ PIXMAN_PATH := $(top_builddir)/../pixman
+ endif
+ PIXMAN_CFLAGS := -I$(PIXMAN_PATH)/pixman/
+ PIXMAN_LIBS := $(PIXMAN_PATH)/pixman/$(CFG)/pixman-1.lib
+
+-CAIRO_LIBS =  gdi32.lib msimg32.lib user32.lib
++CAIRO_LIBS =  gdi32.lib msimg32.lib user32.lib $(top_builddir)/../freetype/instdir/lib/freetype.lib $(top_builddir)/../fontconfig/src/.libs/fontconfig.lib $(top_builddir)/../../LinkTarget/StaticLibrary/expat.lib
+
+ ifeq ($(CAIRO_HAS_PNG_FUNCTIONS),1)
+ ifeq ($(LIBPNG_PATH),)
+ LIBPNG_PATH := $(top_builddir)/../libpng
+ endif
+ LIBPNG_CFLAGS += -I$(LIBPNG_PATH)/
+-CAIRO_LIBS +=  $(LIBPNG_PATH)/libpng.lib
++CAIRO_LIBS +=  $(STATIC_LIB_PATH)/libpng.lib
+ endif
+
+ ifeq ($(CAIRO_HAS_PS_SURFACE)$(CAIRO_HAS_PDF_SURFACE),00)
+@@ -45,12 +47,12 @@
+ ZLIB_PATH := $(top_builddir)/../zlib
+ endif
+ ZLIB_CFLAGS += -I$(ZLIB_PATH)/
+-CAIRO_LIBS += $(ZLIB_PATH)/zdll.lib
++CAIRO_LIBS += $(STATIC_LIB_PATH)/zlib.lib
+ endif
+
+ DEFAULT_CFLAGS = -nologo $(CFG_CFLAGS)
+ DEFAULT_CFLAGS += -I. -I$(top_srcdir) -I$(top_srcdir)/src
+-DEFAULT_CFLAGS += $(PIXMAN_CFLAGS) $(LIBPNG_CFLAGS) $(ZLIB_CFLAGS)
++DEFAULT_CFLAGS += $(PIXMAN_CFLAGS) $(LIBPNG_CFLAGS) $(ZLIB_CFLAGS) -I$(top_builddir)/../freetype/include -I$(top_builddir)/../fontconfig
+
+ CAIRO_CFLAGS = $(DEFAULT_CFLAGS) $(CFLAGS)
+
+diff -ur cairo.org/build/Makefile.win32.features cairo/build/Makefile.win32.features
+--- cairo.org/build/Makefile.win32.features	2020-11-27 07:20:59.000000000 +0800
++++ cairo/build/Makefile.win32.features	2022-08-26 16:23:51.808458300 +0800
+@@ -26,8 +26,8 @@
+ CAIRO_HAS_GLX_FUNCTIONS=0
+ CAIRO_HAS_WGL_FUNCTIONS=0
+ CAIRO_HAS_SCRIPT_SURFACE=1
+-CAIRO_HAS_FT_FONT=0
+-CAIRO_HAS_FC_FONT=0
++CAIRO_HAS_FT_FONT=1
++CAIRO_HAS_FC_FONT=1
+ CAIRO_HAS_PS_SURFACE=1
+ CAIRO_HAS_PDF_SURFACE=1
+ CAIRO_HAS_SVG_SURFACE=0

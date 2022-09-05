@@ -26,11 +26,23 @@
 #include <saltimer.hxx>
 #include <salusereventlist.hxx>
 #include <unx/geninst.h>
+#if defined(_WIN32)
 #include <unx/genprn.h>
+#endif
 
 #include <condition_variable>
 
-#include <sys/time.h>
+#if defined(_WIN32)
+#include <chrono>
+// timeval conflicts with the winsock.h implementation, so _timeval is used in its place
+typedef struct _timeval {
+    long tv_sec;
+    long tv_usec;
+} _timeval;
+
+#else // !_WIN32
+# include <sys/time.h>
+#endif
 
 #define VIRTUAL_DESKTOP_WIDTH 1024
 #define VIRTUAL_DESKTOP_HEIGHT 768
@@ -95,7 +107,11 @@ SalInstance* svp_create_SalInstance();
 // (Wakeup is only called by SvpSalTimer and SvpSalFrame)
 class VCL_DLLPUBLIC SvpSalInstance : public SalGenericInstance, public SalUserEventList
 {
+#ifdef _WIN32
+    _timeval                m_aTimeout;
+#else
     timeval                 m_aTimeout;
+#endif
     sal_uLong               m_nTimeoutMS;
     oslThreadIdentifier     m_MainThread;
 
@@ -171,7 +187,9 @@ public:
 
     virtual void            AddToRecentDocumentList(const OUString& rFileUrl, const OUString& rMimeType, const OUString& rDocumentService) override;
 
+#if ! defined(_WIN32)
     virtual std::unique_ptr<GenPspGraphics> CreatePrintGraphics() override;
+#endif
 
     virtual const cairo_font_options_t* GetCairoFontOptions() override;
 };
@@ -186,7 +204,7 @@ inline void SvpSalInstance::deregisterFrame( SalFrame* pFrame )
     eraseFrame( pFrame );
 }
 
-VCL_DLLPUBLIC cairo_surface_t* get_underlying_cairo_surface(const VirtualDevice& rDevice);
+cairo_surface_t* get_underlying_cairo_surface(const VirtualDevice&);
 
 #endif // INCLUDED_VCL_INC_HEADLESS_SVPINST_HXX
 

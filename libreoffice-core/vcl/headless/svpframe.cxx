@@ -58,9 +58,11 @@ SvpSalFrame::SvpSalFrame( SvpSalInstance* pInstance,
     // SAL_DEBUG("SvpSalFrame::SvpSalFrame: " << this);
 #ifdef IOS
     // Nothing
-#elif defined ANDROID
+#elif defined( ANDROID )
     // Nothing
-#else
+#elif defined( _WIN32 )
+    // NOTHING
+#elif defined( UNX )
     m_aSystemChildData.pSalFrame    = this;
 #endif
 

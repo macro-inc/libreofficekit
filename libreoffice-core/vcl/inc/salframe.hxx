@@ -308,7 +308,7 @@ public:
         { return m_pProc && m_pProc( m_pWindow, nEvent, pEvent ); }
 };
 
-#ifdef _WIN32
+#if defined( _WIN32 ) && !defined( HEADLESS_VCLPLUG )
 bool HasAtHook();
 #endif
 

@@ -45,10 +45,12 @@ class ImplFontMetricData;
 
 class VCL_DLLPUBLIC GenPspGraphics final : public SalGraphicsAutoDelegateToImpl
 {
+#ifndef _WIN32
     std::unique_ptr<GenPspGfxBackend> m_pBackend;
 
     psp::JobData*           m_pJobData;
     psp::PrinterGfx*        m_pPrinterGfx;
+#endif
 
     rtl::Reference<FreetypeFontInstance>
                             m_pFreetypeFont[ MAX_FALLBACK ];
@@ -72,11 +74,13 @@ public:
     static void             AnnounceFonts( vcl::font::PhysicalFontCollection*,
                                            const psp::FastPrintFontInfo& );
 
+#ifndef _WIN32
     // override all pure virtual methods
     virtual SalGraphicsImpl* GetImpl() const override
     {
         return m_pBackend.get();
     }
+#endif
 
     virtual void            GetResolution( sal_Int32& rDPIX, sal_Int32& rDPIY ) override;
 
@@ -108,9 +112,11 @@ public:
                                             bool bVertical,
                                             std::vector< sal_Int32 >& rWidths,
                                             Ucs2UIntMap& rUnicodeEnc ) override;
+#ifndef _WIN32
     virtual std::unique_ptr<GenericSalLayout>
                             GetTextLayout(int nFallbackLevel) override;
     virtual void            DrawTextLayout( const GenericSalLayout& ) override;
+#endif
 
     virtual SystemGraphicsData GetGraphicsData() const override;
 

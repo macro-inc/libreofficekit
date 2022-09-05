@@ -28,8 +28,8 @@
 #include <config_vclplug.h>
 #include <desktop/crashreport.hxx>
 
-#ifndef _WIN32
 #include <headless/svpinst.hxx>
+#ifndef _WIN32
 #include <printerinfomanager.hxx>
 #include <unx/desktops.hxx>
 
@@ -394,7 +394,7 @@ SalData::~SalData() COVERITY_NOEXCEPT_FALSE
 #endif
 }
 
-#ifdef _WIN32
+#if defined( _WIN32 ) && !defined( HEADLESS_VCLPLUG )
 bool HasAtHook()
 {
     BOOL bIsRunning = FALSE;

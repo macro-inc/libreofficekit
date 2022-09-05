@@ -20,10 +20,10 @@ $(eval $(call gb_Rdb_add_components,services,\
 	canvas/source/vcl/vclcanvas \
 	$(if $(ENABLE_CAIRO_CANVAS),canvas/source/cairo/cairocanvas) \
 	$(if $(ENABLE_OPENGL_CANVAS),canvas/source/opengl/oglcanvas) \
-	$(if $(filter WNT,$(OS)), \
+	$(if $(DISABLE_GUI),,$(if $(filter WNT,$(OS)), \
 		canvas/source/directx/directx9canvas \
 		canvas/source/directx/gdipluscanvas \
-	) \
+	)) \
 	comphelper/util/comphelp \
 	configmgr/source/configmgr \
 	$(if $(filter DBCONNECTIVITY,$(BUILD_TYPE)), \
@@ -61,10 +61,10 @@ $(eval $(call gb_Rdb_add_components,services,\
 	$(if $(DISABLE_GUI),vcl/vcl.headless) \
 	$(if $(filter iOS,$(OS)),vcl/vcl.ios) \
 	$(if $(filter MACOSX,$(OS)),vcl/vcl.macosx) \
-	$(if $(filter WNT,$(OS)),\
+	$(if $(DISABLE_GUI),,$(if $(filter WNT,$(OS)),\
 		vcl/vcl.windows \
 		vcl/vclplug_win \
-	) \
+	)) \
 ))
 
 ifeq ($(gb_Side),host)

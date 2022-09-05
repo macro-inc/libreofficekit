@@ -22,12 +22,18 @@
 
 #include <mutex>
 
-#include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <pthread.h>
-#include <sys/time.h>
-#include <poll.h>
+#if defined(_WIN32)
+# include <stdlib.h>
+# include <io.h>
+# include <process.h>
+#else
+# include <unistd.h>
+# include <pthread.h>
+# include <sys/time.h>
+# include <poll.h>
+#endif
 
 #include <sal/types.h>
 #include <sal/log.hxx>
@@ -54,7 +60,54 @@
 #include <svdata.hxx>
 #include <unx/gendata.hxx>
 // FIXME: remove when we re-work the svp mainloop
+#ifdef _WIN32
+inline bool operator >= ( const _timeval &t1, const _timeval &t2 )
+{
+    if( t1.tv_sec == t2.tv_sec )
+        return t1.tv_usec >= t2.tv_usec;
+    return t1.tv_sec > t2.tv_sec;
+}
+
+inline bool operator > ( const _timeval &t1, const _timeval &t2 )
+{
+    if( t1.tv_sec == t2.tv_sec )
+        return t1.tv_usec > t2.tv_usec;
+    return t1.tv_sec > t2.tv_sec;
+}
+
+inline _timeval &operator -= ( _timeval &t1, const _timeval &t2 )
+{
+    if( t1.tv_usec < t2.tv_usec )
+    {
+        t1.tv_sec--;
+        t1.tv_usec += 1000000;
+    }
+    t1.tv_sec  -= t2.tv_sec;
+    t1.tv_usec -= t2.tv_usec;
+    return t1;
+}
+
+inline _timeval &operator += ( _timeval &t1, sal_uIntPtr t2 )
+{
+    t1.tv_sec  += t2 / 1000;
+    t1.tv_usec += (t2 % 1000) * 1000;
+    if( t1.tv_usec > 1000000 )
+    {
+        t1.tv_sec++;
+        t1.tv_usec -= 1000000;
+    }
+    return t1;
+}
+
+inline _timeval operator - ( const _timeval &t1, const _timeval &t2 )
+{
+    _timeval t0 = t1;
+    t0 -= t2;
+    return t0;
+}
+#else
 #include <unx/salunxtime.h>
+#endif
 #include <comphelper/lok.hxx>
 
 SvpSalInstance* SvpSalInstance::s_pDefaultInstance = nullptr;
@@ -76,7 +129,22 @@ do { \
 #define DBG_TESTSVPYIELDMUTEX() ((void)0)
 #endif
 
-#if !defined(ANDROID) && !defined(IOS)
+#ifdef _WIN32
+int gettimeofday(_timeval* tp, void* tzp) {
+  namespace sc = std::chrono;
+  sc::system_clock::duration d = sc::system_clock::now().time_since_epoch();
+  sc::seconds s = sc::duration_cast<sc::seconds>(d);
+  tp->tv_sec = s.count();
+  tp->tv_usec = sc::duration_cast<sc::microseconds>(d - s).count();
+
+  // avoid unreferenced formal parameter error
+  (void)tzp;
+
+  return 0;
+}
+#endif
+
+#if !defined(ANDROID) && !defined(IOS) && !defined(_WIN32)
 
 static void atfork_child()
 {
@@ -97,10 +165,10 @@ SvpSalInstance::SvpSalInstance( std::unique_ptr<SalYieldMutex> pMutex )
     m_nTimeoutMS            = 0;
 
     m_MainThread = osl::Thread::getCurrentIdentifier();
-    CreateWakeupPipe(true);
+    //CreateWakeupPipe(true);
     if( s_pDefaultInstance == nullptr )
         s_pDefaultInstance = this;
-#if !defined(ANDROID) && !defined(IOS)
+#if !defined(ANDROID) && !defined(IOS) && !defined(_WIN32)
     pthread_atfork(nullptr, nullptr, atfork_child);
 #endif
 }
@@ -109,7 +177,7 @@ SvpSalInstance::~SvpSalInstance()
 {
     if( s_pDefaultInstance == this )
         s_pDefaultInstance = nullptr;
-    CloseWakeupPipe(true);
+    //CloseWakeupPipe(true);
 }
 
 void SvpSalInstance::CloseWakeupPipe(bool log)
@@ -117,6 +185,8 @@ void SvpSalInstance::CloseWakeupPipe(bool log)
     SvpSalYieldMutex *const pMutex(dynamic_cast<SvpSalYieldMutex*>(GetYieldMutex()));
     if (!pMutex)
         return;
+    (void)log;
+    /*
     if (pMutex->m_FeedbackFDs[0] != -1)
     {
         if (log)
@@ -126,7 +196,7 @@ void SvpSalInstance::CloseWakeupPipe(bool log)
         close (pMutex->m_FeedbackFDs[0]);
         close (pMutex->m_FeedbackFDs[1]);
         pMutex->m_FeedbackFDs[0] = pMutex->m_FeedbackFDs[1] = -1;
-    }
+    }*/
 }
 
 void SvpSalInstance::CreateWakeupPipe(bool log)
@@ -134,6 +204,8 @@ void SvpSalInstance::CreateWakeupPipe(bool log)
     SvpSalYieldMutex *const pMutex(dynamic_cast<SvpSalYieldMutex*>(GetYieldMutex()));
     if (!pMutex)
         return;
+    (void)log;
+    /*
     if (pipe (pMutex->m_FeedbackFDs) == -1)
     {
         if (log)
@@ -165,6 +237,7 @@ void SvpSalInstance::CreateWakeupPipe(bool log)
 
         // retain the default blocking I/O for feedback pipe
     }
+    */
 }
 
 void SvpSalInstance::TriggerUserEventProcessing()
@@ -193,7 +266,11 @@ bool SvpSalInstance::CheckTimeout( bool bExecuteTimers )
     bool bRet = false;
     if( m_aTimeout.tv_sec ) // timer is started
     {
+#ifdef _WIN32
+        _timeval aTimeOfDay;
+#else
         timeval aTimeOfDay;
+#endif
         gettimeofday( &aTimeOfDay, nullptr );
         if( aTimeOfDay >= m_aTimeout )
         {
@@ -250,7 +327,7 @@ std::unique_ptr<SalVirtualDevice> SvpSalInstance::CreateVirtualDevice(SalGraphic
 {
     SvpSalGraphics *pSvpSalGraphics = dynamic_cast<SvpSalGraphics*>(&rGraphics);
     assert(pSvpSalGraphics);
-#ifndef ANDROID
+#if !defined( ANDROID ) && !defined ( _WIN32 )
     // tdf#127529 normally pPreExistingTarget is null and we are a true virtualdevice drawing to a backing buffer.
     // Occasionally, for canvas/slideshow, pPreExistingTarget is pre-provided as a hack to use the vcl drawing
     // apis to render onto a preexisting cairo surface. The necessity for that precedes the use of cairo in vcl proper
@@ -366,11 +443,13 @@ void SvpSalYieldMutex::doAcquire(sal_uInt32 const nLockCount)
                 m_bNoYieldLock = true;
                 bool const bEvents = pInst->DoYield(false, request == SvpRequest::MainThreadDispatchAllEvents);
                 m_bNoYieldLock = false;
+                /*
                 if (write(m_FeedbackFDs[1], &bEvents, sizeof(bool)) != sizeof(bool))
                 {
                     SAL_WARN("vcl.headless", "Could not write: " << strerror(errno));
                     std::abort();
                 }
+                */
             }
         }
         while (true);
@@ -470,7 +549,11 @@ bool SvpSalInstance::DoYield(bool bWait, bool bHandleAllCurrentEvents)
             sal_Int64 nTimeoutMicroS = 0;
             if (m_aTimeout.tv_sec) // Timer is started.
             {
+#ifdef _WIN32
+                _timeval Timeout;
+#else
                 timeval Timeout;
+#endif
                 // determine remaining timeout.
                 gettimeofday (&Timeout, nullptr);
                 if (m_aTimeout > Timeout)
@@ -563,7 +646,11 @@ void SvpSalInstance::StopTimer()
 
 void SvpSalInstance::StartTimer( sal_uInt64 nMS )
 {
+#ifdef _WIN32
+    _timeval aPrevTimeout (m_aTimeout);
+#else
     timeval aPrevTimeout (m_aTimeout);
+#endif
     gettimeofday (&m_aTimeout, nullptr);
 
     m_nTimeoutMS  = nMS;

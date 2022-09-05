@@ -24,7 +24,7 @@ $(spsupp_IDLDIR)/spsupp.tlb : \
 		-tlb $@ \
 		-h $(spsupp_IDLDIR)/spsupp_h.h \
 		-iid $(spsupp_IDLDIR)/spsupp_i.c \
-		$(INCLUDE) \
+		$$(INCLUDE) \
 		$(SOLARINC) \
 		-Oicf \
 		$<)

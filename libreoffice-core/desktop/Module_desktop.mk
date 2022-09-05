@@ -138,7 +138,7 @@ $(eval $(call gb_Module_add_check_targets,desktop, \
     CppunitTest_desktop_version \
 ))
 
-ifeq ($(OS),LINUX)
+ifeq ($(DISABLE_GUI),TRUE)
 $(eval $(call gb_Module_add_check_targets,desktop, \
     CppunitTest_desktop_lib \
     CppunitTest_desktop_lokinit \

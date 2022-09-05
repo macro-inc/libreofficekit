@@ -15,6 +15,10 @@ $(eval $(call gb_Library_use_library_objects,merged,\
 	$(gb_MERGEDLIBS) \
 ))
 
+$(eval $(call gb_Library_use_static_libraries,merged,\
+	expat \
+))
+
 $(eval $(call gb_Library_use_libraries,merged,\
 	cppu \
 	cppuhelper \
@@ -34,7 +38,7 @@ $(eval $(call gb_Library_add_ldflags,merged,\
 	/ignore:4217 \
 ))
 # cursors
-$(eval $(call gb_Library_add_nativeres,merged,vcl/salsrc))
+# $(eval $(call gb_Library_add_nativeres,merged,vcl/salsrc))
 endif
 
 ifeq ($(OS),MACOSX)

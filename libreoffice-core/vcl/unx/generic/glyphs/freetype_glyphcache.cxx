@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include "boost/winapi/get_last_error.hpp"
 #include <sal/config.h>
 
 #include <o3tl/safeint.hxx>
@@ -47,15 +48,28 @@
 #include FT_SIZES_H
 #include FT_SYNTHESIS_H
 #include FT_TRUETYPE_TABLES_H
-
 #include <vector>
 
 // TODO: move file mapping stuff to OSL
-#include <unistd.h>
-#include <dlfcn.h>
-#include <fcntl.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
+// TODO: Move Win32 implementation to win/ - chase
+#ifdef _WIN32
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
+# include <stdlib.h>
+# include <io.h>
+# include <process.h>
+# include <string.h>
+
+// This are aliases from windows.h that conflict with FreetypeManager::
+# undef CreateFont
+# undef GetGlyphOutline
+#else
+# include <unistd.h>
+# include <dlfcn.h>
+# include <fcntl.h>
+# include <sys/mman.h>
+#endif
 #include <unx/fontmanager.hxx>
 #include <impfontcharmap.hxx>
 
@@ -91,8 +105,11 @@ FreetypeFontFile::FreetypeFontFile( const OString& rNativeFileName )
             bOnce = false;
             pLangBoost = vcl::getLangBoost();
         }
-
+#ifdef _WIN32
+        if( pLangBoost && !_strnicmp( pLangBoost, &maNativeFileName.getStr()[nPos+1], 3 ) )
+#else
         if( pLangBoost && !strncasecmp( pLangBoost, &maNativeFileName.getStr()[nPos+1], 3 ) )
+#endif
            mnLangBoost += 0x2000;     // matching langinfo => better
     }
 }
@@ -102,6 +119,8 @@ bool FreetypeFontFile::Map()
     if (mnRefCount++ == 0)
     {
         const char* pFileName = maNativeFileName.getStr();
+
+#if !defined( _WIN32 )
         int nFile = open( pFileName, O_RDONLY );
         if( nFile < 0 )
         {
@@ -126,6 +145,40 @@ bool FreetypeFontFile::Map()
             mpFileMap = nullptr;
         }
         close( nFile );
+#else
+        void *hFile = CreateFileA(pFileName, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL, nullptr);
+        if( hFile == INVALID_HANDLE_VALUE )
+        {
+            SAL_WARN("vcl.unx.freetype", "mmap of '" << maNativeFileName << "' failed: unable to get handle");
+            mpFileMap = nullptr;
+            return false;
+        }
+        DWORD dwSizeHigh = 0;
+        DWORD dwSizeLow = ::GetFileSize(hFile, &dwSizeHigh);
+        if (dwSizeLow == INVALID_FILE_SIZE) {
+            SAL_WARN("vcl.unx.freetype", "mmap of '" << maNativeFileName << "' failed: unable to get file size");
+            mpFileMap = nullptr;
+            CloseHandle(hFile);
+            return false;
+        }
+
+        void *hFileMapping = CreateFileMapping(hFile, nullptr, PAGE_READONLY, dwSizeHigh, dwSizeLow,
+            nullptr);
+        if (hFileMapping == nullptr) {
+            SAL_WARN("vcl.unx.freetype", "mmap of '" << maNativeFileName << "' failed: unable to get file mapping");
+            mpFileMap = nullptr;
+            CloseHandle(hFile);
+            return false;
+        }
+        size_t szLen = (dwSizeHigh << sizeof(DWORD)) & dwSizeLow;
+        mpFileMap = static_cast<unsigned char*>(MapViewOfFile(hFile, FILE_MAP_READ, 0, 0, szLen));
+        CloseHandle(hFile);
+
+        if (mpFileMap == nullptr) {
+            SAL_WARN("vcl.unx.freetype", "mmap of '" << maNativeFileName << "' failed: " << GetLastError());
+        }
+#endif
     }
 
     return (mpFileMap != nullptr);
@@ -138,7 +191,11 @@ void FreetypeFontFile::Unmap()
     assert(mnRefCount >= 0 && "how did this go negative\n");
     if (mpFileMap)
     {
+#if !defined( _WIN32 )
         munmap(mpFileMap, mnFileSize);
+#else
+        UnmapViewOfFile(mpFileMap);
+#endif
         mpFileMap = nullptr;
     }
 }
@@ -168,7 +225,12 @@ namespace
 {
     void dlFT_Done_MM_Var(FT_Library library, FT_MM_Var *amaster)
     {
+#ifdef _WIN32
+        HMODULE mod = GetModuleHandle(nullptr);
+        static auto func = reinterpret_cast<void(*)(FT_Library, FT_MM_Var*)>(GetProcAddress(mod, "FT_Done_MM_Var"));
+#else
         static auto func = reinterpret_cast<void(*)(FT_Library, FT_MM_Var*)>(dlsym(nullptr, "FT_Done_MM_Var"));
+#endif
         if (func)
             func(library, amaster);
         else

@@ -18,7 +18,15 @@
  */
 
 #include <memory>
-#include <unistd.h>
+
+#ifdef _WIN32
+# include <io.h>
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+#else
+# include <unistd.h>
+#endif
 #include <osl/thread.h>
 
 #include <unx/fontmanager.hxx>
@@ -183,8 +191,20 @@ std::vector<PrintFontManager::PrintFont> PrintFontManager::analyzeFontFile( int 
     OString aFullPath = aDir + "/" + rFontFile;
 
     // #i1872# reject unreadable files
+#ifdef _WIN32
+    int fd = _open(aFullPath.getStr(), _O_RDONLY);
+    if (fd == 0)
+    {
+        _close(fd);
+    }
+    else
+    {
+        return aNewFonts;
+    }
+#else
     if( access( aFullPath.getStr(), R_OK ) )
         return aNewFonts;
+#endif
 
     bool bSupported = false;
     if (pFormat)

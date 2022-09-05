@@ -19,7 +19,7 @@ $(eval $(call gb_ExternalProject_use_nmake,libwebp,build))
 $(call gb_ExternalProject_get_state_target,libwebp,build):
 	$(call gb_Trace_StartRange,libwebp,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
-		nmake -nologo -f Makefile.vc CFG=release-static RTLIBCFG=static OBJDIR=output \
+		nmake -nologo -f Makefile.vc CFG=release-static OBJDIR=output \
 	)
 	$(call gb_Trace_EndRange,libwebp,EXTERNAL)
 else

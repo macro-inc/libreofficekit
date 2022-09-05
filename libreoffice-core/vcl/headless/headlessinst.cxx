@@ -9,7 +9,10 @@
 #include <headless/svpinst.hxx>
 #include <headless/svpdummies.hxx>
 #include <unx/gendata.hxx>
-#include <unistd.h>
+#if defined(_WIN32)
+#else
+# include <unistd.h>
+#endif
 
 class HeadlessSalInstance : public SvpSalInstance
 {

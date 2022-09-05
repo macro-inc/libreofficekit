@@ -34,9 +34,14 @@
 #include <string_view>
 
 // For spawning PDF and FAX generation
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
+#ifdef _WIN32
+# include <ShlObj.h>
+# include <o3tl/char16_t2wchar_t.hxx>
+#else
+# include <unistd.h>
+# include <sys/wait.h>
+# include <sys/stat.h>
+#endif
 
 #include <comphelper/fileurl.hxx>
 #include <o3tl/safeint.hxx>
@@ -70,6 +75,28 @@
 using namespace psp;
 using namespace com::sun::star;
 
+#ifdef _WIN32
+static OUString GetMyDocumentsFolder()
+{
+    LPITEMIDLIST pidl;
+    HRESULT hHdl = SHGetSpecialFolderLocation( nullptr, CSIDL_MYDOCUMENTS, &pidl );
+    OUString aFolder;
+
+    if( hHdl == NOERROR )
+    {
+        WCHAR *lpFolderA;
+        lpFolderA = static_cast<WCHAR*>(HeapAlloc(GetProcessHeap(), 0, sizeof(WCHAR) * 1024));
+
+        SHGetPathFromIDListW( pidl, lpFolderA );
+        aFolder = o3tl::toU( lpFolderA );
+
+        HeapFree(GetProcessHeap(), 0, lpFolderA);
+        SHFree( pidl );
+    }
+    return aFolder;
+}
+#endif
+
 static bool getPdfDir( const PrinterInfo& rInfo, OUString &rDir )
 {
     sal_Int32 nIndex = 0;
@@ -80,8 +107,13 @@ static bool getPdfDir( const PrinterInfo& rInfo, OUString &rDir )
         {
             sal_Int32 nPos = 0;
             rDir = aToken.getToken( 1, '=', nPos );
+#ifdef _WIN32
+            if( rDir.isEmpty() )
+                rDir = GetMyDocumentsFolder();
+#else
             if( rDir.isEmpty() && getenv( "HOME" ) )
                 rDir = OUString( getenv( "HOME" ), strlen( getenv( "HOME" ) ), osl_getThreadTextEncoding() );
+#endif
             return true;
         }
     }
@@ -243,6 +275,7 @@ static void copyJobDataToJobSetup( ImplJobSetup* pJobSetup, JobData& rData )
     pJobSetup->SetPapersizeFromSetup( rData.m_bPapersizeFromSetup );
 }
 
+#ifndef _WIN32
 // Needs a cleaner abstraction ...
 static bool passFileToCommandLine( const OUString& rFilename, const OUString& rCommandLine )
 {
@@ -329,6 +362,7 @@ static bool passFileToCommandLine( const OUString& rFilename, const OUString& rC
 
     return bSuccess;
 }
+#endif
 
 static std::vector<OUString> getFaxNumbers()
 {
@@ -344,10 +378,12 @@ static std::vector<OUString> getFaxNumbers()
     return aFaxNumbers;
 }
 
+#ifndef _WIN32
 static bool createPdf( std::u16string_view rToFile, const OUString& rFromFile, const OUString& rCommandLine )
 {
     return passFileToCommandLine( rFromFile, rCommandLine.replaceAll("(OUTFILE)", rToFile) );
 }
+#endif
 
 /*
  *  SalInstance
@@ -879,8 +915,10 @@ bool PspSalPrinter::EndJob()
 
         if( bSuccess && m_bPdf )
         {
+#ifndef _WIN32
             const PrinterInfo& rInfo( PrinterInfoManager::get().getPrinterInfo( m_aJobData.m_aPrinterName ) );
             bSuccess = createPdf( m_aFileName, m_aTmpFile, rInfo.m_aCommand );
+#endif
         }
     }
     GetSalData()->m_pInstance->jobEndedPrinterUpdate();

@@ -13,6 +13,14 @@ $(eval $(call gb_ExternalProject_register_targets,pixman,\
 	build \
 ))
 
+ifeq ($(OS),WNT)
+$(call gb_ExternalProject_get_state_target,pixman,build) :
+	$(call gb_Trace_StartRange,pixman,EXTERNAL)
+	$(call gb_ExternalProject_run,build,\
+		$(MAKE) pixman -B -f Makefile.win32 "CFG=release" "MMX=off" \
+	)
+	$(call gb_Trace_EndRange,pixman,EXTERNAL)
+else # !WINDOWS
 # ANDROID:
 # The pixman-cpu.c code wants to read /proc/<pid>/auxv, but
 # the Android headers don't define Elf32_auxv_t.
@@ -27,10 +35,11 @@ $(call gb_ExternalProject_get_state_target,pixman,build) :
 		$(if $(filter TRUE,$(DISABLE_DYNLOADING)),--disable-shared,--disable-static) \
 		$(if $(filter ANDROID,$(OS)),--disable-arm-simd --disable-arm-neon --disable-arm-iwmmxt) \
 		$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
-		$(if $(filter INTEL ARM,$(CPUNAME)),ac_cv_c_bigendian=no)) \
+		$(if $(filter INTEL ARM X86_64 AARCH64,$(CPUNAME)),ac_cv_c_bigendian=no)) \
 		$(if $(filter EMSCRIPTEN,$(OS)),CFLAGS="-pthread") \
 		&& $(MAKE) \
 	)
 	$(call gb_Trace_EndRange,pixman,EXTERNAL)
 
+endif
 # vim: set noet sw=4 ts=4:

@@ -21,7 +21,11 @@ $(eval $(call gb_ExternalProject_register_targets,fontconfig,\
 $(call gb_ExternalProject_get_state_target,fontconfig,build) :
 	$(call gb_Trace_StartRange,fontconfig,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
-		CFLAGS="$(CFLAGS) $(if $(debug),-g) $(gb_VISIBILITY_FLAGS) $(if $(filter EMSCRIPTEN,$(OS)),-pthread)" $(if $(filter ANDROID,$(OS)),LIBS="-lm") \
+		CFLAGS="$(CFLAGS) $(if $(filter WNT,$(OS)), -nologo -MD) $(if $(debug),-g) $(gb_VISIBILITY_FLAGS) $(if $(filter EMSCRIPTEN,$(OS)),-pthread)" $(if $(filter ANDROID,$(OS)),LIBS="-lm") \
+		$(if $(filter WNT,$(OS)),\
+			FREETYPE_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,freetype)/include" \
+			FREETYPE_LIBS="-L$(call gb_UnpackedTarball_get_dir,freetype)/instdir/lib -lfreetype" \
+		) \
 		$(gb_RUN_CONFIGURE) ./configure \
 			--disable-shared \
 			--disable-silent-rules \

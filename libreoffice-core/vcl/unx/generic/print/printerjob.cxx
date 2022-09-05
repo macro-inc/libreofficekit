@@ -18,9 +18,12 @@
  */
 
 #include <stdio.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
+
+#ifndef _WIN32
+# include <sys/stat.h>
+# include <fcntl.h>
+# include <unistd.h>
+#endif
 
 #include "psputil.hxx"
 
@@ -41,6 +44,7 @@
 #include <cstddef>
 #include <deque>
 #include <vector>
+#include <cstdio>
 
 using namespace psp;
 
@@ -192,9 +196,13 @@ removeSpoolDir (const OUString& rSpoolDir)
         OSL_FAIL( "psprint: couldn't remove spool directory" );
         return;
     }
-    OString aSysPathByte =
-        OUStringToOString (aSysPath, osl_getThreadTextEncoding());
-    if (system (OString("rm -rf " + aSysPathByte).getStr()) == -1)
+
+    const auto utf8Path = aSysPath.toUtf8();
+    auto boostPath = boost::filesystem::path(utf8Path.getStr(), utf8Path.getStr() + utf8Path.getLength());
+
+    boost::system::error_code ecFile;
+    boost::filesystem::remove_all(boostPath, ecFile);
+    if (ecFile)
         OSL_FAIL( "psprint: couldn't remove spool directory" );
 }
 
