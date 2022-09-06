@@ -1,0 +1,5113 @@
+#. extracted from wizards/source/resources
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2020-10-27 12:31+0100\n"
+"PO-Revision-Date: 2020-10-31 11:35+0000\n"
+"Last-Translator: Christian Lohmaier <cloph@documentfoundation.org>\n"
+"Language-Team: Kashmiri <https://weblate.documentfoundation.org/projects/libo_ui-master/wizardssourceresources/ks/>\n"
+"Language: ks\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.1.1\n"
+"X-POOTLE-MTIME: 1516048043.000000\n"
+
+#. 8UKfi
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_0\n"
+"property.text"
+msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
+msgstr "ڈائریکٹری '%1'ہیچ نئ بنئویتھ۔   <BR> تہندس ہارڈ ڈسكس پیٹھ آس۪ی  کئفی نئ جاے"
+
+#. zDuJi
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_1\n"
+"property.text"
+msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
+msgstr "مواد  دستاویزہیوك نئ بنئویتھ۔  <BR> مہر بئنی كریتھ وچھیو موڈیول 'PRODUCTNAME Writer' چھا انسٹال كریتھ۔"
+
+#. BydGz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_2\n"
+"property.text"
+msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
+msgstr "سپریڈ شیٹ ہیوك نئ بنئویتھ۔  <BR> مہر بئنی كریتھ وچھیو موڈیول'PRODUCTNAME Calc'   چھا انسٹال كریتھ  ۔"
+
+#. jAyjL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_3\n"
+"property.text"
+msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
+msgstr "پیش كش ہیوك نئ بنئویتھ۔  <BR> مہر بئنی كریتھ وچھیو موڈیول<BR> 'PRODUCTNAME Impress'چھا  انسٹال كریتھ۔"
+
+#. 3mrBG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_4\n"
+"property.text"
+msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
+msgstr " '    <BR>ڈرائینگ ہیچ نئ بنئویتھ ۔  مہربئنی كریتھ وچھیو۔'PRODUCTNAME Draw چھا انسٹال كریتھ"
+
+#. rMsgf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_5\n"
+"property.text"
+msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
+msgstr " فار مولا ہیوك نئ بنئویتھ۔  <BR> مہر بئنی كریتھ وچھیو موڈیول'PRODUCTNAME Math' چھا انسٹال كریتھ"
+
+#. j5GzW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_6\n"
+"property.text"
+msgid "The files required could not be found.<BR>Please start the %PRODUCTNAME Setup and choose 'Repair'."
+msgstr "مطلوبہ فائل <BR> آیئ نئ اتھ۪ی۔ مہربئنی كریتھ % PRODUCTNAME  سیٹ اَپ شروع  تئ  'Repair'ژعریو"
+
+#. BFtze
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_7\n"
+"property.text"
+msgid "The file '<PATH>' already exists.<BR><BR>Would you like to overwrite the existing file?"
+msgstr " فایل '<PATH>' چھُ گڈئی موجود۔   <BR><BR> تہئ چھئوئ یژھان موجودئ فایل اووررایٹ كرِن"
+
+#. 7AvGR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_8\n"
+"property.text"
+msgid "Yes"
+msgstr "عئں"
+
+#. GPG93
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_9\n"
+"property.text"
+msgid "Yes to All"
+msgstr "سارنی خعطرئ عئں"
+
+#. oBhQ5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_10\n"
+"property.text"
+msgid "No"
+msgstr "نئ"
+
+#. wMBK7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_11\n"
+"property.text"
+msgid "Cancel"
+msgstr "منسوخ"
+
+#. boSx2
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_12\n"
+"property.text"
+msgid "~Finish"
+msgstr "ختم"
+
+#. apFF8
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_13\n"
+"property.text"
+msgid "< ~Back"
+msgstr "پَتھ"
+
+#. q8epA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_14\n"
+"property.text"
+msgid "~Next >"
+msgstr "۔پتئ>"
+
+#. rSt56
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_15\n"
+"property.text"
+msgid "~Help"
+msgstr "مدد"
+
+#. 9GUa6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_16\n"
+"property.text"
+msgid "Steps"
+msgstr " سٹیپس"
+
+#. 9wWVR
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_17\n"
+"property.text"
+msgid "Close"
+msgstr "بندکرو"
+
+#. zUv9u
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_18\n"
+"property.text"
+msgid "OK"
+msgstr "OK"
+
+#. 6kGc4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_19\n"
+"property.text"
+msgid "The file already exists. Do you want to overwrite it?"
+msgstr "یئ فایل چھئ گڈئی موجود۔ تہئ چھئوئ یژھان اَتھ اووررایٹ كرُن۔"
+
+#. BGj7a
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_20\n"
+"property.text"
+msgid "Template created via <wizard_name> on <current_date>."
+msgstr "ٹمیپلیٹ تخلیق کی گئی via <نام_ویزارڈ> on <جاریہ_تاریخ>"
+
+#. zRGEs
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_21\n"
+"property.text"
+msgid "The wizard could not be run, because important files were not found.\\nUnder 'Tools - Options - %PRODUCTNAME - Paths' click the 'Default' button to reset the paths to the original default settings.\\nThen run the wizard again."
+msgstr ""
+"ویزارڈ ہیكئو نئ چلئویتھ كیازئ كئ اہم فایلئ آی نئ اتھ۪ی.\n"
+" '  ٹولس آپشنس تہت۔ آپشنس۔ %           PRODUCTNAME  ۔پاتھس'   منز كریو كلیك دیفالٹ بٹن  تاكئ پاتھ ہیك۪ی ریسیٹ گژیتھ اصلی 'ڈیفالٹ ' سیٹنگس پیٹھ۔\n"
+" تم۪ی پتئ چلئویو ویزئڈس دوبارئ۔"
+
+#. GohbP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_0\n"
+"property.text"
+msgid "Report Wizard"
+msgstr "رپوٹ    ویزارڈ   ۔۔۔"
+
+#. BZtXG
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_3\n"
+"property.text"
+msgid "~Table"
+msgstr "جدول"
+
+#. BhUoK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_4\n"
+"property.text"
+msgid "Colu~mns"
+msgstr "کالمز"
+
+#. KgzkD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_7\n"
+"property.text"
+msgid "Report_"
+msgstr "رپورٹ_"
+
+#. uKDkU
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_8\n"
+"property.text"
+msgid "- undefined -"
+msgstr "    وضاحت كرنئی"
+
+#. ZZqKE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_9\n"
+"property.text"
+msgid "~Fields in report"
+msgstr " فارمن منز  شعبہ "
+
+#. hMbDC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_11\n"
+"property.text"
+msgid "Grouping"
+msgstr "گروپینگ"
+
+#. wVXwx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_12\n"
+"property.text"
+msgid "Sort options"
+msgstr "سارٹ متبئدل "
+
+#. 7EUD3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_13\n"
+"property.text"
+msgid "Choose layout"
+msgstr "لےآؤٹ ژئریو"
+
+#. 45SFZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_14\n"
+"property.text"
+msgid "Create report"
+msgstr "ریپورٹ  بنئویو"
+
+#. cKDcw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_15\n"
+"property.text"
+msgid "Layout of data"
+msgstr "ڈاٹا لےآؤٹ"
+
+#. HhPzF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_16\n"
+"property.text"
+msgid "Layout of headers and footers"
+msgstr "پیٹمئ تئ تلم۪ی خاشُك لےآؤٹ"
+
+#. bN2Fw
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_19\n"
+"property.text"
+msgid "Fields"
+msgstr " شعبئ"
+
+#. qHq62
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_20\n"
+"property.text"
+msgid "~Sort by"
+msgstr "سارٹ بئی"
+
+#. 8CX4A
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_21\n"
+"property.text"
+msgid "T~hen by"
+msgstr "پتئ"
+
+#. kvzxk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_22\n"
+"property.text"
+msgid "Orientation"
+msgstr "رخ بندی"
+
+#. b3YDa
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_23\n"
+"property.text"
+msgid "Portrait"
+msgstr "پورٹریٹ "
+
+#. DT8hG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_24\n"
+"property.text"
+msgid "Landscape"
+msgstr "لینڈ سکیپ"
+
+#. TErmd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_28\n"
+"property.text"
+msgid "Which fields do you want to have in your report?"
+msgstr "تہ كم شعبئ چھئوئ پنئنس ریپورٹس منز یژھان تھئوِن؟"
+
+#. HZgJU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_29\n"
+"property.text"
+msgid "Do you want to add grouping levels?"
+msgstr "تہئ چھئوئ یژھان گروپنگ لیول شئمل كرِن؟"
+
+#. xPoaP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_30\n"
+"property.text"
+msgid "According to which fields do you want to sort the data?"
+msgstr "تہئ كم۪ی شعبئ كئ حسابئ چھئوئ یژھان ڈاٹاسارٹ کرُن  ؟"
+
+#. kAjMy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_31\n"
+"property.text"
+msgid "How do you want your report to look?"
+msgstr "تہئ كیوتھ چھئوئ یژھان تہند ریپورٹ گژھ۪ی بوزنئ یُن؟"
+
+#. QvM65
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_32\n"
+"property.text"
+msgid "Decide how you want to proceed"
+msgstr "تہئ كریو طے تہئ كیتھ كئن چھئوئ یژھان برونٹھكُن پكُن؟"
+
+#. GqD3n
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_33\n"
+"property.text"
+msgid "Title of report"
+msgstr "رپورٹك عنوان"
+
+#. Nm8v3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_34\n"
+"property.text"
+msgid "Display report"
+msgstr "رپورٹ ہئویو"
+
+#. crCtw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_35\n"
+"property.text"
+msgid "Create report"
+msgstr "ریپورٹ  بنئویو"
+
+#. EiKBA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_36\n"
+"property.text"
+msgid "Ascending"
+msgstr "بوئنئ پیٹھئ ہیور تام"
+
+#. BboXx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_37\n"
+"property.text"
+msgid "Descending"
+msgstr "بۄن كُن ترتیب دیون"
+
+#. sHcrv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_40\n"
+"property.text"
+msgid "~Dynamic report"
+msgstr "~ڈاینومیك ریپورٹ"
+
+#. CxGG7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_41\n"
+"property.text"
+msgid "~Create report now"
+msgstr "رپورٹ بنئویو وئن"
+
+#. FVhkR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_42\n"
+"property.text"
+msgid "~Modify report layout"
+msgstr "رپورٹ لےآؤٹ شیریو"
+
+#. BBFba
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_43\n"
+"property.text"
+msgid "Static report"
+msgstr "سٹیٹیک رپورٹ"
+
+#. gSyfQ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_44\n"
+"property.text"
+msgid "Save as"
+msgstr "محفوظ کرنا"
+
+#. hdCaM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_50\n"
+"property.text"
+msgid "Groupings"
+msgstr "گروپینگس"
+
+#. XrhAA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_51\n"
+"property.text"
+msgid "Then b~y"
+msgstr "بےی- "
+
+#. dnjA2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_52\n"
+"property.text"
+msgid "~Then by"
+msgstr "۔ بےی"
+
+#. ZuRZA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_53\n"
+"property.text"
+msgid "Asc~ending"
+msgstr "بوْنئ پیٹھئ ہیور تام"
+
+#. 2aQcz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_54\n"
+"property.text"
+msgid "Ascend~ing"
+msgstr "بوْنئ پیٹھئ ہیور تام"
+
+#. d7S3o
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_55\n"
+"property.text"
+msgid "Ascendin~g"
+msgstr "بوْنئ پیٹھئ ہیور تام"
+
+#. 8YKTL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_56\n"
+"property.text"
+msgid "De~scending"
+msgstr "ہیر۪ی پیٹھئ بوْن تام"
+
+#. 82XcF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_57\n"
+"property.text"
+msgid "Des~cending"
+msgstr "Des~cending"
+
+#. SCPyV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_58\n"
+"property.text"
+msgid "De~scending"
+msgstr "ہیر۪ی پیٹھئ بوْن تام"
+
+#. s4E5A
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_60\n"
+"property.text"
+msgid "Binary fields cannot be displayed in the report."
+msgstr "بائنری شعبئ ہیكئو نئ رپورٹس منز شئمل كریتھ  ۔"
+
+#. zhqsu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_61\n"
+"property.text"
+msgid "The table '<TABLENAME>' does not exist."
+msgstr "جدول۔'<TABLENAME>' جدول ناو چھُنئ موجود"
+
+#. JdC5d
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_62\n"
+"property.text"
+msgid "Creating Report..."
+msgstr "رپورٹ بناوان۔۔۔"
+
+#. PQ4E9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_63\n"
+"property.text"
+msgid "Number of records inserted: <COUNT>"
+msgstr " <COUNT>: ریکارڈسن  ہیوند تعداد دئخل كریتھ"
+
+#. BUWNB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_64\n"
+"property.text"
+msgid "The form '<REPORTFORM>' does not exist."
+msgstr " فارم'<TABLENAME>' چھُنئ موجود   "
+
+#. AyMsD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_65\n"
+"property.text"
+msgid "The query with the statement <BR>'<STATEMENT>' <BR> could not be run. <BR> Check your data source."
+msgstr "كئیوری  بیانس کسعتھ <BR>'<STATEMENT>'  ہیوك نئ چلئویتھ۔<BR>۔<BR> پنُن ڈاٹا زرئی كریو جانچ"
+
+#. LW9DZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_66\n"
+"property.text"
+msgid "The following hidden control in the form '<REPORTFORM>' could not be read: '<CONTROLNAME>'."
+msgstr "مندرجہ ذیلس  منز ژور۪ی  فارم ہیكئو نئ پریتھ '<REPORTFORM>':'<CONTROLNAME>'. ' ' "
+
+#. GvE8h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_67\n"
+"property.text"
+msgid "Importing data..."
+msgstr "ڈاٹادرآمدکران۔۔۔"
+
+#. LujCA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_68\n"
+"property.text"
+msgid "Labeling fields"
+msgstr "شعبئن  لیبل کران۔۔۔"
+
+#. HPxDv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_69\n"
+"property.text"
+msgid "How do you want to label the fields?"
+msgstr " تہئ كیتھ كئن چھئوئ یژھان شعبن لیبل كرُن؟"
+
+#. C2Caz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_70\n"
+"property.text"
+msgid "Label"
+msgstr "لیبل"
+
+#. EknR9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_71\n"
+"property.text"
+msgid "Field"
+msgstr "شعبہ"
+
+#. agw3x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_72\n"
+"property.text"
+msgid "An error occurred in the wizard.<BR>The template '%PATH' could be erroneous.<BR>Either the required sections or tables do not exist or exist under the wrong name.<BR>See the Help for more detailed information.<BR>Please select another template."
+msgstr "ویزارڈس منز آی غلطی۔.<BR>ٹیمپلیٹ '%PATH' منز ہیك۪ی خئمی عئسیتھ.<BR>یاتئ چھئنئ ضروری سیکشنس یا جدول موجودنتئ چھئ غلط ناوس تہت موجو   .<BR> تفصیلی مولومات خعطرئ وچھیو ہیلپ ۔    .<BR> مہربئنی كریتھ ژعریو دبدل ٹیمپلیٹ ۔ select another template.  "
+
+#. Za86f
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_73\n"
+"property.text"
+msgid "There is an invalid user field in a table."
+msgstr "جدول منز چھُ  نامنظورصارف شعبہ ۔"
+
+#. rXZZH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_74\n"
+"property.text"
+msgid "The sort criterion '<FIELDNAME>' was chosen twice. Each criterion can only be chosen once."
+msgstr ""
+
+#. ZNk6M
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_75\n"
+"property.text"
+msgid "Note: The dummy text will be replaced by data from the database when the report is created."
+msgstr "نوٹ : ڈمی ٹیکسٹ یی  ڈاٹا سعتھ بدلاونئ ڈاٹا  بیسس منز  یل۪ی ریپورٹ یی بدلاونئ۔"
+
+#. 5VdG4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_76\n"
+"property.text"
+msgid "A report '%REPORTNAME' already exists in the database. Please assign another name."
+msgstr "ریپورٹ  '%REPORTNAME'چھُ گڈئی موجود ڈاٹابیسس منز۔ مہربئنی كریتھ دیو بدل ناو۔"
+
+#. TD56g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_78\n"
+"property.text"
+msgid "How do you want to proceed after creating the report?"
+msgstr "رپورٹ بنئویتھ كیتھ كئن چھئوئ یژھان تہئ برونٹھ پكُن؟"
+
+#. fpEwz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_79\n"
+"property.text"
+msgid "What kind of report do you want to create?"
+msgstr "تہئ كیوتھ ریپورٹ چھئوئ یژھان بناوُن  ؟"
+
+#. s3vBB
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_80\n"
+"property.text"
+msgid "Tabular"
+msgstr "جدول کار"
+
+#. dDWAD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_81\n"
+"property.text"
+msgid "Columnar, single-column"
+msgstr ""
+
+#. MwR8x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_82\n"
+"property.text"
+msgid "Columnar, two columns"
+msgstr ""
+
+#. UsKmm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_83\n"
+"property.text"
+msgid "Columnar, three columns"
+msgstr ""
+
+#. RG9ds
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_84\n"
+"property.text"
+msgid "In blocks, labels left"
+msgstr "ان بلاکس-لیبلس كھوفر"
+
+#. dspnP
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_85\n"
+"property.text"
+msgid "In blocks, labels above"
+msgstr "ان بلاکس-لیبلس پیٹھكئنئ"
+
+#. FXJtW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_86\n"
+"property.text"
+msgid "Title:"
+msgstr ":عنوان"
+
+#. 2z2JH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_87\n"
+"property.text"
+msgid "Author:"
+msgstr "مصنف "
+
+#. uESaE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_88\n"
+"property.text"
+msgid "Date:"
+msgstr "تئریخ"
+
+#. GzkD4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_89\n"
+"property.text"
+msgid "Page #page# of #count#"
+msgstr ""
+
+#. 3FXVE
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_90\n"
+"property.text"
+msgid "Page number:"
+msgstr "صفحہ نمبر:"
+
+#. 9HCyq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_91\n"
+"property.text"
+msgid "Page count:"
+msgstr ""
+
+#. FAa63
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_92\n"
+"property.text"
+msgid "No valid report template was found."
+msgstr ""
+
+#. F6vrA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_93\n"
+"property.text"
+msgid "Page:"
+msgstr "صفحہ"
+
+#. v8gUF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_94\n"
+"property.text"
+msgid "Align Left - Border"
+msgstr ""
+
+#. TV3AA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_95\n"
+"property.text"
+msgid "Align Left - Compact"
+msgstr ""
+
+#. DL6ZJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_96\n"
+"property.text"
+msgid "Align Left - Elegant"
+msgstr ""
+
+#. wRNAq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_97\n"
+"property.text"
+msgid "Align Left - Highlighted"
+msgstr ""
+
+#. JnhXj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_98\n"
+"property.text"
+msgid "Align Left - Modern"
+msgstr ""
+
+#. 4Djyg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_99\n"
+"property.text"
+msgid "Align Left - Red & Blue"
+msgstr ""
+
+#. BvcfB
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_100\n"
+"property.text"
+msgid "Default"
+msgstr "ڈیفالٹ"
+
+#. Bca59
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_101\n"
+"property.text"
+msgid "Outline - Borders"
+msgstr ""
+
+#. C9umd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_102\n"
+"property.text"
+msgid "Outline - Compact"
+msgstr ""
+
+#. uYz2T
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_103\n"
+"property.text"
+msgid "Outline - Elegant"
+msgstr ""
+
+#. iFk6x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_104\n"
+"property.text"
+msgid "Outline - Highlighted"
+msgstr ""
+
+#. jhJnN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_105\n"
+"property.text"
+msgid "Outline - Modern"
+msgstr ""
+
+#. mXnKN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_106\n"
+"property.text"
+msgid "Outline - Red & Blue"
+msgstr ""
+
+#. zKFcj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_107\n"
+"property.text"
+msgid "Outline, indented - Borders"
+msgstr ""
+
+#. 8XBee
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_108\n"
+"property.text"
+msgid "Outline, indented - Compact"
+msgstr ""
+
+#. e47Xn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_109\n"
+"property.text"
+msgid "Outline, indented - Elegant"
+msgstr ""
+
+#. CGQuu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_110\n"
+"property.text"
+msgid "Outline, indented - Highlighted"
+msgstr ""
+
+#. ABC5q
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_111\n"
+"property.text"
+msgid "Outline, indented - Modern"
+msgstr ""
+
+#. urT2J
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_112\n"
+"property.text"
+msgid "Outline, indented - Red & Blue"
+msgstr ""
+
+#. TzXg5
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_113\n"
+"property.text"
+msgid "Bubbles"
+msgstr "Bubble"
+
+#. RGiTm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_114\n"
+"property.text"
+msgid "Cinema"
+msgstr ""
+
+#. Eo2jG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_115\n"
+"property.text"
+msgid "Controlling"
+msgstr ""
+
+#. fpiSX
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_116\n"
+"property.text"
+msgid "Default"
+msgstr "ڈیفالٹ"
+
+#. 927HM
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_117\n"
+"property.text"
+msgid "Drafting"
+msgstr "ڈرائینگ"
+
+#. BGvCk
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_118\n"
+"property.text"
+msgid "Finances"
+msgstr "فائنانسیس "
+
+#. mhJr6
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_119\n"
+"property.text"
+msgid "Flipchart"
+msgstr "فلوچارٹ"
+
+#. t5VdL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_120\n"
+"property.text"
+msgid "Formal with Company Logo"
+msgstr ""
+
+#. iwANQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_121\n"
+"property.text"
+msgid "Generic"
+msgstr ""
+
+#. RkArE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_122\n"
+"property.text"
+msgid "Worldmap"
+msgstr ""
+
+#. wpr5T
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_0\n"
+"property.text"
+msgid "C~reate"
+msgstr "بنٲوئن"
+
+#. W6xLZ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_1\n"
+"property.text"
+msgid "~Cancel"
+msgstr "۔منسوخ"
+
+#. ecMFi
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_2\n"
+"property.text"
+msgid "< ~Back"
+msgstr "پَتھ"
+
+#. HvEAE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_3\n"
+"property.text"
+msgid "~Next >"
+msgstr "۔پتئ>"
+
+#. u5rzd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_4\n"
+"property.text"
+msgid "~Database"
+msgstr "۔ڈاٹابیس"
+
+#. sCeDP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_5\n"
+"property.text"
+msgid "~Table name"
+msgstr "۔جدول نام"
+
+#. KC4Dw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_6\n"
+"property.text"
+msgid "An error occurred while running the wizard. The wizard will be terminated."
+msgstr "ویزارڈچلاون ویز۪ی آیی غلطی۔ ویزارڈ یی مكلاونئ۔"
+
+#. ZG95j
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_8\n"
+"property.text"
+msgid "No database has been installed. At least one database is required before the wizard for forms can be started."
+msgstr ""
+
+#. GCAgB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_9\n"
+"property.text"
+msgid "The database does not contain any tables."
+msgstr ""
+
+#. ikZ7F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_10\n"
+"property.text"
+msgid "This title already exists in the database. Please enter another name."
+msgstr ""
+
+#. Dposv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_11\n"
+"property.text"
+msgid "The title must not contain any spaces or special characters."
+msgstr ""
+
+#. FUgQA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_12\n"
+"property.text"
+msgid "The database service (com.sun.data.DatabaseEngine) could not be instantiated."
+msgstr ""
+
+#. HRAeA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_13\n"
+"property.text"
+msgid "The selected table or query could not be opened."
+msgstr ""
+
+#. VAphN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_14\n"
+"property.text"
+msgid "No connection to the database could be established."
+msgstr "ڈاٹابیس ہیوك نئ كہین  تعلق قئیم گژھیتھ۔"
+
+#. z9FhA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_20\n"
+"property.text"
+msgid "~Help"
+msgstr "مدد"
+
+#. eXWrX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_21\n"
+"property.text"
+msgid "~Stop"
+msgstr "۔ٹھئہر "
+
+#. GiCi2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_30\n"
+"property.text"
+msgid "The document could not be saved."
+msgstr "دستاویز ہیوك نئ  ہمحفوظ گژھیتھ"
+
+#. UkQEx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_33\n"
+"property.text"
+msgid "Exiting the wizard"
+msgstr "ویزارٹ ترکئ عمل کر ان"
+
+#. HrveE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_34\n"
+"property.text"
+msgid "Connecting to data source..."
+msgstr "ڈاٹاسورسس سعتھ جوڑان۔۔۔۔"
+
+#. se64P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_35\n"
+"property.text"
+msgid "The connection to the data source could not be established."
+msgstr "ڈاٹاسورسس سعتھ ہیوك نئ تعلق قئئم گژیتھ۔"
+
+#. Ch5MD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_36\n"
+"property.text"
+msgid "The file path entered is not valid."
+msgstr "دئخل فائل پاتھ چھُ  نامنظور۔"
+
+#. kPABE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_37\n"
+"property.text"
+msgid "Please select a data source"
+msgstr " مہربئنی كریتھ ژعریو  ڈاٹا  سورس"
+
+#. XDBBC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_38\n"
+"property.text"
+msgid "Please select a table or query"
+msgstr " مہربئنی كریتھ ژعریو جدول  یا  سوال"
+
+#. AgeWk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_39\n"
+"property.text"
+msgid "Add field"
+msgstr "شوبئ   جوڑیو"
+
+#. FoExR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_40\n"
+"property.text"
+msgid "Remove field"
+msgstr "شعبہ ہٹئویو"
+
+#. BuUZ5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_41\n"
+"property.text"
+msgid "Add all fields"
+msgstr "سئری  شعبئ ہئویو"
+
+#. PVELV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_42\n"
+"property.text"
+msgid "Remove all fields"
+msgstr "سئری  شعبئ  ہٹئویو"
+
+#. jAXRw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_43\n"
+"property.text"
+msgid "Move field up"
+msgstr "شعبہ پكنئویو ہیور كُن"
+
+#. Ao2Z6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_44\n"
+"property.text"
+msgid "Move field down"
+msgstr "شعبہ نیو بوْن كُن"
+
+#. B4mWx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_45\n"
+"property.text"
+msgid "The field names from '%NAME' could not be retrieved."
+msgstr " شعبئ ناو '%NAME' منز ہیوك نئ   واپس انیتھ"
+
+#. SNhe5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_0\n"
+"property.text"
+msgid "Query Wizard"
+msgstr "سوال ویزارڈ"
+
+#. RySqB
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_1\n"
+"property.text"
+msgid "Query"
+msgstr "کیوریز"
+
+#. wKhwS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_2\n"
+"property.text"
+msgid "Query Wizard"
+msgstr "سوال ویزارڈ"
+
+#. QEtRG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_3\n"
+"property.text"
+msgid "~Tables"
+msgstr "۔جدول  "
+
+#. s2KnF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_4\n"
+"property.text"
+msgid "A~vailable fields"
+msgstr " دستیاب شعبئ"
+
+#. Wsx8x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_5\n"
+"property.text"
+msgid "Name ~of the query"
+msgstr "سوال  ناو"
+
+#. t9MEU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_6\n"
+"property.text"
+msgid "Display ~Query"
+msgstr "سوال ہئویو"
+
+#. UBWUX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_7\n"
+"property.text"
+msgid "~Modify Query"
+msgstr "سوال بدلئویو"
+
+#. AoeET
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_8\n"
+"property.text"
+msgid "~How do you want to proceed after creating the query?"
+msgstr "كئیوری پت۪ی كیتھ كئن چھووئ یژھان تہئ برونٹھ پكُن؟"
+
+#. kofEg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_9\n"
+"property.text"
+msgid "Match ~all of the following"
+msgstr "سئری مندرجہ ذیل رلئویو"
+
+#. 4xM3Z
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_10\n"
+"property.text"
+msgid "~Match any of the following"
+msgstr "مندر جئ منزئ رلئویو كاہں تئ"
+
+#. WLFFc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_11\n"
+"property.text"
+msgid "~Detailed query (Shows all records of the query.)"
+msgstr "تفصیلی كئیوری(سئری ریكارڈس ہئویو سوالیك)"
+
+#. fnzhE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_12\n"
+"property.text"
+msgid "~Summary query (Shows only results of aggregate functions.)"
+msgstr "خلاصئ كئیوری(صرف ہئویو كُل  فنکشنن ہند نتیجئ)"
+
+#. SdQBk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_16\n"
+"property.text"
+msgid "Aggregate functions"
+msgstr "كل فنکشن"
+
+#. tFNb2
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_17\n"
+"property.text"
+msgid "Fields"
+msgstr " شعبئ"
+
+#. D9sGR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_18\n"
+"property.text"
+msgid "~Group by"
+msgstr "گروپس منز"
+
+#. E5N85
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_19\n"
+"property.text"
+msgid "Field"
+msgstr "شعبہ"
+
+#. 2dqd2
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_20\n"
+"property.text"
+msgid "Alias"
+msgstr "عرفیت"
+
+#. 8eMER
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_21\n"
+"property.text"
+msgid "Table:"
+msgstr " :جدول "
+
+#. jaKR7
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_22\n"
+"property.text"
+msgid "Query:"
+msgstr "کیوری"
+
+#. TpbSv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_24\n"
+"property.text"
+msgid "Condition"
+msgstr "شرط "
+
+#. Dvk6K
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_25\n"
+"property.text"
+msgid "Value"
+msgstr "قئمتھ"
+
+#. oP8P9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_26\n"
+"property.text"
+msgid "is equal to"
+msgstr " مساوی چھُ"
+
+#. D7K36
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_27\n"
+"property.text"
+msgid "is not equal to"
+msgstr "مسئوی چھُ نئ"
+
+#. n9gFB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_28\n"
+"property.text"
+msgid "is smaller than"
+msgstr "ہوتئ چھئُ کم"
+
+#. FAiPg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_29\n"
+"property.text"
+msgid "is greater than"
+msgstr " ہوتئ چھئُ  زیادئ"
+
+#. pFsPY
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_30\n"
+"property.text"
+msgid "is equal or less than"
+msgstr "ہوتئ چھُ مسئوی یا کم"
+
+#. yT9cM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_31\n"
+"property.text"
+msgid "is equal or greater than"
+msgstr "ہوتئ چھُ  مسئوی یا زیادئ"
+
+#. GFnAN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_32\n"
+"property.text"
+msgid "like"
+msgstr "مسلند"
+
+#. JZCLd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_33\n"
+"property.text"
+msgid "not like"
+msgstr "بےیئ"
+
+#. TiHHv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_34\n"
+"property.text"
+msgid "is null"
+msgstr "یا"
+
+#. dpAdZ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_35\n"
+"property.text"
+msgid "is not null"
+msgstr "۔ نل چھُنئ"
+
+#. ZnCKf
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_36\n"
+"property.text"
+msgid "true"
+msgstr "صحیح "
+
+#. AwCQp
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_37\n"
+"property.text"
+msgid "false"
+msgstr "غلط "
+
+#. GEGKb
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_38\n"
+"property.text"
+msgid "and"
+msgstr "بےیئ"
+
+#. GDvQV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_39\n"
+"property.text"
+msgid "or"
+msgstr "یا"
+
+#. BaA5J
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_40\n"
+"property.text"
+msgid "get the sum of"
+msgstr "كُل نیو"
+
+#. uCRgg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_41\n"
+"property.text"
+msgid "get the average of"
+msgstr "اُك اوسط  نیو"
+
+#. UjEVW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_42\n"
+"property.text"
+msgid "get the minimum of"
+msgstr "کاکم ازکم نیو"
+
+#. qpN4C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_43\n"
+"property.text"
+msgid "get the maximum of"
+msgstr "اُك زیادئ ہوتئ زیاد ئ نیو"
+
+#. DAZUE
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_44\n"
+"property.text"
+msgid "get the count of"
+msgstr "كُل نیو"
+
+#. BBEEj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_48\n"
+"property.text"
+msgid "(none)"
+msgstr "كہین نئ"
+
+#. agTUo
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_50\n"
+"property.text"
+msgid "Fie~lds in the Query:"
+msgstr ":كئیوری منز شعبئ"
+
+#. CScUQ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_51\n"
+"property.text"
+msgid "Sorting order:"
+msgstr ":سارٹینگ آرڈر"
+
+#. JDHFH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_52\n"
+"property.text"
+msgid "No sorting fields were assigned."
+msgstr "كہین  سارٹینگ شعبئ آو نئ منتقل كرنئ"
+
+#. GLtfA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_53\n"
+"property.text"
+msgid "Search conditions:"
+msgstr ":شرط كریو تلاش  "
+
+#. DocWB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_54\n"
+"property.text"
+msgid "No conditions were assigned."
+msgstr "كہین  شرط آ۪ی نئ منتقل كرنئ"
+
+#. BfAEG
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_55\n"
+"property.text"
+msgid "Aggregate functions:"
+msgstr ":كُل فنکشنس:"
+
+#. mArUE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_56\n"
+"property.text"
+msgid "No aggregate functions were assigned."
+msgstr "كہین كُل فنكشن آ۪ی نئ منتقل كرنئ "
+
+#. uDTRV
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_57\n"
+"property.text"
+msgid "Grouped by:"
+msgstr ":گروپ كرنئ آمُت"
+
+#. WXLSS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_58\n"
+"property.text"
+msgid "No Groups were assigned."
+msgstr "كہین   گروپس عئس نئ آمِت منتقل كرنئ"
+
+#. jhPaR
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_59\n"
+"property.text"
+msgid "Grouping conditions:"
+msgstr ": گروپینگ شرط"
+
+#. EoMHV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_60\n"
+"property.text"
+msgid "No grouping conditions were assigned."
+msgstr "كہین  گروپینگ شر ط  آی نئ منتقل كرنئ۔"
+
+#. NNF8b
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_70\n"
+"property.text"
+msgid "Select the fields (columns) for your query"
+msgstr "پنئن۪ی كئیوری خعطرئ ژعریو شعبئ(كالمز)"
+
+#. kX9cK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_71\n"
+"property.text"
+msgid "Select the sorting order"
+msgstr "سارٹینگ آرڈر ژعریو"
+
+#. 7jmnS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_72\n"
+"property.text"
+msgid "Select the search conditions"
+msgstr "سرچ کنڈیشن ژعریو"
+
+#. UHCrm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_73\n"
+"property.text"
+msgid "Select the type of query"
+msgstr "كئیوری ہیوند قئسم ژعریو"
+
+#. ZY6MS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_74\n"
+"property.text"
+msgid "Select the groups"
+msgstr " گروپس  ژعریو"
+
+#. N8n8X
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_75\n"
+"property.text"
+msgid "Select the grouping conditions"
+msgstr "گروپینگ شر ط  ژعریو"
+
+#. sy7Lt
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_76\n"
+"property.text"
+msgid "Assign aliases if desired"
+msgstr "اگریژھان چھئوئ عرف كریو منتقل"
+
+#. exiZ6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_77\n"
+"property.text"
+msgid "Check the overview and decide how to proceed"
+msgstr "اوروئیو كریو جانچ تئ فوصلئ كریو كیتھ كئن چھووئ برونٹھ كُن پكُن۔"
+
+#. 2uhKR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_80\n"
+"property.text"
+msgid "Field selection"
+msgstr " ژعرمُت شعبہ "
+
+#. LzPyD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_81\n"
+"property.text"
+msgid "Sorting order"
+msgstr ":سارٹینگ آرڈر "
+
+#. pVVLS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_82\n"
+"property.text"
+msgid "Search conditions"
+msgstr " شر ط كریو تلاش  "
+
+#. Z22GZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_83\n"
+"property.text"
+msgid "Detail or summary"
+msgstr "تفصیل یاخلاصہ "
+
+#. 4EYC7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_84\n"
+"property.text"
+msgid "Grouping"
+msgstr "گروپینگ"
+
+#. MziCd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_85\n"
+"property.text"
+msgid "Grouping conditions"
+msgstr "گروپینگ شرط"
+
+#. EB7JF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_86\n"
+"property.text"
+msgid "Aliases"
+msgstr "عرفیت "
+
+#. WzptL
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_87\n"
+"property.text"
+msgid "Overview"
+msgstr "اورویئو"
+
+#. f4xrP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_88\n"
+"property.text"
+msgid "A field that has not been assigned an aggregate function must be used in a group."
+msgstr "یتھ شعبس مجموعی فنکشن چھئنو آمئژ منتقل كرنئ سُئ گئژھ۪ی گروپس منز یُن استیمال كرنئ۔"
+
+#. 2C2nu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_89\n"
+"property.text"
+msgid "The condition '<FIELDNAME> <LOGICOPERATOR> <VALUE>' was chosen twice. Each condition can only be chosen once"
+msgstr " شرط'<FIELDNAME>  دوبارئ آو ژارنئ۔ہر كاہں شرط ی اك۪ی لٹ۪ی منتقل كرنئ ۔<LOGICOPERATOR> <VALUE>' "
+
+#. ZAHzB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_90\n"
+"property.text"
+msgid "The aggregate function <FUNCTION> has been assigned twice to the fieldname '<NUMERICFIELD>'."
+msgstr "           مجموعی فنكشنس چھُ  <FUNCTION>چھُ دوی لٹ۪ی آمُت شبئ ناو منتقل كرنئ"
+
+#. s2MGE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_91\n"
+"property.text"
+msgid ","
+msgstr ""
+
+#. D8bmB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_92\n"
+"property.text"
+msgid "<FIELDTITLE> (<FIELDNAME>)"
+msgstr "<FIELDTITLE> (<FIELDNAME>)"
+
+#. dGCJv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_93\n"
+"property.text"
+msgid "<FIELDNAME> (<SORTMODE>)"
+msgstr "<FIELDNAME> (<SORTMODE>)"
+
+#. RAt2h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_94\n"
+"property.text"
+msgid "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+msgstr "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+
+#. pbBGo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_95\n"
+"property.text"
+msgid "<CALCULATEDFUNCTION> <FIELDNAME>"
+msgstr "<CALCULATEDFUNCTION> <FIELDNAME>"
+
+#. MBwoM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_96\n"
+"property.text"
+msgid "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+msgstr "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+
+#. yheet
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_0\n"
+"property.text"
+msgid "Form Wizard"
+msgstr "فارم ویزارڈ"
+
+#. H4MXV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_1\n"
+"property.text"
+msgid "Fields in ~the form"
+msgstr " فارمن منز  شعبہ "
+
+#. 6J6EJ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_2\n"
+"property.text"
+msgid "Binary fields are always listed and selectable from the left list.\\nIf possible, they are interpreted as images."
+msgstr ""
+"باینئری شعبئ چھئ ہمیشئ یوان فہرستس منز تئ ژارنئ چھئ یوان كھوفرئ فہرست منز.\n"
+"  اگر ممكن چھُ تم چھئ یوان شكلئ تصووُر كرنئ۔"
+
+#. BCBCd
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_3\n"
+"property.text"
+msgid "A subform is a form that is inserted in another form.\\nUse subforms to show data from tables or queries with a one-to-many relationship."
+msgstr ""
+"زیلی فارم جھُ فارم یس بییس فارمس منز چھُ یوان ڈئخل كرنئ .\n"
+"  زیلی فارم كریو استیمال جدول منزئ یا سوالئ منزئ  اكس سعتھ وارہن تعلوقاتن سعتھ ڈاٹا  ہاونئ خعطرئ "
+
+#. h4XzG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_4\n"
+"property.text"
+msgid "~Add Subform"
+msgstr "ذیلی فارم رلئویو"
+
+#. GSiwE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_5\n"
+"property.text"
+msgid "~Subform based on existing relation"
+msgstr "۔ذیلی فارم چھُ  موجودئ تعلقس پیٹھ منحصر "
+
+#. oFM6V
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_6\n"
+"property.text"
+msgid "Tables or queries"
+msgstr "جدول یاسوال"
+
+#. 2BEab
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_7\n"
+"property.text"
+msgid "Subform based on ~manual selection of fields"
+msgstr "ذیلی فارم  چھُ شعبن ہندس  مینول ژار س پیٹھ  منحصر "
+
+#. PShA6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_8\n"
+"property.text"
+msgid "~Which relation do you want to add?"
+msgstr "تہئ كُس تعلق چھئوئ یژھان رلاوُن؟"
+
+#. yGGuc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_9\n"
+"property.text"
+msgid "Fields in the ~subform"
+msgstr "زیلی  فارمن منز  شعبہ "
+
+#. KG4Hj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_12\n"
+"property.text"
+msgid "~Available fields"
+msgstr "۔ دستیاب شعبئ"
+
+#. pB2Mv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_13\n"
+"property.text"
+msgid "Fields in form"
+msgstr " فارمن منز  شعبہ "
+
+#. fFuDk
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_19\n"
+"property.text"
+msgid "The join '<FIELDNAME1>' and '<FIELDNAME2>' has been selected twice.\\nBut joins may only be used once."
+msgstr ""
+"  '<FIELDNAME2>'تئ'<FIELDNAME1>'  چھئ آمیت ژارنئ دوی پھیر۪ی.\n"
+" مگر  جوین یی اك۪ی لٹ۪ی استیمال كرنئ"
+
+#. 9uFd2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_20\n"
+"property.text"
+msgid "~First joined subform field"
+msgstr "۔گڈنیوك جوڈمُت ذیلی فارم شعبہ "
+
+#. NfpyC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_21\n"
+"property.text"
+msgid "~Second joined subform field"
+msgstr "دئیم جوڈمُت ذیلی فارم شعبہ "
+
+#. 5F4nf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_22\n"
+"property.text"
+msgid "~Third joined subform field"
+msgstr "۔ ترییم جوڈمُت ذیلی فارم شعبہ "
+
+#. BJBzR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_23\n"
+"property.text"
+msgid "~Fourth joined subform field"
+msgstr "ژوریم جوڈمُت ذیلی فارم شعبہ "
+
+#. EAJxx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_24\n"
+"property.text"
+msgid "F~irst joined main form field"
+msgstr "پہلےجڑاہوامرکزی فارم شعبہ "
+
+#. S72RL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_25\n"
+"property.text"
+msgid "S~econd joined main form field"
+msgstr "دئیم جوڈمُت مركزی فارم شعبہ "
+
+#. C73ZZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_26\n"
+"property.text"
+msgid "T~hird joined main form field"
+msgstr "ترییم جوڈمُت مركزی فارم شعبہ "
+
+#. AwNUu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_27\n"
+"property.text"
+msgid "F~ourth joined main form field"
+msgstr "ژوریم جوڈمُت مركزی فارم شعبہ "
+
+#. KCNEY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_28\n"
+"property.text"
+msgid "Field border"
+msgstr "شعبُك کنارئ"
+
+#. oQq6u
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_29\n"
+"property.text"
+msgid "No border"
+msgstr "كہین  کنارئ چھُنئ"
+
+#. hk9Xa
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_30\n"
+"property.text"
+msgid "3D look"
+msgstr "3D وچھیو"
+
+#. noMiL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_31\n"
+"property.text"
+msgid "Flat"
+msgstr "ہموار"
+
+#. kCBjw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_32\n"
+"property.text"
+msgid "Label placement"
+msgstr "لیبل متعین"
+
+#. Vrww6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_33\n"
+"property.text"
+msgid "Align left"
+msgstr "كھوفُر كُن دیو ترتیب "
+
+#. Qrt6U
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_34\n"
+"property.text"
+msgid "Align right"
+msgstr "دَچُھن    كُن دیو ترتیب "
+
+#. KNG6r
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_35\n"
+"property.text"
+msgid "Arrangement of DB fields"
+msgstr "شعبیچ  ترتیب وئریDB"
+
+#. nRTak
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_36\n"
+"property.text"
+msgid "Columnar - Labels Left"
+msgstr "کالمنر-لیبلس كھوفر"
+
+#. HcbRM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_37\n"
+"property.text"
+msgid "Columnar - Labels on Top"
+msgstr "کالمنر-لیبلس پیٹھئ كئن۪ی"
+
+#. dRw3C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_38\n"
+"property.text"
+msgid "In Blocks - Labels Left"
+msgstr "ان بلاکس-لیبلس كھوفر"
+
+#. m99kS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_39\n"
+"property.text"
+msgid "In Blocks - Labels Above"
+msgstr "ان بلاکس-لیبلس پیٹھكئنئ"
+
+#. ZNTvC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_40\n"
+"property.text"
+msgid "As Data Sheet"
+msgstr "ڈاٹاشیٹ ہیو"
+
+#. F5dN5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_41\n"
+"property.text"
+msgid "Arrangement of the main form"
+msgstr "مرکزی فارمئچ  ترتیب"
+
+#. BEN4F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_42\n"
+"property.text"
+msgid "Arrangement of the subform"
+msgstr "ذیلی فارمك ترتیب"
+
+#. ZAxZE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_44\n"
+"property.text"
+msgid "The form is to be ~used for entering new data only."
+msgstr "یہ فارم  چھُ صرف نئو ڈاٹا استیمال كرنئ خعطرئ دئخل یوان كرنئ۔"
+
+#. epRse
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_45\n"
+"property.text"
+msgid "Existing data will not be displayed"
+msgstr "موجودئ ڈاٹایی نئ ہاونئ"
+
+#. hrpiG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_46\n"
+"property.text"
+msgid "T~he form is to display all data"
+msgstr "فارم چھُ سئوری ڈاٹا ہاونئ خعطرئ"
+
+#. jqEHe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_47\n"
+"property.text"
+msgid "Do not allow ~modification of existing data"
+msgstr "موجودئ  ڈاٹاس منز مئ دیو تبدیلین اجازتھ۔"
+
+#. FE9no
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_48\n"
+"property.text"
+msgid "Do not allow ~deletion of existing data"
+msgstr "موجودئ  ڈاٹاس منز مئ دیو خئرج كرنس  اجازتھ۔"
+
+#. KwdDp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_49\n"
+"property.text"
+msgid "Do not allow ~addition of new data"
+msgstr "نئوس ڈاٹا س منز  اضافئ كرنس مئ دیو اجازتھ۔"
+
+#. Z7Wzp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_50\n"
+"property.text"
+msgid "Name of ~the form"
+msgstr "فارم ناو "
+
+#. AdLhz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_51\n"
+"property.text"
+msgid "How do you want to proceed after creating the form?"
+msgstr "فارم بناونئ پتئ كیتھ كئن چھئوئ یژھان تہئ برونٹھكُن پكُن؟"
+
+#. G7CYq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_52\n"
+"property.text"
+msgid "~Work with the form"
+msgstr " فارمس سعتھ كئم۔"
+
+#. iCnFm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_53\n"
+"property.text"
+msgid "~Modify the form"
+msgstr "فارم كریو تبدیال"
+
+#. 5EgBu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_55\n"
+"property.text"
+msgid "~Page Styles"
+msgstr "صفحن ہیوند سٹائلز"
+
+#. D99cE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_80\n"
+"property.text"
+msgid "Field selection"
+msgstr " ژعرمُت شعبہ "
+
+#. AspWz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_81\n"
+"property.text"
+msgid "Set up a subform"
+msgstr "ذیلی فارم كریو سیٹ اپ  "
+
+#. YayFB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_82\n"
+"property.text"
+msgid "Add subform fields"
+msgstr " ذیلی فارم شعبئ رلئویو"
+
+#. V2Q6R
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_83\n"
+"property.text"
+msgid "Get joined fields"
+msgstr "رلئومت شعبئ انیو"
+
+#. orBm4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_84\n"
+"property.text"
+msgid "Arrange controls"
+msgstr "کنٹرولز دیو ترتیب "
+
+#. QGCau
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_85\n"
+"property.text"
+msgid "Set data entry"
+msgstr " ڈاٹا دئخلئ كریو سیٹ"
+
+#. vFeqn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_86\n"
+"property.text"
+msgid "Apply styles"
+msgstr "سٹائل كریو لاگوئ"
+
+#. 24keF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_87\n"
+"property.text"
+msgid "Set name"
+msgstr " ناو كریو سیٹ "
+
+#. H25LH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_88\n"
+"property.text"
+msgid "(Date)"
+msgstr "تئریخ"
+
+#. EACeJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_89\n"
+"property.text"
+msgid "(Time)"
+msgstr "(وقت)"
+
+#. scXkg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_90\n"
+"property.text"
+msgid "Select the fields of your form"
+msgstr "پنئن۪ی فارمُك شعبہ  ژعریو"
+
+#. s6xRo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_91\n"
+"property.text"
+msgid "Decide if you want to set up a subform"
+msgstr "فئصلئ كریو اگر تہئ ذیلی فارم سیٹ اپ  چھئوئ یژھان كرُن"
+
+#. 4pHsF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_92\n"
+"property.text"
+msgid "Select the fields of your subform"
+msgstr "پنئن۪ی ذیلی فارمك شعبہ  ژعریو"
+
+#. WT3Gn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_93\n"
+"property.text"
+msgid "Select the joins between your forms"
+msgstr " پنونین فارمن منز ژعریو جوڈ"
+
+#. DWvza
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_94\n"
+"property.text"
+msgid "Arrange the controls on your form"
+msgstr "پنئنس فارمس پیٹھ دیو كنٹرولس ترتیب"
+
+#. j6uv4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_95\n"
+"property.text"
+msgid "Select the data entry mode"
+msgstr "ڈاٹااینٹری موڈ ژعریو"
+
+#. TWztZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_96\n"
+"property.text"
+msgid "Apply the style of your form"
+msgstr " پنئن۪ی فارمُك سٹایل ژعریو"
+
+#. zZiae
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_97\n"
+"property.text"
+msgid "Set the name of the form"
+msgstr "فارمك ناو كریو سیٹ۔"
+
+#. JTRXV
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_98\n"
+"property.text"
+msgid "A form with the name '%FORMNAME' already exists.\\nChoose another name."
+msgstr ""
+" '%FORMNAME' اكھ ناو چھُ گڈئی موجود.\n"
+" بدل ناو ژئریو"
+
+#. KJkgf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_1\n"
+"property.text"
+msgid "Table Wizard"
+msgstr "جدول ویزارٹ "
+
+#. hGMoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_2\n"
+"property.text"
+msgid "Select fields"
+msgstr "شعبئ ژعریو"
+
+#. XEQgp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_3\n"
+"property.text"
+msgid "Set types and formats"
+msgstr "ٹائپس تئ فارمیٹس ژعریو"
+
+#. Lww9c
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_4\n"
+"property.text"
+msgid "Set primary key"
+msgstr "پرائمری كونز كریوسیٹ "
+
+#. LkTBf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_5\n"
+"property.text"
+msgid "Create table"
+msgstr "جدول كریو تخلیق"
+
+#. hei5Y
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_8\n"
+"property.text"
+msgid "Select fields for your table"
+msgstr "پنئنئ شوبئ  خعطرئ ژعریو جدول"
+
+#. 5DXT6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_9\n"
+"property.text"
+msgid "Set field types and formats"
+msgstr "فیلڈٹائپس تئ فارمیٹس ژعریو"
+
+#. bAfiP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_10\n"
+"property.text"
+msgid "Set primary key"
+msgstr "پرائمری كونز كریوسیٹ "
+
+#. UHTbE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_11\n"
+"property.text"
+msgid "Create table"
+msgstr "جدول كریو تخلیق"
+
+#. XyCFc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_14\n"
+"property.text"
+msgid "This wizard helps you to create a table for your database. After selecting a table category and a sample table, choose the fields you want to include in your table. You can include fields from more than one sample table."
+msgstr "یئ ویزارڈ چھئوو تہئ مدد كران پنئنئ ڈاٹا بیس خعطرئ جدول بناونس منز۔ جدول كیٹوگری تئ نمونئ جدول ژارنئ پت۪ی ژعریو شعبئ یم تہئ جدولس منز شئمل چھئوئ یژھان كرِن۔ تہئ ہیكیو شعبئ شئمل كریتھ اك۪ی ہوتئ زیادئ نمونئ جدولئ منزئ۔"
+
+#. FEU9Q
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_15\n"
+"property.text"
+msgid "Ca~tegory"
+msgstr "کیٹگری "
+
+#. aBFKF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_16\n"
+"property.text"
+msgid "B~usiness"
+msgstr "تجارت"
+
+#. nfCjy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_17\n"
+"property.text"
+msgid "P~ersonal"
+msgstr "ذئتی"
+
+#. NrVBB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_18\n"
+"property.text"
+msgid "~Sample tables"
+msgstr "۔جدول نمونئ"
+
+#. itXJ9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_19\n"
+"property.text"
+msgid "A~vailable fields"
+msgstr " دستیاب شعبئ"
+
+#. JteH7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_20\n"
+"property.text"
+msgid "Field information"
+msgstr "شعبئچ  ی مولومات"
+
+#. NqEog
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_21\n"
+"property.text"
+msgid "+"
+msgstr ""
+
+#. BhFze
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_22\n"
+"property.text"
+msgid "-"
+msgstr ""
+
+#. B8Qeu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_23\n"
+"property.text"
+msgid "Field name"
+msgstr " شعبك ناو"
+
+#. gF5v4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_24\n"
+"property.text"
+msgid "Field type"
+msgstr " شعبہ ٹائپ "
+
+#. S82Up
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_25\n"
+"property.text"
+msgid "~Selected fields"
+msgstr "۔ شعبئ ژعرمِت"
+
+#. iWG72
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_26\n"
+"property.text"
+msgid "A primary key uniquely identifies each record in a database table. Primary keys ease the linking of information in separate tables, and it is recommended that you have a primary key in every table. Without a primary key, it will not be possible to enter data into this table."
+msgstr "پرائمری چھئ ہر كُن۪ی ریكارڈس منز ڈاٹا بیس جدول پرزناوان۔  پرایمری كی چھئ سہل بناوان مولومات الگ الگ جدولن منز تئ یئ چھئ یوان صلح دینئ تہئ تھئویو پرایمری كی ہر كُن۪ی جدولس منز۔ پرایمری كی بغئر چھُنئ ڈاٹا جدولس منز دئخل كرُن ممكن۔"
+
+#. 3kaaw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_27\n"
+"property.text"
+msgid "~Create a primary key"
+msgstr "پرائمری کی بناویو"
+
+#. xGC6Z
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_28\n"
+"property.text"
+msgid "~Automatically add a primary key"
+msgstr "۔پرائمری كنز كریو  پانئی جمع"
+
+#. aP3ai
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_29\n"
+"property.text"
+msgid "~Use an existing field as a primary key"
+msgstr "موجودئ شعبئ كریو پرایمری كی كس طور س پیٹھ استیمال"
+
+#. KBVAL
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_30\n"
+"property.text"
+msgid "Define p~rimary key as a combination of several fields"
+msgstr "پرائمری كونز كریو واضیح یكجاح واریاح شعبئ ہی"
+
+#. PQfF2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_31\n"
+"property.text"
+msgid "F~ieldname"
+msgstr "شعبےکانام"
+
+#. AK4Vf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_32\n"
+"property.text"
+msgid "~Primary key fields"
+msgstr "پرائمری کلیدشعبے"
+
+#. ZykVT
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_33\n"
+"property.text"
+msgid "Auto ~value"
+msgstr "خودکار قیمت"
+
+#. AnaDG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_34\n"
+"property.text"
+msgid "What do you want to name your table?"
+msgstr "آپ اپنےجدول کوکیانام دیناچاہتےہیں؟"
+
+#. vVHAs
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_35\n"
+"property.text"
+msgid "Congratulations. You have entered all the information needed to create your table."
+msgstr "مبارک چھئوئ۔ تہئ چھئوئ كرمژ سئری مولومات جدول بناونئ خعطرئ دئخل ۔"
+
+#. 9wGua
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_36\n"
+"property.text"
+msgid "What do you want to do next?"
+msgstr "تہئ كیاہ چھئوئ یژھان پتئ كرُن؟"
+
+#. satRX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_37\n"
+"property.text"
+msgid "Modify the table design"
+msgstr "جدول ڈئزائن شیریو"
+
+#. GEjDE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_38\n"
+"property.text"
+msgid "Insert data immediately"
+msgstr "ڈاٹاكریو  دئخل فئورن"
+
+#. E8SB9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_39\n"
+"property.text"
+msgid "C~reate a form based on this table"
+msgstr "یتھ فارمس پیٹھ منحصر بنئویوجدول"
+
+#. FkbmE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_40\n"
+"property.text"
+msgid "The table you have created could not be opened."
+msgstr "تہئ  یُس جدول بنئوئ سُئ ہیوك نئ كھولیتھ۔"
+
+#. mZMcY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_41\n"
+"property.text"
+msgid "The table name '%TABLENAME' contains a character ('%SPECIALCHAR') that might not be supported by the database."
+msgstr " جدول ناو  '%TABLENAME'اَس منز چھئ حرف ('%SPECIALCHAR') یمئن  ڈاٹابیسُك  معاون  آس۪ی نئ۔"
+
+#. GGfLR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_42\n"
+"property.text"
+msgid "The field name '%FIELDNAME' contains a special character ('%SPECIALCHAR') that might not be supported by the database."
+msgstr "فائل ناو '%FIELDNAME'منز چھُ خصوصی لفظ شئمل  ('%SPECIALCHAR') یتھ  ڈاٹابیسك  معاون آس۪ی نئ۔"
+
+#. CtXqK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_43\n"
+"property.text"
+msgid "Field"
+msgstr "شعبہ"
+
+#. LCMUy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_44\n"
+"property.text"
+msgid "MyTable"
+msgstr "میون جدول"
+
+#. g7GJC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_45\n"
+"property.text"
+msgid "Add a Field"
+msgstr "شوبئ   جوڑیو"
+
+#. EC4Xn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_46\n"
+"property.text"
+msgid "Remove the selected Field"
+msgstr "ژعرمُت شعبہ ہٹئویو"
+
+#. rhV9g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_47\n"
+"property.text"
+msgid "The field cannot be inserted because this would exceed the maximum number of %COUNT possible fields in the database table"
+msgstr "   شعبہ  ہیك۪ی نئ دئخل گژیتھ كیازئ كئ یئ بڈ۪ی %COUNT ممكن شعبئ ك۪ین   میکسیمم نمبرن یس   ڈاٹابیس جدول منز چھُ"
+
+#. jbZRo
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_48\n"
+"property.text"
+msgid "The name '%TABLENAME' already exists.\\nPlease enter another name."
+msgstr ""
+"ناو '%TABLENAME'چھُ گڈئی موجود۔  \n"
+"مہربئنی كریتھ كریو بدل ناو دئخل۔"
+
+#. CSsZM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_49\n"
+"property.text"
+msgid "Catalog of the table"
+msgstr "جدولك کیٹلاگ"
+
+#. vYCp3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_50\n"
+"property.text"
+msgid "Schema of the table"
+msgstr "جدولیچ سکیم"
+
+#. UnUxG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_51\n"
+"property.text"
+msgid "The field '%FIELDNAME' already exists."
+msgstr "%FORMNAME' شعبئ چھُ گڈئی موجود"
+
+#. Jqd4i
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_0\n"
+"property.text"
+msgid "~Cancel"
+msgstr "۔منسوخ"
+
+#. t9bGA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_1\n"
+"property.text"
+msgid "~Help"
+msgstr "مدد"
+
+#. TQ8fA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_2\n"
+"property.text"
+msgid "< ~Back"
+msgstr "پَتھ"
+
+#. XD8JL
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_3\n"
+"property.text"
+msgid "~Convert"
+msgstr "تبدیل کرو"
+
+#. tGJBz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_4\n"
+"property.text"
+msgid "Note: Currency amounts from external links and currency conversion factors in formulas cannot be converted."
+msgstr "نوٹ:کرنسی رقم  نیبریمیو لنكس پیٹھئ تئ كرنسی تبدیلی وجوہات ضئبتن منز ہیكئو نئ تبدیل كیتھ۔"
+
+#. GdxoQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_5\n"
+"property.text"
+msgid "First, unprotect all sheets."
+msgstr "گُڈنیوك،  غئر محفوظ شیٹس  "
+
+#. fUudC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_6\n"
+"property.text"
+msgid "Currencies:"
+msgstr "کرنسیز"
+
+#. 5Uug9
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_7\n"
+"property.text"
+msgid "C~ontinue >"
+msgstr "جئری>>"
+
+#. 9JLmA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_8\n"
+"property.text"
+msgid "C~lose"
+msgstr "بند"
+
+#. pkLZp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_0\n"
+"property.text"
+msgid "~Entire document"
+msgstr "پورئ دستاویز"
+
+#. KTycA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_1\n"
+"property.text"
+msgid "Selection"
+msgstr "انتخاب"
+
+#. NCtfG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_2\n"
+"property.text"
+msgid "Cell S~tyles"
+msgstr "سیل سٹائلز"
+
+#. W4CcY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_3\n"
+"property.text"
+msgid "Currency cells in the current ~sheet"
+msgstr "کرنسی سیلس حال كس  شیٹس منز"
+
+#. XBbAm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_4\n"
+"property.text"
+msgid "Currency cells in the entire ~document"
+msgstr "کرنسی سیلس سئرسی دستاویزمنز"
+
+#. dRGpU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_5\n"
+"property.text"
+msgid "~Selected range"
+msgstr "۔  حد ژعورمُت"
+
+#. KGDmq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_6\n"
+"property.text"
+msgid "Select Cell Styles"
+msgstr "سیل  سٹائلزژعریو"
+
+#. rEiCE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_7\n"
+"property.text"
+msgid "Select currency cells"
+msgstr "کرنسی سیلس ژعریو"
+
+#. yXtpS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_8\n"
+"property.text"
+msgid "Currency ranges:"
+msgstr "کرنسی ہیند حد"
+
+#. d2faA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_9\n"
+"property.text"
+msgid "Templates:"
+msgstr ":ٹیمپلیٹس"
+
+#. 63WRQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_0\n"
+"property.text"
+msgid "Extent"
+msgstr "توسیع"
+
+#. CDmMh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_1\n"
+"property.text"
+msgid "~Single %PRODUCTNAME Calc document"
+msgstr "کیلک دستاویز%PRODUCTNAMEوئحد"
+
+#. nUcAR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_2\n"
+"property.text"
+msgid "Complete ~directory"
+msgstr "مکمل ڈائریکٹری"
+
+#. eUtmF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_3\n"
+"property.text"
+msgid "Source Document:"
+msgstr "دستاویزی زرئی"
+
+#. iQj6g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_4\n"
+"property.text"
+msgid "Source directory:"
+msgstr "زرئی ڈائریکٹری:"
+
+#. JM8cN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_5\n"
+"property.text"
+msgid "~Including subfolders"
+msgstr "سب فولڈرزشئمل کرِن"
+
+#. BFR2F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_6\n"
+"property.text"
+msgid "Target directory:"
+msgstr ":ٹارگیٹ ڈائریکٹری"
+
+#. 2q8vo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_7\n"
+"property.text"
+msgid "Temporarily unprotect sheet without query"
+msgstr "عئرضی غئرمحفوظ شیٹ سوال بغئر "
+
+#. BVhae
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_10\n"
+"property.text"
+msgid "Also convert fields and tables in text documents"
+msgstr "شعبئ تئ جدول بدلئویو مواد دستاویزس  منز"
+
+#. sFtH8
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_0\n"
+"property.text"
+msgid "Conversion status:"
+msgstr "بدلاونُك  رتبہ"
+
+#. 8EcKA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_1\n"
+"property.text"
+msgid "Conversion status of the cell templates:"
+msgstr " :سیل ٹیمپلیٹسن  ہیوند بدلاومُك درجئ"
+
+#. BAX9w
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_2\n"
+"property.text"
+msgid "Registration of the relevant ranges: Sheet %1Number%1 of %2TotPageCount%2"
+msgstr " متعلقہ حدن ہنز ریجسٹریشن:شیٹ %1Number%1 of %2TotPageCount%2"
+
+#. EbBJf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_3\n"
+"property.text"
+msgid "Entry of the ranges to be converted..."
+msgstr "حدن ہیوند  دئخلہ  یس بدلاوُن چھُ"
+
+#. f3Erf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_4\n"
+"property.text"
+msgid "Sheet protection for each sheet will be restored..."
+msgstr "شیٹ تحفظ یی ہر كن۪ی شیٹ  خعطرئ  ری سٹور كرنئ "
+
+#. 5sPuS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_5\n"
+"property.text"
+msgid "Conversion of the currency units in the cell templates..."
+msgstr "کرنسی یونٹس ہنز  سیل ٹیمپلیٹس منز  تبدیلی"
+
+#. JuVQA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_0\n"
+"property.text"
+msgid "~Finish"
+msgstr "ختم"
+
+#. xsatA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_1\n"
+"property.text"
+msgid "Select directory"
+msgstr "ڈائریکٹری ژعریو"
+
+#. o4Myk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_2\n"
+"property.text"
+msgid "Select file"
+msgstr "فائل ژعریو"
+
+#. 5khdm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_3\n"
+"property.text"
+msgid "Select target directory"
+msgstr "ٹارگیٹ ڈائریکٹری ژعریو"
+
+#. Ldc4o
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_4\n"
+"property.text"
+msgid "non-existent"
+msgstr "غئر موجود"
+
+#. bh9MB
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_5\n"
+"property.text"
+msgid "Euro Converter"
+msgstr "یورومیں بدلنےوالا"
+
+#. tb9sF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_6\n"
+"property.text"
+msgid "Should protected spreadsheets be temporarily unprotected?"
+msgstr "محفوظ كرمُت  سپریڈشیٹ  پزئ عئرضی طورپيٹھ غئرمحفوظ یُن کرنئ؟"
+
+#. zFqxc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_7\n"
+"property.text"
+msgid "Enter the password to unprotect the table %1TableName%1"
+msgstr "   %1 جدول ناو%1  جدول غئر محفوظ کرنئ خعطرئ كریو خفیہ لفظ دئخل "
+
+#. t2n9c
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_8\n"
+"property.text"
+msgid "Wrong Password!"
+msgstr " !غلط خفیہ لفظ"
+
+#. YPd7L
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_9\n"
+"property.text"
+msgid "Protected Sheet"
+msgstr "محفوظكرمُت شیٹ"
+
+#. JbEyK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_10\n"
+"property.text"
+msgid "Warning!"
+msgstr " !آگہی"
+
+#. tYfDo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_11\n"
+"property.text"
+msgid "Protection for the sheets will not be removed."
+msgstr "شیٹسن خعطرئ   تحفظ یی نئ ہٹاونئ   "
+
+#. YfPkn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_12\n"
+"property.text"
+msgid "Sheet cannot be unprotected"
+msgstr "شیٹ ہیكئو نئ غئرمحفوظ  كریتھ"
+
+#. PisTE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_13\n"
+"property.text"
+msgid "The Wizard cannot edit this document as cell formats cannot be modified in documents containing protected spreadsheets."
+msgstr "یئ ویزارڈ ہیك۪ی نئ دستاویزس ادارت كریتھ كیازئ كئ سیل فارمیٹس ہیكئو نئ بدلئویتھ پروٹیكٹیڈ  سپریڈشیٹس كین دستاویزن منز"
+
+#. t5jgU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_14\n"
+"property.text"
+msgid "Please note that the Euro Converter will, otherwise, not be able to edit this document!"
+msgstr "خیال تھئویو یورو کنورٹرکر۪ی،یا، یی نئ ییتھ دستاویزس ادارت كرنئ۔"
+
+#. MwoXF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_15\n"
+"property.text"
+msgid "Please choose a currency to be converted first!"
+msgstr "مہربئنی كریتھ ژعریو كرنسی گڈئ تبدیل كرنئ خعطرئ"
+
+#. CzTMy
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_16\n"
+"property.text"
+msgid "Password:"
+msgstr "خفیہ لفظ"
+
+#. QBznu
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_17\n"
+"property.text"
+msgid "OK"
+msgstr "OK"
+
+#. ALxZG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_18\n"
+"property.text"
+msgid "Cancel"
+msgstr "منسوخ"
+
+#. bTNoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_19\n"
+"property.text"
+msgid "Please select a %PRODUCTNAME Calc document for editing!"
+msgstr "  مہر بئنی كریتھ ژعریو  %  PRODUCTNAME Calc  دستاویز ادارت كرنئ خعطرئ"
+
+#. 8QobR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_20\n"
+"property.text"
+msgid "'<1>' is not a directory!"
+msgstr " '<1>' چھئنئ ڈائریکٹری  "
+
+#. saw7C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_21\n"
+"property.text"
+msgid "Document is read-only!"
+msgstr "!دستاویز چھئ پریو صرف"
+
+#. GZECF
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_22\n"
+"property.text"
+msgid "The '<1>' file already exists.<CR>Do you want to overwrite it?"
+msgstr "  <CR>چھئ گڈئی موجود '<1>'  تہ چھئوئ یژھان اووررایٹ كرُن؟"
+
+#. 9dJcF
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_23\n"
+"property.text"
+msgid "Do you really want to terminate conversion at this point?"
+msgstr "تہئ چھئوئ یژھان یتھ موڈس پیٹھ تبدیلی مكلاوئن؟"
+
+#. ufpoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_24\n"
+"property.text"
+msgid "Cancel Wizard"
+msgstr "  ویزارڈ  منسوخ"
+
+#. HCfhF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_0\n"
+"property.text"
+msgid "Portuguese Escudo"
+msgstr "پرتگالی ایس کیوڈو"
+
+#. 4PAvX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_1\n"
+"property.text"
+msgid "Dutch Guilder"
+msgstr "ڈچ گلڈر"
+
+#. VzRz9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_2\n"
+"property.text"
+msgid "French Franc"
+msgstr "فرانسیسی فرینک"
+
+#. rQFWP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_3\n"
+"property.text"
+msgid "Spanish Peseta"
+msgstr "اسپینی پیسیٹا"
+
+#. tc8KC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_4\n"
+"property.text"
+msgid "Italian Lira"
+msgstr "اطالوی لیرا"
+
+#. XgEB3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_5\n"
+"property.text"
+msgid "German Mark"
+msgstr "جرمنی مارک"
+
+#. 7sBxK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_6\n"
+"property.text"
+msgid "Belgian Franc"
+msgstr "بلغاری فرینک"
+
+#. nLYJf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_7\n"
+"property.text"
+msgid "Irish Punt"
+msgstr "آئرش پنٹ"
+
+#. rujpn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_8\n"
+"property.text"
+msgid "Luxembourg Franc"
+msgstr "لکزمبرگ فرینک"
+
+#. jR3cM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_9\n"
+"property.text"
+msgid "Austrian Schilling"
+msgstr "آسٹریائی شیلینگ"
+
+#. 8x4oF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_10\n"
+"property.text"
+msgid "Finnish Mark"
+msgstr "فینش مارک"
+
+#. LsUXE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_11\n"
+"property.text"
+msgid "Greek Drachma"
+msgstr "یونانی ریچما"
+
+#. cks9C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_12\n"
+"property.text"
+msgid "Slovenian Tolar"
+msgstr ""
+
+#. CMbyy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_13\n"
+"property.text"
+msgid "Cypriot Pound"
+msgstr "   دستاویزخئطرئ سیٹ كرمئژ كرنسی چھئنئ    یوروپی کرنسی  !  "
+
+#. HyCde
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_14\n"
+"property.text"
+msgid "Maltese Lira"
+msgstr "تہنزئ آپریٹینگ سسٹم  خعطرئ یُس زبان چھئ سیٹ  آمئژ كرنئ  سُئ چھئنئ   یوروپی مانیٹری زبان  "
+
+#. GAtT3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_15\n"
+"property.text"
+msgid "Slovak Koruna"
+msgstr ""
+
+#. iXDND
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_16\n"
+"property.text"
+msgid "Estonian Kroon"
+msgstr ""
+
+#. NRqiA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_17\n"
+"property.text"
+msgid "Latvian Lats"
+msgstr ""
+
+#. N9Psc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_18\n"
+"property.text"
+msgid "Lithuanian Litas"
+msgstr ""
+
+#. eDjBr
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_0\n"
+"property.text"
+msgid "Progress"
+msgstr "ترقی"
+
+#. JhTCq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_1\n"
+"property.text"
+msgid "Retrieving the relevant documents..."
+msgstr "متعلقہ دستاویز واپس انان"
+
+#. CLY8k
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_2\n"
+"property.text"
+msgid "Converting the documents..."
+msgstr "دستاویز تبدیل کرران"
+
+#. Fh3Fg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_3\n"
+"property.text"
+msgid "Settings:"
+msgstr "سیٹینگس:"
+
+#. C3AGk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_4\n"
+"property.text"
+msgid "Sheet is always unprotected"
+msgstr "شیٹ چھُ ہمیشئ  غئرمحفوظ شدہ"
+
+#. BBZaA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_0\n"
+"property.text"
+msgid "Theme Selection"
+msgstr "  موضوعك ژار"
+
+#. DbGhN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_1\n"
+"property.text"
+msgid "Error while saving the document to the clipboard! The following action cannot be undone."
+msgstr "کلیپ  بورڈس پیٹھ دستاویز محفوظ كرن ویز۪ی گئی غلطی۔ چلوئن كئم ہیكٲو نئ انڈن كریتھ۔"
+
+#. LTS44
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_2\n"
+"property.text"
+msgid "~Cancel"
+msgstr "۔منسوخ"
+
+#. qXu5G
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_3\n"
+"property.text"
+msgid "~OK"
+msgstr "~OK"
+
+#. VkFhm
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_0\n"
+"property.text"
+msgid "(Standard)"
+msgstr "معیئری"
+
+#. YUTxB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_1\n"
+"property.text"
+msgid "Autumn Leaves"
+msgstr ""
+
+#. Bmx9P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_2\n"
+"property.text"
+msgid "Be"
+msgstr ""
+
+#. AYcUq
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_3\n"
+"property.text"
+msgid "Black and White"
+msgstr "سیاہ اورسفید"
+
+#. kNA76
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_4\n"
+"property.text"
+msgid "Blackberry Bush"
+msgstr ""
+
+#. AsnuA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_5\n"
+"property.text"
+msgid "Blue Jeans"
+msgstr ""
+
+#. VgzDD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_6\n"
+"property.text"
+msgid "Fifties Diner"
+msgstr ""
+
+#. YDRhE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_7\n"
+"property.text"
+msgid "Glacier"
+msgstr ""
+
+#. 769K8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_8\n"
+"property.text"
+msgid "Green Grapes"
+msgstr ""
+
+#. bNeCA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_9\n"
+"property.text"
+msgid "Marine"
+msgstr "حاشیہ"
+
+#. LYvgg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_10\n"
+"property.text"
+msgid "Millennium"
+msgstr ""
+
+#. 2dsey
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_11\n"
+"property.text"
+msgid "Nature"
+msgstr ""
+
+#. sobFj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_12\n"
+"property.text"
+msgid "Neon"
+msgstr ""
+
+#. E9VPF
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_13\n"
+"property.text"
+msgid "Night"
+msgstr "دَچھُن"
+
+#. VFByN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_14\n"
+"property.text"
+msgid "PC Nostalgia"
+msgstr ""
+
+#. FCRpD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_15\n"
+"property.text"
+msgid "Pastel"
+msgstr ""
+
+#. uAsPp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_16\n"
+"property.text"
+msgid "Pool Party"
+msgstr ""
+
+#. GDi2u
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_17\n"
+"property.text"
+msgid "Pumpkin"
+msgstr ""
+
+#. piSqr
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_0\n"
+"property.text"
+msgid "Addressee"
+msgstr "مكتوب  الیہ "
+
+#. Cy8W9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_1\n"
+"property.text"
+msgid "One recipient"
+msgstr "اکوی  ریسیپیئنٹ"
+
+#. rH3a3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_2\n"
+"property.text"
+msgid "Several recipients (address database)"
+msgstr "واریاح ریسیپیئنٹس(ڈاٹابیس پتہ) "
+
+#. G8T6x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_3\n"
+"property.text"
+msgid "Use of This Template"
+msgstr "یئ  ٹیمپلیٹ كریواستیمال  "
+
+#. wTrM9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceMsgError\n"
+"property.text"
+msgid "An error has occurred."
+msgstr "  غلطی آ  ئ۪ی"
+
+#. K77VB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_0\n"
+"property.text"
+msgid "Click placeholder and overwrite"
+msgstr "پلیس ہولڈرپیٹھ كریو کلیک تئ اوررائٹ کریو"
+
+#. hRJRf
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_1\n"
+"property.text"
+msgid "Company"
+msgstr "ادارہ"
+
+#. c6Zjp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_2\n"
+"property.text"
+msgid "Department"
+msgstr "شعبہ"
+
+#. cYzGQ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_3\n"
+"property.text"
+msgid "First Name"
+msgstr "پہلا نام"
+
+#. BEmdM
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_4\n"
+"property.text"
+msgid "Last Name"
+msgstr "آخری نام"
+
+#. fxfq5
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_5\n"
+"property.text"
+msgid "Street"
+msgstr "سڑک"
+
+#. DxdCD
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_6\n"
+"property.text"
+msgid "Country"
+msgstr "ملک"
+
+#. uNexF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_7\n"
+"property.text"
+msgid "ZIP/Postal Code"
+msgstr "پوسٹل کوڈ/ZIP "
+
+#. qHMFm
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_8\n"
+"property.text"
+msgid "City"
+msgstr "شہر"
+
+#. AqdCs
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_9\n"
+"property.text"
+msgid "Title"
+msgstr "عنوان"
+
+#. s8G9A
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_10\n"
+"property.text"
+msgid "Position"
+msgstr "جاے"
+
+#. Wa8WF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_11\n"
+"property.text"
+msgid "Form of Address"
+msgstr "نیبُك فارم"
+
+#. 5FwLR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_12\n"
+"property.text"
+msgid "Initials"
+msgstr "انیشیئلس"
+
+#. zH6b3
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_13\n"
+"property.text"
+msgid "Salutation"
+msgstr "خیرمقدمی"
+
+#. wDEfh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_14\n"
+"property.text"
+msgid "Home Phone"
+msgstr "گھریوك فون"
+
+#. LJ5ou
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_15\n"
+"property.text"
+msgid "Work Phone"
+msgstr "کامئ  فون"
+
+#. hJQtY
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_16\n"
+"property.text"
+msgid "Fax"
+msgstr "فیکس"
+
+#. jmiN2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_17\n"
+"property.text"
+msgid "Email"
+msgstr ""
+
+#. w7uK5
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_18\n"
+"property.text"
+msgid "URL"
+msgstr "URL"
+
+#. bgJJe
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_19\n"
+"property.text"
+msgid "Notes"
+msgstr "نوٹس"
+
+#. EhQEg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_20\n"
+"property.text"
+msgid "Alt. Field 1"
+msgstr " ۔شعبہ1Alt "
+
+#. bZ4za
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_21\n"
+"property.text"
+msgid "Alt. Field 2"
+msgstr "۔شعبہ2Alt "
+
+#. vgr7W
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_22\n"
+"property.text"
+msgid "Alt. Field 3"
+msgstr "۔شعبہ3Alt "
+
+#. TGKbX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_23\n"
+"property.text"
+msgid "Alt. Field 4"
+msgstr "۔شعبہ4Alt "
+
+#. HTUTU
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_24\n"
+"property.text"
+msgid "ID"
+msgstr "ID"
+
+#. BkAJF
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_25\n"
+"property.text"
+msgid "State"
+msgstr "ریاست"
+
+#. 8NXAm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_26\n"
+"property.text"
+msgid "Office Phone"
+msgstr "آفس فون "
+
+#. RvvuS
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_27\n"
+"property.text"
+msgid "Pager"
+msgstr "پیجر"
+
+#. M65e8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_28\n"
+"property.text"
+msgid "Mobile Phone"
+msgstr "موبائل فون "
+
+#. hNCCT
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_29\n"
+"property.text"
+msgid "Other Phone"
+msgstr "دیگرفون "
+
+#. jNWYd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_30\n"
+"property.text"
+msgid "Calendar URL"
+msgstr "URLکیلینڈر "
+
+#. Ad3kk
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_31\n"
+"property.text"
+msgid "Invite"
+msgstr "مدعوکرنا"
+
+#. gpGUV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceNoTextmark_0\n"
+"property.text"
+msgid "The bookmark 'Recipient' is missing."
+msgstr "نشان زدریسیپیئنٹ  چھُ راوان۔"
+
+#. G6KuE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceNoTextmark_1\n"
+"property.text"
+msgid "Form letter fields can not be included."
+msgstr "فارم چیٹھ۪ی  شعبئ  ہیكٲو نئ رلئویتھ۔"
+
+#. WM8Eu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgName\n"
+"property.text"
+msgid "Minutes Template"
+msgstr "منٹس ٹیمپلیٹس "
+
+#. 3Yeqe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgNoCancel\n"
+"property.text"
+msgid "An option must be confirmed."
+msgstr "آپشن گژھن  تصدیق ین كرنئ۔"
+
+#. BEWBh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgFrame\n"
+"property.text"
+msgid "Minutes Type"
+msgstr "منٹس ٹائپ"
+
+#. hyGRE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgButton1\n"
+"property.text"
+msgid "Results Minutes"
+msgstr "نتیجہ منٹس"
+
+#. DMfQn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgButton2\n"
+"property.text"
+msgid "Evaluation Minutes"
+msgstr "جانچ کرنک منٹ"
+
+#. 9zy6P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextField\n"
+"property.text"
+msgid "User data field is not defined!"
+msgstr "!استیمال كرن وئل سُند ڈاٹا  غئرواضیح"
+
+#. DzUkS
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"NoDirCreation\n"
+"property.text"
+msgid "The '%1' directory cannot be created:"
+msgstr "ڈائریکٹر ی '%1  ہیك۪ی نئ بنیتھ"
+
+#. JDcBR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MsgDirNotThere\n"
+"property.text"
+msgid "The '%1' directory does not exist."
+msgstr "ڈائریکٹر   '%1  چھُ نئ موجود"
+
+#. WcmGg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"QueryfornewCreation\n"
+"property.text"
+msgid "Do you want to create it now?"
+msgstr "تہئ چھئوئ یژھان  وئن بناوِن؟"
+
+#. 6rvR2
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"HelpButton\n"
+"property.text"
+msgid "~Help"
+msgstr "مدد"
+
+#. qeDY7
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CancelButton\n"
+"property.text"
+msgid "~Cancel"
+msgstr "۔منسوخ"
+
+#. yZGTC
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"BackButton\n"
+"property.text"
+msgid "< ~Back"
+msgstr "پَتھ"
+
+#. Wc2Fp
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"NextButton\n"
+"property.text"
+msgid "Ne~xt >"
+msgstr "برونٹھیم>> "
+
+#. tntS5
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"BeginButton\n"
+"property.text"
+msgid "~Convert"
+msgstr "تبدیل کرو"
+
+#. CL4tm
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CloseButton\n"
+"property.text"
+msgid "~Close"
+msgstr "~بند كریو"
+
+#. 3FYU3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"WelcometextLabel1\n"
+"property.text"
+msgid "This wizard convert legacy format documents to Open Document Format for Office Applications."
+msgstr ""
+
+#. ZQwGS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"WelcometextLabel3\n"
+"property.text"
+msgid "Select the document type for conversion:"
+msgstr ":تبدیلی خعطرئ ژعریو دستاویزٹائپ  "
+
+#. 8QmDc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_1_\n"
+"property.text"
+msgid "Word templates"
+msgstr "  لفظ ٹیمپلیٹس"
+
+#. AujXQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_2_\n"
+"property.text"
+msgid "Excel templates"
+msgstr "ایکسیل ٹیمپلیٹس"
+
+#. hPB75
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_3_\n"
+"property.text"
+msgid "PowerPoint templates"
+msgstr "پاورپوائنٹ ٹیمپلیٹس"
+
+#. QUiMA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_1_\n"
+"property.text"
+msgid "Word documents"
+msgstr "وئرڈ  دستاویز"
+
+#. BDr26
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_2_\n"
+"property.text"
+msgid "Excel documents"
+msgstr "ایکسیل دستاویز"
+
+#. 9RwAv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_3_\n"
+"property.text"
+msgid "PowerPoint/Publisher documents"
+msgstr ""
+
+#. uCxvB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSContainerName\n"
+"property.text"
+msgid "Microsoft Office"
+msgstr "مائکروسافٹ آفس"
+
+#. s4vuw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SummaryHeader\n"
+"property.text"
+msgid "Summary:"
+msgstr ":خلاصہ"
+
+#. uAmbh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"GroupnameDefault\n"
+"property.text"
+msgid "Imported_Templates"
+msgstr "برآمد كرمئت -ٹیمپلیٹس "
+
+#. As7iy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressMoreDocs\n"
+"property.text"
+msgid "Documents"
+msgstr "دستاویز"
+
+#. tbXgc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressMoreTemplates\n"
+"property.text"
+msgid "Templates"
+msgstr "ٹیمپلیٹس"
+
+#. foG9h
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"FileExists\n"
+"property.text"
+msgid "The '<1>' file already exists.<CR>Do you want to overwrite it?"
+msgstr "  <CR>چھئ گڈئی موجود '<1>'  تہ چھئوئ یژھان اووررایٹ كرُن؟"
+
+#. bvMuH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MorePathsError3\n"
+"property.text"
+msgid "Directories do not exist"
+msgstr "ڈایریكٹری چھئنئ موجود "
+
+#. Jh3WF
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"ConvertError1\n"
+"property.text"
+msgid "Do you really want to terminate conversion at this point?"
+msgstr "تہئ چھئوئ یژھان یتھ موڈس پیٹھ تبدیلی مكلاوئن؟"
+
+#. zuFo9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ConvertError2\n"
+"property.text"
+msgid "Cancel Wizard"
+msgstr "  ویزارڈ  منسوخ"
+
+#. MNVFe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RTErrorDesc\n"
+"property.text"
+msgid "An error has occurred in the wizard."
+msgstr ""
+
+#. VzQoq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RTErrorHeader\n"
+"property.text"
+msgid "Error"
+msgstr "غلطی"
+
+#. mFTyW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"OverwriteallFiles\n"
+"property.text"
+msgid "Do you want to overwrite documents without being asked?"
+msgstr "تہئ چھئوئ پریژھنئی یژھان دستاویز اوررائٹ کرن؟ \" "
+
+#. rWgBN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ReeditMacro\n"
+"property.text"
+msgid "Document macro has to be revised."
+msgstr "دستاویزمیکرو پیی دہراوُن۔"
+
+#. GDbH6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CouldNotsaveDocument\n"
+"property.text"
+msgid "Document '<1>' could not be saved."
+msgstr " دستاویز '<1>' ہیوك نئ محفوظ  گژیتھ"
+
+#. GcGjC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CouldNotopenDocument\n"
+"property.text"
+msgid "Document '<1>' could not be opened."
+msgstr "دستاویز '<1>' ہیك۪ی نئ كھولیتھ۔"
+
+#. XG3Dg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"PathDialogMessage\n"
+"property.text"
+msgid "Select a directory"
+msgstr "اَكھ  ڈائریکٹری ژئریو"
+
+#. 8DV2D
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"DialogTitle\n"
+"property.text"
+msgid "Document Converter"
+msgstr "دستاویز تبدیل کرن وۄل"
+
+#. 6hySA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SearchInSubDir\n"
+"property.text"
+msgid "Including subdirectories"
+msgstr "زیلی ڈائریکٹریزشئمل کرِن"
+
+#. Juv8i
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage1\n"
+"property.text"
+msgid "Progress"
+msgstr "ترقی"
+
+#. EWECA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage2\n"
+"property.text"
+msgid "Retrieving the relevant documents:"
+msgstr "متعلقہ دستاویز واپس انان"
+
+#. zTpAx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage3\n"
+"property.text"
+msgid "Converting the documents"
+msgstr "دستاویز تبدیل کرران"
+
+#. B6PuJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressFound\n"
+"property.text"
+msgid "Found:"
+msgstr ":آو اتھ۪ی"
+
+#. 9G86q
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage5\n"
+"property.text"
+msgid "\"%1 found"
+msgstr "%1آو اتھ۪ی"
+
+#. GmveL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"Ready\n"
+"property.text"
+msgid "Finished"
+msgstr "مكلیو"
+
+#. yZCLk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SourceDocuments\n"
+"property.text"
+msgid "Source documents"
+msgstr "زریی دستاویز  "
+
+#. vDd4X
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TargetDocuments\n"
+"property.text"
+msgid "Target documents"
+msgstr "ٹارگیٹ دستاویز"
+
+#. VyLKU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"LogfileSummary\n"
+"property.text"
+msgid "<COUNT> documents converted"
+msgstr "دستاویز كریو  تبدیل <COUNT> "
+
+#. D8KY3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumInclusiveSubDir\n"
+"property.text"
+msgid "All subdirectories will be taken into account"
+msgstr "سارے ذیلی ڈائریکٹریز ین  زہنس منز تھوونئ"
+
+#. 8Bmz9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumSaveDokumente\n"
+"property.text"
+msgid "These will be exported to the following directory:"
+msgstr "یم ین برونٹھم۪ی ڈائریکٹری منز  درآمدكرنئ۔"
+
+#. 8atHD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextImportLabel\n"
+"property.text"
+msgid "Import from:"
+msgstr ":پیٹھئ برآمد"
+
+#. zpCFk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextExportLabel\n"
+"property.text"
+msgid "Save to:"
+msgstr "۔ منز محفوظ"
+
+#. C7a2B
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CreateLogfile\n"
+"property.text"
+msgid "Create log file"
+msgstr "لاگ فا‏ئل  بنئویو"
+
+#. pzBG4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"LogfileHelpText\n"
+"property.text"
+msgid "A log file will be created in your work directory"
+msgstr "لاگ فائل یی بناونئ تہنزئ   ورک ڈائریکٹری منز"
+
+#. mDG8Y
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ShowLogfile\n"
+"property.text"
+msgid "Show log file"
+msgstr "لاگ فائل   ہئویو"
+
+#. 7S3Ct
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTextDocuments\n"
+"property.text"
+msgid "All Word documents contained in the following directory will be imported:"
+msgstr "یم۪ی ڈایریكٹری ہند سئری   وئرڈ دستاویز ین برامد كرنئ:"
+
+#. iBJo8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTableDocuments\n"
+"property.text"
+msgid "All Excel documents contained in the following directory will be imported:"
+msgstr "یم۪ی ڈایریكٹری ہند سئری  ایكسیل دستاویز ین برامد كرنئ:"
+
+#. kZfUh
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSDrawDocuments\n"
+"property.text"
+msgid "All PowerPoint/Publisher documents contained in the following directory will be imported:"
+msgstr "یم۪ی ڈایریكٹری ہند سئری پاور پوینٹ ٹیمپلیٹس ین برامد كرنئ:"
+
+#. AEPyE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTextTemplates\n"
+"property.text"
+msgid "All Word templates contained in the following directory will be imported:"
+msgstr "یم۪ی ڈایریكٹری ہند سئری   وئرڈ ٹیملیٹس   ین برامد كرنئ:"
+
+#. G2vMa
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTableTemplates\n"
+"property.text"
+msgid "All Excel templates contained in the following directory will be imported:"
+msgstr "یم۪ی ڈایریكٹری ہند سئری  ایكسیل ٹیمپلیٹس ین برامد كرنئ:"
+
+#. AEEwA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSDrawTemplates\n"
+"property.text"
+msgid "All PowerPoint templates contained in the following directory will be imported:"
+msgstr "یم۪ی ڈایریكٹری ہند سئری پاور پوینٹ ٹیمپلیٹس ین برامد كرنئ:"

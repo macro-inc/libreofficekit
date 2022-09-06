@@ -1,0 +1,5258 @@
+#. extracted from sfx2
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-08-24 12:29+0200\n"
+"PO-Revision-Date: 2022-06-06 17:37+0000\n"
+"Last-Translator: Ayhan YALÇINSOY <ayhanyalcinsoy@gmail.com>\n"
+"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-master/sfx2messages/tr/>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1552412178.000000\n"
+
+#. bHbFE
+#: include/sfx2/strings.hrc:25
+msgctxt "STR_TEMPLATE_FILTER"
+msgid "Templates"
+msgstr "Şablonlar"
+
+#. FfusE
+#: include/sfx2/strings.hrc:26
+msgctxt "STR_SAVEDOC"
+msgid "~Save"
+msgstr "~Kaydet"
+
+#. CQKYg
+#: include/sfx2/strings.hrc:27
+msgctxt "STR_SAVEASDOC"
+msgid "Save ~As..."
+msgstr "~Farklı Kaydet..."
+
+#. BdP9V
+#: include/sfx2/strings.hrc:28
+msgctxt "STR_SAVEACOPY"
+msgid "Save a Copy..."
+msgstr "Bir Kopyasını Kaydet..."
+
+#. vFaub
+#: include/sfx2/strings.hrc:29
+msgctxt "STR_CLOSEDOC"
+msgid "~Close"
+msgstr "~Kapat"
+
+#. 4jsUR
+#: include/sfx2/strings.hrc:30
+msgctxt "STR_OPEN"
+msgid "~Open"
+msgstr "~Aç"
+
+#. ACduP
+#: include/sfx2/strings.hrc:31
+msgctxt "STR_EDIT_TEMPLATE"
+msgid "~Edit"
+msgstr "~Düzenle"
+
+#. aKW5U
+#: include/sfx2/strings.hrc:32
+msgctxt "STR_DEFAULT_TEMPLATE"
+msgid "Set as De~fault"
+msgstr "Va~rsayılan Olarak Ayarla"
+
+#. Bwnha
+#: include/sfx2/strings.hrc:33
+msgctxt "STR_RESET_DEFAULT"
+msgid "Reset De~fault"
+msgstr "Varsayılanı Sı~fırla"
+
+#. oRvm4
+#: include/sfx2/strings.hrc:34
+msgctxt "STR_DELETE_TEMPLATE"
+msgid "~Delete"
+msgstr "~Sil"
+
+#. UyfFH
+#: include/sfx2/strings.hrc:35
+msgctxt "STR_SFX_RENAME"
+msgid "~Rename"
+msgstr "~Yeniden Adlandır"
+
+#. Gnhk4
+#: include/sfx2/strings.hrc:36
+msgctxt "STR_ACTION_MOVE"
+msgid "~Move"
+msgstr "~Taşı"
+
+#. tWE8a
+#: include/sfx2/strings.hrc:37
+msgctxt "STR_ACTION_EXPORT"
+msgid "E~xport"
+msgstr "Dı~şa Aktar"
+
+#. aEN5D
+#: include/sfx2/strings.hrc:38
+msgctxt "STR_CATEGORY_RENAME"
+msgid "Ren~ame Category"
+msgstr "Kategoriyi Ye~niden Adlandır"
+
+#. Ys9z4
+#: include/sfx2/strings.hrc:39
+msgctxt "STR_RENAME_TEMPLATE"
+msgid "Enter new template name:"
+msgstr "Yeni şablon adını girin:"
+
+#. TVTsi
+#: include/sfx2/strings.hrc:40
+msgctxt "STR_TEMPLATE_TOOLTIP"
+msgid ""
+"Title: $1\n"
+"Category: $2"
+msgstr ""
+"Başlık: $1\n"
+"Kategori: $2"
+
+#. W2X7Y
+#: include/sfx2/strings.hrc:41
+msgctxt "STR_TEMPLATE_SELECTION"
+msgid "Select a Template"
+msgstr "Şablon Seç"
+
+#. ihUZ6
+#: include/sfx2/strings.hrc:42
+msgctxt "STR_AUTOMATICVERSION"
+msgid "Automatically saved version"
+msgstr "Otomatik kaydedilen sürüm"
+
+#. EfF2v
+#: include/sfx2/strings.hrc:43
+msgctxt "STR_EXPORTBUTTON"
+msgid "Export"
+msgstr "Dışa Aktar"
+
+#. q7FND
+#: include/sfx2/strings.hrc:44
+msgctxt "STR_LABEL_FILEFORMAT"
+msgid "File format:"
+msgstr "Dosya biçimi:"
+
+#. N7LVW
+#: include/sfx2/strings.hrc:45
+msgctxt "STR_HIDDENINFO_CONTAINS"
+msgid ""
+"This document contains:\n"
+"\n"
+msgstr ""
+"Bu belge içerikleri:\n"
+"\n"
+
+#. 8tujE
+#: include/sfx2/strings.hrc:46
+msgctxt "STR_HIDDENINFO_RECORDCHANGES"
+msgid "Recorded changes"
+msgstr "Kayıtlı değişiklikler"
+
+#. LUUtP
+#: include/sfx2/strings.hrc:47
+msgctxt "STR_HIDDENINFO_NOTES"
+msgid "Notes"
+msgstr "Notlar"
+
+#. tDmMa
+#: include/sfx2/strings.hrc:48
+msgctxt "STR_HIDDENINFO_DOCVERSIONS"
+msgid "Document versions"
+msgstr "Belge sürümleri"
+
+#. ZBKQD
+#: include/sfx2/strings.hrc:49
+msgctxt "STR_HIDDENINFO_CONTINUE_SAVING"
+msgid "Do you want to continue saving the document?"
+msgstr "Belgeyi kaydederek devam etmek istiyor musunuz?"
+
+#. BzbMB
+#: include/sfx2/strings.hrc:50
+msgctxt "STR_HIDDENINFO_CONTINUE_PRINTING"
+msgid "Do you want to continue printing the document?"
+msgstr "Belgeyi yazdırarak devam etmek istiyor musunuz?"
+
+#. ExQK6
+#: include/sfx2/strings.hrc:51
+msgctxt "STR_HIDDENINFO_CONTINUE_SIGNING"
+msgid "Do you want to continue signing the document?"
+msgstr "Belgeyi imzalayarak devam etmek istiyor musunuz?"
+
+#. TepyB
+#: include/sfx2/strings.hrc:52
+msgctxt "STR_HIDDENINFO_CONTINUE_CREATEPDF"
+msgid "Do you want to continue creating a PDF file?"
+msgstr "PDF dosyası oluşturarak devam etmek istiyor musunuz?"
+
+#. CbFjm
+#: include/sfx2/strings.hrc:53
+msgctxt "STR_NEW_FILENAME_SAVE"
+msgid "If you do not want to overwrite the original document, you should save your work under a new filename."
+msgstr "Özgün belge üzerine yazılamaz, eğer yaptığınız işi kaydetmek isterseniz yeni belge ismi ile kaydedebilirsiniz."
+
+#. 7stwX
+#. Used in the title of a shared document.
+#: include/sfx2/strings.hrc:55
+msgctxt "STR_SHARED"
+msgid " (shared)"
+msgstr " (paylaştırılmış)"
+
+#. W5PzH
+#: include/sfx2/strings.hrc:56
+msgctxt "STR_XMLSEC_ODF12_EXPECTED"
+msgid "The document format version is set to ODF 1.1 (OpenOffice.org 2.x) in Tools-Options-Load/Save-General. Signing documents requires ODF 1.2 (OpenOffice.org 3.x)."
+msgstr "Belge biçimini ODF 1.1 (OpenOffice.org 2.x) olarak ayarlamak için Araçlar-Seçenekler-Yükle/Kaydet-Genel seçeğini kullanabilirsiniz. Belgeyi imzalamak için ODF 1.2 (OpenOffice.org 3.x) gereklidir."
+
+#. tqPCH
+#: include/sfx2/strings.hrc:57
+msgctxt "STR_XMLSEC_QUERY_SAVESIGNEDBEFORESIGN"
+msgid ""
+"The document has to be saved before it can be signed. Saving the document removes all present signatures.\n"
+"Do you want to save the document?"
+msgstr ""
+"Belge imzalanmadan önce kaydedilmelidir. Belgeyi kaydetmek mevcut imzaları kaldırır.\n"
+"Belgeyi kaydetmek istiyor musunuz?"
+
+#. iFaMb
+#: include/sfx2/strings.hrc:58
+msgctxt "STR_QRYTEMPL_MESSAGE"
+msgid "The template '$(ARG1)' on which this document is based, has been modified. Do you want to update the styles of the current document, using the modified template?"
+msgstr "Bu belgenin oluşturulduğu '$(ARG1)' şablonu değiştirilmiş. Mevcut belgenin biçemlerini değiştirilmiş şablonu kullanarak güncellemek ister misiniz?"
+
+#. ABmvY
+#: include/sfx2/strings.hrc:59
+msgctxt "STR_QRYTEMPL_UPDATE_BTN"
+msgid "~Update Styles"
+msgstr "Bi~çemleri Güncelle"
+
+#. W4thg
+#: include/sfx2/strings.hrc:60
+msgctxt "STR_QRYTEMPL_KEEP_BTN"
+msgid "~Keep Old Styles"
+msgstr "Eski Biçemleri Sa~kla"
+
+#. X6MGZ
+#: include/sfx2/strings.hrc:61
+msgctxt "STR_CATEGORY_NEW"
+msgid "~New Category"
+msgstr "~Yeni Kategori"
+
+#. VNfyE
+#: include/sfx2/strings.hrc:62
+msgctxt "STR_CATEGORY_DELETE"
+msgid "~Delete Category"
+msgstr "~Kategoriyi Sil"
+
+#. YdoDu
+#: include/sfx2/strings.hrc:63
+msgctxt "STR_MSG_EXPORT_SUCCESS"
+msgid "$1 templates successfully exported."
+msgstr "$1 şablon başarıyla dışa aktarıldı."
+
+#. g6iDa
+#: include/sfx2/strings.hrc:64
+msgctxt "STR_MSG_QUERY_COPY"
+msgid "$1 could not be moved to the category \"$2\". Do you want to copy the template instead?"
+msgstr "$1, \"$2\" kategorisine taşınamıyor. Bunun yerine şablonu kopyalamak ister misiniz?"
+
+#. 9bJN3
+#: include/sfx2/strings.hrc:65
+msgctxt "STR_CREATE_ERROR"
+msgid "Cannot create category: $1"
+msgstr "Kategori oluşturulamıyor: $1"
+
+#. YR7aW
+#: include/sfx2/strings.hrc:66
+msgctxt "STR_ERROR_SAVEAS"
+msgid "Cannot save template: $1"
+msgstr "Şablon kaydedilemiyor: $1"
+
+#. iE9UD
+#: include/sfx2/strings.hrc:67
+msgctxt "STR_INPUT_NEW"
+msgid "Enter new category name:"
+msgstr "Yeni kategori adını girin:"
+
+#. yxN3P
+#: include/sfx2/strings.hrc:68
+msgctxt "STR_MSG_ERROR_LOCAL_MOVE"
+msgid ""
+"Error moving the following templates to $1.\n"
+"$2"
+msgstr ""
+"Aşağıdaki şablonları $1'e taşırken hata.\n"
+"$2"
+
+#. Sh34g
+#: include/sfx2/strings.hrc:69
+msgctxt "STR_MSG_ERROR_EXPORT"
+msgid ""
+"Error exporting the following templates:\n"
+"$1"
+msgstr ""
+"Aşağıdaki şablonları dışa aktarırken hata:\n"
+"$1"
+
+#. NFsZu
+#: include/sfx2/strings.hrc:70
+msgctxt "STR_MSG_ERROR_IMPORT"
+msgid ""
+"Error importing the following templates to $1:\n"
+"$2"
+msgstr ""
+"Şablonları $1 içine aktarırken hata:\n"
+"$2"
+
+#. g5zLe
+#: include/sfx2/strings.hrc:71
+msgctxt "STR_MSG_ERROR_DELETE_TEMPLATE"
+msgid ""
+"The following templates cannot be deleted:\n"
+"$1"
+msgstr ""
+"Aşağıdaki şablonlar silinemez:\n"
+"$1"
+
+#. 89xV6
+#: include/sfx2/strings.hrc:72
+msgctxt "STR_MSG_ERROR_DELETE_FOLDER"
+msgid ""
+"The following folders cannot be deleted:\n"
+"$1"
+msgstr ""
+"Aşağıdaki klasörler silinemez:\n"
+"$1"
+
+#. buPTz
+#: include/sfx2/strings.hrc:73
+msgctxt "STR_TOOLTIP_ERROR_RENAME_TEMPLATE"
+msgid "There is another template with the name $1 in $2."
+msgstr "$2 içinde $1 adında başka bir şablon var."
+
+#. JiTrQ
+#: include/sfx2/strings.hrc:74
+msgctxt "STR_QMSG_SEL_FOLDER_DELETE"
+msgid "Do you want to delete the selected category?"
+msgstr "Seçilen kategoriyi silmek ister misiniz?"
+
+#. C9pLF
+#: include/sfx2/strings.hrc:75
+msgctxt "STR_QMSG_TEMPLATE_OVERWRITE"
+msgid "A template named $1 already exists in $2. Do you want to overwrite it?"
+msgstr "$1 adına sahip bir şablon zaten $2'de mevcut. Üzerine yazmak ister misiniz?"
+
+#. 6MoGu
+#: include/sfx2/strings.hrc:76
+msgctxt "STR_QMSG_SEL_TEMPLATE_DELETE"
+msgid "Do you want to delete the selected templates?"
+msgstr "Seçili şablonları silmek istiyor musunuz?"
+
+#. WR2LD
+#: include/sfx2/strings.hrc:77
+msgctxt "STR_QMSG_ERROR_OPENING_FILE"
+msgid "An error occurred during opening the file. This may be caused by incorrect file contents.\n"
+msgstr "Dosya açılırken hata oluştu. Hatalı dosya içeriğinden kaynaklanabilir.\n"
+
+#. AsUee
+#: include/sfx2/strings.hrc:78
+msgctxt "STR_QMSG_ERROR_OPENING_FILE_DETAILS"
+msgid "The error details are:\n"
+msgstr "Hata ayrıntıları:\n"
+
+#. D2XDV
+#: include/sfx2/strings.hrc:79
+msgctxt "STR_QMSG_ERROR_OPENING_FILE_CONTINUE"
+msgid ""
+"\n"
+"Proceeding with import may cause data loss or corruption, and application may become unstable or crash.\n"
+"\n"
+"Do you want to ignore the error and attempt to continue loading the file?"
+msgstr ""
+"\n"
+"İçe aktarmaya devam etmek veri kaybına yol açabilir ve uygulama kararsız hale gelebilir veya çökebilir.\n"
+"\n"
+"Hata görmezden gelip dosyanın yüklenmesine devam etmek istiyor musunuz?"
+
+#. g63UH
+#: include/sfx2/strings.hrc:81
+msgctxt "STR_HELP_WINDOW_TITLE"
+msgid "%PRODUCTNAME Help"
+msgstr "%PRODUCTNAME Yardım"
+
+#. Veb3m
+#: include/sfx2/strings.hrc:82
+msgctxt "STR_HELP_BUTTON_INDEX_ON"
+msgid "Show Navigation Pane"
+msgstr "Dolaşma Penceresini Göster"
+
+#. 3LGpr
+#: include/sfx2/strings.hrc:83
+msgctxt "STR_HELP_BUTTON_INDEX_OFF"
+msgid "Hide Navigation Pane"
+msgstr "Dolaşma Penceresini Gizle"
+
+#. g8Vns
+#: include/sfx2/strings.hrc:84
+msgctxt "STR_HELP_BUTTON_START"
+msgid "First Page"
+msgstr "İlk Sayfa"
+
+#. YMoQp
+#: include/sfx2/strings.hrc:85
+msgctxt "STR_HELP_BUTTON_PREV"
+msgid "Previous Page"
+msgstr "Önceki Sayfa"
+
+#. mGB7r
+#: include/sfx2/strings.hrc:86
+msgctxt "STR_HELP_BUTTON_NEXT"
+msgid "Next Page"
+msgstr "Sonraki Sayfa"
+
+#. dys7x
+#: include/sfx2/strings.hrc:87
+msgctxt "STR_HELP_BUTTON_PRINT"
+msgid "Print..."
+msgstr "Yazdır..."
+
+#. bmCzY
+#: include/sfx2/strings.hrc:88
+msgctxt "STR_HELP_BUTTON_ADDBOOKMARK"
+msgid "Add to Bookmarks..."
+msgstr "Yer İmlerine Ekle..."
+
+#. SGFus
+#: include/sfx2/strings.hrc:89
+msgctxt "STR_HELP_BUTTON_SEARCHDIALOG"
+msgid "Find on this Page..."
+msgstr "Bu sayfada bul..."
+
+#. qvTDZ
+#: include/sfx2/strings.hrc:90
+msgctxt "STR_HELP_BUTTON_SOURCEVIEW"
+msgid "HTML Source"
+msgstr "HTML Kaynağı"
+
+#. pHyBm
+#: include/sfx2/strings.hrc:91
+msgctxt "STR_HELP_MENU_TEXT_SELECTION_MODE"
+msgid "Select Text"
+msgstr "Metni Seç"
+
+#. 5FCCv
+#: include/sfx2/strings.hrc:92
+msgctxt "STR_HELP_MENU_TEXT_COPY"
+msgid "~Copy"
+msgstr "~Kopyala"
+
+#. TQd3C
+#: include/sfx2/strings.hrc:93
+msgctxt "STR_INFO_NOSEARCHRESULTS"
+msgid "No topics found."
+msgstr "Konu bulunamadı."
+
+#. 9D6Ze
+#: include/sfx2/strings.hrc:94
+msgctxt "STR_INFO_NOSEARCHTEXTFOUND"
+msgid "The text you entered was not found."
+msgstr "Girdiğiniz metin bulunamadı."
+
+#. qLPDs
+#: include/sfx2/strings.hrc:95
+msgctxt "RID_HELP_ONSTARTUP_TEXT"
+msgid "~Display %PRODUCTNAME %MODULENAME Help at Startup"
+msgstr "%PRODUCTNAME %MODULENAME Yardımını Başlangıç'ta ~görüntüle"
+
+#. TEgzB
+#: include/sfx2/strings.hrc:97
+msgctxt "STR_NONAME"
+msgid "Untitled"
+msgstr "İsimsiz"
+
+#. fs5SN
+#: include/sfx2/strings.hrc:98
+msgctxt "STR_STANDARD_SHORTCUT"
+msgid "Standard"
+msgstr "Standart"
+
+#. 6sRBN
+#: include/sfx2/strings.hrc:99
+msgctxt "STR_BYTES"
+msgid "Bytes"
+msgstr "Byte"
+
+#. Z3kKr
+#: include/sfx2/strings.hrc:100
+msgctxt "STR_KB"
+msgid "kB"
+msgstr ""
+
+#. VrFxn
+#: include/sfx2/strings.hrc:101
+msgctxt "STR_MB"
+msgid "MB"
+msgstr "MB"
+
+#. 9rBAW
+#: include/sfx2/strings.hrc:102
+msgctxt "STR_GB"
+msgid "GB"
+msgstr "GB"
+
+#. DqwaN
+#: include/sfx2/strings.hrc:103
+msgctxt "STR_QUERY_LASTVERSION"
+msgid "Cancel all changes?"
+msgstr "Tüm değişiklikleri iptal et?"
+
+#. cCrDG
+#: include/sfx2/strings.hrc:104
+msgctxt "STR_NO_WEBBROWSER_FOUND"
+msgid ""
+"Opening \"$(ARG1)\" failed with error code $(ARG2) and message: \"$(ARG3)\"\n"
+"Maybe no web browser could be found on your system. In that case, please check your Desktop Preferences or install a web browser (for example, Firefox) in the default location requested during the browser installation."
+msgstr ""
+"\"$(ARG1)\" açılması başarısız oldu, hata kodu $(ARG2) ve hata mesajı: \"$(ARG3)\"\n"
+"Belki de sisteminizde bir ağ tarayıcısı yoktur. Bu durumda, lütfen Masaüstü Tercihlerinizi kontrol edin veya ağ tarayıcısının kurulumunda istenen varsayılan konuma bir ağ tarayıcısı (örneğin Firefox vb.) yükleyin."
+
+#. QEABe
+#: include/sfx2/strings.hrc:105
+msgctxt "STR_DANGEROUS_TO_OPEN"
+msgid ""
+"It might be dangerous to open \"$(ARG1)\".\n"
+"Do you really want to open it?"
+msgstr ""
+"\"$(ARG1)\" dosyasını açmak tehlikeli olabilir.\n"
+" Gerçekten açmak istiyor musun?"
+
+#. ADqLM
+#: include/sfx2/strings.hrc:106
+msgctxt "STR_NO_ABS_URI_REF"
+msgid "\"$(ARG1)\" cannot be passed to an external application to open it (e.g., it might not be an absolute URL, or might denote no existing file)."
+msgstr "\"$ (ARG1)\", açmak için harici bir uygulamaya geçirilemez (örneğin, mutlak bir URL olmayabilir veya mevcut bir dosya olmadığını belirtebilir)."
+
+#. XDUCY
+#: include/sfx2/strings.hrc:107
+msgctxt "STR_GID_INTERN"
+msgid "Internal"
+msgstr "Dahili"
+
+#. 4g9hU
+#: include/sfx2/strings.hrc:108
+msgctxt "STR_GID_APPLICATION"
+msgid "Application"
+msgstr "Uygulama"
+
+#. rBzxu
+#: include/sfx2/strings.hrc:109
+msgctxt "STR_GID_VIEW"
+msgid "View"
+msgstr "Görünüm"
+
+#. NQnym
+#: include/sfx2/strings.hrc:110
+msgctxt "STR_GID_DOCUMENT"
+msgid "Documents"
+msgstr "Belgeler"
+
+#. DbzDd
+#: include/sfx2/strings.hrc:111
+msgctxt "STR_GID_EDIT"
+msgid "Edit"
+msgstr "Düzenle"
+
+#. HqK5g
+#: include/sfx2/strings.hrc:112
+msgctxt "STR_GID_MACRO"
+msgid "BASIC"
+msgstr "BASIC"
+
+#. 3QkTL
+#: include/sfx2/strings.hrc:113
+msgctxt "STR_GID_OPTIONS"
+msgid "Options"
+msgstr "Seçenekler"
+
+#. GFEQ3
+#: include/sfx2/strings.hrc:114
+msgctxt "STR_GID_MATH"
+msgid "Math"
+msgstr "Math"
+
+#. rFALW
+#: include/sfx2/strings.hrc:115
+msgctxt "STR_GID_NAVIGATOR"
+msgid "Navigate"
+msgstr "Gezinme"
+
+#. w7dmG
+#: include/sfx2/strings.hrc:116
+msgctxt "STR_GID_INSERT"
+msgid "Insert"
+msgstr "Ekle"
+
+#. fokQp
+#: include/sfx2/strings.hrc:117
+msgctxt "STR_GID_FORMAT"
+msgid "Format"
+msgstr "Biçim"
+
+#. fLTV6
+#: include/sfx2/strings.hrc:118
+msgctxt "STR_GID_TEMPLATE"
+msgid "Templates"
+msgstr "Şablonlar"
+
+#. JAdCZ
+#: include/sfx2/strings.hrc:119
+msgctxt "STR_GID_TEXT"
+msgid "Text"
+msgstr "Metin"
+
+#. PSfaP
+#: include/sfx2/strings.hrc:120
+msgctxt "STR_GID_FRAME"
+msgid "Frame"
+msgstr "Çerçeve"
+
+#. 5V4iR
+#: include/sfx2/strings.hrc:121
+msgctxt "STR_GID_GRAPHIC"
+msgid "Image"
+msgstr "Resim"
+
+#. DzBoB
+#: include/sfx2/strings.hrc:122
+msgctxt "STR_GID_TABLE"
+msgid "Table"
+msgstr "Tablo"
+
+#. Cmsi4
+#: include/sfx2/strings.hrc:123
+msgctxt "STR_GID_ENUMERATION"
+msgid "Numbering"
+msgstr "Numaralandırma"
+
+#. CDFSE
+#: include/sfx2/strings.hrc:124
+msgctxt "STR_GID_DATA"
+msgid "Data"
+msgstr "Veri"
+
+#. CV9Pq
+#: include/sfx2/strings.hrc:125
+msgctxt "STR_GID_SPECIAL"
+msgid "Special Functions"
+msgstr "Özel İşlevler"
+
+#. 5CfQs
+#: include/sfx2/strings.hrc:126
+msgctxt "STR_GID_IMAGE"
+msgid "Image"
+msgstr "Resim"
+
+#. 5wvK9
+#: include/sfx2/strings.hrc:127
+msgctxt "STR_GID_CHART"
+msgid "Chart"
+msgstr "Grafik"
+
+#. pNE8F
+#: include/sfx2/strings.hrc:128
+msgctxt "STR_GID_EXPLORER"
+msgid "Explorer"
+msgstr "Gezgin"
+
+#. yBawD
+#: include/sfx2/strings.hrc:129
+msgctxt "STR_GID_CONNECTOR"
+msgid "Connector"
+msgstr "Bağlayıcı"
+
+#. 3rGea
+#: include/sfx2/strings.hrc:130
+msgctxt "STR_GID_MODIFY"
+msgid "Modify"
+msgstr "Değiştir"
+
+#. WcwGs
+#: include/sfx2/strings.hrc:131
+msgctxt "STR_GID_DRAWING"
+msgid "Drawing"
+msgstr "Çizim"
+
+#. Ajo4w
+#: include/sfx2/strings.hrc:132
+msgctxt "STR_GID_CONTROLS"
+msgid "Controls"
+msgstr "Denetimler"
+
+#. L5coQ
+#: include/sfx2/strings.hrc:133
+msgctxt "STR_QUITAPP"
+msgid "E~xit %PRODUCTNAME"
+msgstr "%PRODUCTNAME'den Çı~k"
+
+#. k2PBJ
+#: include/sfx2/strings.hrc:134
+msgctxt "RID_STR_HELP"
+msgid "Help"
+msgstr "Yardım"
+
+#. roDzu
+#: include/sfx2/strings.hrc:135
+msgctxt "RID_STR_HLPFILENOTEXIST"
+msgid "The help file for this topic is not installed."
+msgstr "Bu konu ile ilgili yardım kurulmadı."
+
+#. zjPS7
+#: include/sfx2/strings.hrc:136
+msgctxt "STR_QUICKSTART_EXIT"
+msgid "Exit Quickstarter"
+msgstr "Hızlı Başlatıcıyı Kapat"
+
+#. ecxqC
+#: include/sfx2/strings.hrc:137
+msgctxt "STR_QUICKSTART_TIP"
+msgid "%PRODUCTNAME %PRODUCTVERSION Quickstarter"
+msgstr "%PRODUCTNAME %PRODUCTVERSION Hızlı Başlatıcı"
+
+#. G9Gqk
+#: include/sfx2/strings.hrc:138
+msgctxt "STR_QUICKSTART_FILEOPEN"
+msgid "Open Document..."
+msgstr "Belge Aç..."
+
+#. wecTF
+#: include/sfx2/strings.hrc:139
+msgctxt "STR_QUICKSTART_FROMTEMPLATE"
+msgid "From Template..."
+msgstr "Şablondan..."
+
+#. FzJCj
+#: include/sfx2/strings.hrc:140
+msgctxt "STR_QUICKSTART_PRELAUNCH"
+msgid "Load %PRODUCTNAME During System Start-Up"
+msgstr "Sistem Başlatılırken %PRODUCTNAME 'i Yükle"
+
+#. hMejq
+#: include/sfx2/strings.hrc:141
+msgctxt "STR_QUICKSTART_LNKNAME"
+msgid "%PRODUCTNAME %PRODUCTVERSION"
+msgstr "%PRODUCTNAME %PRODUCTVERSION"
+
+#. CBB6Z
+#: include/sfx2/strings.hrc:142
+msgctxt "STR_QUICKSTART_FILE"
+msgid "File"
+msgstr "Dosya"
+
+#. c6wAB
+#: include/sfx2/strings.hrc:143
+msgctxt "STR_QUICKSTART_STARTCENTER"
+msgid "Startcenter"
+msgstr "Başlangıç merkezi"
+
+#. Uhn54
+#: include/sfx2/strings.hrc:144
+msgctxt "STR_QUICKSTART_RECENTDOC"
+msgid "Recent Documents"
+msgstr "Son Belgeler"
+
+#. DirQf
+#: include/sfx2/strings.hrc:145
+msgctxt "STR_QUERY_UPDATE_LINKS"
+msgid ""
+"The document %{filename} contains one or more links to external data.\n"
+"\n"
+"Would you like to change the document, and update all links\n"
+"to get the most recent data?"
+msgstr ""
+"%{filename} belgesi harici verilere bir veya daha fazla bağlantı içermektedir.\n"
+"\n"
+"En güncel verileri almak için belgeyi değiştirip bütün bağlantıları\n"
+"güncellemek ister misiniz?"
+
+#. zJGEM
+#: include/sfx2/strings.hrc:146
+msgctxt "STR_DDE_ERROR"
+msgid "DDE link to %1 for %2 area %3 are not available."
+msgstr "%1 ilişkili DDE bağlantısı (%2 için; alan %3) oluşturulamıyor."
+
+#. zECGD
+#: include/sfx2/strings.hrc:147
+msgctxt "STR_SECURITY_WARNING_NO_HYPERLINKS"
+msgid ""
+"For security reasons, the hyperlink cannot be executed.\n"
+"The stated address will not be opened."
+msgstr ""
+"Güvenlik nedenleriyle bu köprü çalıştırılamaz.\n"
+"Belirtilen adres açılmayacak."
+
+#. vcMzA
+#: include/sfx2/strings.hrc:148
+msgctxt "RID_SECURITY_WARNING_TITLE"
+msgid "Security Warning"
+msgstr "Güvenlik Uyarısı"
+
+#. vVCon
+#: include/sfx2/strings.hrc:149
+msgctxt "RID_SVXSTR_XMLSEC_QUERY_LOSINGSIGNATURE"
+msgid ""
+"Saving will remove all existing signatures.\n"
+"Do you want to continue saving the document?"
+msgstr ""
+"Kaydetmek mevcut tüm imzaları silecektir.\n"
+"Belgeyi kaydetmeye devam etmek istiyor musunuz?"
+
+#. cGnF9
+#: include/sfx2/strings.hrc:150
+msgctxt "RID_SVXSTR_XMLSEC_QUERY_SAVEBEFORESIGN"
+msgid ""
+"The document has to be saved before it can be signed.\n"
+"Do you want to save the document?"
+msgstr ""
+"Belge imzalanmadan önce kaydedilmiş olmalıdır.\n"
+"Belgeyi kaydetmek istiyor musunuz?"
+
+#. zNVEd
+#: include/sfx2/strings.hrc:151
+msgctxt "STR_QUERY_CANCELCHECKOUT"
+msgid ""
+"This will discard all changes on the server since check-out.\n"
+"Do you want to proceed?"
+msgstr ""
+"Bu, sunucu üzerinde çıkış yapıldıktan sonra yapılan tüm işlemleri yok sayacaktır.\n"
+"Devam etmek istiyor musunuz?"
+
+#. jufLD
+#: include/sfx2/strings.hrc:152
+msgctxt "STR_INFO_WRONGDOCFORMAT"
+msgid "This document must be saved in OpenDocument file format before it can be digitally signed."
+msgstr "Bu belgenin sayısal imzalanması için OpenDocument biçiminde kaydedilmesi gereklidir."
+
+#. ori9u
+#: include/sfx2/strings.hrc:153
+msgctxt "RID_XMLSEC_DOCUMENTSIGNED"
+msgid " (Signed)"
+msgstr " (İmzalanmış)"
+
+#. kgWZS
+#: include/sfx2/strings.hrc:154
+msgctxt "STR_EMBEDDED_TITLE"
+msgid " (Embedded document)"
+msgstr " (Gömülü belge)"
+
+#. 3nT9T
+#: include/sfx2/strings.hrc:155
+msgctxt "STR_STANDARD"
+msgid "Standard"
+msgstr "Standart"
+
+#. FjCuJ
+#: include/sfx2/strings.hrc:156
+msgctxt "RID_SVXSTR_FILELINK"
+msgid "Document"
+msgstr "Belgeler"
+
+#. BfMd3
+#: include/sfx2/strings.hrc:157
+msgctxt "STR_NONE"
+msgid "- None -"
+msgstr "- Hiçbiri -"
+
+#. XBXvE
+#: include/sfx2/strings.hrc:158
+msgctxt "saveastemplatedlg|categorylist"
+msgid "None"
+msgstr "Hiçbiri"
+
+#. 5kUsi
+#: include/sfx2/strings.hrc:159
+msgctxt "RID_SVXSTR_GRAPHICLINK"
+msgid "Image"
+msgstr "Resim"
+
+#. dUK2G
+#: include/sfx2/strings.hrc:160
+msgctxt "STR_SFX_FILTERNAME_ALL"
+msgid "All files"
+msgstr "Tüm dosyalar"
+
+#. E39E2
+#: include/sfx2/strings.hrc:161
+msgctxt "STR_SFX_FILTERNAME_PDF"
+msgid "PDF files"
+msgstr "PDF dosyaları"
+
+#. gCHbP
+#: include/sfx2/strings.hrc:162
+msgctxt "RID_SVXSTR_EDITGRFLINK"
+msgid "Link Image"
+msgstr "Bağlantı Resmi"
+
+#. u9H7a
+#. i66948 used in project scripting
+#: include/sfx2/strings.hrc:164
+msgctxt "STR_ERRUNOEVENTBINDUNG"
+msgid ""
+"An appropriate component method %1\n"
+"could not be found.\n"
+"\n"
+"Check spelling of method name."
+msgstr ""
+"Bileşen yöntemi %1\n"
+"bulunamadı.\n"
+"\n"
+"Lütfen yöntem adını kontrol edin."
+
+#. 2FLYB
+#: include/sfx2/strings.hrc:165
+msgctxt "RID_SVXSTR_GRFILTER_OPENERROR"
+msgid "Image file cannot be opened"
+msgstr "Görüntü dosyası açılamadı"
+
+#. 6eLsb
+#: include/sfx2/strings.hrc:166
+msgctxt "RID_SVXSTR_GRFILTER_IOERROR"
+msgid "Image file cannot be read"
+msgstr "Görüntü dosyası okunamadı"
+
+#. HGRsV
+#: include/sfx2/strings.hrc:167
+msgctxt "RID_SVXSTR_GRFILTER_FORMATERROR"
+msgid "Unknown image format"
+msgstr "Bilinmeyen resim biçimi"
+
+#. YJhGK
+#: include/sfx2/strings.hrc:168
+msgctxt "RID_SVXSTR_GRFILTER_VERSIONERROR"
+msgid "This version of the image file is not supported"
+msgstr "Grafik dosyasının bu sürümü desteklenmiyor"
+
+#. Sn8KQ
+#: include/sfx2/strings.hrc:169
+msgctxt "RID_SVXSTR_GRFILTER_FILTERERROR"
+msgid "Image filter not found"
+msgstr "Görüntü süzgeci bulunamadı"
+
+#. huEFV
+#: include/sfx2/strings.hrc:170
+msgctxt "RID_SVXSTR_TXTFILTER_FILTERERROR"
+msgid "This is not a text document"
+msgstr "Bu bir metin belgesi değil"
+
+#. ejBgZ
+#: include/sfx2/strings.hrc:171
+msgctxt "RID_SVXSTR_END_REDLINING_WARNING"
+msgid ""
+"This action will exit the change recording mode.\n"
+"No information about changes will be recorded from now on.\n"
+"\n"
+"Exit change recording mode?\n"
+"\n"
+msgstr ""
+"Bu eylem sizi Kayıt kipini değiştir'den çıkaracaktır.\n"
+"Şu andan itibaren değişikliklerle alakalı hiçbir bilgi kaydedilmeyecektir.\n"
+"\n"
+"Kayıt kipini değiştirden çıkılsın mı?\n"
+"\n"
+
+#. E2CcY
+#: include/sfx2/strings.hrc:172
+msgctxt "RID_SVXSTR_INCORRECT_PASSWORD"
+msgid "Incorrect password"
+msgstr "Yanlış parola"
+
+#. 7Ezso
+#: include/sfx2/strings.hrc:173
+msgctxt "RID_SVXSTR_GPG_ENCRYPT_FAILURE"
+msgid "OpenPGP key not trusted, damaged, or encryption failure. Please try again."
+msgstr "OpenPGP anahtarına güvenilmiyor, bozulmuş veya şifreleme hatasına neden oluyor. Lütfen tekrar deneyin."
+
+#. DQCUm
+#: include/sfx2/strings.hrc:175
+msgctxt "STR_PASSWD_MIN_LEN"
+msgid "(Minimum $(MINLEN) characters)"
+msgstr "(Asgari $(MINLEN) karakter)"
+
+#. ZKZnh
+#: include/sfx2/strings.hrc:176
+msgctxt "STR_PASSWD_MIN_LEN1"
+msgid "(Minimum 1 character)"
+msgstr "(Asgari 1 karakter)"
+
+#. B3WoF
+#: include/sfx2/strings.hrc:177
+msgctxt "STR_PASSWD_EMPTY"
+msgid "(The password can be empty)"
+msgstr "(Parolayı boş bırakabilirsiniz)"
+
+#. iBD9D
+#: include/sfx2/strings.hrc:178
+msgctxt "STR_MODULENOTINSTALLED"
+msgid "The action could not be executed. The %PRODUCTNAME program module needed for this action is currently not installed."
+msgstr "Bu işlem gerçekleştirilemedi. Bu işlem için şu anda sistemde kurulu olmayan %PRODUCTNAME program modülü gerekli."
+
+#. TXAV5
+#: include/sfx2/strings.hrc:180
+msgctxt "STR_FILTER_NOT_INSTALLED"
+msgid ""
+"The selected filter $(FILTER) has not been installed.\n"
+"Would you like to do this now?"
+msgstr ""
+"Seçilen $(FILTER) süzgeci kurulu değil.\n"
+"Şimdi kurmak ister misiniz?"
+
+#. gQhYY
+#: include/sfx2/strings.hrc:181
+msgctxt "STR_FILTER_CONSULT_SERVICE"
+msgid ""
+"The selected filter $(FILTER) is not included in your edition.\n"
+"You can find information about orders on our homepage."
+msgstr ""
+"Seçilen $(FILTER) süzgeci sürümünüzde bulunmuyor.\n"
+"Sipariş etmek için gereken bilgileri web sitemizde bulabilirsiniz."
+
+#. Y9yeS
+#: include/sfx2/strings.hrc:183
+msgctxt "STR_WELCOME_LINE1"
+msgid "Welcome to %PRODUCTNAME."
+msgstr "%PRODUCTNAME'e Hoş Geldiniz."
+
+#. DVEkR
+#: include/sfx2/strings.hrc:184
+msgctxt "STR_WELCOME_LINE2"
+msgid "Drop a document here or open an app to create one."
+msgstr "Buraya bir belge bırakın veya bir tane oluşturmak için bir uygulama açın."
+
+#. oTVdA
+#. Translators: Target types in Auto-redaction dialog
+#: include/sfx2/strings.hrc:187
+msgctxt "STR_REDACTION_TARGET_TYPE_TEXT"
+msgid "Text"
+msgstr "Metin"
+
+#. eG5qc
+#: include/sfx2/strings.hrc:188
+msgctxt "STR_REDACTION_TARGET_TYPE_REGEX"
+msgid "Regular expression"
+msgstr "Düzenli ifade"
+
+#. TaDCG
+#: include/sfx2/strings.hrc:189
+msgctxt "STR_REDACTION_TARGET_TYPE_PREDEF"
+msgid "Predefined"
+msgstr "Öntanımlı"
+
+#. bDjwW
+#: include/sfx2/strings.hrc:190
+msgctxt "STR_REDACTION_TARGET_TYPE_UNKNOWN"
+msgid "Unknown"
+msgstr "Bilinmeyen"
+
+#. YgzCk
+#. Translators: Values for the Case Sensitive and the Whole Words columns in Auto-redaction dialog
+#: include/sfx2/strings.hrc:193
+msgctxt "STR_REDACTION_YES"
+msgid "Yes"
+msgstr "Evet"
+
+#. oZNaM
+#: include/sfx2/strings.hrc:194
+msgctxt "STR_REDACTION_NO"
+msgid "No"
+msgstr "Hayır"
+
+#. FM3Gf
+#. Translators: Misc strings of the Auto Redaction dialog
+#: include/sfx2/strings.hrc:197
+msgctxt "STR_REDACTION_TARGET"
+msgid "Target"
+msgstr "Hedef"
+
+#. m2i7V
+#: include/sfx2/strings.hrc:198
+msgctxt "STR_REDACTION_LOAD_TARGETS"
+msgid "Load Targets"
+msgstr "Hedefleri Yükle"
+
+#. HgrwX
+#: include/sfx2/strings.hrc:199
+msgctxt "STR_REDACTION_SAVE_TARGETS"
+msgid "Save Targets"
+msgstr "Hedefleri Kaydet"
+
+#. MYMTF
+#: include/sfx2/strings.hrc:200
+msgctxt "STR_REDACTION_FIELDS_REQUIRED"
+msgid "All fields are required"
+msgstr "Bütün alanlar gereklidir"
+
+#. rQS6M
+#: include/sfx2/strings.hrc:201
+msgctxt "STR_REDACTION_TARGET_NAME_CLASH"
+msgid "There is already a target with this name"
+msgstr "Bu ada sahip bir hedef zaten var"
+
+#. s248s
+#: include/sfx2/strings.hrc:202
+msgctxt "STR_REDACTION_MULTI_EDIT"
+msgid "You have selected multiple targets, but only one target can be edited at once."
+msgstr "Birden fazla hedef seçtiniz, fakat sadece bir tane hedef tek seferde düzenlenebilir."
+
+#. BTayC
+#: include/sfx2/strings.hrc:203
+msgctxt "STR_REDACTION_MULTI_DELETE"
+msgid "Are you sure you would like to delete $(TARGETSCOUNT) targets at once?"
+msgstr "$(TARGETSCOUNT) adet hedefi tek seferde silmek istediğinizden emin misiniz?"
+
+#. qFqDC
+#: include/sfx2/strings.hrc:204
+msgctxt "STR_REDACTION_JSON_FILE_FILTER"
+msgid "Target Set (*.json)"
+msgstr "Hedef Küme (*.json)"
+
+#. EGCo6
+#: include/sfx2/strings.hrc:205
+msgctxt "STR_REDACTION_EDIT_TARGET"
+msgid "Edit Target"
+msgstr "Hedefi Düzenle"
+
+#. ACY9D
+#: include/sfx2/strings.hrc:206
+msgctxt "STR_REDACTION_TARGET_ADD_ERROR"
+msgid "An error occurred while adding new target. Please report this incident."
+msgstr "Yeni hedef eklenirken bir hata meydana geldi. Lütfen bu olayı bildirin."
+
+#. 6Jog7
+#: include/sfx2/strings.hrc:207
+msgctxt "STR_REDACTION_NO_DRAW_WARNING"
+msgid "Draw module is needed for redaction. Please make sure you have %PRODUCTNAME Draw installed and working correctly."
+msgstr "Arındırma için Draw modülü gereklidir. Lütfen %PRODUCTNAME Draw modülünün kurulu ve doğru şekilde çalışır durumda olduğundan emin olunuz."
+
+#. FQ9kN
+#: include/sfx2/strings.hrc:209
+msgctxt "STR_SFX_FILEDLG_ACTUALVERSION"
+msgid "Current version"
+msgstr "Geçerli sürüm"
+
+#. GFAEM
+#: include/sfx2/strings.hrc:210
+msgctxt "STR_SFX_EXPLORERFILE_EXPORT"
+msgid "Export"
+msgstr "Dışa Aktar"
+
+#. 2DBBC
+#: include/sfx2/strings.hrc:211
+msgctxt "STR_SFX_EXPLORERFILE_INSERT"
+msgid "Insert"
+msgstr "Ekle"
+
+#. VBKtt
+#: include/sfx2/strings.hrc:212
+msgctxt "STR_SFX_EXPLORERFILE_BUTTONINSERT"
+msgid "~Insert"
+msgstr "~Ekle"
+
+#. DcLFD
+#: include/sfx2/strings.hrc:213
+msgctxt "STR_SFX_IMPORT_ALL_IMAGES"
+msgid "<All images>"
+msgstr "<Bütün görüntüler>"
+
+#. tPDwc
+#: include/sfx2/strings.hrc:214
+msgctxt "STR_PB_SAVEACOPY"
+msgid "Save a Copy"
+msgstr "Bir Kopyasını Kaydet"
+
+#. T9mMd
+#: include/sfx2/strings.hrc:215
+msgctxt "STR_PB_COMPAREDOC"
+msgid "Compare to"
+msgstr "Karşılaştır"
+
+#. 4qMCh
+#: include/sfx2/strings.hrc:216
+msgctxt "STR_PB_MERGEDOC"
+msgid "Merge with"
+msgstr "Birleştir"
+
+#. cDMBG
+#: include/sfx2/strings.hrc:218
+msgctxt "STR_SFX_NEWOFFICEDOC"
+msgid "%PRODUCTNAME document"
+msgstr "%PRODUCTNAME belgesi"
+
+#. 43QYo
+#: include/sfx2/strings.hrc:219
+msgctxt "SFX_ST_DURATION_FORMAT"
+msgid " Y: %1 M: %2 D: %3 H: %4 M: %5 S: %6"
+msgstr " Y: %1 M: %2 D: %3 H: %4 M: %5 S: %6"
+
+#. jQX7C
+#: include/sfx2/strings.hrc:220
+msgctxt "STR_SFX_QUERY_WRONG_TYPE"
+msgid ""
+"The value entered does not match the specified type.\n"
+"The value will be stored as text."
+msgstr ""
+"Girilen değer ile belirlenen tür eşleşmiyor.\n"
+"Değer metin olarak saklanacak."
+
+#. cinmA
+#: include/sfx2/strings.hrc:222
+msgctxt "STR_QUERY_OVERWRITE"
+msgid "Style already exists. Overwrite?"
+msgstr "Biçem zaten var. Üzerine yazılsın mı?"
+
+#. f627N
+#: include/sfx2/strings.hrc:224
+msgctxt "STR_RESET"
+msgid "~Reset"
+msgstr "~Başa al"
+
+#. EXGDb
+#: include/sfx2/strings.hrc:225
+msgctxt "STR_TABPAGE_INVALIDNAME"
+msgid "This name is already in use."
+msgstr "Bu ad bir şablon adı olarak kullanılıyor."
+
+#. N5aeR
+#: include/sfx2/strings.hrc:226
+msgctxt "STR_TABPAGE_INVALIDSTYLE"
+msgid "This Style does not exist."
+msgstr "Bu biçem mevcut değil."
+
+#. CYQwN
+#: include/sfx2/strings.hrc:227
+msgctxt "STR_TABPAGE_INVALIDPARENT"
+msgid ""
+"This Style cannot be used as a base Style,\n"
+"because it would result in a recursive reference."
+msgstr ""
+"Bu Biçem temel Biçem olarak kullanılamaz,\n"
+"çünkü özyinelemeli referans ile sonuçlanacaktır."
+
+#. ECPSd
+#: include/sfx2/strings.hrc:228
+msgctxt "STR_POOL_STYLE_NAME"
+msgid ""
+"Name already exists as a default Style.\n"
+"Please choose another name."
+msgstr ""
+"Bu isim bir varsayılan biçem olarak mevcut.\n"
+"Lütfen başka bir isim seçin."
+
+#. NWDmA
+#: include/sfx2/strings.hrc:229
+msgctxt "STR_DELETE_STYLE_USED"
+msgid ""
+"One or more of the selected styles is in use in this document.\n"
+"If you will delete it, text or objects using these styles will revert to the parent style.\n"
+"Do you still wish to delete these styles?\n"
+msgstr ""
+"Seçilen biçemlerden bir veya daha fazlası bu belgede kullanılıyor.\n"
+"Bunu silerseniz bu biçemi kullanan metin ve nesneler üst biçeme geri döner.\n"
+"Hâlâ bu biçemleri silmek istiyor musunuz?\n"
+
+#. kuD77
+#: include/sfx2/strings.hrc:230
+msgctxt "STR_DELETE_STYLE"
+msgid "Styles in use: "
+msgstr "Kullanılan biçemler: "
+
+#. 4JhEW
+#: include/sfx2/strings.hrc:231
+msgctxt "STR_SID_NAVIGATOR"
+msgid "Navigator"
+msgstr "Gezgin"
+
+#. Acahp
+#: include/sfx2/strings.hrc:232
+msgctxt "STR_ERROR_WRONG_CONFIRM"
+msgid "Faulty password confirmation"
+msgstr "Parola onayı hatalı"
+
+#. 6uv4b
+#: include/sfx2/strings.hrc:233
+msgctxt "STR_PDF_EXPORT_SEND"
+msgid "Send"
+msgstr "Gönder"
+
+#. 9HHQw
+#: include/sfx2/strings.hrc:234
+msgctxt "STR_FONT_TABPAGE"
+msgid "Font"
+msgstr "Yazı tipi"
+
+#. 7baC6
+#: include/sfx2/strings.hrc:236
+msgctxt "STR_VIEWVERSIONCOMMENT"
+msgid "View Version Comment"
+msgstr "Sürüm Açıklaması Ekle"
+
+#. LGiF8
+#: include/sfx2/strings.hrc:237
+msgctxt "STR_NO_NAME_SET"
+msgid "(no name set)"
+msgstr "(hiç isim ayarlanmadı)"
+
+#. rZ4Ao
+#: include/sfx2/strings.hrc:239
+msgctxt "STR_STYLE_FILTER_HIERARCHICAL"
+msgid "Hierarchical"
+msgstr "Hiyerarşik"
+
+#. 4VXDe
+#: include/sfx2/strings.hrc:241
+msgctxt "STR_MACRO_LOSS"
+msgid "Do you really want to cancel the recording? Any steps recorded up to this point will be lost."
+msgstr "Gerçekten kaydı iptal etmek istiyor musunuz? Şimdiye kadar yapılan tüm kayıtlar silinecektir."
+
+#. 9MnrK
+#: include/sfx2/strings.hrc:242
+msgctxt "STR_CANCEL_RECORDING"
+msgid "Cancel Recording"
+msgstr "Kaydı İptal Et"
+
+#. m9FCm
+#: include/sfx2/strings.hrc:244
+msgctxt "RID_CNT_STR_WAITING"
+msgid "The templates are being initialized for first-time usage."
+msgstr "İlk kullanım için şablonlar hazırlanıyor."
+
+#. F3ym2
+#: include/sfx2/strings.hrc:246
+msgctxt "STR_NODEFPRINTER"
+msgid ""
+"No default printer found.\n"
+"Please choose a printer and try again."
+msgstr ""
+"Varsayılan yazıcı bulunamadı.\n"
+"Bir yazıcı seçip yeniden deneyin."
+
+#. a3NTu
+#: include/sfx2/strings.hrc:247
+msgctxt "STR_NOSTARTPRINTER"
+msgid ""
+"Could not start printer.\n"
+"Please check your printer configuration."
+msgstr ""
+"Yazıcı çalıştırılamadı.\n"
+"Yazıcı yapılandırmasını kontrol edin."
+
+#. acKHX
+#: include/sfx2/strings.hrc:248
+msgctxt "STR_ERROR_PRINTER_BUSY"
+msgid "Printer busy"
+msgstr "Yazıcı şu an kullanılıyor"
+
+#. hDEUj
+#: include/sfx2/strings.hrc:249
+msgctxt "STR_READONLY"
+msgid " (read-only)"
+msgstr " (salt okunur)"
+
+#. uL87C
+#: include/sfx2/strings.hrc:250
+msgctxt "STR_PRINT_NEWORI"
+msgid ""
+"The page size and orientation have been modified.\n"
+"Would you like to save the new settings in the\n"
+"active document?"
+msgstr ""
+"Sayfa boyutu ve yön ayarları değişti.\n"
+"Geçerli belgede\n"
+" yeni ayarlar kaydedilsin mi?"
+
+#. cxuAH
+#: include/sfx2/strings.hrc:251
+msgctxt "STR_PRINT_NEWSIZE"
+msgid ""
+"The page size has been modified.\n"
+"Should the new settings be saved\n"
+"in the active document?"
+msgstr ""
+"Sayfa boyutunu değiştirdiniz.\n"
+"Değiştirilen ayarlar\n"
+"belgede kullanılsın mı?"
+
+#. 4QJxB
+#: include/sfx2/strings.hrc:252
+msgctxt "STR_PRINT_NEWORISIZE"
+msgid ""
+"The page size and orientation have been modified.\n"
+"Would you like to save the new settings in the\n"
+"active document?"
+msgstr ""
+"Sayfa boyutu ve yön ayarları değişti.\n"
+"Geçerli belgede\n"
+" yeni ayarlar kaydedilsin mi?"
+
+#. RXbfs
+#: include/sfx2/strings.hrc:253
+msgctxt "STR_CANT_CLOSE"
+msgid ""
+"The document cannot be closed because a\n"
+" print job is being carried out."
+msgstr ""
+"Belge kapatılamıyor çünkü \n"
+" bir yazdırma işlemi yürütüyor."
+
+#. YGyQP
+#: include/sfx2/strings.hrc:254
+msgctxt "STR_ERROR_SEND_MAIL"
+msgid ""
+"An error occurred in sending the message. Possible errors could be a missing user account or a defective setup.\n"
+"Please check the %PRODUCTNAME settings or your email program settings."
+msgstr ""
+"İletinin gönderilmesinde hata oluştu. Eksik bir kullanıcı hesabı veya eksik bir kurulum hata sebebi olabilir.\n"
+"Lütfen %PRODUCTNAME ayarlarını veya e-posta uygulama ayarlarını kontrol edin."
+
+#. 3nzi6
+#. Error codes look like "MAPI_E_FAILURE" or "1234"
+#: include/sfx2/strings.hrc:256
+msgctxt "STR_ERROR_SEND_MAIL_CODE"
+msgid ""
+"An error occurred in sending the message. Possible errors could be a missing user account or a defective setup.\n"
+"\n"
+"Error code is $1"
+msgstr ""
+"Mesajın gönderilmesinde bir hata oluştu. Olası hatalar eksik bir kullanıcı hesabı veya kusurlu bir kurulum olabilir.\n"
+"\n"
+"Hata kodu $1"
+
+#. ZWTDr
+#: include/sfx2/strings.hrc:257
+msgctxt "STR_ERROR_SEND_MAIL_HEADER"
+msgid "Error sending mail"
+msgstr "İleti gönderilirken hata oluştu"
+
+#. QVS2D
+#: include/sfx2/strings.hrc:258
+msgctxt "STR_QUERY_OPENASTEMPLATE"
+msgid "This document cannot be edited, possibly due to missing access rights. Do you want to edit a copy of the document?"
+msgstr "Bu belge büyük ihtimalle eksik erişim haklarından dolayı düzenlenemiyor. Bu belgenin bir kopyasını düzenlemek ister misiniz?"
+
+#. ZdGNX
+#: include/sfx2/strings.hrc:259
+msgctxt "STR_QUERY_OPENASTEMPLATE_LOCKED"
+msgid ""
+"This document cannot be edited, because it is locked in another session.%LOCKINFO\n"
+"Do you want to edit a copy of the document?"
+msgstr ""
+"Bu belge düzenlenemez, çünkü başka bir oturumda kilitlenmiş.%LOCKINFO\n"
+"Belgenin bir kopyasını düzenlemek ister misiniz?"
+
+#. n3sMB
+#: include/sfx2/strings.hrc:260
+msgctxt "STR_QUERY_OPENASTEMPLATE_ALLOW_IGNORE"
+msgid "You can also try to ignore the lock and open the file for editing."
+msgstr "Ayrıca kilidi gözardı etmeye ve dosyayı düzenleme için açmaya çalışabilirsiniz."
+
+#. yaKxR
+#: include/sfx2/strings.hrc:261
+msgctxt "STR_QUERY_OPENASTEMPLATE_OPENCOPY_BTN"
+msgid "Open ~Copy"
+msgstr "Kopya Olarak A~ç"
+
+#. UYkFP
+#: include/sfx2/strings.hrc:262
+msgctxt "STR_QUERY_OPENASTEMPLATE_OPEN_BTN"
+msgid "~Open"
+msgstr "~Aç"
+
+#. GcSXH
+#: include/sfx2/strings.hrc:263
+msgctxt "STR_REPAIREDDOCUMENT"
+msgid " (repaired document)"
+msgstr " (onarılmış belge)"
+
+#. HPqkX
+#: include/sfx2/strings.hrc:264
+msgctxt "STR_NONCHECKEDOUT_DOCUMENT"
+msgid "This document is not checked out on the server."
+msgstr "Belge sunucu üzerinde kilitlenmedi."
+
+#. uPc29
+#: include/sfx2/strings.hrc:265
+msgctxt "STR_GET_INVOLVED_TEXT"
+msgid "Help us make %PRODUCTNAME even better!"
+msgstr "%PRODUCTNAME yazılımını daha da iyi hale getirmemize yardım edin!"
+
+#. PboiP
+#: include/sfx2/strings.hrc:266
+msgctxt "STR_GET_INVOLVED_BUTTON"
+msgid "Get involved"
+msgstr "Katkıda bulunun"
+
+#. GuLGH
+#: include/sfx2/strings.hrc:267
+msgctxt "STR_DONATE_TEXT"
+msgid "Your donations support our worldwide community."
+msgstr "Bağışlarınız dünya çapındaki topluluğumuzu desteklemektedir."
+
+#. KzgoD
+#: include/sfx2/strings.hrc:268
+msgctxt "STR_DONATE_BUTTON"
+msgid "Donate"
+msgstr "Bağış yap"
+
+#. G8bbK
+#: include/sfx2/strings.hrc:269
+msgctxt "STR_WHATSNEW"
+msgid "You are running version %PRODUCTVERSION of %PRODUCTNAME for the first time. Do you want to learn what's new?"
+msgstr "%PRODUCTNAME uygulamasının %PRODUCTVERSION sürümünü ilk defa çalıştırıyorsunuz. Yenilikler hakkında bilgi sahibi olmak ister misiniz?"
+
+#. J5UkB
+#: include/sfx2/strings.hrc:270
+msgctxt "STR_WHATSNEW_BUTTON"
+msgid "Release Notes"
+msgstr "Sürüm Notları"
+
+#. c7NPT
+#: include/sfx2/strings.hrc:271
+msgctxt "STR_READONLY_DOCUMENT"
+msgid "This document is open in read-only mode."
+msgstr "Belge salt okunur kipte açıldı."
+
+#. KyyFk
+#: include/sfx2/strings.hrc:272
+msgctxt "STR_READONLY_PDF"
+msgid "This PDF is open in read-only mode to allow signing the existing file."
+msgstr "Bu PDF dosyası mevcut dosyanın imzalanması için salt okunur kipte açıldı."
+
+#. MENvD
+#: include/sfx2/strings.hrc:273
+msgctxt "STR_CLASSIFIED_DOCUMENT"
+msgid "The classification label of this document is %1."
+msgstr "Bu belgenin sınıflandırma etiketi: %1."
+
+#. 3B3ij
+#: include/sfx2/strings.hrc:274
+msgctxt "STR_TARGET_DOC_NOT_CLASSIFIED"
+msgid "This document must be classified before the clipboard can be pasted."
+msgstr "Pano içeriğinin yapıştırılabilmesi için öncelikle bu belge sınıflandırılmalıdır."
+
+#. BYcYH
+#: include/sfx2/strings.hrc:275
+msgctxt "STR_DOC_CLASSIFICATION_TOO_LOW"
+msgid "This document has a lower classification level than the clipboard."
+msgstr "Bu belge pano içeriğinden daha düşük seviyede bir sınıflandırmaya sahip."
+
+#. EJPzh
+#: include/sfx2/strings.hrc:276
+msgctxt "STR_CLASSIFIED_INTELLECTUAL_PROPERTY"
+msgid "Level"
+msgstr "Seviye"
+
+#. itVew
+#: include/sfx2/strings.hrc:277
+msgctxt "STR_CLASSIFIED_NATIONAL_SECURITY"
+msgid "National Security:"
+msgstr "Ulusal Güvenlik:"
+
+#. ZBXbG
+#: include/sfx2/strings.hrc:278
+msgctxt "STR_CLASSIFIED_EXPORT_CONTROL"
+msgid "Export Control:"
+msgstr "İhracat Denetimi:"
+
+#. QAnvx
+#: include/sfx2/strings.hrc:279
+msgctxt "STR_CHECKOUT"
+msgid "Check Out"
+msgstr "Kilitle"
+
+#. PwPNw
+#: include/sfx2/strings.hrc:280
+msgctxt "STR_READONLY_EDIT"
+msgid "Edit Document"
+msgstr "Belgeyi Düzenle"
+
+#. FCeC5
+#: include/sfx2/strings.hrc:281
+msgctxt "STR_READONLY_SIGN"
+msgid "Sign Document"
+msgstr "Belgeyi İmzala"
+
+#. MEfTq
+#: include/sfx2/strings.hrc:282
+msgctxt "STR_READONLY_FINISH_SIGN"
+msgid "Finish Signing"
+msgstr "İmzalamayı Bitir"
+
+#. pkWmU
+#: include/sfx2/strings.hrc:283
+msgctxt "STR_SIGNATURE_BROKEN"
+msgid "This document has an invalid signature."
+msgstr "Belgenin geçersiz bir imzası mevcut."
+
+#. Vd3CU
+#: include/sfx2/strings.hrc:284
+msgctxt "STR_SIGNATURE_INVALID"
+msgid "The signature was valid, but the document has been modified"
+msgstr "İmza geçerli ancak belge düzenlenmiş"
+
+#. 2HNfx
+#: include/sfx2/strings.hrc:285
+msgctxt "STR_SIGNATURE_NOTVALIDATED"
+msgid "At least one signature has problems: the certificate could not be validated."
+msgstr "En az bir imzada sorun var: sertifika doğrulanamadı."
+
+#. tjCmr
+#: include/sfx2/strings.hrc:286
+msgctxt "STR_SIGNATURE_PARTIAL_OK"
+msgid "At least one signature has problems: the document is only partially signed."
+msgstr "En az bir imzada sorun var: belge yalnızca kısmen imzalanmış."
+
+#. mU6ot
+#: include/sfx2/strings.hrc:287
+msgctxt "STR_SIGNATURE_NOTVALIDATED_PARTIAL_OK"
+msgid "The certificate could not be validated and the document is only partially signed."
+msgstr "Sertifika doğrulanamadı ve belge sadece kısmen imzalandı."
+
+#. FKDbE
+#: include/sfx2/strings.hrc:288
+msgctxt "STR_SIGNATURE_OK"
+msgid "This document is digitally signed and the signature is valid."
+msgstr "Belge sayısal imzalanmış ve imza geçerli."
+
+#. rMGka
+#: include/sfx2/strings.hrc:289
+msgctxt "STR_SIGNATURE_SHOW"
+msgid "Show Signatures"
+msgstr "İmzaları Göster"
+
+#. fkzJb
+#: include/sfx2/strings.hrc:290
+msgctxt "STR_TRACK_CHANGES_BUTTON"
+msgid "Show Toolbar"
+msgstr "Araç Çubuğunu Göster"
+
+#. 68ZqS
+#: include/sfx2/strings.hrc:291
+msgctxt "STR_TRACK_CHANGES_BUTTON_HIDE"
+msgid "Hide Toolbar"
+msgstr "Araç Çubuğunu Gizle"
+
+#. BzVAA
+#: include/sfx2/strings.hrc:292
+msgctxt "STR_HYPHENATION_BUTTON"
+msgid "Learn more"
+msgstr "Daha fazla bilgi edin"
+
+#. BSyb4
+#: include/sfx2/strings.hrc:293
+msgctxt "STR_REFRESH_MASTER_PASSWORD"
+msgid "The master password is stored in an outdated format, you should refresh it"
+msgstr "Ana parola güncel olmayan bir biçimde saklanır, yenilemeniz gerekir"
+
+#. ysChU
+#: include/sfx2/strings.hrc:294
+msgctxt "STR_REFRESH_PASSWORD"
+msgid "Refresh Password"
+msgstr "Parolayı Yenile"
+
+#. kej8D
+#. Translators: default Impress template names
+#: include/sfx2/strings.hrc:297
+msgctxt "STR_TEMPLATE_NAME1"
+msgid "Grey Elegant"
+msgstr "Zarif Gri"
+
+#. FkuLG
+#: include/sfx2/strings.hrc:298
+msgctxt "STR_TEMPLATE_NAME2"
+msgid "Beehive"
+msgstr "Arı Kovanı"
+
+#. uwaPH
+#: include/sfx2/strings.hrc:299
+msgctxt "STR_TEMPLATE_NAME3"
+msgid "Blue Curve"
+msgstr "Mavi Eğri"
+
+#. hHRDz
+#: include/sfx2/strings.hrc:300
+msgctxt "STR_TEMPLATE_NAME4"
+msgid "Blueprint Plans"
+msgstr "Tasarı Planları"
+
+#. MAnPU
+#: include/sfx2/strings.hrc:301
+msgctxt "STR_TEMPLATE_NAME5"
+msgid "Candy"
+msgstr "Şeker"
+
+#. jEiAn
+#: include/sfx2/strings.hrc:302
+msgctxt "STR_TEMPLATE_NAME6"
+msgid "Yellow Idea"
+msgstr "Sarı Fikir"
+
+#. QDNuB
+#: include/sfx2/strings.hrc:303
+msgctxt "STR_TEMPLATE_NAME7"
+msgid "DNA"
+msgstr "DNA"
+
+#. XBrCi
+#: include/sfx2/strings.hrc:304
+msgctxt "STR_TEMPLATE_NAME8"
+msgid "Focus"
+msgstr "Odak"
+
+#. GADdA
+#: include/sfx2/strings.hrc:305
+msgctxt "STR_TEMPLATE_NAME9"
+msgid "Forestbird"
+msgstr "Orman Kuşu"
+
+#. TT8G5
+#: include/sfx2/strings.hrc:306
+msgctxt "STR_TEMPLATE_NAME10"
+msgid "Freshes"
+msgstr "Serinlik"
+
+#. C5N9D
+#: include/sfx2/strings.hrc:307
+msgctxt "STR_TEMPLATE_NAME11"
+msgid "Inspiration"
+msgstr "İlham"
+
+#. fCKG9
+#: include/sfx2/strings.hrc:308
+msgctxt "STR_TEMPLATE_NAME12"
+msgid "Lights"
+msgstr "Işıklar"
+
+#. pcLWs
+#: include/sfx2/strings.hrc:309
+msgctxt "STR_TEMPLATE_NAME13"
+msgid "Growing Liberty"
+msgstr "Büyüme Özgürlüğü"
+
+#. xo2gC
+#: include/sfx2/strings.hrc:310
+msgctxt "STR_TEMPLATE_NAME14"
+msgid "Metropolis"
+msgstr "Anakent"
+
+#. FFDBk
+#: include/sfx2/strings.hrc:311
+msgctxt "STR_TEMPLATE_NAME15"
+msgid "Midnightblue"
+msgstr "Gece Yarısı Mavisi"
+
+#. yiCzk
+#: include/sfx2/strings.hrc:312
+msgctxt "STR_TEMPLATE_NAME16"
+msgid "Nature Illustration"
+msgstr "Doğa İllüstrasyonu"
+
+#. cCZzC
+#: include/sfx2/strings.hrc:313
+msgctxt "STR_TEMPLATE_NAME17"
+msgid "Pencil"
+msgstr "Kalem"
+
+#. Ji4Cw
+#: include/sfx2/strings.hrc:314
+msgctxt "STR_TEMPLATE_NAME18"
+msgid "Piano"
+msgstr "Piyano"
+
+#. mrbiq
+#: include/sfx2/strings.hrc:315
+msgctxt "STR_TEMPLATE_NAME19"
+msgid "Portfolio"
+msgstr "Portföy"
+
+#. ysBGy
+#: include/sfx2/strings.hrc:316
+msgctxt "STR_TEMPLATE_NAME20"
+msgid "Progress"
+msgstr "İlerleme"
+
+#. gtPt9
+#: include/sfx2/strings.hrc:317
+msgctxt "STR_TEMPLATE_NAME21"
+msgid "Sunset"
+msgstr "Günbatımı"
+
+#. 73Y2e
+#: include/sfx2/strings.hrc:318
+msgctxt "STR_TEMPLATE_NAME22"
+msgid "Vintage"
+msgstr "Antika"
+
+#. MSY8y
+#: include/sfx2/strings.hrc:319
+msgctxt "STR_TEMPLATE_NAME23"
+msgid "Vivid"
+msgstr "Canlı"
+
+#. QDZBz
+#. Translators: default Writer template names
+#: include/sfx2/strings.hrc:321
+msgctxt "STR_TEMPLATE_NAME24"
+msgid "CV"
+msgstr "CV"
+
+#. Koe3V
+#: include/sfx2/strings.hrc:322
+msgctxt "STR_TEMPLATE_NAME25"
+msgid "Resume"
+msgstr "Özgeçmiş"
+
+#. hCpfD
+#: include/sfx2/strings.hrc:323
+msgctxt "STR_TEMPLATE_NAME26"
+msgid "Default"
+msgstr "Varsayılan"
+
+#. d7Hyk
+#: include/sfx2/strings.hrc:324
+msgctxt "STR_TEMPLATE_NAME27"
+msgid "Modern"
+msgstr "Modern"
+
+#. CVJEC
+#: include/sfx2/strings.hrc:325
+msgctxt "STR_TEMPLATE_NAME28"
+msgid "Modern business letter sans-serif"
+msgstr "Modern iş mektubu sans-serif"
+
+#. 95GeB
+#: include/sfx2/strings.hrc:326
+msgctxt "STR_TEMPLATE_NAME29"
+msgid "Modern business letter serif"
+msgstr "Modern iş mektubu serif"
+
+#. XdU49
+#: include/sfx2/strings.hrc:327
+msgctxt "STR_TEMPLATE_NAME30"
+msgid "Businesscard with logo"
+msgstr "Logolu işkartı"
+
+#. UAmSj
+#: include/sfx2/strings.hrc:328
+msgctxt "STR_TEMPLATE_NAME31"
+msgid "Simple"
+msgstr "Basit"
+
+#. W7NVH
+#: include/sfx2/strings.hrc:329
+msgctxt "STR_TEMPLATE_NAME32"
+msgid "BPMN"
+msgstr "İş Süreci Modeli"
+
+#. ZaGGB
+#: include/sfx2/strings.hrc:331
+msgctxt "STR_CLEAR_CHAR"
+msgid "Remove"
+msgstr "Kaldır"
+
+#. JReRY
+#: include/sfx2/strings.hrc:332
+msgctxt "STR_CLEAR_ALL_CHAR"
+msgid "Clear All"
+msgstr "Hepsini Temizle"
+
+#. yC8Gs
+#: include/sfx2/strings.hrc:334
+msgctxt "STR_PASSWORD_LEN"
+msgid "Password length"
+msgstr "Parola uzunluğu"
+
+#. FKFmJ
+#: include/sfx2/strings.hrc:335
+msgctxt "STR_PASSWORD_WARNING"
+msgid "The password you have entered causes interoperability issues. Please enter a password that is shorter than 52 bytes, or longer than 55 bytes."
+msgstr "Girdiğiniz parola birlikte çalışabilirlik sorunlarına neden olur. Lütfen 52 bayttan daha kısa veya 55 bayttan daha uzun bir parola girin."
+
+#. jBQFN
+#: include/sfx2/strings.hrc:337
+msgctxt "STR_CTRLCLICKHYPERLINK"
+msgid "%{key}-click to open hyperlink: %{link}"
+msgstr "köprüyü açmak için %{key} tıklayın: %{link}"
+
+#. jC3AK
+#: include/sfx2/strings.hrc:338
+msgctxt "STR_CLICKHYPERLINK"
+msgid "Click to open hyperlink: %{link}"
+msgstr "Köprüyü açmak için tıklayın: %{link}"
+
+#. eFJMp
+#: include/sfx2/strings.hrc:340
+msgctxt "STR_STYLEUSEDBY"
+msgid "(used by: %STYLELIST)"
+msgstr "(kullanılan: %STYLELIST)"
+
+#. 6UgqW
+#: include/sfx2/strings.hrc:342
+msgctxt "STR_DOCUMENT"
+msgid "Document"
+msgstr "Belge"
+
+#. XDGTb
+#: include/sfx2/strings.hrc:343
+msgctxt "STR_SPREADSHEET"
+msgid "Spreadsheet"
+msgstr "Hesap tablosu"
+
+#. 3UZXB
+#: include/sfx2/strings.hrc:344
+msgctxt "STR_PRESENTATION"
+msgid "Presentation"
+msgstr "Sunum"
+
+#. noN5s
+#: include/sfx2/strings.hrc:345
+msgctxt "STR_DRAWING"
+msgid "Drawing"
+msgstr "Çizim"
+
+#. QpuFo
+#: include/sfx2/strings.hrc:346
+msgctxt "STR_RECENT"
+msgid "Recently used"
+msgstr "Son kullanılan"
+
+#. EcAjb
+#: include/sfx2/strings.hrc:347
+msgctxt "STR_NORECENT"
+msgid "No recent characters"
+msgstr "Yeni karakter yok"
+
+#. tfjbD
+#: include/sfx2/strings.hrc:349
+msgctxt "STR_ACTION_RESET_ALL_DEFAULT_TEMPLATES"
+msgid "Reset All De~fault Templates"
+msgstr "Tüm Varsayılan Şablonları Sı~fırla"
+
+#. GWuDE
+#: include/sfx2/strings.hrc:350
+msgctxt "STR_ACTION_RESET_WRITER_TEMPLATE"
+msgid "Reset De~fault Text Document"
+msgstr "Varsayılan Metin Belgesine Sı~fırla"
+
+#. j5eV8
+#: include/sfx2/strings.hrc:351
+msgctxt "STR_ACTION_RESET_CALC_TEMPLATE"
+msgid "Reset De~fault Spreadsheet"
+msgstr "Varsayılan Hesap Tablosunu Sı~fırla"
+
+#. mWp3t
+#: include/sfx2/strings.hrc:352
+msgctxt "STR_ACTION_RESET_IMPRESS_TEMPLATE"
+msgid "Reset De~fault Presentation"
+msgstr "Varsayılan Sunumu Sı~fırla"
+
+#. wfExB
+#: include/sfx2/strings.hrc:353
+msgctxt "STR_ACTION_RESET_DRAW_TEMPLATE"
+msgid "Reset De~fault Drawing"
+msgstr "Varsayılan Çizimi Sı~fırla"
+
+#. BFaGA
+#: include/sfx2/strings.hrc:354
+msgctxt "STR_ACTION_IMPORT"
+msgid "~Import"
+msgstr "~İçe Aktar"
+
+#. 8Cwfk
+#: include/sfx2/strings.hrc:355
+msgctxt "STR_ACTION_EXTENSIONS"
+msgid "E~xtensions"
+msgstr "E~klentiler"
+
+#. idGvM
+#: include/sfx2/strings.hrc:356
+msgctxt "STR_WINDOW_TITLE_RENAME_TEMPLATE"
+msgid "Rename"
+msgstr "Yeniden Adlandır"
+
+#. EyjE3
+#: include/sfx2/strings.hrc:357
+msgctxt "STR_WINDOW_TITLE_RENAME_CATEGORY"
+msgid "Rename Category"
+msgstr "Kategoriyi Yeniden Adlandır"
+
+#. T79Eb
+#: include/sfx2/strings.hrc:358
+msgctxt "STR_WINDOW_TITLE_RENAME_NEW_CATEGORY"
+msgid "New Category"
+msgstr "Yeni Kategori"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Ekle"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_Uygula"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_İptal et"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_Kapat"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_Sil"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_Düzenle"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_Yardım"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_Yeni"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_Hayır"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_Tamam"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_Kaldır"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_Sıfırla"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Evet"
+
+#. F5rSU
+#: sfx2/inc/dinfdlg.hrc:29
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Checked by"
+msgstr "Kontrol eden"
+
+#. BCYGG
+#: sfx2/inc/dinfdlg.hrc:30
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Client"
+msgstr "Müşteri"
+
+#. nSrT3
+#: sfx2/inc/dinfdlg.hrc:31
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Date completed"
+msgstr "Tamamlanma tarihi"
+
+#. HEaEC
+#: sfx2/inc/dinfdlg.hrc:32
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Department"
+msgstr "Bölüm"
+
+#. TxAux
+#: sfx2/inc/dinfdlg.hrc:33
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Destinations"
+msgstr "Hedefler"
+
+#. f3nqh
+#: sfx2/inc/dinfdlg.hrc:34
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Disposition"
+msgstr "Kütük İşleme Durumu"
+
+#. uznMD
+#: sfx2/inc/dinfdlg.hrc:35
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Division"
+msgstr "Bölüm"
+
+#. 6DuFF
+#: sfx2/inc/dinfdlg.hrc:36
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Document number"
+msgstr "Belge numarası"
+
+#. XXKuP
+#: sfx2/inc/dinfdlg.hrc:37
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Editor"
+msgstr "Düzenleyen"
+
+#. hRRmF
+#: sfx2/inc/dinfdlg.hrc:38
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Email"
+msgstr "E-posta"
+
+#. xNvDx
+#: sfx2/inc/dinfdlg.hrc:39
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Forward to"
+msgstr "İlet"
+
+#. xwv85
+#: sfx2/inc/dinfdlg.hrc:40
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Group"
+msgstr "Grup"
+
+#. u59Qp
+#: sfx2/inc/dinfdlg.hrc:41
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Info"
+msgstr "Bilgi"
+
+#. Ltq9H
+#: sfx2/inc/dinfdlg.hrc:42
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Language"
+msgstr "Dil"
+
+#. bv3HC
+#: sfx2/inc/dinfdlg.hrc:43
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Mailstop"
+msgstr "Posta durağı"
+
+#. AFGi2
+#: sfx2/inc/dinfdlg.hrc:44
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Matter"
+msgstr "Madde"
+
+#. wGAD6
+#: sfx2/inc/dinfdlg.hrc:45
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Office"
+msgstr "Ofis"
+
+#. ZqphY
+#: sfx2/inc/dinfdlg.hrc:46
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Owner"
+msgstr "Sahibi"
+
+#. mK8Th
+#: sfx2/inc/dinfdlg.hrc:47
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Project"
+msgstr "Proje"
+
+#. zFeHt
+#: sfx2/inc/dinfdlg.hrc:48
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Publisher"
+msgstr "Yayınlayan"
+
+#. pF2eJ
+#: sfx2/inc/dinfdlg.hrc:49
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Purpose"
+msgstr "Amaç"
+
+#. GTPFZ
+#: sfx2/inc/dinfdlg.hrc:50
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Received from"
+msgstr "Gönderen"
+
+#. dvGyQ
+#: sfx2/inc/dinfdlg.hrc:51
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Recorded by"
+msgstr "Kayıt eden"
+
+#. GjVXD
+#: sfx2/inc/dinfdlg.hrc:52
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Recorded date"
+msgstr "Kayıt tarihi"
+
+#. o5oXa
+#: sfx2/inc/dinfdlg.hrc:53
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Reference"
+msgstr "Kaynak"
+
+#. ex26g
+#: sfx2/inc/dinfdlg.hrc:54
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Source"
+msgstr "Kaynak"
+
+#. 4HSZB
+#: sfx2/inc/dinfdlg.hrc:55
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Status"
+msgstr "Durum"
+
+#. U3RdC
+#: sfx2/inc/dinfdlg.hrc:56
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Telephone number"
+msgstr "Telefon numarası"
+
+#. Geeuu
+#: sfx2/inc/dinfdlg.hrc:57
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Typist"
+msgstr "Yazan kişi"
+
+#. xxHtR
+#: sfx2/inc/dinfdlg.hrc:58
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "URL"
+msgstr "Adres"
+
+#. CxTQY
+#: sfx2/inc/dinfdlg.hrc:73
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Text"
+msgstr "Metin"
+
+#. MMGFi
+#: sfx2/inc/dinfdlg.hrc:74
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "DateTime"
+msgstr "Tarih Saat"
+
+#. GvJMH
+#: sfx2/inc/dinfdlg.hrc:75
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Date"
+msgstr "Tarih"
+
+#. GyrbX
+#: sfx2/inc/dinfdlg.hrc:76
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Duration"
+msgstr "Süre"
+
+#. CxZ4Z
+#: sfx2/inc/dinfdlg.hrc:77
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Number"
+msgstr "Sayı"
+
+#. CDgvL
+#: sfx2/inc/dinfdlg.hrc:78
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Yes or no"
+msgstr "Evet veya hayır"
+
+#. WzBG6
+#. accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
+#. in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
+#: sfx2/inc/dinfdlg.hrc:83
+msgctxt "documentinfopage|extended_tip|userdatacb"
+msgid "Saves the user's full name with the file. You can edit the name by choosing Tools - Options - %PRODUCTNAME - User Data."
+msgstr "Dosya ile birlikte kullanıcının tam ismini kaydeder. Bu ismi Araçlar - Seçenekler - %PRODUCTNAME - Kullanıcı Verisi bölümünden düzenleyebilirsiniz."
+
+#. AxhLy
+#: sfx2/inc/doctempl.hrc:29
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "My Templates"
+msgstr "Şablonlarım"
+
+#. 5aNp8
+#: sfx2/inc/doctempl.hrc:30
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Styles"
+msgstr "Biçemler"
+
+#. t5QK9
+#: sfx2/inc/doctempl.hrc:31
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Business Correspondence"
+msgstr "Kurumsal Yazışma"
+
+#. Y79e8
+#: sfx2/inc/doctempl.hrc:32
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Other Business Documents"
+msgstr "Diğer Kurumsal Belgeler"
+
+#. 2RCC9
+#: sfx2/inc/doctempl.hrc:33
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Personal Correspondence and Documents"
+msgstr "Kişisel Uygunluk ve Belgeler"
+
+#. 6Dgiz
+#: sfx2/inc/doctempl.hrc:34
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Forms and Contracts"
+msgstr "Formlar ve Anlaşmalar"
+
+#. VCKTG
+#: sfx2/inc/doctempl.hrc:35
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Finances"
+msgstr "Mali İşler"
+
+#. HmqGP
+#: sfx2/inc/doctempl.hrc:36
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Education"
+msgstr "Eğitim"
+
+#. xopM8
+#: sfx2/inc/doctempl.hrc:37
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Presentation Backgrounds"
+msgstr "Sunu Arkaplanları"
+
+#. tSQLA
+#: sfx2/inc/doctempl.hrc:38
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Presentations"
+msgstr "Sunular"
+
+#. KuNzz
+#: sfx2/inc/doctempl.hrc:39
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Miscellaneous"
+msgstr "Diğer"
+
+#. SC4E5
+#: sfx2/inc/doctempl.hrc:40
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Labels"
+msgstr "Etiketler"
+
+#. Wg9Je
+#: sfx2/source/devtools/DevToolsStrings.hrc:15
+msgctxt "STR_TEXT_PORTION"
+msgid "Text Portion %1"
+msgstr "Metin Kısmı %1"
+
+#. 5ZXbE
+#: sfx2/source/devtools/DevToolsStrings.hrc:16
+msgctxt "STR_PARAGRAPH"
+msgid "Paragraph %1"
+msgstr "Paragraf %1"
+
+#. DJi4i
+#: sfx2/source/devtools/DevToolsStrings.hrc:17
+msgctxt "STR_SHAPE"
+msgid "Shape %1"
+msgstr "Şekil %1"
+
+#. Ucjjh
+#: sfx2/source/devtools/DevToolsStrings.hrc:18
+msgctxt "STR_PAGE"
+msgid "Page %1"
+msgstr "Sayfa %1"
+
+#. j9DL6
+#: sfx2/source/devtools/DevToolsStrings.hrc:19
+msgctxt "STR_SLIDE"
+msgid "Slide %1"
+msgstr "Slayt %1"
+
+#. YQqL8
+#: sfx2/source/devtools/DevToolsStrings.hrc:20
+msgctxt "STR_MASTER_SLIDE"
+msgid "Master Slide %1"
+msgstr "Ana Slayt %1"
+
+#. CEfNy
+#: sfx2/source/devtools/DevToolsStrings.hrc:21
+msgctxt "STR_SHEET"
+msgid "Sheet %1"
+msgstr "Sayfa %1"
+
+#. BaABx
+#: sfx2/source/devtools/DevToolsStrings.hrc:23
+msgctxt "STR_SHAPES_NODE"
+msgid "Shapes"
+msgstr "Şekiller"
+
+#. n4VWE
+#: sfx2/source/devtools/DevToolsStrings.hrc:24
+msgctxt "STR_CHARTS_ENTRY"
+msgid "Charts"
+msgstr "Grafikler"
+
+#. 5GWcX
+#: sfx2/source/devtools/DevToolsStrings.hrc:25
+msgctxt "STR_PIVOT_TABLES_ENTRY"
+msgid "Pivot Tables"
+msgstr "Özet Tablolar"
+
+#. BBLBQ
+#: sfx2/source/devtools/DevToolsStrings.hrc:26
+msgctxt "STR_DOCUMENT_ENTRY"
+msgid "Document"
+msgstr "Belge"
+
+#. 4dNGV
+#: sfx2/source/devtools/DevToolsStrings.hrc:27
+msgctxt "STR_SHEETS_ENTRY"
+msgid "Sheets"
+msgstr "Sayfalar"
+
+#. RLwRi
+#: sfx2/source/devtools/DevToolsStrings.hrc:28
+msgctxt "STR_STYLES_ENTRY"
+msgid "Styles"
+msgstr "Biçemler"
+
+#. P4RF4
+#: sfx2/source/devtools/DevToolsStrings.hrc:29
+msgctxt "STR_SLIDES_ENTRY"
+msgid "Slides"
+msgstr "Slaytlar"
+
+#. 4bJSH
+#: sfx2/source/devtools/DevToolsStrings.hrc:30
+msgctxt "STR_MASTER_SLIDES_ENTRY"
+msgid "Master Slides"
+msgstr "Ana Slaytlar"
+
+#. LRq2A
+#: sfx2/source/devtools/DevToolsStrings.hrc:31
+msgctxt "STR_PAGES_ENTRY"
+msgid "Pages"
+msgstr "Sayfalar"
+
+#. 946kV
+#: sfx2/source/devtools/DevToolsStrings.hrc:32
+msgctxt "STR_PARAGRAPHS_ENTRY"
+msgid "Paragraphs"
+msgstr "Paragraflar"
+
+#. JG2qz
+#: sfx2/source/devtools/DevToolsStrings.hrc:33
+msgctxt "STR_TABLES_ENTRY"
+msgid "Tables"
+msgstr "Tablolar"
+
+#. HzFoW
+#: sfx2/source/devtools/DevToolsStrings.hrc:34
+msgctxt "STR_FRAMES_ENTRY"
+msgid "Frames"
+msgstr "Çerçeveler"
+
+#. ekGEm
+#: sfx2/source/devtools/DevToolsStrings.hrc:35
+msgctxt "STR_GRAPHIC_OBJECTS_ENTRY"
+msgid "Graphic Objects"
+msgstr "Grafik Nesneleri"
+
+#. cVWmY
+#: sfx2/source/devtools/DevToolsStrings.hrc:36
+msgctxt "STR_EMBEDDED_OBJECTS_ENTRY"
+msgid "Embedded Objects"
+msgstr "Gömülü Nesneler"
+
+#. xfnkV
+#: sfx2/source/devtools/DevToolsStrings.hrc:38
+msgctxt "STR_ANY_VALUE_TRUE"
+msgid "True"
+msgstr "Doğru"
+
+#. 2WxdA
+#: sfx2/source/devtools/DevToolsStrings.hrc:39
+msgctxt "STR_ANY_VALUE_FALSE"
+msgid "False"
+msgstr "Yanlış"
+
+#. RBC8w
+#: sfx2/source/devtools/DevToolsStrings.hrc:40
+msgctxt "STR_ANY_VALUE_NULL"
+msgid "Null"
+msgstr "Boş"
+
+#. As494
+#: sfx2/source/devtools/DevToolsStrings.hrc:41
+msgctxt "STR_CLASS_UNKNOWN"
+msgid "Unknown"
+msgstr "Bilinmeyen"
+
+#. gAY69
+#: sfx2/source/devtools/DevToolsStrings.hrc:43
+msgctxt "STR_METHOD_TYPE_OBJECT"
+msgid "object"
+msgstr "nesne"
+
+#. HFgBW
+#: sfx2/source/devtools/DevToolsStrings.hrc:44
+msgctxt "STR_METHOD_TYPE_STRUCT"
+msgid "struct"
+msgstr "yapı"
+
+#. 7DCri
+#: sfx2/source/devtools/DevToolsStrings.hrc:45
+msgctxt "STR_METHOD_TYPE_ENUM"
+msgid "enum"
+msgstr "numaralandırma"
+
+#. aEuJR
+#: sfx2/source/devtools/DevToolsStrings.hrc:46
+msgctxt "STR_METHOD_TYPE_SEQUENCE"
+msgid "sequence"
+msgstr "dizi"
+
+#. xXMdD
+#: sfx2/source/devtools/DevToolsStrings.hrc:48
+msgctxt "STR_PROPERTY_TYPE_IS_NAMED_CONTAINER"
+msgid "name container"
+msgstr "ad taşıyıcısı"
+
+#. QLZbz
+#: sfx2/source/devtools/DevToolsStrings.hrc:49
+msgctxt "STR_PROPERTY_TYPE_IS_INDEX_CONTAINER"
+msgid "index container"
+msgstr "dizin taşıyıcısı"
+
+#. LLsJf
+#: sfx2/source/devtools/DevToolsStrings.hrc:50
+msgctxt "STR_PROPERTY_TYPE_IS_ENUMERATION"
+msgid "enumeration"
+msgstr "sayım"
+
+#. aNuA9
+#: sfx2/source/devtools/DevToolsStrings.hrc:52
+msgctxt "STR_PARMETER_MODE_IN"
+msgid "[in]"
+msgstr "[giriş]"
+
+#. W3AEx
+#: sfx2/source/devtools/DevToolsStrings.hrc:53
+msgctxt "STR_PARMETER_MODE_OUT"
+msgid "[out]"
+msgstr "[çıkış]"
+
+#. ENF6w
+#: sfx2/source/devtools/DevToolsStrings.hrc:54
+msgctxt "STR_PARMETER_MODE_IN_AND_OUT"
+msgid "[in&out]"
+msgstr "[giriş&çıkış]"
+
+#. rw6AB
+#: sfx2/source/devtools/DevToolsStrings.hrc:56
+msgctxt "STR_PROPERTY_ATTRIBUTE_IS_ATTRIBUTE"
+msgid "attribute"
+msgstr "öznitelik"
+
+#. BwCGg
+#: sfx2/source/devtools/DevToolsStrings.hrc:57
+msgctxt "STR_PROPERTY_ATTRIBUTE_GET"
+msgid "get"
+msgstr "al"
+
+#. MissY
+#: sfx2/source/devtools/DevToolsStrings.hrc:58
+msgctxt "STR_PROPERTY_ATTRIBUTE_SET"
+msgid "set"
+msgstr "ayarla"
+
+#. Nhmiv
+#: sfx2/source/devtools/DevToolsStrings.hrc:59
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEVOID"
+msgid "may be void"
+msgstr "geçersiz olabilir"
+
+#. zECkD
+#: sfx2/source/devtools/DevToolsStrings.hrc:60
+msgctxt "STR_PROPERTY_ATTRIBUTE_READONLY"
+msgid "read-only"
+msgstr "salt okunur"
+
+#. BtQDx
+#: sfx2/source/devtools/DevToolsStrings.hrc:61
+msgctxt "STR_PROPERTY_ATTRIBUTE_WRITEONLY"
+msgid "write-only"
+msgstr "sadece yazma"
+
+#. dBQEu
+#: sfx2/source/devtools/DevToolsStrings.hrc:62
+msgctxt "STR_PROPERTY_ATTRIBUTE_REMOVABLE"
+msgid "removeable"
+msgstr "kaldırılabilir"
+
+#. jRo8t
+#: sfx2/source/devtools/DevToolsStrings.hrc:63
+msgctxt "STR_PROPERTY_ATTRIBUTE_BOUND"
+msgid "bound"
+msgstr "bağlı"
+
+#. rBqTG
+#: sfx2/source/devtools/DevToolsStrings.hrc:64
+msgctxt "STR_PROPERTY_ATTRIBUTE_CONSTRAINED"
+msgid "constrained"
+msgstr "kısıtlı"
+
+#. XLnBt
+#: sfx2/source/devtools/DevToolsStrings.hrc:65
+msgctxt "STR_PROPERTY_ATTRIBUTE_TRANSIENT"
+msgid "transient"
+msgstr "geçici"
+
+#. BK7Zk
+#: sfx2/source/devtools/DevToolsStrings.hrc:66
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEAMBIGUOUS"
+msgid "may be ambiguous"
+msgstr "belirsiz olabilir"
+
+#. BDEqD
+#: sfx2/source/devtools/DevToolsStrings.hrc:67
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEDEFAULT"
+msgid "may be default"
+msgstr "varsayılan olabilir"
+
+#. TGQhd
+#: sfx2/source/devtools/DevToolsStrings.hrc:69
+msgctxt "STR_PROPERTY_VALUE_SEQUENCE"
+msgid "<Sequence [%1]>"
+msgstr "<Dizi [%1]>"
+
+#. KZ5M4
+#: sfx2/source/devtools/DevToolsStrings.hrc:70
+msgctxt "STR_PROPERTY_VALUE_OBJECT"
+msgid "<Object@%1>"
+msgstr "<Nesne@%1>"
+
+#. xKaJy
+#: sfx2/source/devtools/DevToolsStrings.hrc:71
+msgctxt "STR_PROPERTY_VALUE_STRUCT"
+msgid "<Struct>"
+msgstr "<Yapı>"
+
+#. AxfFu
+#: sfx2/uiconfig/ui/addtargetdialog.ui:8
+msgctxt "addtargetdialog|AddTargetDialog"
+msgid "Add Target"
+msgstr "Hedef Ekle"
+
+#. JC8Vd
+#: sfx2/uiconfig/ui/addtargetdialog.ui:89
+msgctxt "addtargetdialog|label_name"
+msgid "Name:"
+msgstr "Adı:"
+
+#. LXpbz
+#: sfx2/uiconfig/ui/addtargetdialog.ui:120
+msgctxt "addtargetdialog|label_type"
+msgid "Type:"
+msgstr "Tür:"
+
+#. Sy2A7
+#: sfx2/uiconfig/ui/addtargetdialog.ui:135
+msgctxt "addtargetdialog|label_content"
+msgid "Content:"
+msgstr "İçerik:"
+
+#. e5sY6
+#: sfx2/uiconfig/ui/addtargetdialog.ui:169
+msgctxt "addtargetdialog|type"
+msgid "Text"
+msgstr "Metin"
+
+#. dGQqg
+#: sfx2/uiconfig/ui/addtargetdialog.ui:170
+msgctxt "addtargetdialog|type"
+msgid "Regular expression"
+msgstr "Düzenli ifade"
+
+#. wgzA4
+#: sfx2/uiconfig/ui/addtargetdialog.ui:171
+msgctxt "addtargetdialog|type"
+msgid "Predefined"
+msgstr "Öntanımlı"
+
+#. nGjTR
+#: sfx2/uiconfig/ui/addtargetdialog.ui:186
+msgctxt "addtargetdialog|label_content_predef"
+msgid "Content:"
+msgstr "İçerik:"
+
+#. 7uQgC
+#: sfx2/uiconfig/ui/addtargetdialog.ui:204
+msgctxt "addtargetdialog|content_predef"
+msgid "Credit card numbers"
+msgstr "Kredi kartı numaraları"
+
+#. jze4C
+#: sfx2/uiconfig/ui/addtargetdialog.ui:205
+msgctxt "addtargetdialog|content_predef"
+msgid "Email addresses"
+msgstr "E-posta adresleri"
+
+#. wDQAu
+#: sfx2/uiconfig/ui/addtargetdialog.ui:206
+msgctxt "addtargetdialog|content_predef"
+msgid "IP addresses"
+msgstr "IP adresleri"
+
+#. CpoEL
+#: sfx2/uiconfig/ui/addtargetdialog.ui:207
+msgctxt "addtargetdialog|content_predef"
+msgid "Dates (Numerical)"
+msgstr "Tarihler (Numerik)"
+
+#. 3Nz2x
+#: sfx2/uiconfig/ui/addtargetdialog.ui:208
+msgctxt "addtargetdialog|content_predef"
+msgid "National Insurance Number (UK)"
+msgstr "Ulusal Sigorta Numarası (Birleşik Krallık)"
+
+#. jSAay
+#: sfx2/uiconfig/ui/addtargetdialog.ui:209
+msgctxt "addtargetdialog|content_predef"
+msgid "Social Security Number (US)"
+msgstr "Sosyal Güvenlik Numarası (ABD)"
+
+#. kdZJN
+#: sfx2/uiconfig/ui/addtargetdialog.ui:234
+msgctxt "addtargetdialog|checkboxCaseSensitive"
+msgid "Match case"
+msgstr "Büyük-küçük harf eşleştir"
+
+#. G2u3B
+#: sfx2/uiconfig/ui/addtargetdialog.ui:249
+msgctxt "addtargetdialog|checkboxWholeWords"
+msgid "Whole words only"
+msgstr "Yalnızca tam sözcükler"
+
+#. JV66c
+#: sfx2/uiconfig/ui/alienwarndialog.ui:7
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "Confirm File Format"
+msgstr "Dosya Biçimini Onayla"
+
+#. kia7u
+#: sfx2/uiconfig/ui/alienwarndialog.ui:13
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "This document may contain formatting or content that cannot be saved in the currently selected file format “%FORMATNAME”."
+msgstr "Bu belge seçili “%FORMATNAME” dosya biçiminde kaydedilemeyecek biçimlendirmeye veya içeriğe sahip olabilir."
+
+#. 3YA5c
+#: sfx2/uiconfig/ui/alienwarndialog.ui:14
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "Use the default ODF file format to be sure that the document is saved correctly."
+msgstr "Belgenin doğru kaydedildiğinden emin olmak için varsayılan ODF dosya biçimini kullanın."
+
+#. ocqdy
+#: sfx2/uiconfig/ui/alienwarndialog.ui:25
+msgctxt "alienwarndialog|cancel"
+msgid "Use %DEFAULTEXTENSION _Format"
+msgstr "%DEFAULTEXTENSION _Biçimini Kullan"
+
+#. Fzgtz
+#: sfx2/uiconfig/ui/alienwarndialog.ui:40
+msgctxt "alienwarndialog|save"
+msgid "_Use %FORMATNAME Format"
+msgstr "%FORMATNAME biçimini k_ullan"
+
+#. Fgi6S
+#: sfx2/uiconfig/ui/alienwarndialog.ui:65
+msgctxt "alienwarndialog|ask"
+msgid "_Ask when not saving in ODF or default format"
+msgstr "ODF veya varsayılan biçimde k_aydedilmediğinde sor"
+
+#. GVVQ6
+#: sfx2/uiconfig/ui/autoredactdialog.ui:24
+msgctxt "autoredactdialog|AutoRedactDialog"
+msgid "Automatic Redaction"
+msgstr "Otomatik Arındırma"
+
+#. QCidi
+#: sfx2/uiconfig/ui/autoredactdialog.ui:122
+msgctxt "autoredactdialog|target"
+msgid "Target Name"
+msgstr "Hedef Adı"
+
+#. szYkX
+#: sfx2/uiconfig/ui/autoredactdialog.ui:135
+msgctxt "autoredactdialog|description"
+msgid "Type"
+msgstr "Tür"
+
+#. udcn4
+#: sfx2/uiconfig/ui/autoredactdialog.ui:148
+msgctxt "autoredactdialog|target"
+msgid "Content"
+msgstr "İçerik"
+
+#. BBuAc
+#: sfx2/uiconfig/ui/autoredactdialog.ui:161
+msgctxt "autoredactdialog|target"
+msgid "Match case"
+msgstr "Büyük-küçük harf eşleştir"
+
+#. obHtC
+#: sfx2/uiconfig/ui/autoredactdialog.ui:174
+msgctxt "autoredactdialog|target"
+msgid "Whole words"
+msgstr "Tam sözcükler"
+
+#. 4MVdG
+#: sfx2/uiconfig/ui/autoredactdialog.ui:202
+msgctxt "menuassignpage|contentslabel"
+msgid "_Redaction Targets"
+msgstr "A_rındırma Hedefleri"
+
+#. E4GWo
+#: sfx2/uiconfig/ui/autoredactdialog.ui:222
+msgctxt "autoredactdialog|btnLoadTargets"
+msgid "Load Targets"
+msgstr "Hedefleri Yükle"
+
+#. tpbYA
+#: sfx2/uiconfig/ui/autoredactdialog.ui:235
+msgctxt "autoredactdialog|btnSaveTargets"
+msgid "Save Targets"
+msgstr "Hedefleri Kaydet"
+
+#. TQg85
+#: sfx2/uiconfig/ui/autoredactdialog.ui:261
+msgctxt "autoredactdialog|add"
+msgid "Add Target"
+msgstr "Hedef Ekle"
+
+#. 4TvHR
+#: sfx2/uiconfig/ui/autoredactdialog.ui:274
+msgctxt "autoredactdialog|edit"
+msgid "Edit Target"
+msgstr "Hedefi Düzenle"
+
+#. knEqb
+#: sfx2/uiconfig/ui/autoredactdialog.ui:287
+msgctxt "autoredactdialog|delete"
+msgid "Delete Target"
+msgstr "Hedefi Sil"
+
+#. iLkdK
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:8
+msgctxt "bookmarkdialog|BookmarkDialog"
+msgid "Add to Bookmarks"
+msgstr "Yer İmlerine Ekle"
+
+#. U6BGv
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:83
+msgctxt "bookmarkdialog|alttitle"
+msgid "Rename Bookmark"
+msgstr "Yer İmini Yeniden Adlandır"
+
+#. Fq2rD
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:102
+msgctxt "bookmarkdialog|label2"
+msgid "Bookmark:"
+msgstr "Yer imi:"
+
+#. 3A3VL
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:12
+msgctxt "bookmarkmenu|display"
+msgid "Display"
+msgstr "Göster"
+
+#. VDDCt
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:26
+msgctxt "bookmarkmenu|rename"
+msgid "Rename..."
+msgstr "Yeniden adlandır..."
+
+#. fCQ9n
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:34
+msgctxt "bookmarkmenu|delete"
+msgid "Delete"
+msgstr "Sil"
+
+#. WGFBK
+#: sfx2/uiconfig/ui/charmapcontrol.ui:20
+msgctxt "charmapcontrol|label1"
+msgid "Favorites"
+msgstr "Sık Kullanılanlar"
+
+#. HAe2e
+#: sfx2/uiconfig/ui/charmapcontrol.ui:261
+msgctxt "charmapcontrol|label2"
+msgid "Recent"
+msgstr "Son kullanılan"
+
+#. BQwCQ
+#: sfx2/uiconfig/ui/charmapcontrol.ui:500
+msgctxt "charmapcontrol|specialchardlg"
+msgid "More Characters…"
+msgstr "Daha Fazla Karakter…"
+
+#. i2ZhQ
+#: sfx2/uiconfig/ui/charviewmenu.ui:12
+msgctxt "charviewmenu|clearchar"
+msgid "Remove"
+msgstr "Kaldır"
+
+#. bKHTP
+#: sfx2/uiconfig/ui/charviewmenu.ui:20
+msgctxt "charviewmenu|clearallchar"
+msgid "Clear All"
+msgstr "Hepsini Temizle"
+
+#. Y8jYN
+#: sfx2/uiconfig/ui/checkin.ui:8
+msgctxt "checkin|CheckinDialog"
+msgid "Check-In"
+msgstr "Kilitlemeyi Çöz"
+
+#. ABZKD
+#: sfx2/uiconfig/ui/checkin.ui:90
+msgctxt "checkin|MajorVersion"
+msgid "New major version"
+msgstr "Yeni ana sürüm"
+
+#. PYDWP
+#: sfx2/uiconfig/ui/checkin.ui:106
+msgctxt "checkin|label2"
+msgid "Version comment:"
+msgstr "Sürüm açıklaması:"
+
+#. CEnTA
+#: sfx2/uiconfig/ui/cmisline.ui:44
+msgctxt "cmisline|type"
+msgid "Type"
+msgstr "Tür"
+
+#. g2yBR
+#: sfx2/uiconfig/ui/cmisline.ui:59
+msgctxt "cmisline|yes"
+msgid "Yes"
+msgstr "Evet"
+
+#. BWGuL
+#: sfx2/uiconfig/ui/cmisline.ui:73
+msgctxt "cmisline|no"
+msgid "No"
+msgstr "Hayır"
+
+#. kDKBB
+#: sfx2/uiconfig/ui/commandpopup.ui:36
+msgctxt "commandpopup|entry"
+msgid "Search command"
+msgstr "Arama komutu"
+
+#. w2G7M
+#: sfx2/uiconfig/ui/custominfopage.ui:15
+msgctxt "custominfopage|add"
+msgid "Add _Property"
+msgstr "Özellik _Ekle"
+
+#. 85KDm
+#: sfx2/uiconfig/ui/custominfopage.ui:23
+msgctxt "custominfopage|extended_tip|add"
+msgid "Click to add a new row to the Properties list."
+msgstr "Özellikler listesine yeni satır eklemek için tıklayın."
+
+#. aB3bA
+#: sfx2/uiconfig/ui/custominfopage.ui:42
+msgctxt "custominfopage|name"
+msgid "Name"
+msgstr "Adı"
+
+#. Ja2JC
+#: sfx2/uiconfig/ui/custominfopage.ui:55
+msgctxt "custominfopage|type"
+msgid "Type"
+msgstr "Tür"
+
+#. WxjS6
+#: sfx2/uiconfig/ui/custominfopage.ui:68
+msgctxt "custominfopage|value"
+msgid "Value"
+msgstr "Değer"
+
+#. kSFdB
+#: sfx2/uiconfig/ui/custominfopage.ui:116
+msgctxt "custominfopage|extended_tip|properties"
+msgid "Enter your custom contents. You can change the name, type, and contents of each row. You can add or remove rows. The items will be exported as metadata to other file formats."
+msgstr "Özel içeriklerinizi girin. Her satırda ismi, türü ve içerikleri değiştirebilirsiniz. Satırları ekleyebilir veya silebilirsiniz. Öğeler diğer dosya türlerine meta verisi olarak eklenir."
+
+#. au5jH
+#: sfx2/uiconfig/ui/custominfopage.ui:138
+msgctxt "custominfopage|extended_tip|CustomInfoPage"
+msgid "Allows you to assign custom information fields to your document."
+msgstr "Belgenize kullanıcı tanımlı bilgi alanları eklemenize izin verir."
+
+#. VHwZA
+#: sfx2/uiconfig/ui/deck.ui:101 sfx2/uiconfig/ui/deck.ui:106
+msgctxt "deck|SFX_STR_SIDEBAR_CLOSE_DECK"
+msgid "Close Sidebar Deck"
+msgstr "Kenar Çubuğunu Kapat"
+
+#. pxEPn
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:18
+msgctxt "descriptioninfopage|label27"
+msgid "_Title:"
+msgstr "_Başlık:"
+
+#. HqzQo
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:32
+msgctxt "descriptioninfopage|label28"
+msgid "_Subject:"
+msgstr "_Konu:"
+
+#. gEGPn
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:46
+msgctxt "descriptioninfopage|label29"
+msgid "_Keywords:"
+msgstr "_Anahtar sözcükler:"
+
+#. Nayo4
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:61
+msgctxt "descriptioninfopage|label30"
+msgid "_Comments:"
+msgstr "_Açıklamalar:"
+
+#. qw238
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:79
+msgctxt "descriptioninfopage|extended_tip|title"
+msgid "Enter a title for the document."
+msgstr "Belgeniz için bir başlık girin."
+
+#. rvZHi
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:96
+msgctxt "descriptioninfopage|extended_tip|subject"
+msgid "Enter a subject for the document. You can use a subject to group documents with similar contents."
+msgstr "Belgeniz için bir konu girin. Benzer içerikli belgeleri gruplamak için bir konu kullanabilirsiniz."
+
+#. FoxGh
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:113
+msgctxt "descriptioninfopage|extended_tip|keywords"
+msgid "Enter the words that you want to use to index the content of your document. Keywords must be separated by commas. A keyword can contain white space characters or semicolons."
+msgstr "Belgenizin içeriklerini indislemek için kullanmak istediğiniz anahtar sözcükleri girin. Anahtar sözcükler virgüllerle ayrılmalıdır. Bir anahtar sözcük noktalı virgüller ve boşluklar bulundurabilir."
+
+#. bo2q7
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:137
+msgctxt "descriptioninfopage|extended_tip|comments"
+msgid "Enter comments to help identify the document."
+msgstr "Belgenizi tanımlamanıza yardım eden açıklamaları girin."
+
+#. sGW3Z
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:150
+msgctxt "descriptioninfopage|extended_tip|DescriptionInfoPage"
+msgid "Contains descriptive information about the document."
+msgstr "Belge hakkında açıklayıcı bilgi bulundurur."
+
+#. tC2rt
+#: sfx2/uiconfig/ui/developmenttool.ui:116
+msgctxt "developmenttool|dom_current_selection_toggle-tooltip"
+msgid "Current Selection In Document"
+msgstr "Belgedeki Mevcut Seçim"
+
+#. Po2S3
+#: sfx2/uiconfig/ui/developmenttool.ui:117
+msgctxt "developmenttool|dom_current_selection_toggle"
+msgid "Current Selection"
+msgstr "Mevcut Seçim"
+
+#. eB6NR
+#: sfx2/uiconfig/ui/developmenttool.ui:128
+msgctxt "developmenttool|dom_refresh_button-tooltip"
+msgid "Refresh Document Model Tree View"
+msgstr "Belge Modeli Ağaç Görünümünü Yenile"
+
+#. FD2yt
+#: sfx2/uiconfig/ui/developmenttool.ui:129
+msgctxt "developmenttool|dom_refresh_button"
+msgid "Refresh"
+msgstr "Yenile"
+
+#. qVgcX
+#: sfx2/uiconfig/ui/developmenttool.ui:175
+msgctxt "developmenttool|object"
+msgid "Object"
+msgstr "Nesne"
+
+#. x6GLB
+#: sfx2/uiconfig/ui/developmenttool.ui:223
+msgctxt "developmenttool|tooltip-back"
+msgid "Back"
+msgstr "Geri"
+
+#. SinPk
+#: sfx2/uiconfig/ui/developmenttool.ui:224
+msgctxt "developmenttool|back"
+msgid "Back"
+msgstr "Geri"
+
+#. 4CBb3
+#: sfx2/uiconfig/ui/developmenttool.ui:236
+msgctxt "developmenttool|tooltip-inspect"
+msgid "Inspect"
+msgstr "İncele"
+
+#. vCciB
+#: sfx2/uiconfig/ui/developmenttool.ui:237
+msgctxt "developmenttool|inspect"
+msgid "Inspect"
+msgstr "İncele"
+
+#. nFMXe
+#: sfx2/uiconfig/ui/developmenttool.ui:249
+msgctxt "developmenttool|tooltip-refresh"
+msgid "Refresh"
+msgstr "Yenile"
+
+#. CFuvW
+#: sfx2/uiconfig/ui/developmenttool.ui:250
+msgctxt "developmenttool|refresh"
+msgid "Refresh"
+msgstr "Yenile"
+
+#. 6gFmn
+#: sfx2/uiconfig/ui/developmenttool.ui:273
+msgctxt "developmenttool|classname"
+msgid "Class name:"
+msgstr "Sınıf adı:"
+
+#. a9j7f
+#: sfx2/uiconfig/ui/developmenttool.ui:338
+#: sfx2/uiconfig/ui/developmenttool.ui:387
+#: sfx2/uiconfig/ui/developmenttool.ui:445
+msgctxt "developmenttool|name"
+msgid "Name"
+msgstr "Adı"
+
+#. VFqAa
+#: sfx2/uiconfig/ui/developmenttool.ui:358
+msgctxt "developmenttool|interfaces"
+msgid "Interfaces"
+msgstr "Arayüzler"
+
+#. iCdWe
+#: sfx2/uiconfig/ui/developmenttool.ui:410
+msgctxt "developmenttool|services"
+msgid "Services"
+msgstr "Hizmetler"
+
+#. H7pYE
+#: sfx2/uiconfig/ui/developmenttool.ui:460
+msgctxt "developmenttool|value"
+msgid "Value"
+msgstr "Değer"
+
+#. Jjkqh
+#: sfx2/uiconfig/ui/developmenttool.ui:474
+msgctxt "developmenttool|type"
+msgid "Type"
+msgstr "Tür"
+
+#. zpXuY
+#: sfx2/uiconfig/ui/developmenttool.ui:488
+msgctxt "developmenttool|info"
+msgid "Info"
+msgstr "Bilgi"
+
+#. AUktw
+#: sfx2/uiconfig/ui/developmenttool.ui:539
+msgctxt "developmenttool|properties"
+msgid "Properties"
+msgstr "Özellikler"
+
+#. wGJtn
+#: sfx2/uiconfig/ui/developmenttool.ui:569
+msgctxt "developmenttool|method"
+msgid "Method"
+msgstr "Yöntem"
+
+#. EnGfg
+#: sfx2/uiconfig/ui/developmenttool.ui:584
+msgctxt "developmenttool|returntype"
+msgid "Return Type"
+msgstr "Geri Dönüş Türü"
+
+#. AKnSa
+#: sfx2/uiconfig/ui/developmenttool.ui:598
+msgctxt "developmenttool|parameters"
+msgid "Parameters"
+msgstr "Parametreler"
+
+#. tmttq
+#: sfx2/uiconfig/ui/developmenttool.ui:612
+msgctxt "developmenttool|implementation_class"
+msgid "Implementation Class"
+msgstr "Uygulama Sınıfı"
+
+#. Q2CBK
+#: sfx2/uiconfig/ui/developmenttool.ui:634
+msgctxt "developmenttool|methods"
+msgid "Methods"
+msgstr "Yöntemler"
+
+#. 68CBk
+#: sfx2/uiconfig/ui/devtoolsmenu.ui:12
+msgctxt "devtoolsmenu|inspect"
+msgid "Inspect"
+msgstr "İncele"
+
+#. zjFgn
+#: sfx2/uiconfig/ui/documentfontspage.ui:28
+msgctxt "documentfontspage|embedFonts"
+msgid "_Embed fonts in the document"
+msgstr "_Yazı tiplerini belgeye göm"
+
+#. FzuRv
+#: sfx2/uiconfig/ui/documentfontspage.ui:36
+msgctxt "documentfontspage|extended_tip|embedFonts"
+msgid "Mark this box to embed document fonts into the document file, for portability between different computer systems."
+msgstr "Bu seçeneği kullanarak farklı bilgisayarlar arasında taşınabilirlik için yazı tiplerini dosyanıza gömebilirsiniz."
+
+#. 6rfon
+#: sfx2/uiconfig/ui/documentfontspage.ui:48
+msgctxt "documentfontspage|embedUsedFonts"
+msgid "_Only embed fonts that are used in documents"
+msgstr "_Sadece belgelerde kullanılan yazı tiplerini göm"
+
+#. V8E5f
+#: sfx2/uiconfig/ui/documentfontspage.ui:67
+msgctxt "documentfontspage|fontEmbeddingLabel"
+msgid "Font Embedding"
+msgstr "Yazı Tipi Gömme"
+
+#. Gip6V
+#: sfx2/uiconfig/ui/documentfontspage.ui:95
+msgctxt "documentfontspage|embedLatinScriptFonts"
+msgid "_Latin fonts"
+msgstr "_Latin yazıtipleri"
+
+#. nFM92
+#: sfx2/uiconfig/ui/documentfontspage.ui:110
+msgctxt "documentfontspage|embedAsianScriptFonts"
+msgid "_Asian fonts"
+msgstr "_Asya yazıtipleri"
+
+#. nSg9b
+#: sfx2/uiconfig/ui/documentfontspage.ui:125
+msgctxt "documentfontspage|embedComplexScriptFonts"
+msgid "_Complex fonts"
+msgstr "_Karmaşık yazıtipleri"
+
+#. EFytK
+#: sfx2/uiconfig/ui/documentfontspage.ui:144
+msgctxt "documentfontspage|fontScriptFrameLabel"
+msgid "Font scripts to embed"
+msgstr "Gömülecek yazıtipi betikleri"
+
+#. izc2Y
+#: sfx2/uiconfig/ui/documentfontspage.ui:158
+msgctxt "documentfontspage|extended_tip|DocumentFontsPage"
+msgid "Embed document fonts in the current file."
+msgstr "Geçerli dosyaya belge yazı tiplerini gömün."
+
+#. CCxGn
+#: sfx2/uiconfig/ui/documentinfopage.ui:19
+msgctxt "documentinfopage|label13"
+msgid "_Created:"
+msgstr "_Oluşturulma:"
+
+#. EZKmF
+#: sfx2/uiconfig/ui/documentinfopage.ui:33
+msgctxt "documentinfopage|label14"
+msgid "_Modified:"
+msgstr "_Değiştirildi:"
+
+#. 4GLKx
+#: sfx2/uiconfig/ui/documentinfopage.ui:47
+msgctxt "documentinfopage|label15"
+msgid "_Digitally signed:"
+msgstr "_Sayısal imzalı:"
+
+#. gJwUC
+#: sfx2/uiconfig/ui/documentinfopage.ui:61
+msgctxt "documentinfopage|label16"
+msgid "Last pri_nted:"
+msgstr "En son y_azdırılma:"
+
+#. drz3P
+#: sfx2/uiconfig/ui/documentinfopage.ui:75
+msgctxt "documentinfopage|label17"
+msgid "Total _editing time:"
+msgstr "Toplam düzenleme süresi:"
+
+#. MEzSr
+#: sfx2/uiconfig/ui/documentinfopage.ui:89
+msgctxt "documentinfopage|label18"
+msgid "Re_vision number:"
+msgstr "Revizyon numarası:"
+
+#. BgTqU
+#: sfx2/uiconfig/ui/documentinfopage.ui:131
+msgctxt "documentinfopage|showsigned"
+msgid "Multiply signed document"
+msgstr "İmzalı belgeyi çokla"
+
+#. sGFJQ
+#: sfx2/uiconfig/ui/documentinfopage.ui:183
+msgctxt "documentinfopage|userdatacb"
+msgid "_Apply user data"
+msgstr "_Kullanıcı verilerini kullan"
+
+#. JFxmP
+#: sfx2/uiconfig/ui/documentinfopage.ui:197
+msgctxt "documentinfopage|reset"
+msgid "Reset Properties"
+msgstr "Özellikleri Sıfırla"
+
+#. HrN2U
+#: sfx2/uiconfig/ui/documentinfopage.ui:204
+msgctxt "documentinfopage|extended_tip|reset"
+msgid "Resets the editing time to zero, the creation date to the current date and time, and the version number to 1. The modification and printing dates are also deleted."
+msgstr "Toplam düzenleme süresini sıfırlar, oluşturma tarihi ve saatini şu andaki zamana çevirir ve sürüm numarasını 1 değerine ayarlar. Ayrıca düzenleme ve yazdırma tarihleri de silinir."
+
+#. qeWvU
+#: sfx2/uiconfig/ui/documentinfopage.ui:215
+msgctxt "documentinfopage|signature"
+msgid "Di_gital Signatures..."
+msgstr "Sa_yısal İmzalar..."
+
+#. rEEgJ
+#: sfx2/uiconfig/ui/documentinfopage.ui:234
+msgctxt "documentinfopage|label11"
+msgid "_Size:"
+msgstr "_Boyut:"
+
+#. WNFYB
+#: sfx2/uiconfig/ui/documentinfopage.ui:247
+msgctxt "documentinfopage|showsize"
+msgid "unknown"
+msgstr "bilinmiyor"
+
+#. EgtLE
+#: sfx2/uiconfig/ui/documentinfopage.ui:262
+msgctxt "documentinfopage|label8"
+msgid "_Location:"
+msgstr "_Konum:"
+
+#. 9xhwo
+#: sfx2/uiconfig/ui/documentinfopage.ui:276
+msgctxt "documentinfopage|label7"
+msgid "_Type:"
+msgstr "_Tür:"
+
+#. ZLmAo
+#: sfx2/uiconfig/ui/documentinfopage.ui:299
+msgctxt "documentinfopage|changepass"
+msgid "Change _Password"
+msgstr "_Parolayı Değiştir"
+
+#. oqAZE
+#: sfx2/uiconfig/ui/documentinfopage.ui:317
+msgctxt "documentinfopage|templateft"
+msgid "Template:"
+msgstr "Şablon:"
+
+#. 5pXPV
+#: sfx2/uiconfig/ui/documentinfopage.ui:366
+msgctxt "documentinfopage|extended_tip|nameed"
+msgid "Displays the file name."
+msgstr "Dosya adını görüntüler."
+
+#. LCDUj
+#: sfx2/uiconfig/ui/documentinfopage.ui:397
+msgctxt "documentinfopage|thumbnailsavecb"
+msgid "Save preview image with this document"
+msgstr "Ön izleme resmini belgeyle birlikte kaydet"
+
+#. 2GKBr
+#: sfx2/uiconfig/ui/documentinfopage.ui:415
+msgctxt "documentinfopage|image-preferred-dpi-checkbutton"
+msgid "Image preferred DPI"
+msgstr "Resim, tercih edilen DPI"
+
+#. VWjRu
+#: sfx2/uiconfig/ui/documentinfopage.ui:479
+msgctxt "documentinfopage|extended_tip|DocumentInfoPage"
+msgid "Contains basic information about the current file."
+msgstr "Geçerli dosya hakkında temel bilgiyi bulundurur."
+
+#. scgsx
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:8
+msgctxt "documentpropertiesdialog|DocumentPropertiesDialog"
+msgid "Properties of “%1”"
+msgstr "“%1”in Özellikleri"
+
+#. iTECQ
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:135
+msgctxt "documentpropertiesdialog|general"
+msgid "General "
+msgstr "Genel "
+
+#. Vggig
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:182
+msgctxt "documentpropertiesdialog|description"
+msgid "Description"
+msgstr "Açıklama"
+
+#. HTaxP
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:230
+msgctxt "documentpropertiesdialog|customprops"
+msgid "Custom Properties"
+msgstr "Özel Özellikler"
+
+#. DccDw
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:278
+msgctxt "documentpropertiesdialog|cmisprops"
+msgid "CMIS Properties"
+msgstr "CMIS Özellikleri"
+
+#. q9i7y
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:326
+msgctxt "documentpropertiesdialog|security"
+msgid "Security"
+msgstr "Güvenlik"
+
+#. 42uNG
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:7
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "Confirm editing of document"
+msgstr "Belgenin düzenlenmesini onayla"
+
+#. bdEZG
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:13
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "Are you sure you want to edit the document?"
+msgstr "Belgeyi düzenlemek istediğinize emin misiniz?"
+
+#. AMrnx
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:14
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "The original file can be signed without editing the document. Existing signatures on the document will be lost in case of saving an edited version."
+msgstr "Özgün belge düzenlenmeden imzalanabilir. Düzenlenmiş sürümün kaydedilmesinden sonra mevcut imzaların üzerine yazılacaktır."
+
+#. wRps5
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:25
+msgctxt "editdocumentdialog|edit"
+msgid "Edit Document"
+msgstr "Belgeyi Düzenle"
+
+#. oWdm6
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:42
+msgctxt "editdocumentdialog|cancel"
+msgid "Cancel"
+msgstr "İptal"
+
+#. hrgcD
+#: sfx2/uiconfig/ui/editdurationdialog.ui:43
+msgctxt "editdurationdialog|EditDurationDialog"
+msgid "Edit Duration"
+msgstr "Süreyi Ayarla"
+
+#. 66AnB
+#: sfx2/uiconfig/ui/editdurationdialog.ui:132
+msgctxt "editdurationdialog|negative"
+msgid "_Negative"
+msgstr "_Negatif"
+
+#. LeAmz
+#: sfx2/uiconfig/ui/editdurationdialog.ui:149
+msgctxt "editdurationdialog|label1"
+msgid "_Years:"
+msgstr "_Yıllar:"
+
+#. kFDdM
+#: sfx2/uiconfig/ui/editdurationdialog.ui:163
+msgctxt "editdurationdialog|label"
+msgid "_Months:"
+msgstr "_Aylar:"
+
+#. CHLhB
+#: sfx2/uiconfig/ui/editdurationdialog.ui:177
+msgctxt "editdurationdialog|label3"
+msgid "_Days:"
+msgstr "_Günler:"
+
+#. 2w5Dd
+#: sfx2/uiconfig/ui/editdurationdialog.ui:191
+msgctxt "editdurationdialog|label4"
+msgid "H_ours:"
+msgstr "S_aatler:"
+
+#. TtWAW
+#: sfx2/uiconfig/ui/editdurationdialog.ui:205
+msgctxt "editdurationdialog|label5"
+msgid "Min_utes:"
+msgstr "Da_kikalar:"
+
+#. TieWF
+#: sfx2/uiconfig/ui/editdurationdialog.ui:219
+msgctxt "editdurationdialog|label6"
+msgid "_Seconds:"
+msgstr "_Saniyeler:"
+
+#. GxEZZ
+#: sfx2/uiconfig/ui/editdurationdialog.ui:233
+msgctxt "editdurationdialog|label7"
+msgid "Millise_conds:"
+msgstr "Mi_lisaniye:"
+
+#. FLFW8
+#: sfx2/uiconfig/ui/editdurationdialog.ui:340
+msgctxt "editdurationdialog|label2"
+msgid "Duration"
+msgstr "Süre"
+
+#. 9cAb5
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:7
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "No email configuration"
+msgstr "E-posta yapılandırması yapılmamış"
+
+#. cFct7
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:14
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "%PRODUCTNAME was unable to find a working email configuration."
+msgstr "%PRODUCTNAME çalışan bir eposta yapılandırması bulamadı."
+
+#. xQi7X
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:15
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "Please save this document locally instead and attach it from within your email client."
+msgstr "Lütfen bu belgeyi kaydedin ve eposta istemciniz içerisinden ekleyin."
+
+#. DVQUS
+#: sfx2/uiconfig/ui/floatingrecord.ui:7
+msgctxt "floatingrecord|FloatingRecord"
+msgid "Record Macro"
+msgstr "Makro Kaydet"
+
+#. Fa63R
+#: sfx2/uiconfig/ui/helpbookmarkpage.ui:32
+msgctxt "helpbookmarkpage|label1"
+msgid "_Bookmarks"
+msgstr "_Yer imleri"
+
+#. kZqGE
+#: sfx2/uiconfig/ui/helpbookmarkpage.ui:83
+msgctxt "helpbookmarkpage|display"
+msgid "_Display"
+msgstr "_Göster"
+
+#. S7ppr
+#: sfx2/uiconfig/ui/helpcontrol.ui:77
+msgctxt "helpcontrol|contents"
+msgid "Contents"
+msgstr "İçindekiler"
+
+#. vxPLh
+#: sfx2/uiconfig/ui/helpcontrol.ui:126
+msgctxt "helpcontrol|index"
+msgid "Index"
+msgstr "Dizin"
+
+#. HdGQi
+#: sfx2/uiconfig/ui/helpcontrol.ui:176
+msgctxt "helpcontrol|find"
+msgid "Find"
+msgstr "Bul"
+
+#. 7fapN
+#: sfx2/uiconfig/ui/helpcontrol.ui:226
+msgctxt "helpcontrol|bookmarks"
+msgid "Bookmarks"
+msgstr "Yer imleri"
+
+#. UQL8A
+#: sfx2/uiconfig/ui/helpindexpage.ui:30
+msgctxt "helpindexpage|display"
+msgid "_Display"
+msgstr "_Göster"
+
+#. 4MkAM
+#: sfx2/uiconfig/ui/helpindexpage.ui:116
+msgctxt "helpindexpage|label1"
+msgid "_Search Term"
+msgstr "_Arama Terimi"
+
+#. wKLbH
+#: sfx2/uiconfig/ui/helpmanual.ui:7
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "%PRODUCTNAME Help Not Installed"
+msgstr "%PRODUCTNAME Yardımı Yüklü Değil"
+
+#. JBdnz
+#: sfx2/uiconfig/ui/helpmanual.ui:12
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "The %PRODUCTNAME built-in help for current UI language ($UILOCALE) is not installed on your computer."
+msgstr "Geçerli kullanıcı arayüzü diline ($UILOCALE) ilişkin %PRODUCTNAME yerleşik yardım bilgisayarınızda yüklü değil."
+
+#. DxMPr
+#: sfx2/uiconfig/ui/helpmanual.ui:13
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "You may either install it from our website or your system’s repositories, or read an online version."
+msgstr "Web sayfamızdan veya sisteminizin deposundan kurabilir veya çevrim içi bir sürümünü okuyabilirsiniz."
+
+#. AaeBL
+#: sfx2/uiconfig/ui/helpmanual.ui:23
+msgctxt "helpmanual|website"
+msgid "Read Help Online"
+msgstr "Çevrim İçi Yardımı Oku"
+
+#. B2Wzh
+#: sfx2/uiconfig/ui/helpmanual.ui:60
+msgctxt "helpmanual|hidedialog"
+msgid "Do not show this dialog again"
+msgstr "Bu sihirbazı tekrar gösterme"
+
+#. 8FjCk
+#: sfx2/uiconfig/ui/helpsearchpage.ui:30
+msgctxt "helpsearchpage|display"
+msgid "_Display"
+msgstr "_Göster"
+
+#. JDsn3
+#: sfx2/uiconfig/ui/helpsearchpage.ui:46
+msgctxt "helpsearchpage|label1"
+msgid "_Search term"
+msgstr "_Arama terimi"
+
+#. VRVyq
+#: sfx2/uiconfig/ui/helpsearchpage.ui:122
+msgctxt "helpsearchpage|find"
+msgid "_Find"
+msgstr "_Bul"
+
+#. ZiE8A
+#: sfx2/uiconfig/ui/helpsearchpage.ui:141
+msgctxt "helpsearchpage|completewords"
+msgid "_Complete words only"
+msgstr "_Yanlızca tam sözcükler"
+
+#. vzqdb
+#: sfx2/uiconfig/ui/helpsearchpage.ui:155
+msgctxt "helpsearchpage|headings"
+msgid "Find in _headings only"
+msgstr "Sadece _başlıkları ara"
+
+#. JDZho
+#: sfx2/uiconfig/ui/helpwindow.ui:69
+msgctxt "helpwindow|backward|tooltip_text"
+msgid "Previous Page"
+msgstr "Önceki Sayfa"
+
+#. Gv3uP
+#: sfx2/uiconfig/ui/helpwindow.ui:80
+msgctxt "helpwindow|forward|tooltip_text"
+msgid "Next Page"
+msgstr "Sonraki Sayfa"
+
+#. uaBtK
+#: sfx2/uiconfig/ui/helpwindow.ui:91
+msgctxt "helpwindow|start|tooltip_text"
+msgid "First Page"
+msgstr "İlk Sayfa"
+
+#. TizVY
+#: sfx2/uiconfig/ui/helpwindow.ui:112
+msgctxt "helpwindow|print|tooltip_text"
+msgid "Print"
+msgstr "Yazdır"
+
+#. 7wgqt
+#: sfx2/uiconfig/ui/helpwindow.ui:123
+msgctxt "helpwindow|bookmarks|tooltip_text"
+msgid "Add to Bookmarks"
+msgstr "Yer İmlerine Ekle"
+
+#. qPF9A
+#: sfx2/uiconfig/ui/helpwindow.ui:134
+msgctxt "helpwindow|searchdialog|tooltip_text"
+msgid "Find on this Page"
+msgstr "Bu Sayfada Bul"
+
+#. VnXxR
+#: sfx2/uiconfig/ui/infobar.ui:65
+msgctxt "infobar|close|tooltip_text"
+msgid "Close Infobar"
+msgstr "Bilgi Çubuğunu Kapat"
+
+#. DpXCY
+#: sfx2/uiconfig/ui/inputdialog.ui:87
+msgctxt "inputdialog|label"
+msgid "Height:"
+msgstr "Yükseklik:"
+
+#. HwHjx
+#: sfx2/uiconfig/ui/licensedialog.ui:8
+msgctxt "licensedialog|LicenseDialog"
+msgid "Licensing and Legal information"
+msgstr "Lisans ve Yasal bilgi"
+
+#. yLwba
+#: sfx2/uiconfig/ui/licensedialog.ui:25
+msgctxt "licensedialog|show"
+msgid "_Show License"
+msgstr "_Lisansı göster"
+
+#. 3unZa
+#: sfx2/uiconfig/ui/licensedialog.ui:68
+msgctxt "licensedialog|label"
+msgid ""
+"%PRODUCTNAME is made available subject to the terms of the Mozilla Public License, v. 2.0. A copy of the MPL can be obtained at http://mozilla.org/MPL/2.0/.\n"
+"\n"
+"Third Party Code Additional copyright notices and license terms applicable to portions of the Software are set forth in the LICENSE.html file; choose Show License to see exact details in English.\n"
+"\n"
+"All trademarks and registered trademarks mentioned herein are the property of their respective owners.\n"
+"\n"
+"Copyright © 2000–2022 LibreOffice contributors. All rights reserved.\n"
+"\n"
+"This product was created by %OOOVENDOR, based on OpenOffice.org, which is Copyright 2000, 2011 Oracle and/or its affiliates. %OOOVENDOR acknowledges all community members, please see http://www.libreoffice.org/ for more details."
+msgstr ""
+"%PRODUCTNAME, Mozilla Kamu Lisansı, V. 2.0 hükümlerine tabi olarak sunulur. MPL'nin bir kopyası http://mozilla.org/MPL/2.0/ adresinden edinilebilir.\n"
+"\n"
+"Üçüncü Taraf kodu yazılımın bölümleri için geçerli olan ek telif hakkı bildirimleri ve lisans koşulları LICENSE.html dosyasında belirtilmiştir; tam ayrıntıları İngilizce olarak görmek için lisansı Göster'i seçin\n"
+"\n"
+"Burada adı geçen tüm ticari markalar ve tescilli ticari markalar ilgili sahiplerinin mülkiyetindedir.\n"
+"\n"
+"Telif hakkı © 2000–2022 LibreOffice katkıcıları. Tüm hakları saklıdır.\n"
+"\n"
+"Bu ürün, Telif Hakkı 2000, 2011 Oracle ve/veya bağlı kuruluşlarına ait olan OpenOffice.org temel alınarak %OOOVENDOR tarafından oluşturulmuştur. %OOOVENDOR tüm topluluk üyelerini kabul eder, lütfen daha fazla bilgi için http://www.libreoffice.org/ adresine bakın."
+
+#. QuVoN
+#: sfx2/uiconfig/ui/linefragment.ui:57
+msgctxt "linefragment|STR_SFX_REMOVE_PROPERTY"
+msgid "Remove Property"
+msgstr "Özelliği Kaldır"
+
+#. 8gPai
+#: sfx2/uiconfig/ui/linefragment.ui:149
+msgctxt "linefragment|SFX_ST_EDIT"
+msgid "..."
+msgstr "..."
+
+#. x4Fjd
+#: sfx2/uiconfig/ui/linefragment.ui:185
+msgctxt "linefragment|yes"
+msgid "Yes"
+msgstr "Evet"
+
+#. mJFyB
+#: sfx2/uiconfig/ui/linefragment.ui:200
+msgctxt "linefragment|no"
+msgid "No"
+msgstr "Hayır"
+
+#. muk9B
+#: sfx2/uiconfig/ui/linkeditdialog.ui:8
+msgctxt "linkeditdialog|title"
+msgid "Modify DDE Link"
+msgstr "DDE Bağlantısında Değişiklik Yap"
+
+#. CZn3G
+#: sfx2/uiconfig/ui/linkeditdialog.ui:102
+msgctxt "linkeditdialog|label2"
+msgid "_Application:"
+msgstr "_Uygulama:"
+
+#. GZsEX
+#: sfx2/uiconfig/ui/linkeditdialog.ui:116
+msgctxt "linkeditdialog|label3"
+msgid "_File:"
+msgstr "_Dosya:"
+
+#. 6Fx6h
+#: sfx2/uiconfig/ui/linkeditdialog.ui:130
+msgctxt "linkeditdialog|label4"
+msgid "_Category:"
+msgstr "_Kategori:"
+
+#. AzB2M
+#: sfx2/uiconfig/ui/linkeditdialog.ui:148
+msgctxt "linkeditdialog|extended_tip|app"
+msgid "Lists the application that last saved the source file. The office suite applications have the server name soffice."
+msgstr "Kaynak dosyayı en son kaydeden uygulamayı listeler.  Ofis paketi uygulamalarının sunucu adı soffice'dir."
+
+#. cj9do
+#: sfx2/uiconfig/ui/linkeditdialog.ui:166
+msgctxt "linkeditdialog|extended_tip|file"
+msgid "Path to the source file. Relative paths must be expressed by full URI, for example, with file://."
+msgstr "Kaynak dosya yolu. İlgili yollar tam adres (URI) yolu, file:// ile, ifade edilmelidir."
+
+#. cMPNq
+#: sfx2/uiconfig/ui/linkeditdialog.ui:184
+msgctxt "linkeditdialog|extended_tip|category"
+msgid "Lists the section or object that the link refers to in the source file. If you want, you can enter a new section or object here."
+msgstr "Bağlantının kaynak dosyada başvurduğu bölümü veya nesneyi listeler. İsterseniz buraya yeni bir bölüm veya nesne girebilirsiniz."
+
+#. hiapi
+#: sfx2/uiconfig/ui/linkeditdialog.ui:199
+msgctxt "linkeditdialog|label1"
+msgid "Modify Link"
+msgstr "Bağlantıyı Değiştir"
+
+#. ba2Tn
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:24
+msgctxt "loadtemplatedialog|LoadTemplateDialog"
+msgid "New"
+msgstr "Yeni"
+
+#. MkW3E
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:40
+msgctxt "loadtemplatedialog|fromfile"
+msgid "From File..."
+msgstr "Dosyadan..."
+
+#. jSrBT
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:45
+msgctxt "loadtemplatedialog|fromfile|tooltip_text"
+msgid "Copy styles from selected external document to current document."
+msgstr "Biçemleri seçilen harici belgeden mevcut belgeye kopyalar."
+
+#. GE236
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:48
+msgctxt "loadtemplatedialog|extended_tip|fromfile"
+msgid "Locate the file containing the styles that you want to load, and then click Open."
+msgstr "Yüklemek istediğiniz biçemleri içeren dosyanın yeri saptayın ve sonra Aç 'a tıklayın."
+
+#. YCguC
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:165
+msgctxt "loadtemplatedialog|extended_tip|categories"
+msgid "Lists the available template categories. Click a category to view its contents in the Templates list."
+msgstr "Mevcut olan şablon kategorilerini listeler. Şablonlar listesinde içeriğini görüntülemek için bir kategoriyi tıklayın."
+
+#. PZS7L
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:176
+msgctxt "loadtemplatedialog|label1"
+msgid "Categories"
+msgstr "Kategoriler"
+
+#. hkGaT
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:230
+msgctxt "loadtemplatedialog|extended_tip|templates"
+msgid "Lists the available templates for the selected category."
+msgstr "Seçilen kategori için mevcut şablonları listeler."
+
+#. hryGV
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:241
+msgctxt "loadtemplatedialog|label2"
+msgid "Templates"
+msgstr "Şablonlar"
+
+#. LAAM3
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:245
+msgctxt "loadtemplatedialog|label2|tooltip_text"
+msgid "Templates in the selected category"
+msgstr "Seçilen kategorideki şablonlar"
+
+#. rFENe
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:264
+msgctxt "loadtemplatedialog|text"
+msgid "_Paragraph and Character"
+msgstr "_Paragraf ve Karakter"
+
+#. jCAuA
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:269
+msgctxt "loadtemplatedialog|text|tooltip_text"
+msgid "Copy paragraph and character styles to current document."
+msgstr "Paragraf ve karakter biçemlerini mevcut belgeye kopyalar."
+
+#. VLWfZ
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:273
+msgctxt "loadtemplatedialog|extended_tip|text"
+msgid "Loads the paragraph and the character styles from the selected document into the current document."
+msgstr "Seçilen belgeden geçerli belgeye paragraf ve karakter biçemleri yükler."
+
+#. d2q55
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:284
+msgctxt "loadtemplatedialog|frame"
+msgid "_Frame"
+msgstr "_Çerçeve"
+
+#. HSCZj
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:289
+msgctxt "loadtemplatedialog|frame|tooltip_text"
+msgid "Copy frame styles to current document."
+msgstr "Çerçeve biçemlerini mevcut belgeye kopyalar."
+
+#. 4ZF6u
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:293
+msgctxt "loadtemplatedialog|extended_tip|frame"
+msgid "Loads the frame styles from the selected document into the current document."
+msgstr "Seçilen belgeden geçerli belgeye çerçeve biçemleri yükler."
+
+#. vFZLz
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:304
+msgctxt "loadtemplatedialog|pages"
+msgid "Pa_ge"
+msgstr "Say_fa"
+
+#. hdRo6
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:309
+msgctxt "loadtemplatedialog|pages|tooltip_text"
+msgid "Copy page styles to current document."
+msgstr "Sayfa biçemlerini mevcut belgeye kopyalar."
+
+#. o2C8c
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:313
+msgctxt "loadtemplatedialog|extended_tip|pages"
+msgid "Loads the page styles from the selected document into the current document."
+msgstr "Seçilen belgeden geçerli belgeye sayfa biçemleri yükler."
+
+#. 2xgCH
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:324
+msgctxt "loadtemplatedialog|numbering"
+msgid "_List"
+msgstr "_Liste"
+
+#. VZxbf
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:329
+msgctxt "loadtemplatedialog|numbering|tooltip_text"
+msgid "Copy list styles to current document."
+msgstr "Liste biçemlerini mevcut belgeye kopyalar."
+
+#. PAsEB
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:333
+msgctxt "loadtemplatedialog|extended_tip|numbering"
+msgid "Loads the list styles from the selected document into the current document."
+msgstr "Liste biçemlerini seçili belgeden geçerli belgeye yükler."
+
+#. VWzsG
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:344
+msgctxt "loadtemplatedialog|overwrite"
+msgid "_Overwrite"
+msgstr "_Üzerine yaz"
+
+#. cr86W
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:350
+msgctxt "loadtemplatedialog|overwrite|tooltip_text"
+msgid "Overwrite styles with same name"
+msgstr "Aynı isimli biçemlerin üzerine yazar"
+
+#. A9ogA
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:353
+msgctxt "loadtemplatedialog|extended_tip|overwrite"
+msgid "Replaces styles in the current document that have the same name as the styles you are loading."
+msgstr "Mevcut belgede, yüklediğiniz biçemle aynı ada sahip tüm biçemleri değiştirir."
+
+#. 7ru2R
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:376
+msgctxt "loadtemplatedialog|alttitle"
+msgid "Load Styles from Template"
+msgstr "Şablondan Biçemleri Yükle"
+
+#. X5Pi5
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:413
+msgctxt "loadtemplatedialog|label3"
+msgid "Pre_view"
+msgstr "Öni_zleme"
+
+#. hR7cK
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:419
+msgctxt "loadtemplatedialog|extended_tip|expander"
+msgid "Shows or hides a preview of a selected template."
+msgstr "Seçili şablonun ön izlemesini gösterir veya gizler."
+
+#. CRcca
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:449
+msgctxt "loadtemplatedialog|extended_tip|LoadTemplateDialog"
+msgid "Imports formatting styles from another document or template into the current document."
+msgstr "Geçerli belgeye şablonlardan veya başka belgeden biçimlendirme biçemleri içe aktarır."
+
+#. EAhup
+#: sfx2/uiconfig/ui/managestylepage.ui:33
+msgctxt "managestylepage|nameft"
+msgid "_Name:"
+msgstr "_İsim:"
+
+#. VroAG
+#: sfx2/uiconfig/ui/managestylepage.ui:47
+msgctxt "managestylepage|nextstyleft"
+msgid "Ne_xt style:"
+msgstr "So_nraki biçem:"
+
+#. mJYgm
+#: sfx2/uiconfig/ui/managestylepage.ui:61
+msgctxt "managestylepage|linkedwithft"
+msgid "Inherit from:"
+msgstr "Geldiği kaynak:"
+
+#. 9pGL9
+#: sfx2/uiconfig/ui/managestylepage.ui:75
+msgctxt "managestylepage|categoryft"
+msgid "_Category:"
+msgstr "_Kategori:"
+
+#. MMhJQ
+#: sfx2/uiconfig/ui/managestylepage.ui:99
+msgctxt "managestylepage|editstyle"
+msgid "Edit Style"
+msgstr "Biçemi Düzenle"
+
+#. 7XGEs
+#: sfx2/uiconfig/ui/managestylepage.ui:123
+msgctxt "managestylepage|editlinkstyle"
+msgid "Edit Style"
+msgstr "Biçemi Düzenle"
+
+#. cKjrA
+#: sfx2/uiconfig/ui/managestylepage.ui:147
+msgctxt "managestylepage|autoupdate"
+msgid "_AutoUpdate"
+msgstr "_Otomatik güncelleme"
+
+#. oTXJz
+#: sfx2/uiconfig/ui/managestylepage.ui:192
+msgctxt "managestylepage|label1"
+msgid "Style"
+msgstr "Biçem"
+
+#. NXG9o
+#: sfx2/uiconfig/ui/managestylepage.ui:227
+msgctxt "managestylepage|label2"
+msgid "Contains"
+msgstr "İçerir"
+
+#. WJunC
+#: sfx2/uiconfig/ui/newstyle.ui:16
+msgctxt "newstyle|CreateStyleDialog"
+msgid "New Style from Selection"
+msgstr "Seçimden Yeni Biçem"
+
+#. 2XkTt
+#: sfx2/uiconfig/ui/newstyle.ui:140
+msgctxt "newstyle|styles-atkobject"
+msgid "Custom styles for selected category"
+msgstr "Seçilen kategori için yeni biçemler"
+
+#. UEGSg
+#: sfx2/uiconfig/ui/newstyle.ui:160
+msgctxt "newstyle|stylename-atkobject"
+msgid "Style name"
+msgstr "Biçem adı"
+
+#. bjN3T
+#: sfx2/uiconfig/ui/newstyle.ui:175
+msgctxt "newstyle|categorylabel"
+msgid "Custom styles for current document"
+msgstr "Mevcut belge için özel biçemlerin"
+
+#. 6mnDS
+#: sfx2/uiconfig/ui/newstyle.ui:191
+msgctxt "newstyle|label1"
+msgid "Enter new style name:"
+msgstr "Yeni biçem adı girin:"
+
+#. R6zJz
+#: sfx2/uiconfig/ui/notebookbar.ui:74
+msgctxt "notebookbar|label9"
+msgid "File"
+msgstr "Dosya"
+
+#. QAUXF
+#: sfx2/uiconfig/ui/optprintpage.ui:35
+msgctxt "optprintpage|printer"
+msgid "_Printer"
+msgstr "_Yazıcı"
+
+#. PUG9y
+#: sfx2/uiconfig/ui/optprintpage.ui:44
+msgctxt "extended_tip|printer"
+msgid "Specifies whether the print settings apply to direct printing or to printing to a file."
+msgstr "Yazdırma ayarlarının doğrudan yazdırmaya mı yoksa dosyaya yazdırmaya mı uygulanacağını belirtir."
+
+#. Eyv8g
+#: sfx2/uiconfig/ui/optprintpage.ui:55
+msgctxt "optprintpage|file"
+msgid "Print to _file"
+msgstr "Dosyaya _yazdır"
+
+#. TMHvE
+#: sfx2/uiconfig/ui/optprintpage.ui:64
+msgctxt "extended_tip|file"
+msgid "Specifies whether the print settings apply to direct printing or to printing to a file."
+msgstr "Yazdırma ayarlarının doğrudan yazdırmaya mı yoksa dosyaya yazdırmaya mı uygulanacağını belirtir."
+
+#. C8jvp
+#: sfx2/uiconfig/ui/optprintpage.ui:79
+msgctxt "optprintpage|label4"
+msgid "Settings for"
+msgstr "Ayarlar"
+
+#. 2T5Af
+#: sfx2/uiconfig/ui/optprintpage.ui:109
+msgctxt "optprintpage|papersize"
+msgid "P_aper size"
+msgstr "S_ayfa boyutu"
+
+#. yj4DA
+#: sfx2/uiconfig/ui/optprintpage.ui:117
+msgctxt "extended_tip|papersize"
+msgid "Mark this check box if a certain paper size is needed for printing the current document."
+msgstr "Bu onay kutusunu belirli bir kağıt boyutu geçerli belgeyi yazdırmak için gerekiyorsa işaretleyin."
+
+#. stDFq
+#: sfx2/uiconfig/ui/optprintpage.ui:128
+msgctxt "optprintpage|paperorient"
+msgid "Pap_er orientation"
+msgstr "Say_fa yönü"
+
+#. FdFNk
+#: sfx2/uiconfig/ui/optprintpage.ui:136
+msgctxt "extended_tip|paperorient"
+msgid "Mark this check box if you need a certain paper orientation for printing the current document."
+msgstr "Bu onay kutusunu mevcut belgeyi yazdırmak için belirli bir kağıt yönelimine ihtiyaç varsa işaretleyin."
+
+#. L6rtF
+#: sfx2/uiconfig/ui/optprintpage.ui:147
+msgctxt "optprintpage|trans"
+msgid "_Transparency"
+msgstr "Ş_effaflık"
+
+#. F6nF9
+#: sfx2/uiconfig/ui/optprintpage.ui:155
+msgctxt "extended_tip|trans"
+msgid "Mark this check box if you always want to be warned if transparent objects are contained in the document."
+msgstr "Bu onay kutusunu belgenin içerdiği şeffaf nesneler hakkında her zaman uyarı almak istiyorsanız işaretleyin."
+
+#. C5jZN
+#: sfx2/uiconfig/ui/optprintpage.ui:170
+msgctxt "optprintpage|label2"
+msgid "Warnings"
+msgstr "Uyarılar"
+
+#. PJFLE
+#: sfx2/uiconfig/ui/optprintpage.ui:198
+msgctxt "optprintpage|reducegrad"
+msgid "Reduce _gradient"
+msgstr "_Geçişi azalt"
+
+#. GC8dk
+#: sfx2/uiconfig/ui/optprintpage.ui:206
+msgctxt "extended_tip|reducegrad"
+msgid "If this field is marked, gradients are printed with reduced quality."
+msgstr "Bu alan işaretlenirse, renk geçişleri daha düşük kaliteyle yazdırılır."
+
+#. skDME
+#: sfx2/uiconfig/ui/optprintpage.ui:230
+msgctxt "optprintpage|reducegradstripes"
+msgid "Gradient _stripes:"
+msgstr "Geçiş _çizgileri:"
+
+#. k8zh7
+#: sfx2/uiconfig/ui/optprintpage.ui:239
+msgctxt "extended_tip|reducegradstripes"
+msgid "Specifies the maximum number of gradient stripes for printing."
+msgstr "Yazdırma için geçişli şeritlerin en fazla sayısını belirtir."
+
+#. 5HCxT
+#: sfx2/uiconfig/ui/optprintpage.ui:257
+msgctxt "extended_tip|reducegradstep"
+msgid "Specifies the maximum number of gradient stripes for printing."
+msgstr "Yazdırma için geçişli şeritlerin en fazla sayısını belirtir."
+
+#. W8LE7
+#: sfx2/uiconfig/ui/optprintpage.ui:274
+msgctxt "optprintpage|reducegradcolor"
+msgid "Intermediate _color"
+msgstr "Ara _renk"
+
+#. TUbxx
+#: sfx2/uiconfig/ui/optprintpage.ui:283
+msgctxt "extended_tip|reducegradcolor"
+msgid "Specifies that gradients are only printed in a single intermediate color."
+msgstr "Geçişlerin sadece tek bir ara renkle yazdırılacağını belirtir."
+
+#. myMLR
+#: sfx2/uiconfig/ui/optprintpage.ui:304
+msgctxt "optprintpage|label1"
+msgid "Reduce Gradient"
+msgstr "Geçişi Azalt"
+
+#. abbre
+#: sfx2/uiconfig/ui/optprintpage.ui:312
+msgctxt "extended_tip|frame2"
+msgid "Defines which warnings appear before printing begins."
+msgstr "Yazdırma başlamadan önce hangi uyarının belireceğini tanımlar."
+
+#. ySmQe
+#: sfx2/uiconfig/ui/optprintpage.ui:337
+msgctxt "optprintpage|reducebitmap"
+msgid "Reduce _bitmaps"
+msgstr "_Bit eşlem değerini düşür"
+
+#. nNjfk
+#: sfx2/uiconfig/ui/optprintpage.ui:345
+msgctxt "extended_tip|reducebitmap"
+msgid "Specifies that bitmaps are printed with reduced quality. The resolution can only be reduced and not increased."
+msgstr "Bit eşlemlerin kalitesi düşürülerek yazdırılacağını belirtir. Çözünürlük sadece düşürülebilir, arttırılamaz."
+
+#. qF2KM
+#: sfx2/uiconfig/ui/optprintpage.ui:363
+msgctxt "optprintpage|reducebitmapnormal"
+msgid "N_ormal print quality"
+msgstr "N_ormal yazdırma kalitesi"
+
+#. i5T3j
+#: sfx2/uiconfig/ui/optprintpage.ui:372
+msgctxt "extended_tip|reducebitmapnormal"
+msgid "High print quality corresponds to a resolution of 300dpi. Normal print quality corresponds to a resolution of 200dpi. "
+msgstr "Yüksek kalitede yazdırmak 300dpi çözünürlüğe karşılık gelir. Normal yazdırma kalitesi 200dpi çözünürlüğe karşılık gelmektedir. "
+
+#. EZGK5
+#: sfx2/uiconfig/ui/optprintpage.ui:389
+msgctxt "optprintpage|reducebitmapresol"
+msgid "Reso_lution:"
+msgstr "Çözünür_lük:"
+
+#. q3aJL
+#: sfx2/uiconfig/ui/optprintpage.ui:398
+msgctxt "extended_tip|reducebitmapresol"
+msgid "Specifies the maximum print quality in dpi. The resolution can only be reduced and not increased."
+msgstr "En fazla yazdırma kalitesini dpi cinsinden belirtir. Bu çözünürlük azaltılabilir ama arttırılamaz."
+
+#. 6ALtE
+#: sfx2/uiconfig/ui/optprintpage.ui:412
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "72 DPI"
+msgstr "72 DPI"
+
+#. FgpJ3
+#: sfx2/uiconfig/ui/optprintpage.ui:413
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "96 DPI"
+msgstr "96 DPI"
+
+#. d7BqR
+#: sfx2/uiconfig/ui/optprintpage.ui:414
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "150 DPI (Fax)"
+msgstr "150 DPI (Faks)"
+
+#. 46imh
+#: sfx2/uiconfig/ui/optprintpage.ui:415
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "200 DPI (default)"
+msgstr "200 DPI (varsayılan)"
+
+#. AsLSp
+#: sfx2/uiconfig/ui/optprintpage.ui:416
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "300 DPI"
+msgstr "300 dpi"
+
+#. qZJg5
+#: sfx2/uiconfig/ui/optprintpage.ui:417
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "600 DPI"
+msgstr "600 dpi"
+
+#. 8KFUc
+#: sfx2/uiconfig/ui/optprintpage.ui:421
+msgctxt "extended_tip|reducebitmapdpi"
+msgid "Specifies the maximum print quality in dpi. The resolution can only be reduced and not increased."
+msgstr "En fazla yazdırma kalitesini dpi cinsinden belirtir. Bu çözünürlük azaltılabilir ama arttırılamaz."
+
+#. YXTXc
+#: sfx2/uiconfig/ui/optprintpage.ui:438
+msgctxt "optprintpage|reducebitmapoptimal"
+msgid "_High print quality"
+msgstr "_Yüksek yazdırma kalitesi"
+
+#. BdCpv
+#: sfx2/uiconfig/ui/optprintpage.ui:447
+msgctxt "extended_tip|reducebitmapoptimal"
+msgid "High print quality corresponds to a resolution of 300dpi. Normal print quality corresponds to a resolution of 200dpi. "
+msgstr "Yüksek kalitede yazdırmak 300dpi çözünürlüğe karşılık gelir. Normal yazdırma kalitesi 200dpi çözünürlüğe karşılık gelmektedir. "
+
+#. YxX2s
+#: sfx2/uiconfig/ui/optprintpage.ui:468
+msgctxt "optprintpage|label1"
+msgid "Reduce Bitmaps"
+msgstr "Bit Eşlem Değerini Düşür"
+
+#. 5qQBR
+#: sfx2/uiconfig/ui/optprintpage.ui:496
+msgctxt "optprintpage|reducetrans"
+msgid "_Reduce transparency"
+msgstr "Şeffaflığı _azalt"
+
+#. yDstT
+#: sfx2/uiconfig/ui/optprintpage.ui:504
+msgctxt "extended_tip|reducetrans"
+msgid "If you mark this field the transparent objects will be printed like normal, non-transparent objects, depending on your selection in the following two option buttons."
+msgstr "Eğer bu alanı işaretlerseniz, şeffaf nesneler aşağıda bulunan iki seçenek düğmesindeki seçiminize bağlı olarak normal, opak nesneler gibi yazdırılacaktır."
+
+#. B4C76
+#: sfx2/uiconfig/ui/optprintpage.ui:522
+msgctxt "optprintpage|reducetransauto"
+msgid "Auto_matically"
+msgstr "Oto_matik"
+
+#. ehRjn
+#: sfx2/uiconfig/ui/optprintpage.ui:531
+msgctxt "extended_tip|reducetransauto"
+msgid "Specifies that the transparency is only printed if the transparent area covers less than a quarter of the entire page."
+msgstr "Sadece saydam alan tüm sayfanın çeyreğinden az alan kaplıyorsa şeffaflığın yazdırılacağını belirtir."
+
+#. K7P4C
+#: sfx2/uiconfig/ui/optprintpage.ui:542
+msgctxt "optprintpage|reducetransnone"
+msgid "_No transparency"
+msgstr "Ş_effaflık yok"
+
+#. ZuLVY
+#: sfx2/uiconfig/ui/optprintpage.ui:551
+msgctxt "extended_tip|reducetransnone"
+msgid "With this option transparency is never printed."
+msgstr "Bu seçenekle şeffaflık asla yazdırılmaz."
+
+#. B5Cpd
+#: sfx2/uiconfig/ui/optprintpage.ui:572
+msgctxt "optprintpage|label1"
+msgid "Reduce Transparency"
+msgstr "Şeffaflığı Azalt"
+
+#. GAFzh
+#: sfx2/uiconfig/ui/optprintpage.ui:600
+msgctxt "optprintpage|pdf"
+msgid "_PDF as standard print job format"
+msgstr "Standart Yazdırma işi olarak _PDF"
+
+#. wm7C7
+#: sfx2/uiconfig/ui/optprintpage.ui:614
+msgctxt "optprintpage|converttogray"
+msgid "Con_vert colors to grayscale"
+msgstr "Renkleri gri tonlara dönüştür"
+
+#. UNSqH
+#: sfx2/uiconfig/ui/optprintpage.ui:622
+msgctxt "extended_tip|converttogray"
+msgid "Specifies that all colors are printed only as grayscale."
+msgstr "Tüm renklerin grinin tonları olarak yazdırılacağını belirtir."
+
+#. CrFLq
+#: sfx2/uiconfig/ui/optprintpage.ui:633
+msgctxt "optprintpage|reducebitmaptrans"
+msgid "Include transparent objects"
+msgstr "Şeffaf nesneleri dahil et"
+
+#. FFAFJ
+#: sfx2/uiconfig/ui/optprintpage.ui:641
+msgctxt "extended_tip|reducebitmaptrans"
+msgid "If this field is marked, the reduction in print quality for bitmaps also applies to the transparent areas of objects."
+msgstr "Bu alan işaretlenirse, bit eşlemler için baskı kalitesinde azalma, nesnelerin saydam alanlar için de geçerli olur."
+
+#. bWPko
+#: sfx2/uiconfig/ui/optprintpage.ui:656
+msgctxt "optprintpage|label4"
+msgid "Defaults"
+msgstr "Varsayılanlar"
+
+#. mMKbc
+#: sfx2/uiconfig/ui/optprintpage.ui:678
+msgctxt "extended_tip|OptPrintPage"
+msgid "Specifies the print setting options."
+msgstr "Yazdırma ayar seçeneklerini belirtir."
+
+#. NEo7g
+#: sfx2/uiconfig/ui/panel.ui:73 sfx2/uiconfig/ui/panel.ui:78
+msgctxt "panel|SFX_STR_SIDEBAR_MORE_OPTIONS"
+msgid "More Options"
+msgstr "Daha Fazla Seçenek"
+
+#. QrtGb
+#: sfx2/uiconfig/ui/password.ui:8
+msgctxt "password|PasswordDialog"
+msgid "Enter Password"
+msgstr "Parolayı Girin"
+
+#. gATKy
+#: sfx2/uiconfig/ui/password.ui:102
+msgctxt "password|userft"
+msgid "User:"
+msgstr "Kullanıcı:"
+
+#. FRqiZ
+#: sfx2/uiconfig/ui/password.ui:116
+msgctxt "password|pass1ft"
+msgid "Password:"
+msgstr "Parola:"
+
+#. HE8mc
+#: sfx2/uiconfig/ui/password.ui:130
+msgctxt "password|confirm1ft"
+msgid "Confirm:"
+msgstr "Onayla:"
+
+#. EFJRk
+#: sfx2/uiconfig/ui/password.ui:164
+msgctxt "password|pass1ed-atkobject"
+msgid "Password"
+msgstr "Parola"
+
+#. yVorz
+#: sfx2/uiconfig/ui/password.ui:165
+msgctxt "password|extended_tip|pass1ed"
+msgid "Type a password. A password is case sensitive."
+msgstr "Bir parola yazın. Parola büyük küçük harfe duyarlıdır."
+
+#. kEcVk
+#: sfx2/uiconfig/ui/password.ui:185
+msgctxt "password|extended_tip|confirm1ed"
+msgid "Re-enter the password."
+msgstr "Parolayı yeniden girin."
+
+#. JBCUB
+#: sfx2/uiconfig/ui/password.ui:200
+msgctxt "password|label1"
+msgid "Password"
+msgstr "Parola"
+
+#. zDBUt
+#: sfx2/uiconfig/ui/password.ui:232
+msgctxt "password|pass2ft"
+msgid "Password:"
+msgstr "Parola:"
+
+#. 8RcEw
+#: sfx2/uiconfig/ui/password.ui:246
+msgctxt "password|confirm2ft"
+msgid "Confirm:"
+msgstr "Onayla:"
+
+#. EkHiq
+#: sfx2/uiconfig/ui/password.ui:267
+msgctxt "password|extended_tip|pass2ed"
+msgid "Type a password. A password is case sensitive."
+msgstr "Bir parola yazın. Parola büyük küçük harfe duyarlıdır."
+
+#. c4nGS
+#: sfx2/uiconfig/ui/password.ui:287
+msgctxt "password|extended_tip|confirm2ed"
+msgid "Re-enter the password."
+msgstr "Parolayı yeniden girin."
+
+#. mCxpj
+#: sfx2/uiconfig/ui/password.ui:302
+msgctxt "password|label2"
+msgid "Second Password"
+msgstr "İkinci Parola"
+
+#. JZhHV
+#: sfx2/uiconfig/ui/password.ui:338
+msgctxt "password|onlyascii"
+msgid "Only Basic Latin characters can be entered"
+msgstr "Yalnızca Temel Latince karakterler girilebilir"
+
+#. AFsUP
+#: sfx2/uiconfig/ui/printeroptionsdialog.ui:8
+msgctxt "printeroptionsdialog|PrinterOptionsDialog"
+msgid "Printer Options"
+msgstr "Yazıcı Seçenekleri"
+
+#. oAzTR
+#: sfx2/uiconfig/ui/querysavedialog.ui:7
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Save Document?"
+msgstr "Belge Kaydedilsin mi?"
+
+#. wFiA8
+#: sfx2/uiconfig/ui/querysavedialog.ui:13
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Save changes to document “$(DOC)” before closing?"
+msgstr "Kapatmadan önce “$(DOC)” belgesinde yaptığınız değişiklikleri kaydetmek ister misiniz?"
+
+#. 7mtVz
+#: sfx2/uiconfig/ui/querysavedialog.ui:14
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Your changes will be lost if you don’t save them."
+msgstr "Eğer kaydetmezseniz yaptığınız değişiklikler kaybolacak."
+
+#. sQCdE
+#: sfx2/uiconfig/ui/querysavedialog.ui:25
+msgctxt "querysavedialog|discard"
+msgid "Do_n’t Save"
+msgstr "Ka_ydetme"
+
+#. dzVqL
+#: sfx2/uiconfig/ui/querysavedialog.ui:56
+msgctxt "querysavedialog|save"
+msgid "_Save"
+msgstr "_Kaydet"
+
+#. 6WbvE
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:7
+msgctxt "safemodequerydialog|SafeModeQueryDialog"
+msgid "Enter Safe Mode"
+msgstr "Güvenli Moda Geç"
+
+#. esgus
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:12
+msgctxt "safemodequerydialog|label"
+msgid "Are you sure you want to restart %PRODUCTNAME and enter safe mode?"
+msgstr "%PRODUCTNAME uygulamasını yeniden başlatmak ve güvenli kipe geçmek istediğinizden emin misiniz?"
+
+#. DpN8R
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:40
+msgctxt "safemodequerydialog|restart"
+msgid "_Restart"
+msgstr "_Yeniden Başlat"
+
+#. ejCo9
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:14
+msgctxt "saveastemplatedlg|SaveAsTemplateDialog"
+msgid "Save As Template"
+msgstr "Şablon Olarak Kaydet"
+
+#. Gjb3A
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:102
+msgctxt "saveastemplatedlg|create_label"
+msgid "Enter Template _Name:"
+msgstr "Şablon _Adı Girin:"
+
+#. NyFdH
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:103
+msgctxt "saveastemplatedlg|create_label"
+msgid "Enter a name for the template."
+msgstr "Şablon için bir isim girin."
+
+#. Xo6BH
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:126
+msgctxt "saveastemplatedlg|extended_tip|name_entry"
+msgid "Enter a name for the template."
+msgstr "Şablon için bir isim girin."
+
+#. GLDum
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:154
+msgctxt "saveastemplatedlg|select_label"
+msgid "Select Template _Category:"
+msgstr "Şablon _Kategorisi Seçin:"
+
+#. 4ANkg
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:155
+msgctxt "saveastemplatedlg|select_label"
+msgid "Save template in selected category."
+msgstr "Şablonu seçilen kategoriye kaydedin."
+
+#. JBPKb
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:203
+msgctxt "saveastemplatedlg|extended_tip|categorylb"
+msgid "Select a category in which to save the new template."
+msgstr "Yeni şablonun kaydedileceği kategoriyi seçin."
+
+#. wpZGc
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:223
+msgctxt "saveastemplatedlg|defaultcb"
+msgid "_Set as default template"
+msgstr "Varsayılan _şablon olarak kaydet"
+
+#. syB4y
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:231
+msgctxt "saveastemplatedlg|extended_tip|defaultcb"
+msgid "The new template will be used as the default template."
+msgstr "Yeni şablon varsayılan şablon olarak kullanılacaktır."
+
+#. gH8PB
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:259
+msgctxt "saveastemplatedlg|extended_tip|SaveAsTemplateDialog"
+msgid "Saves the current document as a template."
+msgstr "Geçerli belgeyi bir şablon olarak kaydeder."
+
+#. 9tSnA
+#: sfx2/uiconfig/ui/searchdialog.ui:8
+msgctxt "searchdialog|SearchDialog"
+msgid "Find on this Page"
+msgstr "Bu Sayfada Bul"
+
+#. LAKYg
+#: sfx2/uiconfig/ui/searchdialog.ui:26
+msgctxt "searchdialog|search"
+msgid "_Find"
+msgstr "_Bul"
+
+#. G5Qc9
+#: sfx2/uiconfig/ui/searchdialog.ui:99
+msgctxt "searchdialog|label1"
+msgid "_Search for:"
+msgstr "_Aranacak:"
+
+#. TY5bL
+#: sfx2/uiconfig/ui/searchdialog.ui:125
+msgctxt "searchdialog|matchcase"
+msgid "Ma_tch case"
+msgstr "Büyük/küçük _harf duyarlı"
+
+#. B2ksn
+#: sfx2/uiconfig/ui/searchdialog.ui:139
+msgctxt "searchdialog|wholewords"
+msgid "Whole wor_ds only"
+msgstr "Yalnızca _tam sözcükler"
+
+#. ycWSx
+#: sfx2/uiconfig/ui/searchdialog.ui:153
+msgctxt "searchdialog|backwards"
+msgid "Bac_kwards"
+msgstr "Geri_ye"
+
+#. C7fSt
+#: sfx2/uiconfig/ui/searchdialog.ui:167
+msgctxt "searchdialog|wrap"
+msgid "Wrap _around"
+msgstr "_Sarmala"
+
+#. onEmh
+#: sfx2/uiconfig/ui/securityinfopage.ui:22
+msgctxt "securityinfopage|readonly"
+msgid "_Open file read-only"
+msgstr "Salt _okunur aç"
+
+#. HCEUE
+#: sfx2/uiconfig/ui/securityinfopage.ui:31
+msgctxt "securityinfopage|extended_tip|readonly"
+msgid "Select to allow this document to be opened in read-only mode only."
+msgstr "Bu belgenin sadece okunur bir biçimde açılmasına izin vermek için işaretleyin."
+
+#. GvCw9
+#: sfx2/uiconfig/ui/securityinfopage.ui:42
+msgctxt "securityinfopage|recordchanges"
+msgid "Record _changes"
+msgstr "Değişikliklerin ka_ydını tut"
+
+#. pNhop
+#: sfx2/uiconfig/ui/securityinfopage.ui:50
+msgctxt "securityinfopage|extended_tip|recordchanges"
+msgid "Select to enable recording changes. This is the same as Edit - Track Changes - Record."
+msgstr "Değişiklikleri kaydetmeyi etkinleştirmek için işaretleyin. Düzenle - Değişiklikleri İzle - Kaydet ile aynı anlama gelir."
+
+#. Nv8rA
+#: sfx2/uiconfig/ui/securityinfopage.ui:66
+msgctxt "securityinfopage|protect"
+msgid "Protect..."
+msgstr "Koru..."
+
+#. 6T6ZP
+#: sfx2/uiconfig/ui/securityinfopage.ui:72
+msgctxt "securityinfopage|extended_tip|protect"
+msgid "Protects the change recording state with a password. If change recording is protected for the current document, the button is named Unprotect. Click Unprotect and type the correct password to disable the protection."
+msgstr "Kayıt değişikliği durumunu bir parolayla korur. Eğer değişiklik kaydı mevcut belgede korunuyorsa düğme Korumayı Kaldır adını alır. Korumayı kaldırmak için Korumayı Kaldır düğmesine tıklayın ve doğru parolayı girin."
+
+#. jgWP4
+#: sfx2/uiconfig/ui/securityinfopage.ui:84
+msgctxt "securityinfopage|unprotect"
+msgid "_Unprotect..."
+msgstr "_Korumayı kaldır..."
+
+#. UEdGx
+#: sfx2/uiconfig/ui/securityinfopage.ui:91
+msgctxt "securityinfopage|extended_tip|unprotect"
+msgid "Protects the change recording state with a password. If change recording is protected for the current document, the button is named Unprotect. Click Unprotect and type the correct password to disable the protection."
+msgstr "Kayıt değişikliği durumunu bir parolayla korur. Eğer değişiklik kaydı mevcut belgede korunuyorsa düğme Korumayı Kaldır adını alır. Korumayı kaldırmak için Korumayı Kaldır düğmesine tıklayın ve doğru parolayı girin."
+
+#. JNezG
+#: sfx2/uiconfig/ui/securityinfopage.ui:113
+msgctxt "securityinfopage|label47"
+msgid "File Sharing Options"
+msgstr "Dosya Paylaşım Seçenekleri"
+
+#. VXrJ5
+#: sfx2/uiconfig/ui/securityinfopage.ui:121
+msgctxt "securityinfopage|extended_tip|SecurityInfoPage"
+msgid "Sets password options for the current document."
+msgstr "Mevcut belge için parola seçeneklerini ayarlar."
+
+#. EDC9x
+#: sfx2/uiconfig/ui/startcenter.ui:17
+msgctxt "startcenter|clear_all"
+msgid "Clear Recent Documents"
+msgstr "Son Kullanılan Belgeleri Temizle"
+
+#. gCfQ9
+#: sfx2/uiconfig/ui/startcenter.ui:38
+msgctxt "startcenter|filter_writer"
+msgid "Writer Templates"
+msgstr "Writer Şablonları"
+
+#. kj5ts
+#: sfx2/uiconfig/ui/startcenter.ui:45
+msgctxt "startcenter|filter_calc"
+msgid "Calc Templates"
+msgstr "Calc Şablonları"
+
+#. HEYvU
+#: sfx2/uiconfig/ui/startcenter.ui:52
+msgctxt "startcenter|filter_impress"
+msgid "Impress Templates"
+msgstr "Impress Şablonları"
+
+#. uWEpu
+#: sfx2/uiconfig/ui/startcenter.ui:59
+msgctxt "startcenter|filter_draw"
+msgid "Draw Templates"
+msgstr "Draw Şablonları"
+
+#. e3TH8
+#: sfx2/uiconfig/ui/startcenter.ui:72
+msgctxt "startcenter|manage"
+msgid "Manage Templates"
+msgstr "Şablonları Yönet"
+
+#. isnw8
+#: sfx2/uiconfig/ui/startcenter.ui:151
+msgctxt "startcenter|open_all"
+msgid "_Open File"
+msgstr "D_osya Aç"
+
+#. 6zjop
+#: sfx2/uiconfig/ui/startcenter.ui:172
+msgctxt "startcenter|open_remote"
+msgid "Remote File_s"
+msgstr "Uzak Do_syalar"
+
+#. ZUnZ9
+#: sfx2/uiconfig/ui/startcenter.ui:205
+msgctxt "startcenter|open_recent"
+msgid "_Recent Documents"
+msgstr "Son Belgele_r"
+
+#. BnkvG
+#: sfx2/uiconfig/ui/startcenter.ui:229
+msgctxt "startcenter|templates_all"
+msgid "T_emplates"
+msgstr "_Şablonlar"
+
+#. JEkqY
+#: sfx2/uiconfig/ui/startcenter.ui:270
+msgctxt "startcenter|create_label"
+msgid "Create:"
+msgstr "Oluştur:"
+
+#. SY4iY
+#: sfx2/uiconfig/ui/startcenter.ui:281
+msgctxt "startcenter|writer_all"
+msgid "_Writer Document"
+msgstr "_Writer Belgesi"
+
+#. Bvz5c
+#: sfx2/uiconfig/ui/startcenter.ui:301
+msgctxt "startcenter|calc_all"
+msgid "_Calc Spreadsheet"
+msgstr "_Calc Hesap Tablosu"
+
+#. RxGP6
+#: sfx2/uiconfig/ui/startcenter.ui:321
+msgctxt "startcenter|impress_all"
+msgid "_Impress Presentation"
+msgstr "_Impress Sunumu"
+
+#. 7fE2M
+#: sfx2/uiconfig/ui/startcenter.ui:341
+msgctxt "startcenter|draw_all"
+msgid "_Draw Drawing"
+msgstr "_Draw Çizimi"
+
+#. 7wn8r
+#: sfx2/uiconfig/ui/startcenter.ui:361
+msgctxt "startcenter|math_all"
+msgid "_Math Formula"
+msgstr "_Math Formülü"
+
+#. nnwDC
+#: sfx2/uiconfig/ui/startcenter.ui:381
+msgctxt "startcenter|database_all"
+msgid "_Base Database"
+msgstr "_Base Veritabanı"
+
+#. ZEDmn
+#: sfx2/uiconfig/ui/startcenter.ui:403
+msgctxt "startcenter|althelplabel"
+msgid "He_lp"
+msgstr "Yar_dım"
+
+#. oqVes
+#: sfx2/uiconfig/ui/startcenter.ui:473
+msgctxt "startcenter|extensions"
+msgid "E_xtensions"
+msgstr "E_klentiler"
+
+#. rDw4E
+#: sfx2/uiconfig/ui/startcenter.ui:498
+msgctxt "startcenter|label1"
+msgid "Application"
+msgstr "Uygulama"
+
+#. UiDMp
+#: sfx2/uiconfig/ui/startcenter.ui:518
+msgctxt "startcenter|all_recent_label"
+msgid "Recent Files List"
+msgstr "Son Kullanılan Dosyaların Listesi"
+
+#. kho2B
+#: sfx2/uiconfig/ui/startcenter.ui:531
+msgctxt "startcenter|local_view_label"
+msgid "Templates List"
+msgstr "Şablon Listesi"
+
+#. UHrAZ
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:12
+msgctxt "stylecontextmenu|new"
+msgid "New..."
+msgstr "Yeni..."
+
+#. hnLax
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:20
+msgctxt "stylecontextmenu|edit"
+msgid "Modify..."
+msgstr "Düzenle..."
+
+#. TPTqm
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:28
+msgctxt "stylecontextmenu|hide"
+msgid "Hide"
+msgstr "Gizle"
+
+#. mrCMd
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:36
+msgctxt "stylecontextmenu|show"
+msgid "Show"
+msgstr "Göster"
+
+#. 7bAyD
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:44
+msgctxt "stylecontextmenu|delete"
+msgid "Delete..."
+msgstr "Sil..."
+
+#. N4BGe
+#: sfx2/uiconfig/ui/tabbarcontents.ui:24
+msgctxt "tabbar|locktaskpanel"
+msgid "Dock"
+msgstr "Kilitle"
+
+#. GNBR3
+#: sfx2/uiconfig/ui/tabbarcontents.ui:33
+msgctxt "tabbar|unlocktaskpanel"
+msgid "Undock"
+msgstr "Kilidi kaldır"
+
+#. jXux4
+#: sfx2/uiconfig/ui/tabbarcontents.ui:42
+msgctxt "tabbar|hidesidebar"
+msgid "Close Sidebar"
+msgstr "Kenar Çubuğunu Kapat"
+
+#. hEmHk
+#: sfx2/uiconfig/ui/tabbarcontents.ui:50
+msgctxt "tabbar|customization"
+msgid "Customization"
+msgstr "Özelleştirme"
+
+#. 9Hfx6
+#: sfx2/uiconfig/ui/tabbarcontents.ui:66
+msgctxt "tabbar|restoredefault"
+msgid "Restore Default"
+msgstr "Varsayılana Geri Yükle"
+
+#. DBWZf
+#: sfx2/uiconfig/ui/tabbarcontents.ui:98
+msgctxt "tabbar|menubutton|tool_tip"
+msgid "Sidebar Settings"
+msgstr "Kenar Çubuğu Ayarları"
+
+#. XBaqU
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:16
+msgctxt "templatecategorydlg|TemplatesCategoryDialog"
+msgid "Select Category"
+msgstr "Kategori Seç"
+
+#. HXfot
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:108
+msgctxt "templatecategorydlg|select_label"
+msgid "Select from Existing Category"
+msgstr "Mevcut Kategoriden Seç"
+
+#. 7eShP
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:178
+msgctxt "templatecategorydlg|create_label"
+msgid "or Create a New Category"
+msgstr "veya Yeni bir Kategori Oluştur"
+
+#. eUWTy
+#: sfx2/uiconfig/ui/templatedlg.ui:46
+msgctxt "templatedlg|TemplateDialog"
+msgid "Templates"
+msgstr "Şablonlar"
+
+#. rhuYP
+#: sfx2/uiconfig/ui/templatedlg.ui:77
+msgctxt "templatedlg|hidedialogcb"
+msgid "Show this dialog at startup"
+msgstr "Bu pencereyi başlangıçta göster"
+
+#. 32zsB
+#: sfx2/uiconfig/ui/templatedlg.ui:144
+msgctxt "templatedlg|search_filter|tooltip_text"
+msgid "Search"
+msgstr "Ara"
+
+#. sGZMC
+#: sfx2/uiconfig/ui/templatedlg.ui:148
+msgctxt "templatedlg|search_filter"
+msgid "Search..."
+msgstr "Ara..."
+
+#. DF5YC
+#: sfx2/uiconfig/ui/templatedlg.ui:167
+msgctxt "templatedlg|action_menu|label"
+msgid "_Manage"
+msgstr "_Yönet"
+
+#. LUs2m
+#: sfx2/uiconfig/ui/templatedlg.ui:181
+msgctxt "templatedlg|extended_tip|action_menu"
+msgid "Provides commands to create, rename and delete categories, reset default templates, and refresh the template manager."
+msgstr "Kategori oluşturma, yeniden adlandırma, silme, varsayılan şablonları sıfırlama ve şablon yöneticisini tazele komutlarını sunar."
+
+#. fXVNY
+#: sfx2/uiconfig/ui/templatedlg.ui:208
+msgctxt "templatedlg|filter_application|tooltip_text"
+msgid "Filter by Application"
+msgstr "Uygulamaya göre süz"
+
+#. tqVhJ
+#: sfx2/uiconfig/ui/templatedlg.ui:210
+msgctxt "templatedlg|applist"
+msgid "All Applications"
+msgstr "Tüm Uygulamalar"
+
+#. pD6pU
+#: sfx2/uiconfig/ui/templatedlg.ui:211
+msgctxt "templatedlg|applist"
+msgid "Text Documents"
+msgstr "Metin Belgeleri"
+
+#. eECt7
+#: sfx2/uiconfig/ui/templatedlg.ui:212
+msgctxt "templatedlg|applist"
+msgid "Spreadsheets"
+msgstr "Hesap Tabloları"
+
+#. ajLbV
+#: sfx2/uiconfig/ui/templatedlg.ui:213
+msgctxt "templatedlg|applist"
+msgid "Presentations"
+msgstr "Sunumlar"
+
+#. LfUzB
+#: sfx2/uiconfig/ui/templatedlg.ui:214
+msgctxt "templatedlg|applist"
+msgid "Drawings"
+msgstr "Çizimler"
+
+#. t7zE7
+#: sfx2/uiconfig/ui/templatedlg.ui:228
+msgctxt "templatedlg|filter_folder|tooltip_text"
+msgid "Filter by Category"
+msgstr "Kategoriye göre süz"
+
+#. 93CGw
+#: sfx2/uiconfig/ui/templatedlg.ui:230
+msgctxt "templatedlg|folderlist"
+msgid "All Categories"
+msgstr "Tüm Kategoriler"
+
+#. NF9wE
+#: sfx2/uiconfig/ui/templatedlg.ui:251
+msgctxt "templatedlg|label1"
+msgid "Filter"
+msgstr "Süzgeç"
+
+#. ewTL3
+#: sfx2/uiconfig/ui/templatedlg.ui:357
+msgctxt "templatedlg|treeviewcolumn1"
+msgid "Name"
+msgstr "Adı"
+
+#. 7EJRA
+#: sfx2/uiconfig/ui/templatedlg.ui:374
+msgctxt "templatedlg|treeviewcolumn2"
+msgid "Category"
+msgstr "Kategori"
+
+#. AC27i
+#: sfx2/uiconfig/ui/templatedlg.ui:389
+msgctxt "templatedlg|treeviewcolumn3"
+msgid "Application"
+msgstr "Uygulama"
+
+#. eSaBw
+#: sfx2/uiconfig/ui/templatedlg.ui:404
+msgctxt "templatedlg|treeviewcolumn4"
+msgid "Modified"
+msgstr "Değiştirildi"
+
+#. pNzYA
+#: sfx2/uiconfig/ui/templatedlg.ui:419
+msgctxt "templatedlg|treeviewcolumn5"
+msgid "Size"
+msgstr "Boyut"
+
+#. j39jM
+#: sfx2/uiconfig/ui/templatedlg.ui:445
+msgctxt "templatedlg|thumbnailviewlabel"
+msgid "Template List"
+msgstr "Şablon Listesi"
+
+#. yEhgP
+#: sfx2/uiconfig/ui/templatedlg.ui:464
+msgctxt "templatedlg|thumbnail_view_btn|tooltip_text"
+msgid "Thumbnail View"
+msgstr "Küçük Resim Görünümü"
+
+#. j76ke
+#: sfx2/uiconfig/ui/templatedlg.ui:481
+msgctxt "templatedlg|list_view_btn|tooltip_text"
+msgid "List View"
+msgstr "Liste Görünümü"
+
+#. pm89q
+#: sfx2/uiconfig/ui/templatepanel.ui:127
+msgctxt "templatepanel|STR_STYLE_FILL_FORMAT_MODE"
+msgid "Fill Format Mode"
+msgstr "Biçim Doldur Kipi"
+
+#. GLRFT
+#: sfx2/uiconfig/ui/templatepanel.ui:139
+msgctxt "templatepanel|STR_STYLE_NEW_STYLE_FROM_SELECTION"
+msgid "New Style from Selection"
+msgstr "Seçimden Yeni Biçem"
+
+#. tAdD9
+#: sfx2/uiconfig/ui/templatepanel.ui:151
+msgctxt "templatepanel|STR_STYLE_NEW_STYLE_ACTION"
+msgid "Styles actions"
+msgstr "Biçem eylemleri"
+
+#. Xk5tD
+#: sfx2/uiconfig/ui/templatepanel.ui:163
+msgctxt "templatepanel|STR_STYLE_UPDATE_STYLE"
+msgid "Update Style"
+msgstr "Biçemi Güncelle"
+
+#. irBvi
+#: sfx2/uiconfig/ui/templatepanel.ui:220 sfx2/uiconfig/ui/templatepanel.ui:266
+msgctxt "templatepanel|STR_STYLE_ELEMTLIST"
+msgid "Style List"
+msgstr "Biçem Listesi"
+
+#. FHud7
+#: sfx2/uiconfig/ui/templatepanel.ui:280
+msgctxt "commontemplate|STR_PREVIEW_CHECKBOX"
+msgid "Show previews"
+msgstr "Önizlemeleri göster"
+
+#. p9AWW
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:8
+msgctxt "versioncommentdialog|VersionCommentDialog"
+msgid "Insert Version Comment"
+msgstr "Sürüm Açıklaması Ekle"
+
+#. CPwta
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:103
+msgctxt "versioncommentdialog|timestamp"
+msgid "Date and time: "
+msgstr "Tarih ve saat: "
+
+#. 2mDfC
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:115
+msgctxt "versioncommentdialog|author"
+msgid "Saved by: "
+msgstr "Kaydeden: "
+
+#. T5AY5
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:164
+msgctxt "versioncommentdialog|extended_tip|VersionCommentDialog"
+msgid "Enter a comment here when you are saving a new version. If you clicked Show to open this dialog, you cannot edit the comment."
+msgstr "Yeni bir sürümü kaydederken buraya bir açıklama girin. Bu iletişim penceresini açmak için Göster'e tıkladıysanız, açıklamayı düzenleyemezsiniz."
+
+#. oBSSb
+#: sfx2/uiconfig/ui/versionscmis.ui:50
+msgctxt "versionscmis|compare"
+msgid "_Compare"
+msgstr "_Karşılaştır"
+
+#. WyDoB
+#: sfx2/uiconfig/ui/versionscmis.ui:64
+msgctxt "versionscmis|show"
+msgid "_Show..."
+msgstr "-Göster..."
+
+#. A8Eqt
+#: sfx2/uiconfig/ui/versionscmis.ui:92
+msgctxt "versionscmis|open"
+msgid "_Open"
+msgstr "_A"
+
+#. gRBJa
+#: sfx2/uiconfig/ui/versionscmis.ui:177
+msgctxt "versionscmis|datetime"
+msgid "Date and time"
+msgstr "Tarih ve saat"
+
+#. 3VLw3
+#: sfx2/uiconfig/ui/versionscmis.ui:190
+msgctxt "versionscmis|savedby"
+msgid "Saved by"
+msgstr "Kaydeden"
+
+#. FzBeT
+#: sfx2/uiconfig/ui/versionscmis.ui:203
+msgctxt "versionscmis|comments"
+msgid "Comments"
+msgstr "Açıklamalar"
+
+#. c2cVg
+#: sfx2/uiconfig/ui/versionscmis.ui:226
+msgctxt "versionscmis|label2"
+msgid "Existing Versions"
+msgstr "Mevcut Sürümler"
+
+#. A4BT2
+#: sfx2/uiconfig/ui/versionsofdialog.ui:33
+msgctxt "versionsofdialog|cmis"
+msgid "CMIS"
+msgstr "CMIS"
+
+#. EqmYX
+#: sfx2/uiconfig/ui/versionsofdialog.ui:53
+msgctxt "versionsofdialog|extended_tip|delete"
+msgid "Deletes the selected version."
+msgstr "Seçili sürümü siler."
+
+#. erGHD
+#: sfx2/uiconfig/ui/versionsofdialog.ui:65
+msgctxt "versionsofdialog|compare"
+msgid "_Compare"
+msgstr "_Karşılaştır"
+
+#. TKEzJ
+#: sfx2/uiconfig/ui/versionsofdialog.ui:72
+msgctxt "versionsofdialog|extended_tip|compare"
+msgid "Compare the changes that were made in each version."
+msgstr "Her bir sürümde yapılmış değişiklikleri karşılaştır."
+
+#. UkbhC
+#: sfx2/uiconfig/ui/versionsofdialog.ui:84
+msgctxt "versionsofdialog|show"
+msgid "_Show..."
+msgstr "_Göster..."
+
+#. 4SD7F
+#: sfx2/uiconfig/ui/versionsofdialog.ui:91
+msgctxt "versionsofdialog|extended_tip|show"
+msgid "Displays the entire comment for the selected version."
+msgstr "Seçili sürümün tüm açıklamalarını görüntüler."
+
+#. E8yNH
+#: sfx2/uiconfig/ui/versionsofdialog.ui:119
+msgctxt "versionsofdialog|open"
+msgid "_Open"
+msgstr "_Aç"
+
+#. ASJac
+#: sfx2/uiconfig/ui/versionsofdialog.ui:126
+msgctxt "versionsofdialog|extended_tip|open"
+msgid "Opens the selected version in a read-only window."
+msgstr "Seçili sürümü salt okunur bir pencerede açar."
+
+#. qKnKv
+#: sfx2/uiconfig/ui/versionsofdialog.ui:184
+msgctxt "versionsofdialog|save"
+msgid "Save _New Version"
+msgstr "Yeni _Sürümü Kaydet"
+
+#. gTR6x
+#: sfx2/uiconfig/ui/versionsofdialog.ui:191
+msgctxt "versionsofdialog|extended_tip|save"
+msgid "Saves the current state of the document as a new version. If you want, you can also enter comments in the Insert Version Comment dialog before you save the new version."
+msgstr "Belgenin mevcut durumunu yeni bir sürüm olarak kaydeder. İsterseniz, yeni sürümü kaydetmeden önce Sürüm Açıklaması Ekle iletişim penceresinde açıklama da girebilirsiniz."
+
+#. aCeEr
+#: sfx2/uiconfig/ui/versionsofdialog.ui:202
+msgctxt "versionsofdialog|always"
+msgid "_Always save a new version on closing"
+msgstr "K_apatırken daima yeni bir sürüm kaydet"
+
+#. JxFDN
+#: sfx2/uiconfig/ui/versionsofdialog.ui:210
+msgctxt "versionsofdialog|extended_tip|always"
+msgid "If you have made changes to your document then a new version is automatically saved when you close the document."
+msgstr "Belgenizde değişiklik yaptıysanız, belgeyi kapattığınızda otomatik olarak yeni bir sürüm kaydedilir."
+
+#. vuHjH
+#: sfx2/uiconfig/ui/versionsofdialog.ui:225
+msgctxt "versionsofdialog|label1"
+msgid "New Versions"
+msgstr "Yeni Sürümler"
+
+#. nDGNv
+#: sfx2/uiconfig/ui/versionsofdialog.ui:278
+msgctxt "versionsofdialog|datetime"
+msgid "Date and time"
+msgstr "Tarih ve saat"
+
+#. MBoBZ
+#: sfx2/uiconfig/ui/versionsofdialog.ui:291
+msgctxt "versionsofdialog|savedby"
+msgid "Saved by"
+msgstr "Kaydeden"
+
+#. kqEcm
+#: sfx2/uiconfig/ui/versionsofdialog.ui:304
+msgctxt "versionsofdialog|comments"
+msgid "Comments"
+msgstr "Açıklamalar"
+
+#. GLD85
+#: sfx2/uiconfig/ui/versionsofdialog.ui:315
+msgctxt "versionsofdialog|extended_tip|versions"
+msgid "Lists the existing versions of the current document, the date and the time they were created, the author and the associated comments."
+msgstr "Geçerli belgede var olan sürümleri görüntüler, ayrıca sürümün yaratılma tarihi ile saati, ve yazar adı ile açıklamaları görüntülenir."
+
+#. EbijK
+#: sfx2/uiconfig/ui/versionsofdialog.ui:332
+msgctxt "versionsofdialog|label2"
+msgid "Existing Versions"
+msgstr "Mevcut Sürümler"
+
+#. 5BdCA
+#: sfx2/uiconfig/ui/versionsofdialog.ui:367
+msgctxt "versionsofdialog|extended_tip|VersionsOfDialog"
+msgid "Saves and organizes multiple versions of the current document in the same file. You can also open, delete and compare previous versions."
+msgstr "Geçerli belgenin birden çok sürümünü aynı dosyaya kaydeder ve düzenler. Ayrıca önceki sürümleri açabilir, silebilir ve karşılaştırabilirsiniz."

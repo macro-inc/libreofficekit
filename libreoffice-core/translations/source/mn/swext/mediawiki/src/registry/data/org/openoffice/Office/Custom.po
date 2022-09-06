@@ -1,0 +1,337 @@
+#. extracted from swext/mediawiki/src/registry/data/org/openoffice/Office/Custom
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2021-11-22 01:38+0000\n"
+"Last-Translator: Bachka <ichinnorovb@gmail.com>\n"
+"Language-Team: Mongolian <https://translations.documentfoundation.org/projects/libo_ui-master/swextmediawikisrcregistrydataorgopenofficeofficecustom/mn/>\n"
+"Language: mn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.8.1\n"
+"X-POOTLE-MTIME: 1369351562.000000\n"
+
+#. sc9Hg
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"GeneralSendError\n"
+"value.text"
+msgid "The operation 'Send to MediaWiki' could not be completed successfully."
+msgstr "\"МэдиаВикирүү илгээх\" үйлдэл амжилттай болж чадсангүй."
+
+#. UGGhv
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"NoWikiFilter\n"
+"value.text"
+msgid "The MediaWiki export filter cannot be found. Choose 'Tools-XML Filter Settings' to install the filter, or use the setup to install the component."
+msgstr "МэдиаВикигийн экспортлох шүүлтүүр олдохгүй байна. \"Хэрэгсэл-XML Шүүлтүүр тохиргоо\" сонгож шүүлтүүрийг суулга эсвэл суулгацыг ашиглан компонентыг суулга."
+
+#. iB82N
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"NoConnectionToURL\n"
+"value.text"
+msgid "A connection to the MediaWiki system at '$ARG1' could not be created."
+msgstr "МэдиаВикигийн системрүү '$ARG1' холболт үүсгэгдэж чадсангүй."
+
+#. Z4jaW
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"WrongLogin\n"
+"value.text"
+msgid "User name or password is incorrect. Please try again, or leave the fields blank for an anonymous connection."
+msgstr "Хэрэглэгчийн нэр эвсэл нууц үг буруу байна. Дахин оролдож үзнэ үү.Хэрвээ нуугдмал хэрэглэгчийн эрхээр холбогдох гэж байгаа бол талбаруудыг хоосон орхино уу."
+
+#. bDNGk
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"InvalidURL\n"
+"value.text"
+msgid "A connection could not be created because the URL is invalid."
+msgstr "УРЛ хүчингүй учраас холболт үүсгэгдэж чадсангүй."
+
+#. rgyi4
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"NoURL\n"
+"value.text"
+msgid "Specify a MediaWiki server by providing a URL."
+msgstr "URL оруулах замаар MediaWiki серверийг зааж өгнө үү."
+
+#. EUk3J
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"CancelSending\n"
+"value.text"
+msgid "The transfer has been interrupted. Please check the integrity of the wiki article."
+msgstr "Дамжуулал тасалдлаа. Вики өгүүлэлийн үнэн эсэхийг шалгана уу."
+
+#. kAkE2
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_EditSetting_UrlLabel\n"
+"value.text"
+msgid "U~RL"
+msgstr "~УРЛ"
+
+#. Nisvz
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_EditSetting_UsernameLabel\n"
+"value.text"
+msgid "~Username"
+msgstr "~Хэрэглэгчийн нэр"
+
+#. rRpmN
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_EditSetting_PasswordLabel\n"
+"value.text"
+msgid "~Password"
+msgstr "~Нууц үг"
+
+#. J2PDr
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_SendTitle\n"
+"value.text"
+msgid "Send to MediaWiki"
+msgstr "МэдиаВикируу илгээх"
+
+#. 84fuf
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_WikiArticle\n"
+"value.text"
+msgid "Wiki article"
+msgstr "Вики өгүүлэл"
+
+#. EZQn5
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_No\n"
+"value.text"
+msgid "No"
+msgstr "Үгүй"
+
+#. Ck54C
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_OK\n"
+"value.text"
+msgid "OK"
+msgstr "OK"
+
+#. GXHo2
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_Yes\n"
+"value.text"
+msgid "Yes"
+msgstr "Тийм"
+
+#. iqReE
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_AddButton\n"
+"value.text"
+msgid "~Add..."
+msgstr "~Нэмэх..."
+
+#. pAx7t
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_EditButton\n"
+"value.text"
+msgid "~Edit..."
+msgstr "~Засах..."
+
+#. UC2XF
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_SendButton\n"
+"value.text"
+msgid "~Send"
+msgstr "~Илгээх"
+
+#. j2hBK
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_RemoveButton\n"
+"value.text"
+msgid "~Remove"
+msgstr "~Устгах"
+
+#. BGuwk
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_NewWikiPage_Label1\n"
+"value.text"
+msgid "A wiki article with the title '$ARG1' does not exist yet. Do you want to create a new article with that name?"
+msgstr "\"$ARG1\" гарчигтай вики өгүүлэл байхгүй байна. Та ийм нэртэй шинэ өгүүлэл үүсгэмээр байна уу?"
+
+#. PiBrD
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_SendToMediaWiki_Label1\n"
+"value.text"
+msgid "Media~Wiki Server"
+msgstr "Мэдиа~Вики сервер"
+
+#. GiPyL
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_SendToMediaWiki_Label2\n"
+"value.text"
+msgid "~Title"
+msgstr "~Гарчиг"
+
+#. DM8RZ
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_SendToMediaWiki_Label3\n"
+"value.text"
+msgid "S~ummary"
+msgstr "Д~үгнэлт"
+
+#. yDFJs
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_SendToMediaWiki_MinorCheck\n"
+"value.text"
+msgid "This is a ~minor edit"
+msgstr "Энэ бол ~минор засалт"
+
+#. UuPKB
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_SendToMediaWiki_BrowserCheck\n"
+"value.text"
+msgid "Show in web ~browser"
+msgstr "Веб толилуурт харуулах"
+
+#. NB2ot
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"UnknownCert\n"
+"value.text"
+msgid "The certificate of the selected site is unknown."
+msgstr "Сонгогдсон сайтын гэрчилгээ тодорхойгүй."
+
+#. FFtew
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_MediaWiki_Title\n"
+"value.text"
+msgid "MediaWiki"
+msgstr "МэдиаВики"
+
+#. rcSqA
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_EditSetting_AccountLine\n"
+"value.text"
+msgid "Account"
+msgstr "Данс"
+
+#. LRJUJ
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_EditSetting_WikiLine\n"
+"value.text"
+msgid "MediaWiki Server"
+msgstr "МэдиаВики сервер"
+
+#. xzqU7
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_EditSetting_SaveBox\n"
+"value.text"
+msgid "~Save password"
+msgstr "~Нууц үг хадгалах"
+
+#. CmQ7N
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_MediaWiki_Extension_String\n"
+"value.text"
+msgid "Wiki Publisher"
+msgstr "Wiki Publisher"
+
+#. CpbZt
+#: WikiExtension.xcu
+msgctxt ""
+"WikiExtension.xcu\n"
+".WikiExtension.Strings\n"
+"Dlg_WikiPageExists_Label1\n"
+"value.text"
+msgid "A wiki article with the title '$ARG1' already exists.&#13;&#13;Do you want to replace the current article with your article?&#13;&#13;"
+msgstr "'$ARG1' нэртэй бичвэр вики дээр байна.&#13;&#13;Та тэр бичвэрийг энэ бичвэрээр орлуулах уу?&#13;&#13;"

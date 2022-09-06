@@ -1,0 +1,1484 @@
+#. extracted from helpcontent2/source/text/simpress/00
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2021-10-20 13:08+0200\n"
+"PO-Revision-Date: 2021-05-16 21:37+0000\n"
+"Last-Translator: Rizal Muttaqin <riz_17_oke@yahoo.co.id>\n"
+"Language-Team: Indonesian <https://translations.documentfoundation.org/projects/libo_help-master/textsimpress00/id/>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1550993388.000000\n"
+
+#. sqmGT
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"tit\n"
+"help.text"
+msgid "To access this command"
+msgstr "Untuk mengakses perintah ini"
+
+#. LgX3a
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"hd_id3149655\n"
+"help.text"
+msgid "<variable id=\"wie\">To access this command </variable>"
+msgstr "<variable id=\"wie\">Untuk mengakses perintah ini </variable>"
+
+#. Aehfn
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id8789025\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens a dialog to save the selected bitmap picture as a file. The default file format is the internal format of the image.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Membuka dialog untuk menyimpan gambar yang dipilih sebagai berkas tersendiri. Format berkas dasar adalah format berkas internal milik citra tersebut.</ahelp>"
+
+#. jwbyg
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id5316324\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens the Custom Animation sidebar deck.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Membuka Animasi Ubahan pada dek bilah sisi.</ahelp>"
+
+#. AgwPX
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3147435\n"
+"help.text"
+msgid "<image id=\"img_id3156441\" src=\"cmd/sc_rect.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156441\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156441\" src=\"cmd/sc_rect.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156441\">Ikon</alt></image>"
+
+#. WDm24
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3145801\n"
+"help.text"
+msgid "Rectangle"
+msgstr "Persegi Panjang"
+
+#. NtR9T
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "<image id=\"img_id3155065\" src=\"cmd/sc_ellipse.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155065\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155065\" src=\"cmd/sc_ellipse.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155065\">Ikon</alt></image>"
+
+#. wzpZu
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3147344\n"
+"help.text"
+msgid "Ellipse"
+msgstr "Lonjong"
+
+#. s7WDt
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3147004\n"
+"help.text"
+msgid "<image id=\"img_id3159236\" src=\"cmd/sc_linetoolbox.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3159236\">Icon</alt></image>"
+msgstr "<image id=\"img_id3159236\" src=\"cmd/sc_linetoolbox.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3159236\">Ikon</alt></image>"
+
+#. UEPDr
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3150202\n"
+"help.text"
+msgid "Curve"
+msgstr "Kurva"
+
+#. h8xyX
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3156449\n"
+"help.text"
+msgid "<image id=\"img_id3149409\" src=\"cmd/sc_objectalign.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149409\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149409\" src=\"cmd/sc_objectalign.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149409\">Ikon</alt></image>"
+
+#. L68Vx
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3157979\n"
+"help.text"
+msgid "Alignment"
+msgstr "Perataan"
+
+#. SeWur
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3159208\n"
+"help.text"
+msgid "<image id=\"img_id3159231\" src=\"cmd/sc_bringtofront.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3159231\">Icon</alt></image>"
+msgstr "<image id=\"img_id3159231\" src=\"cmd/sc_bringtofront.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3159231\">Ikon</alt></image>"
+
+#. Djhh6
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id3153013\n"
+"help.text"
+msgid "Arrange"
+msgstr "Susun"
+
+#. X5cDM
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"tit\n"
+"help.text"
+msgid "File Menu"
+msgstr "Menu Berkas"
+
+#. EfFEL
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"hd_id3153188\n"
+"help.text"
+msgid "File Menu"
+msgstr "Menu Berkas"
+
+#. ADnSj
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id3146974\n"
+"help.text"
+msgid "<variable id=\"dtvlc\">Choose <emph>File - Export</emph></variable>"
+msgstr "<variable id=\"dtvlc\">Pilih <emph>Berkas - Ekspor</emph></variable>"
+
+#. Cjh6J
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit Menu"
+msgstr "Menu Sunting"
+
+#. CdKVf
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"hd_id3150792\n"
+"help.text"
+msgid "Edit Menu"
+msgstr "Menu Sunting"
+
+#. E6R5D
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3145171\n"
+"help.text"
+msgid "Choose <emph>Edit - Duplicate</emph>"
+msgstr "Pilih <emph>Sunting - Duplikat</emph>"
+
+#. iFMuz
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3156441\n"
+"help.text"
+msgid "Shift+F3"
+msgstr "Shift+F3"
+
+#. YHwXy
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3149263\n"
+"help.text"
+msgid "<variable id=\"bearbueber\">Choose <emph>Shape - Cross-fading</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)</variable>"
+msgstr ""
+
+#. k3XUS
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3149666\n"
+"help.text"
+msgid "<variable id=\"basl\">Choose <emph>Edit - Delete Slide</emph></variable>"
+msgstr "<variable id=\"basl\">Pilih <emph>Sunting - Hapus Slide</emph></variable>"
+
+#. 9u4Ng
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3147397\n"
+"help.text"
+msgid "<variable id=\"baebl\">Open the context menu of an inserted layer, then choose <emph>Delete Layer</emph></variable>"
+msgstr "<variable id=\"baebl\">Buka menu konteks dari lapisan yang disisipkan, lalu pilih <emph>Hapus Lapisan</emph></variable>"
+
+#. pYxE9
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3155603\n"
+"help.text"
+msgid "<variable id=\"feldbefehl\">Choose <emph>Edit - Fields</emph></variable>"
+msgstr "<variable id=\"feldbefehl\">Pilih <emph>Sunting - Ruas</emph></variable>"
+
+#. 4mxmD
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id8695944\n"
+"help.text"
+msgid "<variable id=\"gluebar\">Click the <emph>Show Gluepoint Functions</emph> icon on the Drawing Bar</variable>"
+msgstr ""
+
+#. cjzea
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"tit\n"
+"help.text"
+msgid "View Menu"
+msgstr "Menu Tampilan"
+
+#. cEoGX
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"hd_id3150542\n"
+"help.text"
+msgid "View Menu"
+msgstr "Menu Tilik"
+
+#. UBHxX
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3148798\n"
+"help.text"
+msgid "<variable id=\"aslal\">Choose <emph>View - Rulers</emph> </variable>"
+msgstr "<variable id=\"aslal\">Pilih <emph>Tilik - Penggaris</emph></variable>"
+
+#. iwSEb
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3153771\n"
+"help.text"
+msgid "<variable id=\"option\">Choose <emph>View - Toolbars - Options</emph> </variable>"
+msgstr "<variable id=\"option\">Pilih <emph>Tilik - Bilah Alat - Opsi</emph></variable>"
+
+#. MGzp8
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3152576\n"
+"help.text"
+msgid "Choose <emph>View - Toolbars - Presentation</emph>"
+msgstr "Pilih <emph>Tilik - Bilah Alat - Presentasi</emph>"
+
+#. huGDF
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3146316\n"
+"help.text"
+msgid "<variable id=\"quali\">Choose <emph>View - Color/Grayscale</emph> </variable>"
+msgstr "<variable id=\"quali\">Pilih <emph>Tilik - Warna/Skala Abu-abu</emph></variable>"
+
+#. uV5Vw
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3166426\n"
+"help.text"
+msgid "Choose <emph>View - Normal</emph>"
+msgstr "Pilih <emph>Tilik - Normal</emph>"
+
+#. BmGph
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3157982\n"
+"help.text"
+msgid "Choose <emph>View - Outline</emph>"
+msgstr "Pilih <emph>Tilik - Ikhtisar</emph>"
+
+#. XPAAD
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3149875\n"
+"help.text"
+msgid "Choose <emph>View - Slide Sorter</emph>"
+msgstr "Pilih <emph>Tilik - Pengurut Salindia</emph>"
+
+#. FNUA9
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3149352\n"
+"help.text"
+msgid "Choose <emph>View - Notes </emph>"
+msgstr "Pilih <emph>Tilik - Catatan</emph>"
+
+#. QQktS
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3155255\n"
+"help.text"
+msgid "Choose <emph>View - Master Handout</emph>"
+msgstr "Pilih <emph>Tampilan - Master Handout</emph>"
+
+#. jBGUy
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3154328\n"
+"help.text"
+msgid "Choose <emph>Slide Show - Slide Show</emph>"
+msgstr "Pilih <emph>Pertunjukan Salindia - Pertunjukan Salindia</emph>"
+
+#. cvTps
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3150134\n"
+"help.text"
+msgid "F5"
+msgstr "F5"
+
+#. PCLQ7
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3145244\n"
+"help.text"
+msgid "On the <emph>Standard</emph> toolbar, click"
+msgstr "Pada bilah alat <emph>Standar</emph>, klik"
+
+#. ijFCe
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3148768\n"
+"help.text"
+msgid "<image id=\"img_id3148774\" src=\"cmd/sc_presentation.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148774\">Slide Show Icon</alt></image>"
+msgstr "<image id=\"img_id3148774\" src=\"cmd/sc_presentation.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148774\">Ikon Pertunjukan Salindia</alt></image>"
+
+#. uF2sr
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3151016\n"
+"help.text"
+msgid "Slide Show"
+msgstr "Pertunjukan Salindia"
+
+#. 7udz4
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3153719\n"
+"help.text"
+msgid "Choose <emph>View - Normal</emph>"
+msgstr "Pilih <emph>Tilik - Normal</emph>"
+
+#. qm8qt
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3151264\n"
+"help.text"
+msgid "Choose <emph>View - Master Slide</emph>"
+msgstr ""
+
+#. DxBby
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_idN10AF7\n"
+"help.text"
+msgid "<variable id=\"masterlayouts\">Choose <emph>View - Master Slide </emph></variable>"
+msgstr "<variable id=\"masterlayouts\">Pilih <emph>Tampilan - Salindia Induk </emph></variable>"
+
+#. QetBX
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_idN10B19\n"
+"help.text"
+msgid "<variable id=\"notesmaster\">Choose <emph>View - Master Notes</emph> </variable>"
+msgstr "<variable id=\"notesmaster\">Pilih <emph>Tampilan - Catatan Induk</emph> </variable>"
+
+#. SL63x
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_idN10B07\n"
+"help.text"
+msgid "<variable id=\"master\">Choose <emph>Slide - Master Elements</emph> </variable>"
+msgstr "<variable id=\"master\">Pilih <emph>Salindia - Elemen Induk</emph> </variable>"
+
+#. FdzkE
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_idN10B57\n"
+"help.text"
+msgid "Choose <emph>Insert - Header and Footer</emph>"
+msgstr "Pilih <emph>Sisip - Kop dan Kaki</emph>"
+
+#. oGfDH
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_idN10B6E\n"
+"help.text"
+msgid "Choose <emph>Insert - Page number</emph>"
+msgstr "Pilih <emph>Sisip - Nomor halaman</emph>"
+
+#. cjDmN
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_idN10B74\n"
+"help.text"
+msgid "Choose <emph>Insert - Date and time</emph>"
+msgstr "Pilih <emph>Sisip - Tanggal dan waktu</emph>"
+
+#. Qq7zc
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3149286\n"
+"help.text"
+msgid "<variable id=\"hinterzeichnung\">Choose <emph>View - Normal</emph> </variable>"
+msgstr "<variable id=\"hinterzeichnung\">Pilih <emph>Tilik - Normal</emph></variable>"
+
+#. vJ7GF
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3153480\n"
+"help.text"
+msgid "<variable id=\"master_drawing\">Choose <emph>View - Master Slide</emph> </variable>"
+msgstr "<variable id=\"master_drawing\">Pilih <emph>Tampilan - Salindia Induk</emph> </variable>"
+
+#. LG3aP
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3147254\n"
+"help.text"
+msgid "<variable id=\"hinternotizen\">Choose <emph>View - Notes</emph> </variable>"
+msgstr "<variable id=\"hinternotizen\">Pilih <emph>Tilik - Catatan</emph></variable>"
+
+#. yDXA6
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Menu"
+msgstr "Menu Sisip"
+
+#. 7GedS
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"hd_id3143219\n"
+"help.text"
+msgid "Insert Menu"
+msgstr "Menu Sisip"
+
+#. aJf3t
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155064\n"
+"help.text"
+msgid "<variable id=\"seiteduplizieren\">Choose <emph>Insert - Duplicate Slide</emph></variable>"
+msgstr "<variable id=\"seiteduplizieren\">Pilih <emph>Sisip - Duplikasi Slide</emph></variable>"
+
+#. jgiAE
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153711\n"
+"help.text"
+msgid "<variable id=\"seitegliederung\">Choose <emph>Insert - Expand Slide</emph></variable>"
+msgstr "<variable id=\"seitegliederung\">Pilih <emph>Sisip - Perluas Slide</emph></variable>"
+
+#. EB7uY
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154254\n"
+"help.text"
+msgid "<variable id=\"uebersicht\">Choose <emph>Insert - Summary Slide</emph></variable>"
+msgstr "<variable id=\"uebersicht\">Pilih <emph>Sisip - Slide Ikhtisar</emph></variable>"
+
+#. Hrdda
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147002\n"
+"help.text"
+msgid "Choose <emph>Insert - Layer</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Sisip - Lapisan</emph> (Hanya<item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. EZDXv
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150363\n"
+"help.text"
+msgid "Open context menu of layer tabs - choose <emph>Insert Layer</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Buka menu konteks tabulasi lapisan - pilih <emph>Sisip Lapisan</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. j8G6i
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155376\n"
+"help.text"
+msgid "Choose <emph>Insert - Insert Snap Point/Line</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Sisip - Sisip Titik/Garis Kancing</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. YA4wU
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154372\n"
+"help.text"
+msgid "Open a context menu and choose <emph>Insert Snap Point/Line</emph>"
+msgstr "Buka menu konteks dan pilih <emph>Sisip Titik/Garis Kancing</emph>"
+
+#. zUpYX
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145388\n"
+"help.text"
+msgid "<variable id=\"efglbe\">Select a snap point or line, open the context menu, and choose <emph>Edit Snap Point/Line</emph></variable>"
+msgstr "<variable id=\"efglbe\">Pilih titik atau garis kancing, buka menu konteks, dan pilih <emph>Sunting Titik/Garis Kancing</emph></variable>"
+
+#. hmnUh
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3151239\n"
+"help.text"
+msgid "Choose <emph>Insert - Table</emph>"
+msgstr "Pilih <emph>Sisip - Tabel</emph>"
+
+#. 6CAQP
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3144769\n"
+"help.text"
+msgid "On the <emph>Insert</emph> toolbar, click"
+msgstr "Pada bilah alat <emph>Sisip</emph>, klik"
+
+#. h7J5j
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3163703\n"
+"help.text"
+msgid "<image id=\"img_id3145361\" src=\"cmd/sc_grid.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145361\">Icon Insert Table</alt></image>"
+msgstr "<image id=\"img_id3145361\" src=\"cmd/sc_grid.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145361\">Ikon Sisip Tabel</alt></image>"
+
+#. tUXJX
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3146963\n"
+"help.text"
+msgid "Table"
+msgstr "Tabel"
+
+#. mEkeS
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153075\n"
+"help.text"
+msgid "Choose <switchinline select=\"appl\"><caseinline select=\"IMPRESS\"><menuitem>Slide - Insert Slide from File</menuitem></caseinline><defaultinline><menuitem>Page - Insert Page from File</menuitem></defaultinline></switchinline>"
+msgstr "Pilih <switchinline select=\"appl\"><caseinline select=\"IMPRESS\"><menuitem>Salindia - Sisipkan Salindia dari Berkas</menuitem></caseinline><defaultinline><menuitem>Halaman - Sisipkan Halaman dari Berkas</menuitem></defaultinline></switchinline>"
+
+#. ttNgv
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153958\n"
+"help.text"
+msgid "On the <emph>Insert</emph> toolbar, click"
+msgstr "Pada bilah alat <emph>Sisip</emph>, klik"
+
+#. DARhB
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3156397\n"
+"help.text"
+msgid "<image id=\"img_id3145237\" src=\"cmd/sc_inserttoolbox.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145237\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145237\" src=\"cmd/sc_inserttoolbox.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145237\">Ikon</alt></image>"
+
+#. PTcaY
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3157900\n"
+"help.text"
+msgid "<switchinline select=\"appl\"><caseinline select=\"IMPRESS\">Insert Slide from File</caseinline><defaultinline>Insert Page from File</defaultinline></switchinline>"
+msgstr "<switchinline select=\"appl\"><caseinline select=\"IMPRESS\">Sisipkan Salindia dari Berkas</caseinline><defaultinline>Sisipkan Halaman dari Berkas</defaultinline></switchinline>"
+
+#. YV4RY
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149351\n"
+"help.text"
+msgid "<variable id=\"feldbf\">Choose <emph>Insert - Field</emph></variable>"
+msgstr "<variable id=\"feldbf\">Pilih <emph>Sisip - Ruas</emph></variable>"
+
+#. 49ske
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150477\n"
+"help.text"
+msgid "<variable id=\"feldbf1\">Choose <emph>Insert - Field - Date (fixed)</emph></variable>"
+msgstr "<variable id=\"feldbf1\">Pilih <emph>Sisip - Ruas - Tanggal (tetap)</emph></variable>"
+
+#. pBt9o
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3146879\n"
+"help.text"
+msgid "<variable id=\"feldbf2\">Choose <emph>Insert - Field - Date (variable)</emph></variable>"
+msgstr "<variable id=\"feldbf2\">Pilih <emph>Sisip - Ruas - Tanggal (variabel)</emph></variable>"
+
+#. qZQxK
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153036\n"
+"help.text"
+msgid "<variable id=\"feldbf3\">Choose <emph>Insert - Field - Time (fixed)</emph></variable>"
+msgstr "<variable id=\"feldbf3\">Pilih <emph>Sisip - Ruas - Waktu (tetap)</emph></variable>"
+
+#. 32BH2
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145590\n"
+"help.text"
+msgid "<variable id=\"feldbf4\">Choose <emph>Insert - Field - Time (variable)</emph></variable>"
+msgstr "<variable id=\"feldbf4\">Pilih <emph>Sisip - Ruas - Waktu (variabel)</emph></variable>"
+
+#. Gqsm2
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153935\n"
+"help.text"
+msgid "<variable id=\"feldbf5\">Choose <emph>Insert - Field - Page Number</emph></variable>"
+msgstr "<variable id=\"feldbf5\">Pilih <emph>Sisip - Ruas - Nomor Halaman</emph></variable>"
+
+#. dXqjF
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3148583\n"
+"help.text"
+msgid "<variable id=\"feldbf6\">Choose <emph>Insert - Field - Author</emph></variable>"
+msgstr "<variable id=\"feldbf6\">Pilih <emph>Sisip - Ruas - Penulis</emph></variable>"
+
+#. C9fiu
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155951\n"
+"help.text"
+msgid "<variable id=\"feldbf7\">Choose <emph>Insert - Field - File Name</emph></variable>"
+msgstr "<variable id=\"feldbf7\">Pilih <emph>Sisip - Ruas - Nama Berkas</emph></variable>"
+
+#. p2LBA
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"tit\n"
+"help.text"
+msgid "Format Menu"
+msgstr "Menu Format"
+
+#. vAQMZ
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"hd_id3147001\n"
+"help.text"
+msgid "Format Menu"
+msgstr "Menu Format"
+
+#. Px883
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148489\n"
+"help.text"
+msgid "In the context menu of a dimension line, choose <emph>Dimensions</emph>."
+msgstr "Pada menu konteks garis dimensi, pilih <emph>Dimensi</emph>."
+
+#. t2Prp
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150207\n"
+"help.text"
+msgid "On the <emph>Lines and Arrows</emph> toolbar, click the <emph>Dimension Line</emph> icon."
+msgstr "Pada baris alat <emph>Garis dan Panah</emph>, klik ikon <emph>Garis Dimensi</emph>."
+
+#. s6Euy
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3152874\n"
+"help.text"
+msgid "In a Draw document, right-click a layer tab and choose <emph>Modify Layer</emph>"
+msgstr "Dalam dokumen Draw, klik kanan sebuah tabulasi lapisan dan pilih <emph>Ubah Lapisan</emph>"
+
+#. XDEfU
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154765\n"
+"help.text"
+msgid "Choose <emph>Format - Layer</emph> (only $[officename] Draw)"
+msgstr "Pilih <emph>Format - Lapis</emph> (hanya $[officename] Draw)"
+
+#. i9rFk
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3146316\n"
+"help.text"
+msgid "Choose <emph>Format - Interaction</emph>"
+msgstr "Pilih <emph>Format - Interaksi</emph>"
+
+#. Gfjf3
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149257\n"
+"help.text"
+msgid "On the <emph>Standard</emph> toolbar, click"
+msgstr "Pada bilah alat <emph>Standar</emph>, klik"
+
+#. 4a3bB
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154649\n"
+"help.text"
+msgid "<image id=\"img_id3150205\" src=\"cmd/sc_animationeffects.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150205\">Icon Interaction</alt></image>"
+msgstr "<image id=\"img_id3150205\" src=\"cmd/sc_animationeffects.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150205\">Ikon Interaksi</alt></image>"
+
+#. 8eiDD
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155380\n"
+"help.text"
+msgid "Interaction"
+msgstr "Interaksi"
+
+#. aFWLc
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools Menu"
+msgstr "Menu Perkakas"
+
+#. CnZRw
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"hd_id3153770\n"
+"help.text"
+msgid "Tools Menu"
+msgstr "Menu Perkakas"
+
+#. XwRiS
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153727\n"
+"help.text"
+msgid "<variable id=\"silbentrennung\">Choose <emph>Tools - Language - Hyphenation</emph></variable>"
+msgstr "<variable id=\"silbentrennung\">Pilih <emph>Perkakas - Bahasa - Pemenggalan Kata</emph></variable>"
+
+#. DpRab
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3163803\n"
+"help.text"
+msgid "<variable id=\"neuprae\">Choose <emph>Slide Show - Custom Slide Show</emph> and then click <emph>New</emph>.</variable>"
+msgstr "<variable id=\"neuprae\">Pilih <emph>Pertunjukan Slide - Pertunjukan Slide Ubahan</emph> lalu klik <emph>Baru</emph>.</variable>"
+
+#. mc9oT
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"tit\n"
+"help.text"
+msgid "Slide Show Menu"
+msgstr "Menu Pertunjukan Slide"
+
+#. aUDNd
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"hd_id3150541\n"
+"help.text"
+msgid "Slide Show Menu"
+msgstr "Menu Pertunjukan Slide"
+
+#. xdCQt
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3158394\n"
+"help.text"
+msgid "<variable id=\"etdaw\">Choose <menuitem>View - Slide Transition</menuitem></variable>"
+msgstr "<variable id=\"etdaw\">Pilih <menuitem>Tilik - Transisi Salindia</menuitem></variable>"
+
+#. LvLjL
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3152576\n"
+"help.text"
+msgid "Choose <emph>Insert - Animated Image</emph>"
+msgstr "Pilih <emph>Sisip - Citra Bergerak</emph>"
+
+#. L8Qvn
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3149262\n"
+"help.text"
+msgid "Choose <emph>Slide Show - Custom Animation</emph>"
+msgstr "Pilih <emph>Pertunjukan Slide - Animasi Ubahan</emph>"
+
+#. GjRGc
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3146976\n"
+"help.text"
+msgid "On the <emph>Drawing</emph> toolbar, click"
+msgstr "Pada bilah alat <emph>Menggambar</emph>, klik"
+
+#. xScEZ
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3155603\n"
+"help.text"
+msgid "<image id=\"img_id3149400\" src=\"cmd/sc_customanimation.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3149400\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149400\" src=\"cmd/sc_customanimation.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id3149400\">Ikon</alt></image>"
+
+#. HAFtd
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3154754\n"
+"help.text"
+msgid "Custom Animation"
+msgstr "Animasi Ubahan"
+
+#. jGCAJ
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3152987\n"
+"help.text"
+msgid "<variable id=\"praesent\">Choose <emph>Slide Show - Slide Show Settings</emph></variable>"
+msgstr "<variable id=\"praesent\">Pilih <emph>Pertunjukan Slide - Pengaturan Pertunjukan Slide</emph></variable>"
+
+#. k7Q8Z
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3155089\n"
+"help.text"
+msgid "<variable id=\"indipra\">Choose <emph>Slide Show - Custom Slide Show</emph></variable>"
+msgstr "<variable id=\"indipra\">Pilih <emph>Pertunjukan Slide - Pertunjukan Slide Ubahan</emph></variable>"
+
+#. 3GUFv
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shape Menu"
+msgstr "Menu Bentuk"
+
+#. k9tyC
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"hd_id3152578\n"
+"help.text"
+msgid "Shape Menu"
+msgstr "Menu Bentuk"
+
+#. EbLAA
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3151075\n"
+"help.text"
+msgid "Choose <emph>Shape - Convert </emph>(<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Konversikan</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. 8sqbB
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3153415\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Convert</emph>"
+msgstr "Buka menu konteks dari objek yang terpilih lalu pilih <emph>Konversikan</emph>"
+
+#. griuj
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3149124\n"
+"help.text"
+msgid "Choose <emph>Shape - Convert - To Curve</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Konversikan - Ke Kurva</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. cjVjh
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3149018\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Convert - To Curve</emph>"
+msgstr "Buka menu konteks dari objek yang terpilih lalu pilih <emph>Konversikan - Ke Kurva</emph>"
+
+#. ie8zi
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3156384\n"
+"help.text"
+msgid "Choose <emph>Shape - Convert - To Polygon</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Konversikan - Ke Poligon</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. vFDG5
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3154702\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Convert - To Polygon</emph>"
+msgstr "Buka menu konteks dari objek yang dipilih dan pilih <emph>Konversikan - Ke Poligon</emph>"
+
+#. F9Wc6
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3147001\n"
+"help.text"
+msgid "Choose <emph>Shape - Convert - To 3D</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Konversikan - Ke 3D</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. ZM2qM
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3155111\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Convert - To 3D </emph>"
+msgstr "Buka menu konteks dari objek yang dipilih dan pilih <emph>Konversikan - Ke 3D</emph>"
+
+#. opPFD
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150205\n"
+"help.text"
+msgid "Choose <emph>Shape - Convert - To 3D Rotation Object</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Konversikan - Ke Objek Rotasi 3D</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. 6GqEg
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3152992\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Convert - To 3D Rotation Body</emph>"
+msgstr "Buka menu konteks dari objek yang terpilih lalu pilih <emph>Konversikan - Ke Tubuh Rotasi 3D</emph>"
+
+#. 7cKRf
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3152986\n"
+"help.text"
+msgid "Choose <emph>Shape - Convert - To Bitmap</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Konversikan - Ke Bitmap</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. zYDUA
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3149409\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Convert - To Bitmap</emph>"
+msgstr "Buka menu konteks dari objek yang terpilih lalu pilih <emph>Konversikan - Ke Bitmap</emph>"
+
+#. uSWV6
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3148870\n"
+"help.text"
+msgid "Choose <emph>Shape - Convert - To Metafile</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Konversikan - Ke Metafile</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. FKBs3
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3148608\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Convert - To Metafile</emph>"
+msgstr "Buka menu konteks dari objek yang terpilih dan pilih <emph>Konversikan - Ke Berkas Meta</emph>"
+
+#. CHC6W
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3153246\n"
+"help.text"
+msgid "Choose <emph>Shape - Convert - To Contour</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Konversikan - Ke Kontur</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. JexGE
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3159231\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Convert - To Contour</emph>"
+msgstr "Buka menu konteks dari objek yang terpilih lalu pilih <emph>Konversikan - Ke Kontur</emph>"
+
+#. YK9Mw
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3153008\n"
+"help.text"
+msgid "Choose <emph>Shape - Arrange - In Front of Object</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Susun - Di Depan Objek</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. d8mib
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3145117\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Arrange - In Front of Object</emph>"
+msgstr "Buka menu konteks dari objek yang terpilih lalu pilih <emph>Susun - Di Depan Objek</emph>"
+
+#. htvAg
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3147249\n"
+"help.text"
+msgid "On the Drawing bar, open the <emph>Arrange</emph> toolbar and click:"
+msgstr "Pada bilah Menggambar, buka bilah alat <emph>Susun</emph> dan klik:"
+
+#. dqCBp
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150537\n"
+"help.text"
+msgid "<image id=\"img_id3145233\" src=\"cmd/sc_beforeobject.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145233\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145233\" src=\"cmd/sc_beforeobject.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145233\">Ikon</alt></image>"
+
+#. BEnZu
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3153121\n"
+"help.text"
+msgid "In Front of Object"
+msgstr "Di Depan Objek"
+
+#. EyNkU
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150654\n"
+"help.text"
+msgid "Choose <emph>Shape - Arrange - Behind Object</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Susun - Di Belakang Objek</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. ECTJD
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150482\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Arrange - Behind Object</emph>"
+msgstr "Buka menu konteks dari objek yang terpilih lalu pilih <emph>Susun - Di Belakang Objek</emph>"
+
+#. Z8LeP
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3149886\n"
+"help.text"
+msgid "On the Drawing bar, open the <emph>Arrange</emph> toolbar and click:"
+msgstr "Pada bilah Menggambar, buka bilah alat <emph>Susun</emph> dan klik:"
+
+#. nyRAj
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150865\n"
+"help.text"
+msgid "<image id=\"img_id3145597\" src=\"cmd/sc_behindobject.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145597\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145597\" src=\"cmd/sc_behindobject.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145597\">Ikon</alt></image>"
+
+#. zJ8mS
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3153110\n"
+"help.text"
+msgid "Behind Object"
+msgstr "Di Belakang Objek"
+
+#. CHavZ
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150002\n"
+"help.text"
+msgid "Choose <emph>Shape - Arrange - Reverse</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Susun - Balikkan</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. kQ8FJ
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150339\n"
+"help.text"
+msgid "Open the context menu of a selected object and choose <emph>Arrange - Reverse</emph>"
+msgstr "Buka menu konteks dari objek yang terpilih lalu pilih <emph>Susun - Kebalikan</emph>"
+
+#. 46G6g
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3145164\n"
+"help.text"
+msgid "On the Drawing bar, open the <emph>Arrange</emph> toolbar and click:"
+msgstr "Pada bilah Menggambar, buka bilah alat <emph>Susun</emph> dan klik:"
+
+#. CCqy7
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3154327\n"
+"help.text"
+msgid "<image id=\"img_id3155439\" src=\"cmd/sc_reverseorder.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155439\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155439\" src=\"cmd/sc_reverseorder.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155439\">Ikon</alt></image>"
+
+#. 3TrJC
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150272\n"
+"help.text"
+msgid "Reverse"
+msgstr "Kebalikan"
+
+#. mCeJp
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3145298\n"
+"help.text"
+msgid "Choose <emph>Shape - Combine</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Kombinasikan</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. PP2FD
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3148386\n"
+"help.text"
+msgid "Select two or more objects, open the context menu and choose <emph>Combine</emph>."
+msgstr "Pilih dua atau lebih objek, buka menu konteksnya dan pilih <emph>Kombinasikan</emph>."
+
+#. ryATH
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150930\n"
+"help.text"
+msgid "Choose <emph>Shape - Split</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Belah</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. ncA47
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3151022\n"
+"help.text"
+msgid "Select a combined object, open the context menu and choose <emph>Split</emph>."
+msgstr "Pilih objek yang telah dikombinasikan, buka menu konteksnya dan pilih <emph>Bagi</emph>."
+
+#. a4HG7
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3154872\n"
+"help.text"
+msgid "Choose <emph>Shape - Connect</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Sambungkan</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. DNEs5
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150470\n"
+"help.text"
+msgid "Select two or more lines, open the context menu and choose <emph>Connect</emph>."
+msgstr "Pilih dua atau lebih garis, buka menu konteksnya dan pilih <emph>Hubungkan</emph>."
+
+#. yzAaS
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3153920\n"
+"help.text"
+msgid "Choose <emph>Shape - Break</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Putus</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. EZSR4
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3148430\n"
+"help.text"
+msgid "Select a line that was created by connecting two or more lines, open the context menu and choose <emph>Break</emph>."
+msgstr "Pilih sebuah garis yang dibuat dengan menghubungkan dua atau lebih garis, buka menu konteksnya dan pilih <emph>Putuskan</emph>."
+
+#. WAW7m
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3155408\n"
+"help.text"
+msgid "Choose <emph>Shape</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. CT5rY
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3145615\n"
+"help.text"
+msgid "Select two or more objects, open the context menu and choose <emph>Shapes</emph>"
+msgstr "Pilih dua atau lebih objek, buka menu konteksnya dan pilih <emph>Bentuk</emph>"
+
+#. fDkqc
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3163822\n"
+"help.text"
+msgid "Choose <emph>Shape - Merge</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Gabung</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. izMq7
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3156309\n"
+"help.text"
+msgid "Select two or more objects, open the context menu and choose <emph>Shapes - Merge</emph>"
+msgstr "Pilih dua atau lebih objek, buka menu konteksnya dan pilih <emph>Bentuk - Gabungkan</emph>"
+
+#. uWZDf
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3150874\n"
+"help.text"
+msgid "Choose <emph>Shape - Subtract</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Kurangkan</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. dyi5b
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3154643\n"
+"help.text"
+msgid "Select two or more objects, open the context menu and choose <emph>Shapes - Subtract</emph>"
+msgstr "Pilih dua atau lebih objek, buka menu konteksnya dan pilih <emph>Bentuk - Subtrakkan</emph>"
+
+#. m8FE7
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3145204\n"
+"help.text"
+msgid "Choose <emph>Shape - Intersect</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
+msgstr "Pilih <emph>Bentuk - Perpotongkan</emph> (hanya <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+
+#. LqCnD
+#: 00000413.xhp
+msgctxt ""
+"00000413.xhp\n"
+"par_id3152931\n"
+"help.text"
+msgid "Select two or more objects, open the context menu and choose <emph>Shapes - Intersect</emph>"
+msgstr "Pilih dua atau lebih objek, buka menu konteksnya dan pilih <emph>Bentuk - Interseksikan</emph>"
+
+#. b3k2w
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"tit\n"
+"help.text"
+msgid "Slide Menu"
+msgstr "Menu Salindia"
+
+#. kJBDm
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"par_id3155530\n"
+"help.text"
+msgid "<variable id=\"frtite\">Choose <menuitem>Slide - Slide Properties</menuitem>    </variable>"
+msgstr ""
+
+#. FRMtM
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"par_id3145386\n"
+"help.text"
+msgid "<variable id=\"frtites\">Choose <menuitem>Slide - Slide Properties</menuitem> and then click the <emph>Page</emph> tab    </variable>"
+msgstr ""
+
+#. DTpAq
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"par_id3148866\n"
+"help.text"
+msgid "<variable id=\"frtiteh\">Choose <menuitem>Slide - Slide Properties</menuitem> and then click the <emph>Background</emph> tab    </variable>"
+msgstr ""
+
+#. fuqnR
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"par_id3155266\n"
+"help.text"
+msgid "<variable id=\"adnsei\">Choose <menuitem>Slide - Layout</menuitem>    </variable>"
+msgstr ""
+
+#. j5KeJ
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"par_id3153012\n"
+"help.text"
+msgid "<variable id=\"seitenvorlage\">Choose <menuitem>Slide - Change Slide Master</menuitem>    </variable>"
+msgstr ""
+
+#. E75uy
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"par_id911634055593609\n"
+"help.text"
+msgid "<variable id=\"loadslidedesign\">Choose <menuitem>Slide - Change Slide Master - Load</menuitem></variable>"
+msgstr ""
+
+#. Whnor
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"par_id3134264\n"
+"help.text"
+msgid "Choose <menuitem>Slide - New Slide</menuitem>"
+msgstr ""
+
+#. 7tbCN
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"par_id3177597\n"
+"help.text"
+msgid "On the <emph>Presentation</emph> bar, click"
+msgstr "Pada bilah <emph>Presentasi</emph>, klik"
+
+#. gBMvH
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"par_id3685251\n"
+"help.text"
+msgid "<image id=\"img_id3183073\" src=\"cmd/sc_insertpage.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3183073\">Icon New slide</alt></image>"
+msgstr ""
+
+#. brVDD
+#: slide_menu.xhp
+msgctxt ""
+"slide_menu.xhp\n"
+"par_id7354512\n"
+"help.text"
+msgid "New Slide"
+msgstr "Salindia Baru"

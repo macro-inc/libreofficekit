@@ -1,0 +1,143 @@
+#. extracted from dictionaries/ru_RU/dialog
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2019-07-23 15:04+0000\n"
+"Last-Translator: Wuhhau <Wuhhau@tutanota.com>\n"
+"Language-Team: Finnish <discuss@fi.libreoffice.org>\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1563894273.000000\n"
+
+#. iXbyq
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"abbreviation\n"
+"property.text"
+msgid "Abbreviation"
+msgstr "Lyhenteet"
+
+#. VdQup
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"grammar\n"
+"property.text"
+msgid "Grammar"
+msgstr "Kielioppi"
+
+#. FxusD
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"hyphen\n"
+"property.text"
+msgid "Compound words with hyphen"
+msgstr "Yhdyssanat, joissa on yhdysmerkki"
+
+#. bDa2k
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"comma\n"
+"property.text"
+msgid "Comma usage"
+msgstr "Pilkun käyttö"
+
+#. MArab
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"common\n"
+"property.text"
+msgid "General error"
+msgstr "Yleinen virhe"
+
+#. gFrYp
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"multiword\n"
+"property.text"
+msgid "Multiword expressions"
+msgstr "Sanaliitot"
+
+#. CSQye
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"together\n"
+"property.text"
+msgid "Together/separately"
+msgstr "Yhteen/erikseen"
+
+#. kFDBx
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"proofreading\n"
+"property.text"
+msgid "Proofreading"
+msgstr "Oikoluku"
+
+#. 8oHz8
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"space\n"
+"property.text"
+msgid "Space mistake"
+msgstr "Virhe välien käytössä"
+
+#. RqxE9
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"typographica\n"
+"property.text"
+msgid "Typographical"
+msgstr "Typografinen"
+
+#. FCFDQ
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"dup\n"
+"property.text"
+msgid "Word duplication"
+msgstr "Sanojen toisto"
+
+#. 3ygV9
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"others\n"
+"property.text"
+msgid "Others"
+msgstr "Muut"
+
+#. m7eFp
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"numsep\n"
+"property.text"
+msgid "Separation of large numbers (ISO)"
+msgstr "Suurten lukujen tuhaterottimet (ISO)"
+
+#. XLh5S
+#: ru_RU_en_US.properties
+msgctxt ""
+"ru_RU_en_US.properties\n"
+"quotation\n"
+"property.text"
+msgid "Quotation"
+msgstr "Lainaukset"

@@ -1,0 +1,2177 @@
+#. extracted from helpcontent2/source/text/sbasic/guide
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-07-04 18:04+0200\n"
+"PO-Revision-Date: 2022-07-06 16:22+0000\n"
+"Last-Translator: Stanislav Horáček <stanislav.horacek@gmail.com>\n"
+"Language-Team: Czech <https://translations.documentfoundation.org/projects/libo_help-master/textsbasicguide/cs/>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1565163076.000000\n"
+
+#. WcTKB
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"tit\n"
+"help.text"
+msgid "Access2Base"
+msgstr "Access2Base"
+
+#. bFKah
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"bm_idA2B001\n"
+"help.text"
+msgid "<bookmark_value>Access2Base</bookmark_value><bookmark_value>Microsoft Access; Access2Base</bookmark_value><bookmark_value>Access databases; run in Base</bookmark_value>"
+msgstr "<bookmark_value>Access2Base</bookmark_value><bookmark_value>Microsoft Access; Access2Base</bookmark_value><bookmark_value>databáze Access; spouštění v Base</bookmark_value>"
+
+#. V4kCb
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"hd_idA2B002\n"
+"help.text"
+msgid "Access2Base"
+msgstr "Access2Base"
+
+#. BDoqs
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"hd_idA2B003\n"
+"help.text"
+msgid "What is Access2Base?"
+msgstr "Co je Access2Base?"
+
+#. CfYuM
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B004\n"
+"help.text"
+msgid "Access2Base is a %PRODUCTNAME BASIC library of macros for (business or personal) application developers and advanced users. It is one of the libraries stored in \"Application macros and dialogs\"."
+msgstr "Access2Base je knihovna maker %PRODUCTNAME Basic určená pro vývojáře aplikací (firemních nebo soukromých) a pokročilé uživatele. Jedná se o jednu z knihoven uložených v části „Makra a dialogová okna aplikace“."
+
+#. CE5QB
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B005\n"
+"help.text"
+msgid "The functionalities provided by the implemented macros are all directly inspired by Microsoft Access. The macros are callable mainly from a %PRODUCTNAME <emph>Base</emph> application, but also from <emph>any</emph> %PRODUCTNAME document (Writer, Calc, ...) where access to data stored in a database makes sense."
+msgstr "Všechny funkce implementované v těchto makrech jsou přímo inspirovány aplikací Microsoft Access. Makra lze volat zejména z aplikace %PRODUCTNAME <emph>Base</emph>, ale také z <emph>jakéhokoliv</emph> dokumentu %PRODUCTNAME (Writer, Calc, ...), v němž se přistupuje k datům uloženým v databázi."
+
+#. tmNkV
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B006\n"
+"help.text"
+msgid "The API provided by Access2Base is intended to be more concise, intuitive and easy to learn than the standard UNO API (API = Application Programming Interface)."
+msgstr "Access2Base poskytuje API, jehož účelem je být stručnější, intuitivnější a snazší na naučení než standardní UNO API (API = Application Programming Interface, rozhraní pro programování aplikací)."
+
+#. DHfDb
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B007\n"
+"help.text"
+msgid "<emph>The library is documented online on </emph><link href=\"http://www.access2base.com\" name=\"http://www.access2base.com\"><emph>http://www.access2base.com</emph></link>."
+msgstr "<emph>Dokumentace ke knihovně je dostupná online na </emph><link href=\"http://www.access2base.com\" name=\"http://www.access2base.com\"><emph>http://www.access2base.com</emph></link>."
+
+#. fGJgF
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"hd_idA2B008\n"
+"help.text"
+msgid "The implemented macros include:"
+msgstr "Implementovaná makra zahrnují:"
+
+#. UFhFo
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B009\n"
+"help.text"
+msgid "a simplified and extensible API for <emph>forms</emph>, <emph>dialogs</emph> and <emph>controls</emph> manipulations similar with the Microsoft Access object model,"
+msgstr "zjednodušené a rozšířitelné API pro manipulace s <emph>formuláři</emph>, <emph>dialogovými okny</emph> a <emph>ovládacími prvky</emph>, podobné objektovému modelu aplikace Microsoft Access,"
+
+#. ZTQD8
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B010\n"
+"help.text"
+msgid "an API for database access with the <emph>table</emph>, <emph>query</emph>, <emph>recordset</emph> and <emph>field</emph> objects,"
+msgstr "API pro přístup do databáze s objekty <emph>tabulka</emph>, <emph>dotaz</emph>, <emph>sada záznamů</emph> a <emph>pole</emph>,"
+
+#. z3ZS9
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B011\n"
+"help.text"
+msgid "a number of <emph>actions</emph> with a syntax identical to their corresponding Microsoft Access macros/actions,"
+msgstr "množství <emph>akcí</emph> se stejnou syntaxí, jakou mají odpovídající makra nebo akce aplikace Microsoft Access,"
+
+#. GQaLp
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B012\n"
+"help.text"
+msgid "the <emph>DLookup</emph>, <emph>DSum</emph>, ... database functions,"
+msgstr "databázové funkce <emph>DLookup</emph>, <emph>DSum</emph>, ...,"
+
+#. jeLAg
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B013\n"
+"help.text"
+msgid "the support of the shortcut notations like <item type=\"literal\">Forms!myForm!myControl</item>"
+msgstr "podporu zkráceného zápisu jako <item type=\"literal\">Forms!myForm!myControl</item>"
+
+#. QDQtE
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B014\n"
+"help.text"
+msgid "in addition"
+msgstr "a navíc"
+
+#. 9EyMt
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B015\n"
+"help.text"
+msgid "a consistent errors and exceptions handler,"
+msgstr "konzistentní správu chyb a výjimek,"
+
+#. 72jo7
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B016\n"
+"help.text"
+msgid "facilities for programming form, dialog and control <emph>events</emph> and"
+msgstr "možnosti programování <emph>událostí</emph> formulářů, dialogů a ovládacích prvků a"
+
+#. ByZAC
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"par_idA2B017\n"
+"help.text"
+msgid "the support of both embedded forms and standalone (Writer) forms."
+msgstr "podporu vložených a samostatných (Writer) formulářů."
+
+#. tmq7c
+#: access2base.xhp
+msgctxt ""
+"access2base.xhp\n"
+"hd_idA2B018\n"
+"help.text"
+msgid "Compare Access2Base with Microsoft Access VBA"
+msgstr "Porovnání Access2Base a Microsoft Access VBA"
+
+#. 4eXWf
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"tit\n"
+"help.text"
+msgid "Basic to Python"
+msgstr "Python z Basicu"
+
+#. eoGBT
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0430\n"
+"help.text"
+msgid "<bookmark_value>Basic;Calling Python</bookmark_value>         <bookmark_value>API;SimpleFileAccess</bookmark_value>         <bookmark_value>API;PathSettings</bookmark_value>         <bookmark_value>API;XScript</bookmark_value>"
+msgstr "<bookmark_value>Basic;volání Pythonu</bookmark_value><bookmark_value>API;SimpleFileAccess</bookmark_value><bookmark_value>API;PathSettings</bookmark_value><bookmark_value>API;XScript</bookmark_value>"
+
+#. 8tB4f
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"hd_id811571848401485\n"
+"help.text"
+msgid "<variable id=\"basic2python\"><link href=\"text/sbasic/guide/basic_2_python.xhp\" name=\"Basic Programming Examples\">Calling Python Scripts from Basic</link></variable>"
+msgstr "<variable id=\"basic2python\"><link href=\"text/sbasic/guide/basic_2_python.xhp\" name=\"Příklady programování v jazyce Basic\">Volání skriptů Pythonu z Basicu</link></variable>"
+
+#. P7E4G
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0432\n"
+"help.text"
+msgid "Calling Python scripts from %PRODUCTNAME Basic macros is possible, and valuable features can be obtained such as:"
+msgstr "Z maker %PRODUCTNAME Basic je možné volat skripty Pythonu a díky tomu lze přistupovat k užitečným funkcím jako například:"
+
+#. ZKSB3
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0433\n"
+"help.text"
+msgid "<literal>ComputerName</literal> identification or <literal>OSName</literal> detection are possible,"
+msgstr "je možné zjistit <literal>ComputerName</literal> nebo <literal>OSName</literal>,"
+
+#. AW7Lr
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0434\n"
+"help.text"
+msgid "Basic <literal>FileLen()</literal> function and <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1ucb_1_1SimpleFileAccess.html\" name=\"ucb.SimpleFileAccess\">com.sun.star.ucb.SimpleFileAccess.</link><literal>getSize()</literal> API function exhibit a 2 Gigabytes file size upper limit that Python helps to overcome,"
+msgstr "funkce Basicu <literal>FileLen()</literal> a funkce API <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1ucb_1_1SimpleFileAccess.html\" name=\"ucb.SimpleFileAccess\">com.sun.star.ucb.SimpleFileAccess.</link><literal>getSize()</literal> jsou omezeny maximální velikostí souboru 2 GB, zatímco v Pythonu se lze tomuto omezení vyhnout,"
+
+#. At8D2
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0435\n"
+"help.text"
+msgid "<link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1util_1_1PathSettings.html\" name=\"util.PathSettings\">com.sun.star.util.PathSettings</link> can be normalized,"
+msgstr "lze normalizovat <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1util_1_1PathSettings.html\" name=\"util.PathSettings\">com.sun.star.util.PathSettings</link>"
+
+#. CPd9K
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0436\n"
+"help.text"
+msgid "and many more."
+msgstr "a k mnohým dalším."
+
+#. JvzSR
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0437\n"
+"help.text"
+msgid "A reasonable exposure to %PRODUCTNAME Basic and to <link href=\"https://api.libreoffice.org/\" name=\"Application Programming Interface\">Application Programming Interface (API)</link> features is recommended prior to perform inter-language calls from Basic to Python, to JavaScript or any other script engine."
+msgstr "Pokud chcete volat volat z jazyka %PRODUCTNAME Basic jazyky jiné (Python, JavaScript nebo jiný skriptovací jazyk), je vhodné, abyste měli odpovídající znalost Basicu a <link href=\"https://api.libreoffice.org/\" name=\"rozhraní pro programování aplikací\">rozhraní pro programování aplikací (API)</link>."
+
+#. 4jY8s
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0438\n"
+"help.text"
+msgid "Retrieving Python Scripts"
+msgstr "Získávání skriptů Pythonu"
+
+#. bBTqb
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0439\n"
+"help.text"
+msgid "Python scripts can be personal, shared, or embedded in documents. In order to execute them, %PRODUCTNAME Basic needs to be provided with Python script locations. Locating <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\" name=\"script.provider.XScript\">com.sun.star.script.provider.XScript</link> interface compliant UNO objects allows the execution of Python scripts:"
+msgstr "Skripty Pythonu mohou být osobní, sdílené nebo vložené v dokumentech. Chcete-li je spouštět, je nutné jazyku %PRODUCTNAME Basic poskytnout informaci o jejich umístění. Toho dosáhnete pomocí rozhraní <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\" name=\"script.provider.XScript\">com.sun.star.script.provider.XScript</link>, které odpovídá objektům UNO:"
+
+#. AZwVA
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0444\n"
+"help.text"
+msgid "''' Grab Python script object before execution"
+msgstr "''' Před spuštěním získá objekt se skriptem Pythonu"
+
+#. woGvx
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0445\n"
+"help.text"
+msgid "' Arguments:"
+msgstr "' Argumenty:"
+
+#. nvnTr
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0446\n"
+"help.text"
+msgid "'    macro   : as \"library/module.py$macro\" or \"module.py$macro\""
+msgstr "'    macro   : jako \"library/module.py$macro\" nebo \"module.py$macro\""
+
+#. Au674
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0447\n"
+"help.text"
+msgid "'    location: as \"document\", \"share\", \"user\" or ENUM(eration)"
+msgstr "'    location: jako \"document\", \"share\", \"user\" nebo ENUM(eration)"
+
+#. u5hgy
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0448\n"
+"help.text"
+msgid "' Result:"
+msgstr "' Výsledek:"
+
+#. kskTS
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0449\n"
+"help.text"
+msgid "'    located com.sun.star.script.provider.XScript UNO service'''"
+msgstr "'    služba UNO com.sun.star.script.provider.XScript s umístěním'''"
+
+#. F9Hvi
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0452\n"
+"help.text"
+msgid "Dim sp As Object ' com.sun.star.script.provider.XScriptProvider compatible"
+msgstr "Dim sp As Object ' kompatibilní s com.sun.star.script.provider.XScriptProvider"
+
+#. osCpU
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0463\n"
+"help.text"
+msgid "Executing Python Scripts"
+msgstr "Spouštění skriptů Pythonu"
+
+#. pAfKa
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0464\n"
+"help.text"
+msgid "Syntax"
+msgstr "Syntaxe"
+
+#. gVpsb
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0466\n"
+"help.text"
+msgid "<literal>opSysName = script.invoke(Array(), in_outs, Array())</literal> ' in_out is an Array"
+msgstr "<literal>opSysName = script.invoke(Array(), in_outs, Array())</literal> ' in_out je typu Array"
+
+#. jiU2w
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0469\n"
+"help.text"
+msgid "Embedded Scripts Examples"
+msgstr "Příklady vložených skriptů"
+
+#. FadCx
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0470\n"
+"help.text"
+msgid "Below <literal>ComputerName</literal>, and <literal>GetFilelen</literal> routines are calling their Python counterparts, using aforementioned <literal>GetPythonScript</literal> function. Exception handling is not detailed."
+msgstr "Níže uvedené programy <literal>ComputerName</literal> a <literal>GetFilelen</literal> volají odpovídající kód v Pythonu, a to s využitím výše zmíněné funkce <literal>GetPythonScript</literal>. V kódu není uvažováno zpracování chyb."
+
+#. YbMbS
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0472\n"
+"help.text"
+msgid "Option Compatible ' Properties are supported"
+msgstr "Option Compatible ' zapnutí podpory Properties"
+
+#. KVNHH
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0477\n"
+"help.text"
+msgid "'''Workstation name'''"
+msgstr "'''Název počítače'''"
+
+#. FCaBa
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0483\n"
+"help.text"
+msgid "'''File size in bytes'''"
+msgstr "'''Velikost souboru v bajtech'''"
+
+#. D9Cbu
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0489\n"
+"help.text"
+msgid "ISEMBEDDED As String ' document script"
+msgstr "ISEMBEDDED As String ' skript v dokumentu"
+
+#. bD77H
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0490\n"
+"help.text"
+msgid "ISPERSONAL As String ' user script"
+msgstr "ISPERSONAL As String ' uživatelský skript"
+
+#. TEbDh
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0491\n"
+"help.text"
+msgid "ISSHARED As String ' %PRODUCTNAME macro"
+msgstr "ISSHARED As String ' makro %PRODUCTNAME"
+
+#. CHTxq
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0497\n"
+"help.text"
+msgid ".ISEMBEDDED = \"document\" ' document script"
+msgstr ".ISEMBEDDED = \"document\" ' skript v dokumentu"
+
+#. GGD4G
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0498\n"
+"help.text"
+msgid ".ISPERSONAL = \"user\" ' user scripts"
+msgstr ".ISPERSONAL = \"user\" ' uživatelský skript"
+
+#. hz9VR
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0499\n"
+"help.text"
+msgid ".ISSHARED = \"share\" ' %PRODUCTNAME macro"
+msgstr ".ISSHARED = \"share\" ' makro %PRODUCTNAME"
+
+#. KfKCA
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0503\n"
+"help.text"
+msgid "Two different Python modules are called. They can either be embedded in the current document, either be stored on the file system. Argument type checking is skipped for clarity:"
+msgstr "Volají se dva různé moduly Pythonu. Tu mohou být buď vloženy do aktuálního dokumenty, nebo být uloženy v souborovém systému. Pro přehlednost je vynechána kontrola typu argumentů:"
+
+#. igPCi
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0526\n"
+"help.text"
+msgid "Personal or Shared Scripts Examples"
+msgstr "Příklady osobních nebo sdílených skriptů"
+
+#. EPVTC
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0527\n"
+"help.text"
+msgid "The calling mechanism for personal or shared Python scripts is identical to that of embedded scripts. Library names are mapped to folders. Computing %PRODUCTNAME user profile and shared modules system file paths can be performed as detailed in <link href=\"text/sbasic/python/python_session.xhp\">Getting session information</link>. Below <literal>OSName</literal>, <literal>HelloWorld</literal> and <literal>NormalizePath</literal> routines are calling their Python counterparts, using aforementioned <literal>GetPythonScript</literal> function. Exception handling is not detailed."
+msgstr "Způsob volání osobních nebo sdílených skriptů Pythonu je stejný jako u vložených skriptů. Názvy knihoven jsou namapovány na složky. Cesty k souborům uživatelského profilu %PRODUCTNAME a sdílených modulů lze zjistit tak, jak je popsáno na stránce <link href=\"text/sbasic/python/python_session.xhp\">Zjišťování informací o relaci</link>. Níže uvedené programy <literal>OSName</literal>, <literal>HelloWorld</literal> a <literal>NormalizePath</literal> volají odpovídající kód v Pythonu, a to s využitím výše zmíněné funkce <literal>GetPythonScript</literal>. V kódu není uvažováno zpracování chyb."
+
+#. bwkSJ
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0529\n"
+"help.text"
+msgid "Option Compatible ' Properties are supported"
+msgstr "Option Compatible ' zapnutí podpory Properties"
+
+#. 3W9xB
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0534\n"
+"help.text"
+msgid "'''Platform name as \"Linux\", \"Darwin\" or \"Windows\"'''"
+msgstr "'''Název platformy jako \"Linux\", \"Darwin\" nebo \"Windows\"'''"
+
+#. WAE7X
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0540\n"
+"help.text"
+msgid "'''%PRODUCTNAME Python shared sample'''"
+msgstr "'''Příklad sdíleného skriptu Pythonu v %PRODUCTNAME'''"
+
+#. MYSSL
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0546\n"
+"help.text"
+msgid "'''Strip superfluous '\\..' in path'''"
+msgstr "'''Odstraní z řetězce s cestou nadbytečné '\\..''''"
+
+#. yTqsy
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0550\n"
+"help.text"
+msgid "Python standard modules"
+msgstr "Standardní moduly Pythonu"
+
+#. 3F9RQ
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0551\n"
+"help.text"
+msgid "%PRODUCTNAME embedded Python contains many standard libraries to benefit from. They bear a rich feature set, such as but not limited to:"
+msgstr "Python, který je součástí %PRODUCTNAME, obsahuje řadu užitečných standardních knihoven, které pokrývají širokou škálu funkcí. Mimo jiné se jedná o knihovny:"
+
+#. aPbV7
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0552\n"
+"help.text"
+msgid "<emph>argparse</emph> Parser for command-line options, arguments and sub-commands"
+msgstr "<emph>argparse</emph> Syntaktický analyzátor možností, argumentů a příkazů zadaných v příkazovém řádku"
+
+#. zBD3c
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0553\n"
+"help.text"
+msgid "<emph>cmath</emph> Mathematical functions for complex numbers"
+msgstr "<emph>cmath</emph> Matematické funkce pro komplexní čísla"
+
+#. GDXVa
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0554\n"
+"help.text"
+msgid "<emph>csv</emph> CSV files reading and writing"
+msgstr "<emph>csv</emph> Načítání a ukládání souborů CSV"
+
+#. FnCu8
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0555\n"
+"help.text"
+msgid "<emph>datetime</emph> Genuine date and time types"
+msgstr "<emph>datetime</emph> Opravdové typy data a času"
+
+#. GQCwa
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0556\n"
+"help.text"
+msgid "<emph>json</emph> JSON encoder and decoder"
+msgstr "<emph>json</emph> Vytváření a zpracovávání formátu JSON"
+
+#. JmFZK
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0557\n"
+"help.text"
+msgid "<emph>math</emph> Mathematical functions"
+msgstr "<emph>math</emph> Matematické funkce"
+
+#. PRGHi
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0558\n"
+"help.text"
+msgid "<emph>re</emph> Regular expression operations"
+msgstr "<emph>re</emph> Operace s regulárními výrazy"
+
+#. XVbzW
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0559\n"
+"help.text"
+msgid "<emph>socket</emph> Low-level networking interface"
+msgstr "<emph>socket</emph> Nízkoúrovňové síťové rozhraní"
+
+#. VehtJ
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0560\n"
+"help.text"
+msgid "<emph>sys</emph> System-specific parameters and functions"
+msgstr "<emph>sys</emph> Parametry a funkce specifické pro systém"
+
+#. RWzWY
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0561\n"
+"help.text"
+msgid "<emph>unittest</emph> and <emph>trace</emph> Unit testing framework and Track Python execution"
+msgstr "<emph>unittest</emph> a <emph>trace</emph> Prostředí pro jednotkové testy a sledování běhu programu v Pythonu"
+
+#. JG3VZ
+#: basic_2_python.xhp
+msgctxt ""
+"basic_2_python.xhp\n"
+"N0562\n"
+"help.text"
+msgid "<emph>xml.etree.ElementTree</emph> ElementTree XML API"
+msgstr "<emph>xml.etree.ElementTree</emph> ElementTree API pro formát XML"
+
+#. CwBFN
+#: basic_examples.xhp
+msgctxt ""
+"basic_examples.xhp\n"
+"tit\n"
+"help.text"
+msgid "Basic Programming Examples"
+msgstr "Příklady programování v jazyce Basic"
+
+#. eBci4
+#: basic_examples.xhp
+msgctxt ""
+"basic_examples.xhp\n"
+"bm_id171559140731329\n"
+"help.text"
+msgid "<bookmark_value>Basic;programming examples</bookmark_value>"
+msgstr "<bookmark_value>Basic;příklady programování</bookmark_value>"
+
+#. DdPKY
+#: basic_examples.xhp
+msgctxt ""
+"basic_examples.xhp\n"
+"hd_id471559139063621\n"
+"help.text"
+msgid "<variable id=\"basicexamplestit\"><link href=\"text/sbasic/guide/basic_examples.xhp\" name=\"Basic Programming Examples\">Basic Programming Examples</link></variable>"
+msgstr "<variable id=\"basicexamplestit\"><link href=\"text/sbasic/guide/basic_examples.xhp\" name=\"Příklady programování v jazyce Basic\">Příklady programování v jazyce Basic</link></variable>"
+
+#. GKzpN
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formatting Borders in Calc with Macros"
+msgstr "Formátování ohraničení v Calcu pomocí maker"
+
+#. gDaEd
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"hd_id461623364876507\n"
+"help.text"
+msgid "<variable id=\"title\"><link href=\"text/sbasic/guide/calc_borders.xhp\" name=\"Calc_Borders_h1\">Formatting Borders in Calc with Macros</link></variable>"
+msgstr "<variable id=\"title\"><link href=\"text/sbasic/guide/calc_borders.xhp\" name=\"Ohraničení v Calcu\">Formátování ohraničení v Calcu pomocí maker</link></variable>"
+
+#. JyRxe
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id461630536347127\n"
+"help.text"
+msgid "By using Basic or Python programming languages it is possible to write macros that apply formats to ranges of cells in Calc."
+msgstr "V programovacích jazycích Basic nebo Python lze psát makra, která použijí na oblast buněk v Calcu určité formátování."
+
+#. 7FCuQ
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"hd_id81630536486560\n"
+"help.text"
+msgid "Formatting Borders in Ranges of Cells"
+msgstr "Formátování ohraničení oblastí buněk"
+
+#. jZniv
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id871630536518700\n"
+"help.text"
+msgid "The code snippet below creates a <literal>Sub</literal> called <literal>FormatCellBorder</literal> that applies new border formats to a given range address in the current Calc sheet."
+msgstr "Následující část kódu vytvoří podprogram (<literal>Sub</literal>) pojmenovaný <literal>FormatCellBorder</literal>, který podle zadané adresy použije na oblast buněk v aktuálním listu Calcu nový formát ohraničení."
+
+#. Xzm6Q
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"bas_id131630537785605\n"
+"help.text"
+msgid "' Creates the UNO struct that will store the new line format"
+msgstr "' Vytvoří strukturu UNO, do níž se uloží nový formát čáry"
+
+#. qpADJ
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"bas_id971630537786724\n"
+"help.text"
+msgid "' Gets the target cell"
+msgstr "' Zjistí cílovou buňku"
+
+#. jXfEv
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"bas_id791630537787373\n"
+"help.text"
+msgid "' Applies the new format to all borders"
+msgstr "' Použije na všechna ohraničení nový formát"
+
+#. 3csnz
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id141630537941393\n"
+"help.text"
+msgid "The <literal>Sub</literal> described above takes in four arguments:"
+msgstr "Výše uvedený <literal>Sub</literal> přijímá čtyři argumenty:"
+
+#. kA3Uj
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id841630538209958\n"
+"help.text"
+msgid "<emph>cellAddress</emph> is a string denoting the range to be formatted in the format \"A1\"."
+msgstr "<emph>cellAddress</emph> je řetězec označující oblast, která se má formátovat, zapsaný ve formátu \"A1\"."
+
+#. dfuE6
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id821630538210271\n"
+"help.text"
+msgid "<emph>newStyle</emph> is an integer value that corresponds to the border line style (see <link href=\"text/sbasic/guide/calc_borders.xhp#LineStyles_h2\" name=\"LineStyles_link\">Line Styles</link> below)."
+msgstr "<emph>newStyle</emph> je celočíselná hodnota odpovídající stylu čáry ohraničení (viz dále část <link href=\"text/sbasic/guide/calc_borders.xhp#LineStyles_h2\" name=\"Styly čar\">Styly čar</link>)."
+
+#. gKaYD
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id191630538210607\n"
+"help.text"
+msgid "<emph>newWidth</emph> is an integer value that defines the line width."
+msgstr "<emph>newWidth</emph> je celočíselná hodnota určující šířku čáry."
+
+#. wVnmn
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id71630538211142\n"
+"help.text"
+msgid "<emph>newColor</emph> is an integer value corresponding to a color defined using the <link href=\"text/sbasic/shared/03010305.xhp\" name=\"RGB_link\">RGB</link> function."
+msgstr "<emph>newColor</emph> je celočíselná hodnota odpovídající barvě definované pomocí funkce <link href=\"text/sbasic/shared/03010305.xhp\" name=\"Funkce RGB\">RGB</link>."
+
+#. 3gYJs
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id201630538522838\n"
+"help.text"
+msgid "To call <literal>FormatCellBorder</literal> create a new macro and pass the desired arguments, as shown below:"
+msgstr "Chcete-li podprogram <literal>FormatCellBorder</literal> zavolat, vytvořte nové makro a předejte mu požadované argumenty následovně:"
+
+#. XpcA7
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"bas_id651630603779228\n"
+"help.text"
+msgid "' Gives access to the line style constants"
+msgstr "' Umožňuje přistupovat ke konstantám pro styly čar"
+
+#. 44Cm4
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"bas_id321630538931144\n"
+"help.text"
+msgid "' Formats \"B5\" with solid blue borders"
+msgstr "' Naformátuje ohraničení u \"B5\" na plné modré"
+
+#. m5WA7
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"bas_id91630538931686\n"
+"help.text"
+msgid "' Formats all borders in the range \"D2:F6\" with red dotted borders"
+msgstr "' Naformátuje všechna ohraničení v oblasti \"D2:F6\" na červená tečkovaná"
+
+#. yt8qz
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id31630540159114\n"
+"help.text"
+msgid "It is possible to implement the same functionality in Python:"
+msgstr "Stejnou funkcionalitu je možné implementovat v Pythonu:"
+
+#. FEQGU
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"pyc_id411630540777672\n"
+"help.text"
+msgid "# Defines the new line format"
+msgstr "# Definuje nový formát čáry"
+
+#. cxBAF
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"pyc_id361630540778786\n"
+"help.text"
+msgid "# Scriptforge service to access cell ranges"
+msgstr "# Služba ScriptForge pro přístup k oblastem buněk"
+
+#. hUVfn
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id931630541661889\n"
+"help.text"
+msgid "The code snippet below implements a macro named <literal>myMacro</literal> that calls <literal>formatCellBorder</literal>:"
+msgstr "V následujícím úryvku kódu je implementováno makro pojmenované <literal>myMacro</literal>, které funkci <literal>formatCellBorder</literal> volá:"
+
+#. zmvzf
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id261630541889040\n"
+"help.text"
+msgid "The Python code presented above uses the <link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\" name=\"SF_link\">ScriptForge library</link> that is available since %PRODUCTNAME 7.2."
+msgstr "Výše uvedený kód Pythonu používá <link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\" name=\"ScriptForge\">knihovnu ScriptForge</link>, která je k dispozici od verze %PRODUCTNAME 7.2."
+
+#. FfECT
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"hd_id361630539136798\n"
+"help.text"
+msgid "Line Styles"
+msgstr "Styly čar"
+
+#. Qt5gG
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id501630539147234\n"
+"help.text"
+msgid "Line styles are defined as integer constants. The table below lists the constants for the line styles available in <menuitem>Format - Cells - Borders</menuitem>:"
+msgstr "Styly čar jsou definovány jako celočíselné konstanty. Následující tabulka uvádí seznam konstant pro styly čar, které jsou k dispozici v <menuitem>Formát - Buňky - Ohraničení</menuitem>:"
+
+#. X2WVp
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id651630604006712\n"
+"help.text"
+msgid "Constant name"
+msgstr "Název konstanty"
+
+#. JTgFF
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id501630539273987\n"
+"help.text"
+msgid "Integer value"
+msgstr "Celočíselná hodnota"
+
+#. GZPBL
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id191630539273987\n"
+"help.text"
+msgid "Line style name"
+msgstr "Název stylu čáry"
+
+#. cGhRo
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id691630539273987\n"
+"help.text"
+msgid "Solid"
+msgstr "Plná"
+
+#. aFDHe
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id591630539325162\n"
+"help.text"
+msgid "Dotted"
+msgstr "Tečkovaná"
+
+#. XJZxB
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id881630539433260\n"
+"help.text"
+msgid "Dashed"
+msgstr "Čárkovaná"
+
+#. VeExq
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id111630539463634\n"
+"help.text"
+msgid "Fine dashed"
+msgstr "Jemně čárkovaná"
+
+#. n9ZFA
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id261630539471483\n"
+"help.text"
+msgid "Double thin"
+msgstr "Dvojitá tenká"
+
+#. ydBcG
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id671630539478101\n"
+"help.text"
+msgid "Dash dot"
+msgstr "Čerchovaná"
+
+#. a4wFd
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id701630539484498\n"
+"help.text"
+msgid "Dash dot dot"
+msgstr "Čerchovaná s dvěma tečkami"
+
+#. A9PVK
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id751630539680866\n"
+"help.text"
+msgid "Refer to the <link href=\"https://api.libreoffice.org/docs/idl/ref/namespacecom_1_1sun_1_1star_1_1table_1_1BorderLineStyle.html\" name=\"BorderLineStyle_link\">BorderLineStyle Constant Reference</link> in the LibreOffice API documentation to learn more about line style constants."
+msgstr "Další informace o konstantách pro styly čar naleznete v dokumentaci API pro LibreOffice v části <link href=\"https://api.libreoffice.org/docs/idl/ref/namespacecom_1_1sun_1_1star_1_1table_1_1BorderLineStyle.html\" name=\"Styl čáry ohraničení\">BorderLineStyle Constant Reference</link>."
+
+#. aJTNw
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"hd_id31630542361666\n"
+"help.text"
+msgid "Formatting Borders Using TableBorder2"
+msgstr "Formátování ohraničení pomocí vlastnosti TableBorder2"
+
+#. vukYu
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id11630542436346\n"
+"help.text"
+msgid "Range objects have a property named <literal>TableBorder2</literal> that can be used to format range borders as it is done in the <menuitem>Format - Cells - Borders</menuitem> dialog in the <emph>Line Arrangement</emph> section."
+msgstr "Objekty s oblastí mají vlastnost <literal>TableBorder2</literal>, kterou lze použít pro stejné formátování ohraničení, jaké se nastavuje v dialogovém okně <menuitem>Formát - Buňky - Ohraničení</menuitem> v části <emph>Uspořádání čar</emph>."
+
+#. A25aA
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id641630542724480\n"
+"help.text"
+msgid "In addition to top, bottom, left and right borders, <literal>TableBorder2</literal> also defines vertical and horizontal borders. The macro below applies only the top and bottom borders to the range \"B2:E5\"."
+msgstr "Kromě ohraničení nahoře, dole, vlevo a vpravo určuje <literal>TableBorder2</literal> také svislé a vodorovné ohraničení. Následující makro nastavuje pro oblast \"B2:E5\" pouze ohraničení nahoře a dole:"
+
+#. k7afV
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"bas_id191630543332073\n"
+"help.text"
+msgid "' Defines the new line format"
+msgstr "' Definuje nový formát čáry"
+
+#. hSdDm
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"bas_id281630543333061\n"
+"help.text"
+msgid "' Struct that stores the new TableBorder2 definition"
+msgstr "' Struktura pro uložení nové definice TableBorder2"
+
+#. SFrJL
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"bas_id11630543334395\n"
+"help.text"
+msgid "' Applies the table format to the range \"B2:E5\""
+msgstr "' Použije formát tabulky na oblast \"B2:E5\""
+
+#. cSa4U
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id401630544066231\n"
+"help.text"
+msgid "The macro can be implemented in Python as follows:"
+msgstr "Toto makro je možné implementovat v Pythonu následovně:"
+
+#. aipfb
+#: calc_borders.xhp
+msgctxt ""
+"calc_borders.xhp\n"
+"par_id751630539680102\n"
+"help.text"
+msgid "Refer to the <link href=\"https://api.libreoffice.org/docs/idl/ref/structcom_1_1sun_1_1star_1_1table_1_1TableBorder2.html\" name=\"BorderLineStyle_link\">TableBorder2 Struct Reference</link> in the LibreOffice API documentation to learn more about its attributes."
+msgstr "Další informace o atributech této struktury naleznete v dokumentaci API pro LibreOffice v části <link href=\"https://api.libreoffice.org/docs/idl/ref/structcom_1_1sun_1_1star_1_1table_1_1TableBorder2.html\" name=\"TableBorder2\">TableBorder2 Struct Reference</link>."
+
+#. YLjtF
+#: control_properties.xhp
+msgctxt ""
+"control_properties.xhp\n"
+"tit\n"
+"help.text"
+msgid "Changing the Properties of Controls in the Dialog Editor"
+msgstr "Změna vlastností ovládacích prvků v Editoru dialogových oken"
+
+#. PDQCc
+#: control_properties.xhp
+msgctxt ""
+"control_properties.xhp\n"
+"bm_id3145786\n"
+"help.text"
+msgid "<bookmark_value>properties; controls in dialog editor</bookmark_value><bookmark_value>changing;control properties</bookmark_value><bookmark_value>controls;changing properties</bookmark_value><bookmark_value>dialog editor;changing control properties</bookmark_value>"
+msgstr "<bookmark_value>vlastnosti; ovládací prvky v editoru dialogových oken</bookmark_value><bookmark_value>změna; vlastnosti ovládacích prvků</bookmark_value><bookmark_value>ovládací prvky; změna vlastností</bookmark_value><bookmark_value>editor dialogových oken; změna vlastností ovládacích prvků</bookmark_value>"
+
+#. NFh5G
+#: control_properties.xhp
+msgctxt ""
+"control_properties.xhp\n"
+"hd_id3145786\n"
+"help.text"
+msgid "<variable id=\"control_properties\"><link href=\"text/sbasic/guide/control_properties.xhp\" name=\"Changing the Properties of Controls in the Dialog Editor\">Changing the Properties of Controls in the Dialog Editor</link></variable>"
+msgstr "<variable id=\"control_properties\"><link href=\"text/sbasic/guide/control_properties.xhp\" name=\"Změna vlastností ovládacích prvků v Editoru dialogových oken\">Změna vlastností ovládacích prvků v Editoru dialogových oken</link></variable>"
+
+#. Es8Xy
+#: control_properties.xhp
+msgctxt ""
+"control_properties.xhp\n"
+"par_id3147317\n"
+"help.text"
+msgid "You can set the properties of control that you add to a dialog. For example, you can change the color, name, and size of a button that you added. You can change most control properties when you create or edit a dialog. However, you can only change some properties at runtime."
+msgstr "Vlastnosti ovládacích prvků, které přidáváte do dialogového okna, je možné změnit. Můžete například změnit barvu, název a velikost tlačítka, které jste přidali. Vlastnosti mohou být změněny při vytváření nebo úpravě dialogového okna. Některé vlastnosti lze změnit pouze za běhu programu."
+
+#. vFBh4
+#: control_properties.xhp
+msgctxt ""
+"control_properties.xhp\n"
+"par_id3145749\n"
+"help.text"
+msgid "To change the properties of a control in design mode, right-click the control, and then choose <emph>Properties</emph>."
+msgstr "Chcete-li změnit vlastnosti ovládacích prvků v režimu návrhu, klepněte na ovládací prvek pravým tlačítkem a zvolte <emph>Vlastnosti</emph>."
+
+#. KPeke
+#: create_dialog.xhp
+msgctxt ""
+"create_dialog.xhp\n"
+"tit\n"
+"help.text"
+msgid "Creating a Basic Dialog"
+msgstr "Vytvoření dialogového okna v aplikaci Basic"
+
+#. MV4Pg
+#: create_dialog.xhp
+msgctxt ""
+"create_dialog.xhp\n"
+"bm_id3149346\n"
+"help.text"
+msgid "<bookmark_value>dialogs;creating Basic dialogs</bookmark_value>"
+msgstr "<bookmark_value>dialogová okna;vytváření dialogových oken Basicu</bookmark_value>"
+
+#. TKtFE
+#: create_dialog.xhp
+msgctxt ""
+"create_dialog.xhp\n"
+"hd_id3149346\n"
+"help.text"
+msgid "<variable id=\"create_dialog\"><link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Creating a Basic Dialog\">Creating a Basic Dialog</link></variable>"
+msgstr "<variable id=\"create_dialog\"><link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Vytvoření dialogového okna v aplikaci Basic\">Vytvoření dialogového okna v aplikaci Basic</link></variable>"
+
+#. xBcR4
+#: create_dialog.xhp
+msgctxt ""
+"create_dialog.xhp\n"
+"par_id3163802\n"
+"help.text"
+msgid "Choose <emph>Tools - Macros - Organize Dialogs</emph>, and then click <emph>New</emph>."
+msgstr "Zvolte <emph>Nástroje - Makra - Správce dialogových oken</emph> a potom klepněte na <emph>Nový</emph>."
+
+#. FkRCE
+#: create_dialog.xhp
+msgctxt ""
+"create_dialog.xhp\n"
+"par_id3150447\n"
+"help.text"
+msgid "Enter a name for the dialog and click <emph>OK</emph>. To rename the dialog later, right-click the name on the tab and choose <emph>Rename</emph>."
+msgstr "Zadejte název dialogového okna a klepněte na tlačítko <emph>OK</emph>. Chcete-li jej později přejmenovat, klepněte pravým tlačítkem na kartu a zvolte <emph>Přejmenovat</emph>."
+
+#. qFeYH
+#: create_dialog.xhp
+msgctxt ""
+"create_dialog.xhp\n"
+"par_idN1065F\n"
+"help.text"
+msgid "Click <emph>Edit</emph>. The Basic dialog editor opens and contains a blank dialog."
+msgstr "Klepněte na <emph>Upravit</emph>. Otevře se editor dialogových oken Basic obsahující prázdné dialogové okno."
+
+#. To7nC
+#: create_dialog.xhp
+msgctxt ""
+"create_dialog.xhp\n"
+"par_id3153726\n"
+"help.text"
+msgid "If you do not see the <emph>Toolbox</emph> bar, click the arrow next to the <emph>Insert Controls </emph>icon to open the <emph>Toolbox</emph> bar."
+msgstr "Pokud nevidíte lištu <emph>Ovládací prvky</emph>, klepněte na šipku vedle ikony <emph>Ovládací prvky</emph> pro otevření nástrojové lišty <emph>Ovládací prvky</emph>."
+
+#. cBdmB
+#: create_dialog.xhp
+msgctxt ""
+"create_dialog.xhp\n"
+"par_id3148455\n"
+"help.text"
+msgid "Click a tool and then drag in the dialog to create the control."
+msgstr "Pro vytvoření ovládacího prvku klepněte na jeho ikonu a umístěte jej do dialogového okna."
+
+#. 99Bfa
+#: insert_control.xhp
+msgctxt ""
+"insert_control.xhp\n"
+"tit\n"
+"help.text"
+msgid "Creating Controls in the Dialog Editor"
+msgstr "Vytvoření ovládacích prvků v Editoru dialogových oken"
+
+#. yeHTt
+#: insert_control.xhp
+msgctxt ""
+"insert_control.xhp\n"
+"bm_id3149182\n"
+"help.text"
+msgid "<bookmark_value>controls; creating in the dialog editor</bookmark_value><bookmark_value>dialog editor;creating controls</bookmark_value>"
+msgstr "<bookmark_value>ovládací prvky;vytváření v editoru dialogových oken</bookmark_value><bookmark_value>editor dialogových oken;vytváření ovládacích prvků</bookmark_value>"
+
+#. UAc5k
+#: insert_control.xhp
+msgctxt ""
+"insert_control.xhp\n"
+"hd_id3149182\n"
+"help.text"
+msgid "<variable id=\"insert_control\"><link href=\"text/sbasic/guide/insert_control.xhp\" name=\"Creating Controls in the Dialog Editor\">Creating Controls in the Dialog Editor</link></variable>"
+msgstr "<variable id=\"insert_control\"><link href=\"text/sbasic/guide/insert_control.xhp\" name=\"Vytvoření ovládacích prvků v Editoru dialogových oken\">Vytvoření ovládacích prvků v Editoru dialogových oken</link></variable>"
+
+#. rCdw2
+#: insert_control.xhp
+msgctxt ""
+"insert_control.xhp\n"
+"par_id3146797\n"
+"help.text"
+msgid "Use the tools on the <emph>Toolbox </emph>of the BASIC dialog editor to add controls to your dialog."
+msgstr "Ovládací prvky přidáte do dialogového okna pomocí nástrojů na liště <emph>Nástroje</emph> editoru dialogových okne BASIC."
+
+#. bDK4t
+#: insert_control.xhp
+msgctxt ""
+"insert_control.xhp\n"
+"par_id3150276\n"
+"help.text"
+msgid "To open the <emph>Toolbox</emph>, click the arrow next to the <emph>Insert Controls</emph> icon on the <emph>Macro</emph> toolbar."
+msgstr "Lištu <emph>Nástroje</emph> otevřete klepnutím na šipku vedle ikony <emph>Vložit ovládací prvky</emph> na nástrojové liště <emph>Makro</emph>."
+
+#. HAqwy
+#: insert_control.xhp
+msgctxt ""
+"insert_control.xhp\n"
+"par_id3145068\n"
+"help.text"
+msgid "Click a tool on the toolbar, for example, <emph>Button</emph>."
+msgstr "Klepněte na nástroj na nástrojové liště, například na <emph>Tlačítko</emph>."
+
+#. BxDGH
+#: insert_control.xhp
+msgctxt ""
+"insert_control.xhp\n"
+"par_id3153360\n"
+"help.text"
+msgid "On the dialog, drag the button to the size you want."
+msgstr "V dialogovém okně tlačítko roztáhněte na požadovanou velikost."
+
+#. fRi68
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"tit\n"
+"help.text"
+msgid "Reading and Writing values to Ranges"
+msgstr "Čtení a zápis hodnot do oblastí"
+
+#. 3hH3s
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"hd_id461623364876507\n"
+"help.text"
+msgid "<variable id=\"title\"><link href=\"text/sbasic/guide/read_write_values.xhp\" name=\"ReadWriteValues_h1\">Reading and Writing values to Ranges</link></variable>"
+msgstr "<variable id=\"title\"><link href=\"text/sbasic/guide/read_write_values.xhp\" name=\"Čtení a zápis hodnot\">Čtení a zápis hodnot do oblastí</link></variable>"
+
+#. ZKUBE
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id781633210592228\n"
+"help.text"
+msgid "Macros in %PRODUCTNAME Calc often need to read and write values from/to sheets. This help page describes the various approaches to accessing sheets and ranges to read or write their values."
+msgstr "Makra v aplikaci %PRODUCTNAME často vyžadují čtení a zápis hodnot z listů a do listů. Tato stránka popisuje různé možnosti, jak k listům a oblastem přistupovat a jak z nich číst a do nich zapisovat hodnoty."
+
+#. D4ZJu
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id191633214565965\n"
+"help.text"
+msgid "All examples presented in this page can be implemented both in Basic and Python."
+msgstr "Všechny příklady na této stránce mohou být implementovány jak v Basicu, tak v Pythonu."
+
+#. LfNCy
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"hd_id331633213558740\n"
+"help.text"
+msgid "Accessing a Single Cell"
+msgstr "Přístup k jediné buňce"
+
+#. A5M3f
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id731633213581386\n"
+"help.text"
+msgid "The example below enters the numeric value 123 into cell \"A1\" of the current sheet."
+msgstr "V následujícím příkladu je do buňky \"A1\" z aktuálního listu zadána číselná hodnota 123."
+
+#. G6yWX
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id131633213887433\n"
+"help.text"
+msgid "The same can be accomplished with Python:"
+msgstr "Téhož lze dosáhnout v Pythonu:"
+
+#. CDmg6
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id861633214219511\n"
+"help.text"
+msgid "Note that in the previous examples the cell is accessed using its range name \"A1\". It is also possible to access cells using indices as though the sheet were a matrix where columns and rows are indexed starting from zero."
+msgstr "V těchto příkladech je k přístupu k buňce použit název oblasti \"A1\". K buňce je možné přistupovat také pomocí indexů, které odpovídají představě, že list je matice a jeho řádky a sloupce začínají od indexu 0."
+
+#. Jja4D
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id161633214461067\n"
+"help.text"
+msgid "This can be done using the <literal>getCellByPosition(colIndex, rowIndex)</literal> method, that takes in a column and a row index. The example below in Basic changes the text value in cell \"C1\" (column 2, row 0)."
+msgstr "K tomu slouží metoda <literal>getCellByPosition(colIndex, rowIndex)</literal>, jejímiž argumenty jsou index sloupce a index řádku. Následující příklad v Basicu změní textovou hodnotu v buňce \"C1\" (sloupec 2, řádek 0)."
+
+#. 5tsZR
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id221633214713436\n"
+"help.text"
+msgid "This example can also be implemented in Python as follows:"
+msgstr "V Pythonu lze tento příklad implementovat následovně:"
+
+#. h6eq5
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id101633215142970\n"
+"help.text"
+msgid "The main difference between Python and Basic scripts lies on how to get access to the sheet object by using the <literal>XSCRIPTCONTEXT</literal> context variable. After that, all methods and properties are identical in Basic and Python."
+msgstr "Hlavní rozdíl mezi skripty v Pythonu a Basicu spočívá v tom, že v Pythonu se získává přístup k objektu s listem pomocí kontextové proměnné <literal>XSCRIPTCONTEXT</literal>. Poté jsou všechny metody a vlastnosti v obou jazycích stejné."
+
+#. PmETF
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"hd_id411633215666257\n"
+"help.text"
+msgid "Values, Strings and Formulas"
+msgstr "Hodnoty, řetězce a vzorce"
+
+#. MBHDg
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id861633215682610\n"
+"help.text"
+msgid "Calc cells can have three types of values: numeric, strings and formulas. Each type has its own set and get methods:"
+msgstr "Buňky Calcu mohou obsahovat tři typu hodnot: čísla, řetězce a vzorce. Každý typ má vlastní metody set a get:"
+
+#. RXE76
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id191633215791905\n"
+"help.text"
+msgid "Type"
+msgstr "Typ"
+
+#. rYCuZ
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id181633215791905\n"
+"help.text"
+msgid "Numeric"
+msgstr "Číslo"
+
+#. ywHfC
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id961633215932180\n"
+"help.text"
+msgid "Text"
+msgstr "Text"
+
+#. KH9Ya
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id651633215984116\n"
+"help.text"
+msgid "Formula"
+msgstr "Vzorec"
+
+#. nGhov
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id21633215845395\n"
+"help.text"
+msgid "Dates and currency values are considered as numeric values in Calc."
+msgstr "Hodnoty data a měny jsou Calcu považovány za číselné."
+
+#. t87Qx
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id221633216111353\n"
+"help.text"
+msgid "The following example enters numeric values into cells \"A1\" and \"A2\" and inserts a formula in cell \"A3\" that returns the multiplication of these values."
+msgstr "V následujícím příkladu jsou do buněk \"A1\" a \"A2\" zadány číselné hodnoty a do buňky \"A3\" je vložen vzorec, který vrátí součin těchto hodnot."
+
+#. r6BG6
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"hd_id321633216630043\n"
+"help.text"
+msgid "Accessing Ranges in Different Sheets"
+msgstr "Přístup k oblastem na jiných listech"
+
+#. TFU8U
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id371633216672570\n"
+"help.text"
+msgid "The previous examples used only the active sheet to perform operations. It is possible to access cell ranges in different sheets by their indices or names."
+msgstr "V předchozí příklady pracovaly pouze s aktivním listem. Je však možné přistupovat k oblastem buněk na jiných listech, a to pomocí jejich indexů nebo názvů."
+
+#. c3yhF
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id861633216843382\n"
+"help.text"
+msgid "The example below enters a numeric value into cell \"A1\" of the sheet named \"Sheet2\"."
+msgstr "V následujícím příkladu je zadána číselná hodnota do buňky \"A1\" na listu pojmenovaném \"Sheet2\"."
+
+#. GpnNS
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id611633217090743\n"
+"help.text"
+msgid "This example can also be implemented in Python as follows:"
+msgstr "V Pythonu lze tento příklad implementovat následovně:"
+
+#. xGQ3k
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id631633217279518\n"
+"help.text"
+msgid "Sheets can also be accessed using zero-based indices indicating which sheet considering the order they appear in the Calc file."
+msgstr "K listům lze přistupovat také pomocí indexů (začínajících od nuly), které označují pořadí listu v souboru Calcu."
+
+#. tSo3e
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id291633264880172\n"
+"help.text"
+msgid "In Basic, instead of using the <literal>getByName</literal> method, use <literal>Sheets(sheetIndex)</literal> as shown next:"
+msgstr "V Basicu použijte místo metody <literal>getByName</literal> <literal>Sheets(sheetIndex)</literal>, jak ukazuje následující příklad:"
+
+#. svDuj
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id891633265000047\n"
+"help.text"
+msgid "This can be done in a similar fashion in Python:"
+msgstr "Podobným způsobem lze totéž provést v Pythonu:"
+
+#. 6qHAn
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"hd_id451633265241066\n"
+"help.text"
+msgid "Using the ScriptForge Library"
+msgstr "Pomocí knihovny ScriptForge"
+
+#. 8CkSe
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id731633265268585\n"
+"help.text"
+msgid "The Calc service of the ScriptForge library can be used to get and set cell values as follows:"
+msgstr "K získávání a nastavování hodnot buněk lze použít službu Calc knihovny ScriptForge, a to následovně:"
+
+#. DCJ2E
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id551633265526538\n"
+"help.text"
+msgid "' Loads the ScriptForge library"
+msgstr "' Načte knihovnu ScriptForge"
+
+#. hgDyM
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id581633265527001\n"
+"help.text"
+msgid "' Gets access to the current Calc document"
+msgstr "' Získá přístup k aktuálnímu dokumentu Calcu"
+
+#. Gw4KG
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id751633265527427\n"
+"help.text"
+msgid "' Sets the value of cells A1 and A2"
+msgstr "' Nastaví hodnoty buněk A1 a A2"
+
+#. VUWVE
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id781633267324929\n"
+"help.text"
+msgid "The <literal>setValue</literal> method can be used to set both numeric and text values. To set a cell formula, use the <literal>setFormula</literal> method."
+msgstr "Metodu <literal>setValue</literal> lze použít pro zadání číselných i textových hodnot. Chcete-li nastavit vzorec, použijte metodu <literal>setFormula</literal>."
+
+#. jPRii
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id251633265634883\n"
+"help.text"
+msgid "With the Calc service, getting and setting cell values can be done with a single line of code. The example below gets the value from cell \"A1\" and shows it on a message box."
+msgstr "Pomocí služby Calc je možné získávat a nastavovat hodnoty buněk jediným řádkem kódu. V následujícím příkladu se získá hodnota buňky \"A1\" a zobrazí se jako zpráva."
+
+#. NzUg4
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id521633608223310\n"
+"help.text"
+msgid "The ScriptForge library also makes it simpler to access ranges in different sheets, as demonstrated in the example below:"
+msgstr "Knihovna ScriptForge rovněž zjednodušuje přístup k oblastem na jiných listech, jak ukazuje následující příklad:"
+
+#. CCeEh
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"bas_id521633608366292\n"
+"help.text"
+msgid "' Gets cell \"A1\" from the sheet named \"Sheet1\""
+msgstr "' Získá hodnotu buňky \"A1\" z listu pojmenovaného \"Sheet1\""
+
+#. qUTqA
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"bas_id661633608366484\n"
+"help.text"
+msgid "' Gets cell \"B3\" from the sheet named \"Sheet2\""
+msgstr "' Získá hodnotu buňky \"B3\" z listu pojmenovaného \"Sheet2\""
+
+#. mCX5W
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"bas_id501633608516381\n"
+"help.text"
+msgid "' Places the result into cell \"A1\" of sheet \"Report\""
+msgstr "' Umístí výsledek do buňky \"A1\" na listu \"Report\""
+
+#. ZdkEz
+#: read_write_values.xhp
+msgctxt ""
+"read_write_values.xhp\n"
+"par_id431633266057163\n"
+"help.text"
+msgid "The examples above can also be implemented in Python as follows:"
+msgstr "V Pythonu lze tyto příklady implementovat následovně:"
+
+#. ayg6P
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"tit\n"
+"help.text"
+msgid "Programming Examples for Controls in the Dialog Editor"
+msgstr "Příklady programů pro ovládací prvky v Editoru dialogových oken"
+
+#. 2mwgE
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"bm_id3155338\n"
+"help.text"
+msgid "<bookmark_value>programming examples for controls</bookmark_value>  <bookmark_value>dialogs;loading (example)</bookmark_value>  <bookmark_value>dialogs;displaying (example)</bookmark_value>  <bookmark_value>controls;reading or editing properties (example)</bookmark_value>  <bookmark_value>list boxes;removing entries from (example)</bookmark_value>  <bookmark_value>list boxes;adding entries to (example)</bookmark_value>  <bookmark_value>examples; programming controls</bookmark_value>  <bookmark_value>dialog editor;programming examples for controls</bookmark_value>  <bookmark_value>Tools;LoadDialog</bookmark_value>"
+msgstr "<bookmark_value>příklady programování ovládacích prvků</bookmark_value><bookmark_value>dialogová okna;načítání (příklad)</bookmark_value><bookmark_value>dialogová okna;zobrazení (příklad)</bookmark_value><bookmark_value>ovládací prvky;čtení nebo úpravy vlastností (příklad)</bookmark_value><bookmark_value>seznamy;odstraňování záznamů (příklad)</bookmark_value><bookmark_value>seznamy;přidávání záznamů (příklad)</bookmark_value><bookmark_value>příklady; programování ovládacích prvků</bookmark_value><bookmark_value>editor dialogových oken;příklady programování ovládacích prvků</bookmark_value><bookmark_value>Tools;LoadDialog</bookmark_value>"
+
+#. XFqTD
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"hd_id3155338\n"
+"help.text"
+msgid "<variable id=\"sample_code\"><link href=\"text/sbasic/guide/sample_code.xhp\" name=\"Programming Examples for Controls in the Dialog Editor\">Programming Examples for Controls in the Dialog Editor</link>   </variable>"
+msgstr "<variable id=\"sample_code\"><link href=\"text/sbasic/guide/sample_code.xhp\" name=\"Příklady programů pro ovládací prvky v Editoru dialogových oken\">Příklady programů pro ovládací prvky v Editoru dialogových oken</link>   </variable>"
+
+#. uFxhk
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3153031\n"
+"help.text"
+msgid "The following examples are for a new <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"dialog\">dialog</link> called \"Dialog1\". Use the tools on the <emph>Toolbox</emph> bar in the dialog editor to create the dialog and add the following controls: a <emph>Check Box</emph> called \"CheckBox1\", a <emph>Label Field</emph> called \"Label1\", a <emph>Button</emph> called \"CommandButton1\", and a <emph>List Box</emph> called \"ListBox1\"."
+msgstr "Následující příklady jsou pro nové <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"dialogové okno\">dialogové okno</link> nazvané \"Dialog1\". Vytvořte dialogové okno pomocí nástrojů z lišty <emph>Nástroje</emph> v editoru dialogových oken a přidejte následující ovládací prvky: <emph>zaškrtávací pole</emph> nazvané \"CheckBox1\", <emph>pole popisku</emph> nazvané \"Label1\", <emph>tlačítko</emph> nazvané \"CommandButton1\" a <emph>seznam</emph> nazvaný \"ListBox1\"."
+
+#. bfDTG
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3154141\n"
+"help.text"
+msgid "Be consistent with uppercase and lowercase letter when you attach a control to an object variable."
+msgstr "Při propojení ovládacího prvku k proměnné objektu použijte jednotnou velikost písma (velká nebo malá písmena)."
+
+#. TxP4F
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"hd_id3154909\n"
+"help.text"
+msgid "Global Function for Loading Dialogs"
+msgstr "Globální funkce pro načítání dialogových oken"
+
+#. uREk8
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3153032\n"
+"help.text"
+msgid "<literal>LoadDialog</literal> function is stored in <literal>Tools.ModuleControls</literal> available from Application Macros and Dialogs."
+msgstr "Funkce <literal>LoadDialog</literal> je uložena v <literal>Tools.ModuleControls</literal>, které jsou dostupné v makrech a dialogových oknech aplikace."
+
+#. kBLFU
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"hd_id3149412\n"
+"help.text"
+msgid "Displaying a Dialog"
+msgstr "Zobrazení dialogového okna"
+
+#. E6rrB
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3145801\n"
+"help.text"
+msgid "REM global definition of variables"
+msgstr "REM globální definice proměnných"
+
+#. FQCDq
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"hd_id3150042\n"
+"help.text"
+msgid "Read or Edit Properties of Controls in the Program"
+msgstr "Čtení nebo úpravy vlastností ovládacích prvků v programu"
+
+#. SahL8
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3145232\n"
+"help.text"
+msgid "REM get dialog model"
+msgstr "REM získat model dialogového okna"
+
+#. VWD2t
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3154021\n"
+"help.text"
+msgid "REM display text of Label1"
+msgstr "REM zobrazit text Label1"
+
+#. aAmMT
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3151277\n"
+"help.text"
+msgid "REM set new text for control Label1"
+msgstr "REM nastavit nový text pro ovládací prvek Label1"
+
+#. DZEpD
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3154119\n"
+"help.text"
+msgid "oLabel1.Text = \"New Files\""
+msgstr "oLabel1.Text = \"Nové soubory\""
+
+#. 5uRRo
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3155115\n"
+"help.text"
+msgid "REM display model properties for the control CheckBox1"
+msgstr "REM zobrazit vlastnosti ovládacího prvku CheckBox1"
+
+#. 9FejL
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3149817\n"
+"help.text"
+msgid "REM set new state for CheckBox1 for model of control"
+msgstr "REM nastavit nový stav pro model ovládacího prvku CheckBox1"
+
+#. JkUUZ
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3159102\n"
+"help.text"
+msgid "REM display model properties for control CommandButton1"
+msgstr "REM zobrazit vlastnosti ovládacího prvku CommandButton1"
+
+#. vS9pR
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3150368\n"
+"help.text"
+msgid "REM display properties of control CommandButton1"
+msgstr "REM zobrazit vlastnosti ovládacího prvku CommandButton1"
+
+#. CVE7H
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3150201\n"
+"help.text"
+msgid "REM execute dialog"
+msgstr "REM spustit dialogové okno"
+
+#. EFJQU
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"hd_id3145387\n"
+"help.text"
+msgid "Add an Entry to a ListBox"
+msgstr "Přidání položky do seznamu"
+
+#. JUfaR
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3148700\n"
+"help.text"
+msgid "REM adds a new entry to the ListBox"
+msgstr "REM přidat nový záznam do ListBoxu"
+
+#. A2XGR
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3144504\n"
+"help.text"
+msgid "oListbox.additem(\"New Item\" & iCount,0)"
+msgstr "oListbox.additem(\"New Item\" & iCount,0)"
+
+#. FKzdb
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"hd_id3147071\n"
+"help.text"
+msgid "Remove an Entry from a ListBox"
+msgstr "Odebrání položky ze seznamu"
+
+#. CmCcv
+#: sample_code.xhp
+msgctxt ""
+"sample_code.xhp\n"
+"par_id3153247\n"
+"help.text"
+msgid "REM remove the first entry from the ListBox"
+msgstr "REM odstranit první položku z ListBoxu"
+
+#. EYDQU
+#: show_dialog.xhp
+msgctxt ""
+"show_dialog.xhp\n"
+"tit\n"
+"help.text"
+msgid "Opening a Dialog With Basic"
+msgstr "Otevření dialogového okna pomocí Basicu"
+
+#. biDaS
+#: show_dialog.xhp
+msgctxt ""
+"show_dialog.xhp\n"
+"bm_id3154140\n"
+"help.text"
+msgid "<bookmark_value>module/dialog toggle</bookmark_value>   <bookmark_value>dialogs;using Basic to show (example)</bookmark_value>   <bookmark_value>examples; showing a dialog with Basic</bookmark_value>   <bookmark_value>Tools;LoadDialog</bookmark_value>"
+msgstr "<bookmark_value>přepínání modul/dialogové okno; </bookmark_value>   <bookmark_value>dialogová okna;použití Basicu pro zobrazení (příklad)</bookmark_value>   <bookmark_value>příklady;zobrazení dialogového okna pomocí kódu programu Basic</bookmark_value>   <bookmark_value>Nástroje;Načíst dialogové okno</bookmark_value>"
+
+#. 7KfDE
+#: show_dialog.xhp
+msgctxt ""
+"show_dialog.xhp\n"
+"hd_id3154140\n"
+"help.text"
+msgid "<variable id=\"show_dialog\"><link href=\"text/sbasic/guide/show_dialog.xhp\" name=\"Opening a Dialog With Basic\">Opening a Dialog With Basic</link></variable>"
+msgstr "<variable id=\"show_dialog\"><link href=\"text/sbasic/guide/show_dialog.xhp\" name=\"Otevření dialogového okna pomocí Basicu\">Otevření dialogového okna pomocí Basicu</link></variable>"
+
+#. PXLvB
+#: show_dialog.xhp
+msgctxt ""
+"show_dialog.xhp\n"
+"par_id3145171\n"
+"help.text"
+msgid "In the <item type=\"productname\">%PRODUCTNAME</item> BASIC window for a dialog that you created, leave the dialog editor by clicking the name tab of the Module that the dialog is assigned to. The name tab is at the bottom of the window."
+msgstr "V okně <item type=\"productname\">%PRODUCTNAME</item> BASIC s vytvořeným dialogovým oknem opusťte Editor dialogových oken klepnutím na kartu s názvem modulu, ke kterému je dialogové okno přiřazeno. Karta s názvem modulu je na spodní straně okna."
+
+#. SyMUQ
+#: show_dialog.xhp
+msgctxt ""
+"show_dialog.xhp\n"
+"par_id3153968\n"
+"help.text"
+msgid "Enter the following code for a subroutine called <emph>Dialog1Show</emph>. In this example, the name of the dialog that you created is \"Dialog1\":"
+msgstr "Vytvořte rutinu <emph>Dialog1Show</emph> s následujícím kódem. V tomto příkladu bude název vytvořeného dialogového okna \"Dialog1\":"
+
+#. ytWYo
+#: show_dialog.xhp
+msgctxt ""
+"show_dialog.xhp\n"
+"par_id3152596\n"
+"help.text"
+msgid "Without using \"LoadDialog\" you can call the code as follows:"
+msgstr "Bez použití funkce \"LoadDialog\" je možné kód vyvolat takto:"
+
+#. DtP6k
+#: show_dialog.xhp
+msgctxt ""
+"show_dialog.xhp\n"
+"par_id3153157\n"
+"help.text"
+msgid "When you execute this code, \"Dialog1\" opens. To close the dialog, click the close button (x) on its title bar."
+msgstr "Pokud spustíte tento kód, zobrazí se dialogové okno \"Dialog1\". Zavřete jej pomocí tlačítka Zavřít (x) v jeho záhlaví."
+
+#. s79uv
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"tit\n"
+"help.text"
+msgid "Translation of Controls in the Dialog Editor"
+msgstr "Překlad ovládacích prvků v editoru dialogových oken"
+
+#. 76okP
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"bm_id8915372\n"
+"help.text"
+msgid "<bookmark_value>dialogs;translating</bookmark_value><bookmark_value>localizing dialogs</bookmark_value><bookmark_value>translating dialogs</bookmark_value>"
+msgstr "<bookmark_value>dialogová okna;překládání</bookmark_value><bookmark_value>lokalizace dialogových oken</bookmark_value><bookmark_value>překládání dialogových oken</bookmark_value>"
+
+#. cTb7F
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"hd_id3574896\n"
+"help.text"
+msgid "<variable id=\"translation\"><link href=\"text/sbasic/guide/translation.xhp\">Translation of Controls in the Dialog Editor</link></variable>"
+msgstr "<variable id=\"translation\"><link href=\"text/sbasic/guide/translation.xhp\">Překlad ovládacích prvků v editoru dialogových oken</link></variable>"
+
+#. FsUBB
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id4601940\n"
+"help.text"
+msgid "The Language toolbar in the Basic IDE dialog editor shows controls to enable and manage localizable dialogs."
+msgstr "Na nástrojové liště Jazyk v editoru dialogových oken Basic najdete nástroje pro zapnutí a správu lokalizovatelných dialogových oken."
+
+#. eGsqR
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id9538560\n"
+"help.text"
+msgid "By default, any dialog that you create only contains string resources for one language. You may want to create dialogs that automatically show localized strings according to the user's language settings."
+msgstr "Standardně vytvořené dialogové okno obsahuje řetězce pro jeden jazyk. Můžete chtít vytvořit dialogová okna, která automaticky zobrazí lokalizované texty podle uživatelova nastavení jazyka."
+
+#. DP4Qb
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id6998809\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Select the language for the strings that you want to edit. Click the Manage Languages icon to add languages.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Zvolte jazyk řetězců, které chcete upravit. Jazyky přidáte klepnutím na ikonu Spravovat jazyky.</ahelp>"
+
+#. KQ48Z
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id71413\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Click a language, then click Default to set the language as default, or click Delete to remove the language from the list.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Klepněte na jazyk, poté klepněte na Výchozí pro nastavení jazyka jako výchozího nebo klepnutím na Odebrat smažte jazyk ze seznamu.</ahelp>"
+
+#. gGdez
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id2924283\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Opens a dialog where you can add a language to the list.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Otevře dialogové okno, ve kterém můžete do seznamu přidat jazyk.</ahelp>"
+
+#. VtLMy
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id5781731\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Select a language in the list and click Delete to remove that language. When you remove all languages, the string resources for localizable dialogs are removed from all dialogs in the current library.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Zvolte jazyk v seznamu a klepnutím na Smazat jazyk odstraňte. Když odeberete všechny jazyky, odstraní se řetězce pro lokalizovaná dialogová okna ze všech dialogových oken v aktuální knihovně.</ahelp>"
+
+#. UyizF
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id6942045\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Select a language in the list and click Default to set the language as default language.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Zvolte jazyk v seznamu a klepněte na Výchozí, tím nastavíte jazyk jako výchozí.</ahelp>"
+
+#. VaSvA
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id4721823\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">The default language will be used as a source for all other language strings.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Výchozí jazyk se použije jako zdroj pro všechny ostatní jazyky.</ahelp>"
+
+#. bJz7U
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id5806756\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Add UI languages for your dialog strings.</ahelp>"
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Přidá jazyky uživatelského rozhraní k jazykům dialogových oken.</ahelp>"
+
+#. Aa3HD
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"hd_id6596881\n"
+"help.text"
+msgid "To enable localizable dialogs"
+msgstr "Zapnutí lokalizovatelných dialogových oken"
+
+#. uS4tc
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id8750572\n"
+"help.text"
+msgid "In the Basic IDE dialog editor, open the Language toolbar choosing <item type=\"menuitem\">View - Toolbars - Language</item>."
+msgstr "V editoru dialogových oken Basic otevřete nástrojovou lištu Jazyk volbou <item type=\"menuitem\">Zobrazit - Nástrojové lišty - Jazyk</item>."
+
+#. df3mU
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id2224494\n"
+"help.text"
+msgid "If the current library already contains a localizable dialog, the Language toolbar is shown automatically."
+msgstr "Pokud již aktuální knihovna lokalizovatelná dialogová okna obsahuje, nástrojová lišta Jazyk se zobrazí automaticky."
+
+#. 8TG4p
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id7359233\n"
+"help.text"
+msgid "Click the <emph>Manage Languages</emph> icon<image id=\"img_id2526017\" src=\"cmd/sc_managelanguage.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id2526017\">Manage Language icon</alt></image> on the Language toolbar or on the Toolbox bar."
+msgstr "Klepněte na ikonu <emph>Spravovat jazyky</emph><image id=\"img_id2526017\" src=\"cmd/sc_managelanguage.png\" width=\"0.1665inch\" height=\"0.1665inch\"><alt id=\"alt_id2526017\">Ikona Spravovat jazyky</alt></image> na nástrojové liště Jazyk."
+
+#. MHDVd
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id6549272\n"
+"help.text"
+msgid "You see the Manage User Interface Language dialog. The dialog manages languages for the current library. The name of the current library is shown on the title bar."
+msgstr "Otevře se dialogové okno Spravovat jazyky uživatelského rozhraní. V tomto dialogovém okně lze spravovat jazyky aktuální knihovny. Název aktuální knihovny se zobrazuje v záhlaví okna."
+
+#. AbvXT
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id6529740\n"
+"help.text"
+msgid "Click Add in the dialog to add a language entry."
+msgstr "Klepnutím na Přidat v dialogovém okně přidáte záznam o jazyku."
+
+#. xFFkk
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id7811822\n"
+"help.text"
+msgid "This step enables all new dialogs to contain localizable string resources."
+msgstr "Tento krok přepne všechna nová dialogová okna na lokalizovatelná."
+
+#. 3FvoR
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id9121982\n"
+"help.text"
+msgid "The first time you click Add, you see the Set Default User Interface Language dialog. The following times you click Add, this dialog has the name Add User Interface Language."
+msgstr "Když poprvé klepnete na Přidat, zobrazí se dialog Nastavit výchozí jazyk uživatelského rozhraní. Když na tlačítko Přidat klepnete příště, jmenuje se dialogové okno Přidat jazyky uživatelského rozhraní."
+
+#. iPpFn
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id3640247\n"
+"help.text"
+msgid "You can also change the default language in the Manage User Interface Language dialog."
+msgstr "Výchozí jazyk také můžete změnit v dialogovém okně Spravovat jazyky uživatelského rozhraní."
+
+#. LBJMN
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id3808404\n"
+"help.text"
+msgid "Select a language."
+msgstr "Zvolte jazyk."
+
+#. EzFFM
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id4585100\n"
+"help.text"
+msgid "This adds string resources to contain the translated versions of all strings to the dialog properties. The set of dialog strings of the default language is copied to the new set of strings. Later, you can switch to the new language and then translate the strings."
+msgstr "Tím přidáte do vlastností dialogového okna zdroje pro řetězce, které budou obsahovat přeložené verze všech dialogových oken. Jako nové řetězce se zkopírují texty z výchozího jazyka. Později se můžete přepnout na nový jazyk a řetězce přeložit."
+
+#. cfjJ8
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id2394482\n"
+"help.text"
+msgid "Close the dialog or add additional languages."
+msgstr "Zavřete dialogové okno nebo přidejte další jazyky."
+
+#. B5tJ2
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"hd_id631733\n"
+"help.text"
+msgid "To edit localizable controls in your dialog"
+msgstr "Úprava lokalizovatelných ovládacích prvků v dialogovém okně"
+
+#. hrvxW
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id2334665\n"
+"help.text"
+msgid "Once you have added the resources for localizable strings in your dialogs, you can select the current language from the Current Language listbox on the Language toolbar."
+msgstr "Jakmile přidáte do dialogových oken zdroje pro lokalizovatelné řetězce, můžete změnit jazyk v seznamu Aktuální jazyk na nástrojové liště Jazyk."
+
+#. igvyu
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id8956572\n"
+"help.text"
+msgid "Switch the Current Language listbox to display the default language."
+msgstr "Přepněte jazyk v seznamu Aktuální jazyk, aby se zobrazil výchozí jazyk."
+
+#. N6mRS
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id500808\n"
+"help.text"
+msgid "Insert any number of controls to your dialog and enter all strings you want."
+msgstr "Vložte do dialogového okna ovládací prvky a zadejte všechny potřebné texty."
+
+#. CWNb6
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id8366649\n"
+"help.text"
+msgid "Select another language in the Current Language listbox."
+msgstr "Zvolte v seznamu Aktuální jazyk jiný jazyk."
+
+#. x82BH
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id476393\n"
+"help.text"
+msgid "Using the control's property dialogs, edit all strings to the other language."
+msgstr "Ve vlastnostech ovládacího prvku přeložte všechny řetězce do jiného jazyka."
+
+#. C5qAe
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id2655720\n"
+"help.text"
+msgid "Repeat for all languages that you added."
+msgstr "Postup zopakujte pro všechny jazyky."
+
+#. GXnCr
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id3682058\n"
+"help.text"
+msgid "The user of your dialog will see the strings of the user interface language of the user's version of %PRODUCTNAME, if you did provide strings in that language."
+msgstr "Uživatel dialogového okna uvidí řetězce v jazyce uživatelského rozhraní své verze %PRODUCTNAME, pokud pro tento jazyk poskytnete překlad."
+
+#. BGLJn
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id5977965\n"
+"help.text"
+msgid "If no language matches the user's version, the user will see the default language strings."
+msgstr "Pokud se žádný jazyk neshoduje s uživatelovou verzí, použijí se texty z výchozího jazyka."
+
+#. ckw8S
+#: translation.xhp
+msgctxt ""
+"translation.xhp\n"
+"par_id3050325\n"
+"help.text"
+msgid "If the user has an older version of %PRODUCTNAME that does not know localizable string resources for Basic dialogs, the user will see the default language strings."
+msgstr "Pokud uživatel používá starší verzi %PRODUCTNAME, která nepracuje s lokalizovatelnými texty dialogových oken Basic, uvidí texty z výchozího jazyka."

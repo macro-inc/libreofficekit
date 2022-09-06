@@ -1,0 +1,5256 @@
+#. extracted from sfx2
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-08-24 12:29+0200\n"
+"PO-Revision-Date: 2022-07-08 10:43+0000\n"
+"Last-Translator: kees538 <kees538@gmail.com>\n"
+"Language-Team: Dutch <https://translations.documentfoundation.org/projects/libo_ui-master/sfx2messages/nl/>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1561713292.000000\n"
+
+#. bHbFE
+#: include/sfx2/strings.hrc:25
+msgctxt "STR_TEMPLATE_FILTER"
+msgid "Templates"
+msgstr "Sjablonen"
+
+#. FfusE
+#: include/sfx2/strings.hrc:26
+msgctxt "STR_SAVEDOC"
+msgid "~Save"
+msgstr "~Opslaan"
+
+#. CQKYg
+#: include/sfx2/strings.hrc:27
+msgctxt "STR_SAVEASDOC"
+msgid "Save ~As..."
+msgstr "Opslaan a~ls"
+
+#. BdP9V
+#: include/sfx2/strings.hrc:28
+msgctxt "STR_SAVEACOPY"
+msgid "Save a Copy..."
+msgstr "Kopie opslaan…"
+
+#. vFaub
+#: include/sfx2/strings.hrc:29
+msgctxt "STR_CLOSEDOC"
+msgid "~Close"
+msgstr "S~luiten"
+
+#. 4jsUR
+#: include/sfx2/strings.hrc:30
+msgctxt "STR_OPEN"
+msgid "~Open"
+msgstr "~Openen"
+
+#. ACduP
+#: include/sfx2/strings.hrc:31
+msgctxt "STR_EDIT_TEMPLATE"
+msgid "~Edit"
+msgstr "~Bewerken"
+
+#. aKW5U
+#: include/sfx2/strings.hrc:32
+msgctxt "STR_DEFAULT_TEMPLATE"
+msgid "Set as De~fault"
+msgstr "Als stan~daard instellen"
+
+#. Bwnha
+#: include/sfx2/strings.hrc:33
+msgctxt "STR_RESET_DEFAULT"
+msgid "Reset De~fault"
+msgstr "Standaard ~herstellen"
+
+#. oRvm4
+#: include/sfx2/strings.hrc:34
+msgctxt "STR_DELETE_TEMPLATE"
+msgid "~Delete"
+msgstr "~Verwijderen"
+
+#. UyfFH
+#: include/sfx2/strings.hrc:35
+msgctxt "STR_SFX_RENAME"
+msgid "~Rename"
+msgstr "~Naam wijzigen"
+
+#. Gnhk4
+#: include/sfx2/strings.hrc:36
+msgctxt "STR_ACTION_MOVE"
+msgid "~Move"
+msgstr "Verp~laatsen"
+
+#. tWE8a
+#: include/sfx2/strings.hrc:37
+msgctxt "STR_ACTION_EXPORT"
+msgid "E~xport"
+msgstr "E~xporteren"
+
+#. aEN5D
+#: include/sfx2/strings.hrc:38
+msgctxt "STR_CATEGORY_RENAME"
+msgid "Ren~ame Category"
+msgstr "C~ategorie hernoemen"
+
+#. Ys9z4
+#: include/sfx2/strings.hrc:39
+msgctxt "STR_RENAME_TEMPLATE"
+msgid "Enter new template name:"
+msgstr "Nieuwe sjabloonnaam invoeren:"
+
+#. TVTsi
+#: include/sfx2/strings.hrc:40
+msgctxt "STR_TEMPLATE_TOOLTIP"
+msgid ""
+"Title: $1\n"
+"Category: $2"
+msgstr ""
+"Titel: $1\n"
+"Categorie: $2"
+
+#. W2X7Y
+#: include/sfx2/strings.hrc:41
+msgctxt "STR_TEMPLATE_SELECTION"
+msgid "Select a Template"
+msgstr "Sjabloon selecteren"
+
+#. ihUZ6
+#: include/sfx2/strings.hrc:42
+msgctxt "STR_AUTOMATICVERSION"
+msgid "Automatically saved version"
+msgstr "Automatisch opgeslagen versie"
+
+#. EfF2v
+#: include/sfx2/strings.hrc:43
+msgctxt "STR_EXPORTBUTTON"
+msgid "Export"
+msgstr "Exporteren"
+
+#. q7FND
+#: include/sfx2/strings.hrc:44
+msgctxt "STR_LABEL_FILEFORMAT"
+msgid "File format:"
+msgstr "Bestandsindeling:"
+
+#. N7LVW
+#: include/sfx2/strings.hrc:45
+msgctxt "STR_HIDDENINFO_CONTAINS"
+msgid ""
+"This document contains:\n"
+"\n"
+msgstr ""
+"Dit document bevat:\n"
+"\n"
+
+#. 8tujE
+#: include/sfx2/strings.hrc:46
+msgctxt "STR_HIDDENINFO_RECORDCHANGES"
+msgid "Recorded changes"
+msgstr "Bijgehouden wijzigingen"
+
+#. LUUtP
+#: include/sfx2/strings.hrc:47
+msgctxt "STR_HIDDENINFO_NOTES"
+msgid "Notes"
+msgstr "Notities"
+
+#. tDmMa
+#: include/sfx2/strings.hrc:48
+msgctxt "STR_HIDDENINFO_DOCVERSIONS"
+msgid "Document versions"
+msgstr "Documentversies"
+
+#. ZBKQD
+#: include/sfx2/strings.hrc:49
+msgctxt "STR_HIDDENINFO_CONTINUE_SAVING"
+msgid "Do you want to continue saving the document?"
+msgstr "Doorgaan met opslaan van het document?"
+
+#. BzbMB
+#: include/sfx2/strings.hrc:50
+msgctxt "STR_HIDDENINFO_CONTINUE_PRINTING"
+msgid "Do you want to continue printing the document?"
+msgstr "Doorgaan met afdrukken van het document?"
+
+#. ExQK6
+#: include/sfx2/strings.hrc:51
+msgctxt "STR_HIDDENINFO_CONTINUE_SIGNING"
+msgid "Do you want to continue signing the document?"
+msgstr "Doorgaan met ondertekenen van het document?"
+
+#. TepyB
+#: include/sfx2/strings.hrc:52
+msgctxt "STR_HIDDENINFO_CONTINUE_CREATEPDF"
+msgid "Do you want to continue creating a PDF file?"
+msgstr "Doorgaan met maken van een PDF-bestand?"
+
+#. CbFjm
+#: include/sfx2/strings.hrc:53
+msgctxt "STR_NEW_FILENAME_SAVE"
+msgid "If you do not want to overwrite the original document, you should save your work under a new filename."
+msgstr "Als u het oorspronkelijke document niet wilt overschrijven, dient u uw werk met een nieuwe bestandsnaam op te slaan."
+
+#. 7stwX
+#. Used in the title of a shared document.
+#: include/sfx2/strings.hrc:55
+msgctxt "STR_SHARED"
+msgid " (shared)"
+msgstr " (gedeeld)"
+
+#. W5PzH
+#: include/sfx2/strings.hrc:56
+msgctxt "STR_XMLSEC_ODF12_EXPECTED"
+msgid "The document format version is set to ODF 1.1 (OpenOffice.org 2.x) in Tools-Options-Load/Save-General. Signing documents requires ODF 1.2 (OpenOffice.org 3.x)."
+msgstr "De versie van het documentformaat is ingesteld op ODF 1.1 (LibreOffice 2.x) in Extra-Opties-Laden/Opslaan-Algemeen. Ondertekende documenten vereisen ODF 1.2 (LibreOffice 3.x)."
+
+#. tqPCH
+#: include/sfx2/strings.hrc:57
+msgctxt "STR_XMLSEC_QUERY_SAVESIGNEDBEFORESIGN"
+msgid ""
+"The document has to be saved before it can be signed. Saving the document removes all present signatures.\n"
+"Do you want to save the document?"
+msgstr ""
+"Het document moet zijn opgeslagen vóórdat het ondertekend kan worden. Opslaan van het document verwijdert alle aanwezige handtekeningen.\n"
+"Wilt u het document opslaan?"
+
+#. iFaMb
+#: include/sfx2/strings.hrc:58
+msgctxt "STR_QRYTEMPL_MESSAGE"
+msgid "The template '$(ARG1)' on which this document is based, has been modified. Do you want to update the styles of the current document, using the modified template?"
+msgstr "Het sjabloon '$(ARG1)' waarop dit document is gebaseerd, is aangepast. Wilt u de opmaakprofielen van het huidige document bijwerken met de gewijzigde sjabloon?"
+
+#. ABmvY
+#: include/sfx2/strings.hrc:59
+msgctxt "STR_QRYTEMPL_UPDATE_BTN"
+msgid "~Update Styles"
+msgstr "~Opmaakprofielen bijwerken"
+
+#. W4thg
+#: include/sfx2/strings.hrc:60
+msgctxt "STR_QRYTEMPL_KEEP_BTN"
+msgid "~Keep Old Styles"
+msgstr "O~ude opmaakprofielen behouden"
+
+#. X6MGZ
+#: include/sfx2/strings.hrc:61
+msgctxt "STR_CATEGORY_NEW"
+msgid "~New Category"
+msgstr "~Nieuwe categorie"
+
+#. VNfyE
+#: include/sfx2/strings.hrc:62
+msgctxt "STR_CATEGORY_DELETE"
+msgid "~Delete Category"
+msgstr "Categorie ~verwijderen"
+
+#. YdoDu
+#: include/sfx2/strings.hrc:63
+msgctxt "STR_MSG_EXPORT_SUCCESS"
+msgid "$1 templates successfully exported."
+msgstr "$1 sjablonen met succes geëxporteerd."
+
+#. g6iDa
+#: include/sfx2/strings.hrc:64
+msgctxt "STR_MSG_QUERY_COPY"
+msgid "$1 could not be moved to the category \"$2\". Do you want to copy the template instead?"
+msgstr "$1 kon niet verplaatst worden naar categorie \"$2\". Wilt u in plaats daarvan het sjabloon kopiëren?"
+
+#. 9bJN3
+#: include/sfx2/strings.hrc:65
+msgctxt "STR_CREATE_ERROR"
+msgid "Cannot create category: $1"
+msgstr "Kan categorie $1 niet maken"
+
+#. YR7aW
+#: include/sfx2/strings.hrc:66
+msgctxt "STR_ERROR_SAVEAS"
+msgid "Cannot save template: $1"
+msgstr "Kan sjabloon $1 niet opslaan"
+
+#. iE9UD
+#: include/sfx2/strings.hrc:67
+msgctxt "STR_INPUT_NEW"
+msgid "Enter new category name:"
+msgstr "Naam voor nieuwe categorie invoeren:"
+
+#. yxN3P
+#: include/sfx2/strings.hrc:68
+msgctxt "STR_MSG_ERROR_LOCAL_MOVE"
+msgid ""
+"Error moving the following templates to $1.\n"
+"$2"
+msgstr ""
+"Fout bij het verplaatsen van de volgende profielen naar $1.\n"
+"$2"
+
+#. Sh34g
+#: include/sfx2/strings.hrc:69
+msgctxt "STR_MSG_ERROR_EXPORT"
+msgid ""
+"Error exporting the following templates:\n"
+"$1"
+msgstr ""
+"Fout bij het exporteren van de volgende profielen:\n"
+" $1"
+
+#. NFsZu
+#: include/sfx2/strings.hrc:70
+msgctxt "STR_MSG_ERROR_IMPORT"
+msgid ""
+"Error importing the following templates to $1:\n"
+"$2"
+msgstr ""
+"Fout bij het importeren van de volgende profielen naar $1:\n"
+" $2"
+
+#. g5zLe
+#: include/sfx2/strings.hrc:71
+msgctxt "STR_MSG_ERROR_DELETE_TEMPLATE"
+msgid ""
+"The following templates cannot be deleted:\n"
+"$1"
+msgstr ""
+"De volgende profielen kunnen niet verwijderd worden:\n"
+" $1"
+
+#. 89xV6
+#: include/sfx2/strings.hrc:72
+msgctxt "STR_MSG_ERROR_DELETE_FOLDER"
+msgid ""
+"The following folders cannot be deleted:\n"
+"$1"
+msgstr ""
+"De volgende mappen kunnen niet verwijderd worden:\n"
+" $1"
+
+#. buPTz
+#: include/sfx2/strings.hrc:73
+msgctxt "STR_TOOLTIP_ERROR_RENAME_TEMPLATE"
+msgid "There is another template with the name $1 in $2."
+msgstr "Er is nog een sjabloon met de naam $1 in $2."
+
+#. JiTrQ
+#: include/sfx2/strings.hrc:74
+msgctxt "STR_QMSG_SEL_FOLDER_DELETE"
+msgid "Do you want to delete the selected category?"
+msgstr "Wilt u de geselecteerde categorie verwijderen?"
+
+#. C9pLF
+#: include/sfx2/strings.hrc:75
+msgctxt "STR_QMSG_TEMPLATE_OVERWRITE"
+msgid "A template named $1 already exists in $2. Do you want to overwrite it?"
+msgstr "Er bestaat al een sjabloon met de naam $1 in $2. Wilt u het overschrijven?"
+
+#. 6MoGu
+#: include/sfx2/strings.hrc:76
+msgctxt "STR_QMSG_SEL_TEMPLATE_DELETE"
+msgid "Do you want to delete the selected templates?"
+msgstr "Wilt u de geselecteerde sjablonen verwijderen?"
+
+#. WR2LD
+#: include/sfx2/strings.hrc:77
+msgctxt "STR_QMSG_ERROR_OPENING_FILE"
+msgid "An error occurred during opening the file. This may be caused by incorrect file contents.\n"
+msgstr "Er onstond een fout bij het openen van het bestand. Dit kan veroorzaakt zijn door onjuiste bestandsinhoud.\n"
+
+#. AsUee
+#: include/sfx2/strings.hrc:78
+msgctxt "STR_QMSG_ERROR_OPENING_FILE_DETAILS"
+msgid "The error details are:\n"
+msgstr "De details van de fout zijn:\n"
+
+#. D2XDV
+#: include/sfx2/strings.hrc:79
+msgctxt "STR_QMSG_ERROR_OPENING_FILE_CONTINUE"
+msgid ""
+"\n"
+"Proceeding with import may cause data loss or corruption, and application may become unstable or crash.\n"
+"\n"
+"Do you want to ignore the error and attempt to continue loading the file?"
+msgstr ""
+"\n"
+"Doorgaan met importeren kan gegevensverlies of corruptie veroorzaken en de toepassing kan instabiel worden of crashen.\n"
+"\n"
+"Wil u de foutmelding negeren en verder gaan met het laden van het bestand?"
+
+#. g63UH
+#: include/sfx2/strings.hrc:81
+msgctxt "STR_HELP_WINDOW_TITLE"
+msgid "%PRODUCTNAME Help"
+msgstr "Help voor %PRODUCTNAME"
+
+#. Veb3m
+#: include/sfx2/strings.hrc:82
+msgctxt "STR_HELP_BUTTON_INDEX_ON"
+msgid "Show Navigation Pane"
+msgstr "Navigatievenster weergeven"
+
+#. 3LGpr
+#: include/sfx2/strings.hrc:83
+msgctxt "STR_HELP_BUTTON_INDEX_OFF"
+msgid "Hide Navigation Pane"
+msgstr "Navigatievenster verbergen"
+
+#. g8Vns
+#: include/sfx2/strings.hrc:84
+msgctxt "STR_HELP_BUTTON_START"
+msgid "First Page"
+msgstr "Beginpagina"
+
+#. YMoQp
+#: include/sfx2/strings.hrc:85
+msgctxt "STR_HELP_BUTTON_PREV"
+msgid "Previous Page"
+msgstr "Vorige"
+
+#. mGB7r
+#: include/sfx2/strings.hrc:86
+msgctxt "STR_HELP_BUTTON_NEXT"
+msgid "Next Page"
+msgstr "Volgende"
+
+#. dys7x
+#: include/sfx2/strings.hrc:87
+msgctxt "STR_HELP_BUTTON_PRINT"
+msgid "Print..."
+msgstr "Afdrukken..."
+
+#. bmCzY
+#: include/sfx2/strings.hrc:88
+msgctxt "STR_HELP_BUTTON_ADDBOOKMARK"
+msgid "Add to Bookmarks..."
+msgstr "Bladwijzer toevoegen..."
+
+#. SGFus
+#: include/sfx2/strings.hrc:89
+msgctxt "STR_HELP_BUTTON_SEARCHDIALOG"
+msgid "Find on this Page..."
+msgstr "Zoeken op deze pagina..."
+
+#. qvTDZ
+#: include/sfx2/strings.hrc:90
+msgctxt "STR_HELP_BUTTON_SOURCEVIEW"
+msgid "HTML Source"
+msgstr "HTML-brontekst"
+
+#. pHyBm
+#: include/sfx2/strings.hrc:91
+msgctxt "STR_HELP_MENU_TEXT_SELECTION_MODE"
+msgid "Select Text"
+msgstr "Tekst selecteren"
+
+#. 5FCCv
+#: include/sfx2/strings.hrc:92
+msgctxt "STR_HELP_MENU_TEXT_COPY"
+msgid "~Copy"
+msgstr "~Kopiëren"
+
+#. TQd3C
+#: include/sfx2/strings.hrc:93
+msgctxt "STR_INFO_NOSEARCHRESULTS"
+msgid "No topics found."
+msgstr "Geen onderwerpen gevonden."
+
+#. 9D6Ze
+#: include/sfx2/strings.hrc:94
+msgctxt "STR_INFO_NOSEARCHTEXTFOUND"
+msgid "The text you entered was not found."
+msgstr "De ingevoerde tekst is niet gevonden."
+
+#. qLPDs
+#: include/sfx2/strings.hrc:95
+msgctxt "RID_HELP_ONSTARTUP_TEXT"
+msgid "~Display %PRODUCTNAME %MODULENAME Help at Startup"
+msgstr "~Toon de %PRODUCTNAME %MODULENAME Help bij het opstarten"
+
+#. TEgzB
+#: include/sfx2/strings.hrc:97
+msgctxt "STR_NONAME"
+msgid "Untitled"
+msgstr "Naamloos"
+
+#. fs5SN
+#: include/sfx2/strings.hrc:98
+msgctxt "STR_STANDARD_SHORTCUT"
+msgid "Standard"
+msgstr "Standaard"
+
+#. 6sRBN
+#: include/sfx2/strings.hrc:99
+msgctxt "STR_BYTES"
+msgid "Bytes"
+msgstr "Bytes"
+
+#. Z3kKr
+#: include/sfx2/strings.hrc:100
+msgctxt "STR_KB"
+msgid "kB"
+msgstr "kB"
+
+#. VrFxn
+#: include/sfx2/strings.hrc:101
+msgctxt "STR_MB"
+msgid "MB"
+msgstr "MB"
+
+#. 9rBAW
+#: include/sfx2/strings.hrc:102
+msgctxt "STR_GB"
+msgid "GB"
+msgstr "GB"
+
+#. DqwaN
+#: include/sfx2/strings.hrc:103
+msgctxt "STR_QUERY_LASTVERSION"
+msgid "Cancel all changes?"
+msgstr "Alle wijzigingen annuleren?"
+
+#. cCrDG
+#: include/sfx2/strings.hrc:104
+msgctxt "STR_NO_WEBBROWSER_FOUND"
+msgid ""
+"Opening \"$(ARG1)\" failed with error code $(ARG2) and message: \"$(ARG3)\"\n"
+"Maybe no web browser could be found on your system. In that case, please check your Desktop Preferences or install a web browser (for example, Firefox) in the default location requested during the browser installation."
+msgstr ""
+"Het openen van \"$(ARG1)\" mislukte met foutcode $(ARG2) en bericht: \"$(ARG3)\"\n"
+"Misschien kon er geen webbrowser op uw systeem gevonden worden. Controleer, in dat geval, de voorkeuren van uw bureaublad of installeer een webbrowser (bijvoorbeeld Firefox) in de standaardlocatie die tijdens het installeren van de browser wordt voorgesteld."
+
+#. QEABe
+#: include/sfx2/strings.hrc:105
+msgctxt "STR_DANGEROUS_TO_OPEN"
+msgid ""
+"It might be dangerous to open \"$(ARG1)\".\n"
+"Do you really want to open it?"
+msgstr ""
+"Het kan gevaarlijk zijn om \"$(ARG1)\" te openen.\n"
+"Wil je hem echt openen?"
+
+#. ADqLM
+#: include/sfx2/strings.hrc:106
+msgctxt "STR_NO_ABS_URI_REF"
+msgid "\"$(ARG1)\" cannot be passed to an external application to open it (e.g., it might not be an absolute URL, or might denote no existing file)."
+msgstr "\"$(ARG1)\" kan niet worden doorgegeven aan een externe applicatie om het te openen (het is bijvoorbeeld mogelijk geen absolute URL of duidt mogelijk geen bestaand bestand aan)."
+
+#. XDUCY
+#: include/sfx2/strings.hrc:107
+msgctxt "STR_GID_INTERN"
+msgid "Internal"
+msgstr "Intern"
+
+#. 4g9hU
+#: include/sfx2/strings.hrc:108
+msgctxt "STR_GID_APPLICATION"
+msgid "Application"
+msgstr "Toepassing"
+
+#. rBzxu
+#: include/sfx2/strings.hrc:109
+msgctxt "STR_GID_VIEW"
+msgid "View"
+msgstr "Weergave"
+
+#. NQnym
+#: include/sfx2/strings.hrc:110
+msgctxt "STR_GID_DOCUMENT"
+msgid "Documents"
+msgstr "Documenten"
+
+#. DbzDd
+#: include/sfx2/strings.hrc:111
+msgctxt "STR_GID_EDIT"
+msgid "Edit"
+msgstr "Bewerken"
+
+#. HqK5g
+#: include/sfx2/strings.hrc:112
+msgctxt "STR_GID_MACRO"
+msgid "BASIC"
+msgstr "BASIC"
+
+#. 3QkTL
+#: include/sfx2/strings.hrc:113
+msgctxt "STR_GID_OPTIONS"
+msgid "Options"
+msgstr "Opties"
+
+#. GFEQ3
+#: include/sfx2/strings.hrc:114
+msgctxt "STR_GID_MATH"
+msgid "Math"
+msgstr "Math"
+
+#. rFALW
+#: include/sfx2/strings.hrc:115
+msgctxt "STR_GID_NAVIGATOR"
+msgid "Navigate"
+msgstr "Navigeren"
+
+#. w7dmG
+#: include/sfx2/strings.hrc:116
+msgctxt "STR_GID_INSERT"
+msgid "Insert"
+msgstr "Invoegen"
+
+#. fokQp
+#: include/sfx2/strings.hrc:117
+msgctxt "STR_GID_FORMAT"
+msgid "Format"
+msgstr "Opmaak"
+
+#. fLTV6
+#: include/sfx2/strings.hrc:118
+msgctxt "STR_GID_TEMPLATE"
+msgid "Templates"
+msgstr "Sjablonen"
+
+#. JAdCZ
+#: include/sfx2/strings.hrc:119
+msgctxt "STR_GID_TEXT"
+msgid "Text"
+msgstr "Tekst"
+
+#. PSfaP
+#: include/sfx2/strings.hrc:120
+msgctxt "STR_GID_FRAME"
+msgid "Frame"
+msgstr "Frame"
+
+#. 5V4iR
+#: include/sfx2/strings.hrc:121
+msgctxt "STR_GID_GRAPHIC"
+msgid "Image"
+msgstr "Afbeelding"
+
+#. DzBoB
+#: include/sfx2/strings.hrc:122
+msgctxt "STR_GID_TABLE"
+msgid "Table"
+msgstr "Tabel"
+
+#. Cmsi4
+#: include/sfx2/strings.hrc:123
+msgctxt "STR_GID_ENUMERATION"
+msgid "Numbering"
+msgstr "Nummering"
+
+#. CDFSE
+#: include/sfx2/strings.hrc:124
+msgctxt "STR_GID_DATA"
+msgid "Data"
+msgstr "Gegevens"
+
+#. CV9Pq
+#: include/sfx2/strings.hrc:125
+msgctxt "STR_GID_SPECIAL"
+msgid "Special Functions"
+msgstr "Speciale functies"
+
+#. 5CfQs
+#: include/sfx2/strings.hrc:126
+msgctxt "STR_GID_IMAGE"
+msgid "Image"
+msgstr "Afbeelding"
+
+#. 5wvK9
+#: include/sfx2/strings.hrc:127
+msgctxt "STR_GID_CHART"
+msgid "Chart"
+msgstr "Grafiek"
+
+#. pNE8F
+#: include/sfx2/strings.hrc:128
+msgctxt "STR_GID_EXPLORER"
+msgid "Explorer"
+msgstr "Verkenner"
+
+#. yBawD
+#: include/sfx2/strings.hrc:129
+msgctxt "STR_GID_CONNECTOR"
+msgid "Connector"
+msgstr "Verbinding"
+
+#. 3rGea
+#: include/sfx2/strings.hrc:130
+msgctxt "STR_GID_MODIFY"
+msgid "Modify"
+msgstr "Aanpassen"
+
+#. WcwGs
+#: include/sfx2/strings.hrc:131
+msgctxt "STR_GID_DRAWING"
+msgid "Drawing"
+msgstr "Tekenen"
+
+#. Ajo4w
+#: include/sfx2/strings.hrc:132
+msgctxt "STR_GID_CONTROLS"
+msgid "Controls"
+msgstr "Besturingselementen"
+
+#. L5coQ
+#: include/sfx2/strings.hrc:133
+msgctxt "STR_QUITAPP"
+msgid "E~xit %PRODUCTNAME"
+msgstr "%PRODUCTNAME ~afsluiten"
+
+#. k2PBJ
+#: include/sfx2/strings.hrc:134
+msgctxt "RID_STR_HELP"
+msgid "Help"
+msgstr "Help"
+
+#. roDzu
+#: include/sfx2/strings.hrc:135
+msgctxt "RID_STR_HLPFILENOTEXIST"
+msgid "The help file for this topic is not installed."
+msgstr "Bij dit onderwerp is geen Help geïnstalleerd."
+
+#. zjPS7
+#: include/sfx2/strings.hrc:136
+msgctxt "STR_QUICKSTART_EXIT"
+msgid "Exit Quickstarter"
+msgstr "SnelStarter afsluiten"
+
+#. ecxqC
+#: include/sfx2/strings.hrc:137
+msgctxt "STR_QUICKSTART_TIP"
+msgid "%PRODUCTNAME %PRODUCTVERSION Quickstarter"
+msgstr "%PRODUCTNAME %PRODUCTVERSION SnelStarter"
+
+#. G9Gqk
+#: include/sfx2/strings.hrc:138
+msgctxt "STR_QUICKSTART_FILEOPEN"
+msgid "Open Document..."
+msgstr "Document openen..."
+
+#. wecTF
+#: include/sfx2/strings.hrc:139
+msgctxt "STR_QUICKSTART_FROMTEMPLATE"
+msgid "From Template..."
+msgstr "Van sjabloon..."
+
+#. FzJCj
+#: include/sfx2/strings.hrc:140
+msgctxt "STR_QUICKSTART_PRELAUNCH"
+msgid "Load %PRODUCTNAME During System Start-Up"
+msgstr "%PRODUCTNAME bij systeemstart laden"
+
+#. hMejq
+#: include/sfx2/strings.hrc:141
+msgctxt "STR_QUICKSTART_LNKNAME"
+msgid "%PRODUCTNAME %PRODUCTVERSION"
+msgstr "%PRODUCTNAME %PRODUCTVERSION"
+
+#. CBB6Z
+#: include/sfx2/strings.hrc:142
+msgctxt "STR_QUICKSTART_FILE"
+msgid "File"
+msgstr "Bestand"
+
+#. c6wAB
+#: include/sfx2/strings.hrc:143
+msgctxt "STR_QUICKSTART_STARTCENTER"
+msgid "Startcenter"
+msgstr "Startcentrum"
+
+#. Uhn54
+#: include/sfx2/strings.hrc:144
+msgctxt "STR_QUICKSTART_RECENTDOC"
+msgid "Recent Documents"
+msgstr "Recente documenten"
+
+#. DirQf
+#: include/sfx2/strings.hrc:145
+msgctxt "STR_QUERY_UPDATE_LINKS"
+msgid ""
+"The document %{filename} contains one or more links to external data.\n"
+"\n"
+"Would you like to change the document, and update all links\n"
+"to get the most recent data?"
+msgstr ""
+"Het document %{filename} bevat één of meerdere koppelingen naar externe gegevens.\n"
+"\n"
+"Wilt u het document wijzigen en alle koppelingen bijwerken om de meest recente gegevens te verkrijgen?"
+
+#. zJGEM
+#: include/sfx2/strings.hrc:146
+msgctxt "STR_DDE_ERROR"
+msgid "DDE link to %1 for %2 area %3 are not available."
+msgstr "DDE-koppeling naar %1 voor %2 bereik %3 zijn niet beschikbaar."
+
+#. zECGD
+#: include/sfx2/strings.hrc:147
+msgctxt "STR_SECURITY_WARNING_NO_HYPERLINKS"
+msgid ""
+"For security reasons, the hyperlink cannot be executed.\n"
+"The stated address will not be opened."
+msgstr ""
+"De hyperlink kan uit veiligheidsoverwegingen niet uitgevoerd worden.\n"
+"Het gegeven adres wordt niet geopend."
+
+#. vcMzA
+#: include/sfx2/strings.hrc:148
+msgctxt "RID_SECURITY_WARNING_TITLE"
+msgid "Security Warning"
+msgstr "Beveiligingswaarschuwing"
+
+#. vVCon
+#: include/sfx2/strings.hrc:149
+msgctxt "RID_SVXSTR_XMLSEC_QUERY_LOSINGSIGNATURE"
+msgid ""
+"Saving will remove all existing signatures.\n"
+"Do you want to continue saving the document?"
+msgstr ""
+"Met opslaan worden alle bestaande handtekeningen verwijderd.\n"
+"Wilt u verdergaan met het opslaan van het document?"
+
+#. cGnF9
+#: include/sfx2/strings.hrc:150
+msgctxt "RID_SVXSTR_XMLSEC_QUERY_SAVEBEFORESIGN"
+msgid ""
+"The document has to be saved before it can be signed.\n"
+"Do you want to save the document?"
+msgstr ""
+"Dit document moet opgeslagen worden voordat het digitaal ondertekend kan worden.\n"
+"Wilt u het document opslaan?"
+
+#. zNVEd
+#: include/sfx2/strings.hrc:151
+msgctxt "STR_QUERY_CANCELCHECKOUT"
+msgid ""
+"This will discard all changes on the server since check-out.\n"
+"Do you want to proceed?"
+msgstr ""
+"Dit zal alle wijzigingen op de server negeren na het afsluiten.\n"
+"Wilt u doorgaan?"
+
+#. jufLD
+#: include/sfx2/strings.hrc:152
+msgctxt "STR_INFO_WRONGDOCFORMAT"
+msgid "This document must be saved in OpenDocument file format before it can be digitally signed."
+msgstr "Dit document moet in OpenDocument-bestandsindeling opgeslagen worden, voordat het digitaal ondertekend kan worden."
+
+#. ori9u
+#: include/sfx2/strings.hrc:153
+msgctxt "RID_XMLSEC_DOCUMENTSIGNED"
+msgid " (Signed)"
+msgstr " (Ondertekend)"
+
+#. kgWZS
+#: include/sfx2/strings.hrc:154
+msgctxt "STR_EMBEDDED_TITLE"
+msgid " (Embedded document)"
+msgstr " (Ingesloten document)"
+
+#. 3nT9T
+#: include/sfx2/strings.hrc:155
+msgctxt "STR_STANDARD"
+msgid "Standard"
+msgstr "Standaard"
+
+#. FjCuJ
+#: include/sfx2/strings.hrc:156
+msgctxt "RID_SVXSTR_FILELINK"
+msgid "Document"
+msgstr "Document"
+
+#. BfMd3
+#: include/sfx2/strings.hrc:157
+msgctxt "STR_NONE"
+msgid "- None -"
+msgstr "- Geen -"
+
+#. XBXvE
+#: include/sfx2/strings.hrc:158
+msgctxt "saveastemplatedlg|categorylist"
+msgid "None"
+msgstr "Geen"
+
+#. 5kUsi
+#: include/sfx2/strings.hrc:159
+msgctxt "RID_SVXSTR_GRAPHICLINK"
+msgid "Image"
+msgstr "Afbeelding"
+
+#. dUK2G
+#: include/sfx2/strings.hrc:160
+msgctxt "STR_SFX_FILTERNAME_ALL"
+msgid "All files"
+msgstr "Alle bestanden"
+
+#. E39E2
+#: include/sfx2/strings.hrc:161
+msgctxt "STR_SFX_FILTERNAME_PDF"
+msgid "PDF files"
+msgstr "PDF-bestanden"
+
+#. gCHbP
+#: include/sfx2/strings.hrc:162
+msgctxt "RID_SVXSTR_EDITGRFLINK"
+msgid "Link Image"
+msgstr "Afbeelding koppelen"
+
+#. u9H7a
+#. i66948 used in project scripting
+#: include/sfx2/strings.hrc:164
+msgctxt "STR_ERRUNOEVENTBINDUNG"
+msgid ""
+"An appropriate component method %1\n"
+"could not be found.\n"
+"\n"
+"Check spelling of method name."
+msgstr ""
+"Er is geen toepasselijke componentmethode %1\n"
+"gevonden.\n"
+"\n"
+"Spelling van methodenaam controleren."
+
+#. 2FLYB
+#: include/sfx2/strings.hrc:165
+msgctxt "RID_SVXSTR_GRFILTER_OPENERROR"
+msgid "Image file cannot be opened"
+msgstr "Afbeeldingsbestand kan niet worden geopend"
+
+#. 6eLsb
+#: include/sfx2/strings.hrc:166
+msgctxt "RID_SVXSTR_GRFILTER_IOERROR"
+msgid "Image file cannot be read"
+msgstr "Afbeeldingsbestand kan niet gelezen worden"
+
+#. HGRsV
+#: include/sfx2/strings.hrc:167
+msgctxt "RID_SVXSTR_GRFILTER_FORMATERROR"
+msgid "Unknown image format"
+msgstr "Ongekend afbeeldingsformaat"
+
+#. YJhGK
+#: include/sfx2/strings.hrc:168
+msgctxt "RID_SVXSTR_GRFILTER_VERSIONERROR"
+msgid "This version of the image file is not supported"
+msgstr "Deze versie van het afbeeldingsbestand wordt niet ondersteund"
+
+#. Sn8KQ
+#: include/sfx2/strings.hrc:169
+msgctxt "RID_SVXSTR_GRFILTER_FILTERERROR"
+msgid "Image filter not found"
+msgstr "Afbeeldingsfilter niet gevonden"
+
+#. huEFV
+#: include/sfx2/strings.hrc:170
+msgctxt "RID_SVXSTR_TXTFILTER_FILTERERROR"
+msgid "This is not a text document"
+msgstr "Dit is geen tekstdocument"
+
+#. ejBgZ
+#: include/sfx2/strings.hrc:171
+msgctxt "RID_SVXSTR_END_REDLINING_WARNING"
+msgid ""
+"This action will exit the change recording mode.\n"
+"No information about changes will be recorded from now on.\n"
+"\n"
+"Exit change recording mode?\n"
+"\n"
+msgstr ""
+"Deze actie zal de modus bijhouden van wijzigingen verlaten.\n"
+"Van af nu zal geen informatie over de wijzigingen opgeslagen worden.\n"
+"Wenst de modus bijhouden van wijzigingen te verlaten?\n"
+"\n"
+
+#. E2CcY
+#: include/sfx2/strings.hrc:172
+msgctxt "RID_SVXSTR_INCORRECT_PASSWORD"
+msgid "Incorrect password"
+msgstr "Dit wachtwoord is niet correct"
+
+#. 7Ezso
+#: include/sfx2/strings.hrc:173
+msgctxt "RID_SVXSTR_GPG_ENCRYPT_FAILURE"
+msgid "OpenPGP key not trusted, damaged, or encryption failure. Please try again."
+msgstr "De OpenPGP sleutel wordt niet vertrouwd, is beschadigd of er is een fout in de encryptie. Gelieve opnieuw te proberen."
+
+#. DQCUm
+#: include/sfx2/strings.hrc:175
+msgctxt "STR_PASSWD_MIN_LEN"
+msgid "(Minimum $(MINLEN) characters)"
+msgstr "(Minimaal $(MINLEN) tekens)"
+
+#. ZKZnh
+#: include/sfx2/strings.hrc:176
+msgctxt "STR_PASSWD_MIN_LEN1"
+msgid "(Minimum 1 character)"
+msgstr "(Minimum 1 teken)"
+
+#. B3WoF
+#: include/sfx2/strings.hrc:177
+msgctxt "STR_PASSWD_EMPTY"
+msgid "(The password can be empty)"
+msgstr "(Het wachtwoord kan leeg zijn)"
+
+#. iBD9D
+#: include/sfx2/strings.hrc:178
+msgctxt "STR_MODULENOTINSTALLED"
+msgid "The action could not be executed. The %PRODUCTNAME program module needed for this action is currently not installed."
+msgstr "De handeling kan niet worden uitgevoerd. De vereiste module %PRODUCTNAME is niet geïnstalleerd."
+
+#. TXAV5
+#: include/sfx2/strings.hrc:180
+msgctxt "STR_FILTER_NOT_INSTALLED"
+msgid ""
+"The selected filter $(FILTER) has not been installed.\n"
+"Would you like to do this now?"
+msgstr ""
+"De gekozen filter $(FILTER) is niet geïnstalleerd.\n"
+"Wilt u dat nu doen?"
+
+#. gQhYY
+#: include/sfx2/strings.hrc:181
+msgctxt "STR_FILTER_CONSULT_SERVICE"
+msgid ""
+"The selected filter $(FILTER) is not included in your edition.\n"
+"You can find information about orders on our homepage."
+msgstr ""
+"Het geselecteerde filter $(FILTER) komt in uw versie niet voor.\n"
+"Voor informatie over bestelmogelijkheden zie onze startpagina."
+
+#. Y9yeS
+#: include/sfx2/strings.hrc:183
+msgctxt "STR_WELCOME_LINE1"
+msgid "Welcome to %PRODUCTNAME."
+msgstr "Welkom bij %PRODUCTNAME."
+
+#. DVEkR
+#: include/sfx2/strings.hrc:184
+msgctxt "STR_WELCOME_LINE2"
+msgid "Drop a document here or open an app to create one."
+msgstr "Zet hier een document neer of open een app om er een te maken."
+
+#. oTVdA
+#. Translators: Target types in Auto-redaction dialog
+#: include/sfx2/strings.hrc:187
+msgctxt "STR_REDACTION_TARGET_TYPE_TEXT"
+msgid "Text"
+msgstr "Tekst"
+
+#. eG5qc
+#: include/sfx2/strings.hrc:188
+msgctxt "STR_REDACTION_TARGET_TYPE_REGEX"
+msgid "Regular expression"
+msgstr "Reguliere expressie"
+
+#. TaDCG
+#: include/sfx2/strings.hrc:189
+msgctxt "STR_REDACTION_TARGET_TYPE_PREDEF"
+msgid "Predefined"
+msgstr "Voorgedefinieerd"
+
+#. bDjwW
+#: include/sfx2/strings.hrc:190
+msgctxt "STR_REDACTION_TARGET_TYPE_UNKNOWN"
+msgid "Unknown"
+msgstr "Onbekend"
+
+#. YgzCk
+#. Translators: Values for the Case Sensitive and the Whole Words columns in Auto-redaction dialog
+#: include/sfx2/strings.hrc:193
+msgctxt "STR_REDACTION_YES"
+msgid "Yes"
+msgstr "Ja"
+
+#. oZNaM
+#: include/sfx2/strings.hrc:194
+msgctxt "STR_REDACTION_NO"
+msgid "No"
+msgstr "Nee"
+
+#. FM3Gf
+#. Translators: Misc strings of the Auto Redaction dialog
+#: include/sfx2/strings.hrc:197
+msgctxt "STR_REDACTION_TARGET"
+msgid "Target"
+msgstr "Doel"
+
+#. m2i7V
+#: include/sfx2/strings.hrc:198
+msgctxt "STR_REDACTION_LOAD_TARGETS"
+msgid "Load Targets"
+msgstr "Doelen laden"
+
+#. HgrwX
+#: include/sfx2/strings.hrc:199
+msgctxt "STR_REDACTION_SAVE_TARGETS"
+msgid "Save Targets"
+msgstr "Doelen opslaan"
+
+#. MYMTF
+#: include/sfx2/strings.hrc:200
+msgctxt "STR_REDACTION_FIELDS_REQUIRED"
+msgid "All fields are required"
+msgstr "Alle velden zijn vereist"
+
+#. rQS6M
+#: include/sfx2/strings.hrc:201
+msgctxt "STR_REDACTION_TARGET_NAME_CLASH"
+msgid "There is already a target with this name"
+msgstr "Er is al een doel met deze naam"
+
+#. s248s
+#: include/sfx2/strings.hrc:202
+msgctxt "STR_REDACTION_MULTI_EDIT"
+msgid "You have selected multiple targets, but only one target can be edited at once."
+msgstr "U heeft meerdere doelen geselecteerd, maar er kan maar één doel tegelijk bewerkt worden."
+
+#. BTayC
+#: include/sfx2/strings.hrc:203
+msgctxt "STR_REDACTION_MULTI_DELETE"
+msgid "Are you sure you would like to delete $(TARGETSCOUNT) targets at once?"
+msgstr "Weet u zeker dat u $(TARGETSCOUNT) doelen tegelijk wilt verwijderen?"
+
+#. qFqDC
+#: include/sfx2/strings.hrc:204
+msgctxt "STR_REDACTION_JSON_FILE_FILTER"
+msgid "Target Set (*.json)"
+msgstr "Doelset (*.json)"
+
+#. EGCo6
+#: include/sfx2/strings.hrc:205
+msgctxt "STR_REDACTION_EDIT_TARGET"
+msgid "Edit Target"
+msgstr "Doel bewerken"
+
+#. ACY9D
+#: include/sfx2/strings.hrc:206
+msgctxt "STR_REDACTION_TARGET_ADD_ERROR"
+msgid "An error occurred while adding new target. Please report this incident."
+msgstr "Er ontstond een fout tijdens het toevoegen van een nieuw doel. Rapporteer dit incident alstublieft."
+
+#. 6Jog7
+#: include/sfx2/strings.hrc:207
+msgctxt "STR_REDACTION_NO_DRAW_WARNING"
+msgid "Draw module is needed for redaction. Please make sure you have %PRODUCTNAME Draw installed and working correctly."
+msgstr "Draw is nodig voor redactie. Zorg ervoor dat %PRODUCTNAME Draw is geïnstalleerd en correct werkt."
+
+#. FQ9kN
+#: include/sfx2/strings.hrc:209
+msgctxt "STR_SFX_FILEDLG_ACTUALVERSION"
+msgid "Current version"
+msgstr "Huidige versie"
+
+#. GFAEM
+#: include/sfx2/strings.hrc:210
+msgctxt "STR_SFX_EXPLORERFILE_EXPORT"
+msgid "Export"
+msgstr "Exporteren"
+
+#. 2DBBC
+#: include/sfx2/strings.hrc:211
+msgctxt "STR_SFX_EXPLORERFILE_INSERT"
+msgid "Insert"
+msgstr "Invoegen"
+
+#. VBKtt
+#: include/sfx2/strings.hrc:212
+msgctxt "STR_SFX_EXPLORERFILE_BUTTONINSERT"
+msgid "~Insert"
+msgstr "~Invoegen"
+
+#. DcLFD
+#: include/sfx2/strings.hrc:213
+msgctxt "STR_SFX_IMPORT_ALL_IMAGES"
+msgid "<All images>"
+msgstr "<Alle afbeeldingen>"
+
+#. tPDwc
+#: include/sfx2/strings.hrc:214
+msgctxt "STR_PB_SAVEACOPY"
+msgid "Save a Copy"
+msgstr "Kopie opslaan"
+
+#. T9mMd
+#: include/sfx2/strings.hrc:215
+msgctxt "STR_PB_COMPAREDOC"
+msgid "Compare to"
+msgstr "Vergelijken met"
+
+#. 4qMCh
+#: include/sfx2/strings.hrc:216
+msgctxt "STR_PB_MERGEDOC"
+msgid "Merge with"
+msgstr "Samenvoegen met"
+
+#. cDMBG
+#: include/sfx2/strings.hrc:218
+msgctxt "STR_SFX_NEWOFFICEDOC"
+msgid "%PRODUCTNAME document"
+msgstr "%PRODUCTNAME document"
+
+#. 43QYo
+#: include/sfx2/strings.hrc:219
+msgctxt "SFX_ST_DURATION_FORMAT"
+msgid " Y: %1 M: %2 D: %3 H: %4 M: %5 S: %6"
+msgstr " J: %1 M: %2 D: %3 U: %4 M: %5 S: %6"
+
+#. jQX7C
+#: include/sfx2/strings.hrc:220
+msgctxt "STR_SFX_QUERY_WRONG_TYPE"
+msgid ""
+"The value entered does not match the specified type.\n"
+"The value will be stored as text."
+msgstr ""
+"De ingevoerde waarde komt niet overeen met het gespecificeerde type.\n"
+"De waarde zal als tekst worden opgeslagen."
+
+#. cinmA
+#: include/sfx2/strings.hrc:222
+msgctxt "STR_QUERY_OVERWRITE"
+msgid "Style already exists. Overwrite?"
+msgstr "Opmaakprofiel bestaat reeds. Overschrijven?"
+
+#. f627N
+#: include/sfx2/strings.hrc:224
+msgctxt "STR_RESET"
+msgid "~Reset"
+msgstr "Her~stellen"
+
+#. EXGDb
+#: include/sfx2/strings.hrc:225
+msgctxt "STR_TABPAGE_INVALIDNAME"
+msgid "This name is already in use."
+msgstr "Deze naam wordt al gebruikt."
+
+#. N5aeR
+#: include/sfx2/strings.hrc:226
+msgctxt "STR_TABPAGE_INVALIDSTYLE"
+msgid "This Style does not exist."
+msgstr "Dit opmaakprofiel bestaat niet."
+
+#. CYQwN
+#: include/sfx2/strings.hrc:227
+msgctxt "STR_TABPAGE_INVALIDPARENT"
+msgid ""
+"This Style cannot be used as a base Style,\n"
+"because it would result in a recursive reference."
+msgstr ""
+"Dit opmaakprofiel kan niet als basisopmaakprofiel worden gebruikt,\n"
+" omdat er dan een kringverwijzing zou ontstaan."
+
+#. ECPSd
+#: include/sfx2/strings.hrc:228
+msgctxt "STR_POOL_STYLE_NAME"
+msgid ""
+"Name already exists as a default Style.\n"
+"Please choose another name."
+msgstr ""
+"Naam wordt al voor een standaardopmaakprofiel gebruikt.\n"
+"Kies een andere naam."
+
+#. NWDmA
+#: include/sfx2/strings.hrc:229
+msgctxt "STR_DELETE_STYLE_USED"
+msgid ""
+"One or more of the selected styles is in use in this document.\n"
+"If you will delete it, text or objects using these styles will revert to the parent style.\n"
+"Do you still wish to delete these styles?\n"
+msgstr ""
+"Een of meer van de geselecteerde opmaakprofielen worden in dit document gebruikt.\n"
+"Als u het verwijdert, zullen tekst of objecten met deze opmaakprofielen  terugkeren naar het bovenliggende opmaakprofiel.\n"
+"Wilt u deze opmaakprofielen nog steeds verwijderen?\n"
+
+#. kuD77
+#: include/sfx2/strings.hrc:230
+msgctxt "STR_DELETE_STYLE"
+msgid "Styles in use: "
+msgstr "Opmaakprofielen in gebruik: "
+
+#. 4JhEW
+#: include/sfx2/strings.hrc:231
+msgctxt "STR_SID_NAVIGATOR"
+msgid "Navigator"
+msgstr "Navigator"
+
+#. Acahp
+#: include/sfx2/strings.hrc:232
+msgctxt "STR_ERROR_WRONG_CONFIRM"
+msgid "Faulty password confirmation"
+msgstr "Foutieve bevestiging van wachtwoord"
+
+#. 6uv4b
+#: include/sfx2/strings.hrc:233
+msgctxt "STR_PDF_EXPORT_SEND"
+msgid "Send"
+msgstr "Verzenden"
+
+#. 9HHQw
+#: include/sfx2/strings.hrc:234
+msgctxt "STR_FONT_TABPAGE"
+msgid "Font"
+msgstr "Lettertype"
+
+#. 7baC6
+#: include/sfx2/strings.hrc:236
+msgctxt "STR_VIEWVERSIONCOMMENT"
+msgid "View Version Comment"
+msgstr "Versie-opmerking bekijken"
+
+#. LGiF8
+#: include/sfx2/strings.hrc:237
+msgctxt "STR_NO_NAME_SET"
+msgid "(no name set)"
+msgstr "(geen naam ingesteld)"
+
+#. rZ4Ao
+#: include/sfx2/strings.hrc:239
+msgctxt "STR_STYLE_FILTER_HIERARCHICAL"
+msgid "Hierarchical"
+msgstr "Hiërarchisch"
+
+#. 4VXDe
+#: include/sfx2/strings.hrc:241
+msgctxt "STR_MACRO_LOSS"
+msgid "Do you really want to cancel the recording? Any steps recorded up to this point will be lost."
+msgstr "Wilt u het opnemen werkelijk annuleren? Alle stappen, die tot nu toe zijn opgenomen, zullen verloren gaan."
+
+#. 9MnrK
+#: include/sfx2/strings.hrc:242
+msgctxt "STR_CANCEL_RECORDING"
+msgid "Cancel Recording"
+msgstr "Opnemen annuleren"
+
+#. m9FCm
+#: include/sfx2/strings.hrc:244
+msgctxt "RID_CNT_STR_WAITING"
+msgid "The templates are being initialized for first-time usage."
+msgstr "De sjablonen worden nu geïnitialiseerd voor het eerste gebruik."
+
+#. F3ym2
+#: include/sfx2/strings.hrc:246
+msgctxt "STR_NODEFPRINTER"
+msgid ""
+"No default printer found.\n"
+"Please choose a printer and try again."
+msgstr ""
+"Geen standaardprinter gevonden.\n"
+"Kies een printer en probeer het nogmaals."
+
+#. a3NTu
+#: include/sfx2/strings.hrc:247
+msgctxt "STR_NOSTARTPRINTER"
+msgid ""
+"Could not start printer.\n"
+"Please check your printer configuration."
+msgstr ""
+"Printer kan niet worden gestart.\n"
+"Controleer de configuratie van uw printer."
+
+#. acKHX
+#: include/sfx2/strings.hrc:248
+msgctxt "STR_ERROR_PRINTER_BUSY"
+msgid "Printer busy"
+msgstr "Printer bezig"
+
+#. hDEUj
+#: include/sfx2/strings.hrc:249
+msgctxt "STR_READONLY"
+msgid " (read-only)"
+msgstr " (alleen-lezen)"
+
+#. uL87C
+#: include/sfx2/strings.hrc:250
+msgctxt "STR_PRINT_NEWORI"
+msgid ""
+"The page size and orientation have been modified.\n"
+"Would you like to save the new settings in the\n"
+"active document?"
+msgstr ""
+"U hebt de paginagrootte en afdrukstand gewijzigd.\n"
+"Wilt u de nieuwe instellingen overnemen\n"
+"in het actieve document?"
+
+#. cxuAH
+#: include/sfx2/strings.hrc:251
+msgctxt "STR_PRINT_NEWSIZE"
+msgid ""
+"The page size has been modified.\n"
+"Should the new settings be saved\n"
+"in the active document?"
+msgstr ""
+"U hebt de paginagrootte gewijzigd.\n"
+"Wilt u de nieuwe instellingen\n"
+"overnemen in het document?"
+
+#. 4QJxB
+#: include/sfx2/strings.hrc:252
+msgctxt "STR_PRINT_NEWORISIZE"
+msgid ""
+"The page size and orientation have been modified.\n"
+"Would you like to save the new settings in the\n"
+"active document?"
+msgstr ""
+"U hebt de paginagrootte en afdrukstand gewijzigd.\n"
+"Wilt u de nieuwe instellingen overnemen\n"
+"in het actieve document?"
+
+#. RXbfs
+#: include/sfx2/strings.hrc:253
+msgctxt "STR_CANT_CLOSE"
+msgid ""
+"The document cannot be closed because a\n"
+" print job is being carried out."
+msgstr ""
+"Het document kan momenteel niet worden gesloten,\n"
+" omdat er nog een afdrukopdracht wordt uitgevoerd."
+
+#. YGyQP
+#: include/sfx2/strings.hrc:254
+msgctxt "STR_ERROR_SEND_MAIL"
+msgid ""
+"An error occurred in sending the message. Possible errors could be a missing user account or a defective setup.\n"
+"Please check the %PRODUCTNAME settings or your email program settings."
+msgstr ""
+"Fout bij verzenden van bericht. Mogelijke fouten zijn een ontbrekende gebruikersaccount of een defecte Set-up.\n"
+"Controleer de instellingen van %PRODUCTNAME of die van uw e-mailprogramma."
+
+#. 3nzi6
+#. Error codes look like "MAPI_E_FAILURE" or "1234"
+#: include/sfx2/strings.hrc:256
+msgctxt "STR_ERROR_SEND_MAIL_CODE"
+msgid ""
+"An error occurred in sending the message. Possible errors could be a missing user account or a defective setup.\n"
+"\n"
+"Error code is $1"
+msgstr ""
+"Er is een fout opgetreden bij het verzenden van het bericht. Mogelijke fouten zijn een ontbrekend gebruikersaccount of een defecte installatie.\n"
+"\n"
+"Foutcode is $1"
+
+#. ZWTDr
+#: include/sfx2/strings.hrc:257
+msgctxt "STR_ERROR_SEND_MAIL_HEADER"
+msgid "Error sending mail"
+msgstr "Fout bij verzenden van e-mail."
+
+#. QVS2D
+#: include/sfx2/strings.hrc:258
+msgctxt "STR_QUERY_OPENASTEMPLATE"
+msgid "This document cannot be edited, possibly due to missing access rights. Do you want to edit a copy of the document?"
+msgstr "Het document kan niet geopend worden om te bewerken, mogelijk vanwege ontbrekende rechten. Wilt u een kopie van het document bewerken?"
+
+#. ZdGNX
+#: include/sfx2/strings.hrc:259
+msgctxt "STR_QUERY_OPENASTEMPLATE_LOCKED"
+msgid ""
+"This document cannot be edited, because it is locked in another session.%LOCKINFO\n"
+"Do you want to edit a copy of the document?"
+msgstr ""
+"Dit document kan niet bewerkt worden, omdat het geblokkeerd is door een andere sessie. %LOCKINFO\n"
+"Wilt u een kopie van het document bewerken?"
+
+#. n3sMB
+#: include/sfx2/strings.hrc:260
+msgctxt "STR_QUERY_OPENASTEMPLATE_ALLOW_IGNORE"
+msgid "You can also try to ignore the lock and open the file for editing."
+msgstr "U kunt ook de blokkering proberen te negeren en het document voor bewerken openen."
+
+#. yaKxR
+#: include/sfx2/strings.hrc:261
+msgctxt "STR_QUERY_OPENASTEMPLATE_OPENCOPY_BTN"
+msgid "Open ~Copy"
+msgstr "~Kopie openen"
+
+#. UYkFP
+#: include/sfx2/strings.hrc:262
+msgctxt "STR_QUERY_OPENASTEMPLATE_OPEN_BTN"
+msgid "~Open"
+msgstr "~Openen"
+
+#. GcSXH
+#: include/sfx2/strings.hrc:263
+msgctxt "STR_REPAIREDDOCUMENT"
+msgid " (repaired document)"
+msgstr " (gerepareerd document)"
+
+#. HPqkX
+#: include/sfx2/strings.hrc:264
+msgctxt "STR_NONCHECKEDOUT_DOCUMENT"
+msgid "This document is not checked out on the server."
+msgstr "Het document is niet afgemeld van de server."
+
+#. uPc29
+#: include/sfx2/strings.hrc:265
+msgctxt "STR_GET_INVOLVED_TEXT"
+msgid "Help us make %PRODUCTNAME even better!"
+msgstr "Help ons %PRODUCTNAME nog beter te maken!"
+
+#. PboiP
+#: include/sfx2/strings.hrc:266
+msgctxt "STR_GET_INVOLVED_BUTTON"
+msgid "Get involved"
+msgstr "Doe mee"
+
+#. GuLGH
+#: include/sfx2/strings.hrc:267
+msgctxt "STR_DONATE_TEXT"
+msgid "Your donations support our worldwide community."
+msgstr "Uw donaties ondersteunen onze wereldwijde gemeenschap."
+
+#. KzgoD
+#: include/sfx2/strings.hrc:268
+msgctxt "STR_DONATE_BUTTON"
+msgid "Donate"
+msgstr "Doneren"
+
+#. G8bbK
+#: include/sfx2/strings.hrc:269
+msgctxt "STR_WHATSNEW"
+msgid "You are running version %PRODUCTVERSION of %PRODUCTNAME for the first time. Do you want to learn what's new?"
+msgstr "U voert voor de eerste keer versie %PRODUCTVERSION van %PRODUCTNAME uit. Wilt u weten wat er nieuw is?"
+
+#. J5UkB
+#: include/sfx2/strings.hrc:270
+msgctxt "STR_WHATSNEW_BUTTON"
+msgid "Release Notes"
+msgstr "Versie-opmerkingen"
+
+#. c7NPT
+#: include/sfx2/strings.hrc:271
+msgctxt "STR_READONLY_DOCUMENT"
+msgid "This document is open in read-only mode."
+msgstr "Document is in de modus alleen-lezen geopend."
+
+#. KyyFk
+#: include/sfx2/strings.hrc:272
+msgctxt "STR_READONLY_PDF"
+msgid "This PDF is open in read-only mode to allow signing the existing file."
+msgstr "Deze PDF is geopend in alleen-lezen-modus, zodat het bestaande bestand ondertekend kan worden."
+
+#. MENvD
+#: include/sfx2/strings.hrc:273
+msgctxt "STR_CLASSIFIED_DOCUMENT"
+msgid "The classification label of this document is %1."
+msgstr "De rubricering van dit document is %1."
+
+#. 3B3ij
+#: include/sfx2/strings.hrc:274
+msgctxt "STR_TARGET_DOC_NOT_CLASSIFIED"
+msgid "This document must be classified before the clipboard can be pasted."
+msgstr "Dit document moet gecassificeerd worden voordat het klembord kan worden geplakt."
+
+#. BYcYH
+#: include/sfx2/strings.hrc:275
+msgctxt "STR_DOC_CLASSIFICATION_TOO_LOW"
+msgid "This document has a lower classification level than the clipboard."
+msgstr "Dit document heeft een lagere rubricering dan de inhoud van het klembord."
+
+#. EJPzh
+#: include/sfx2/strings.hrc:276
+msgctxt "STR_CLASSIFIED_INTELLECTUAL_PROPERTY"
+msgid "Level"
+msgstr "Niveau"
+
+#. itVew
+#: include/sfx2/strings.hrc:277
+msgctxt "STR_CLASSIFIED_NATIONAL_SECURITY"
+msgid "National Security:"
+msgstr "Nationale veiligheid:"
+
+#. ZBXbG
+#: include/sfx2/strings.hrc:278
+msgctxt "STR_CLASSIFIED_EXPORT_CONTROL"
+msgid "Export Control:"
+msgstr "Besturingselement exporteren:"
+
+#. QAnvx
+#: include/sfx2/strings.hrc:279
+msgctxt "STR_CHECKOUT"
+msgid "Check Out"
+msgstr "Uitchecken"
+
+#. PwPNw
+#: include/sfx2/strings.hrc:280
+msgctxt "STR_READONLY_EDIT"
+msgid "Edit Document"
+msgstr "Document bewerken"
+
+#. FCeC5
+#: include/sfx2/strings.hrc:281
+msgctxt "STR_READONLY_SIGN"
+msgid "Sign Document"
+msgstr "Documenten ondertekenen"
+
+#. MEfTq
+#: include/sfx2/strings.hrc:282
+msgctxt "STR_READONLY_FINISH_SIGN"
+msgid "Finish Signing"
+msgstr "Ondertekenen voltooien"
+
+#. pkWmU
+#: include/sfx2/strings.hrc:283
+msgctxt "STR_SIGNATURE_BROKEN"
+msgid "This document has an invalid signature."
+msgstr "Dit document heeft een ongeldige ondertekening."
+
+#. Vd3CU
+#: include/sfx2/strings.hrc:284
+msgctxt "STR_SIGNATURE_INVALID"
+msgid "The signature was valid, but the document has been modified"
+msgstr "De handtekening is geldig, maar het document is gewijzigd"
+
+#. 2HNfx
+#: include/sfx2/strings.hrc:285
+msgctxt "STR_SIGNATURE_NOTVALIDATED"
+msgid "At least one signature has problems: the certificate could not be validated."
+msgstr "Ten minste één handtekening heeft problemen: het certificaat kon niet worden gevalideerd."
+
+#. tjCmr
+#: include/sfx2/strings.hrc:286
+msgctxt "STR_SIGNATURE_PARTIAL_OK"
+msgid "At least one signature has problems: the document is only partially signed."
+msgstr "Ten minste één handtekening heeft problemen: het document is slechts gedeeltelijk ondertekend."
+
+#. mU6ot
+#: include/sfx2/strings.hrc:287
+msgctxt "STR_SIGNATURE_NOTVALIDATED_PARTIAL_OK"
+msgid "The certificate could not be validated and the document is only partially signed."
+msgstr "Het certificaat kon niet worden gevalideerd en het document is slechts gedeeltelijk ondertekend."
+
+#. FKDbE
+#: include/sfx2/strings.hrc:288
+msgctxt "STR_SIGNATURE_OK"
+msgid "This document is digitally signed and the signature is valid."
+msgstr "Het document is digitaal ondertekend en de handtekening is geldig."
+
+#. rMGka
+#: include/sfx2/strings.hrc:289
+msgctxt "STR_SIGNATURE_SHOW"
+msgid "Show Signatures"
+msgstr "Ondertekening tonen"
+
+#. fkzJb
+#: include/sfx2/strings.hrc:290
+msgctxt "STR_TRACK_CHANGES_BUTTON"
+msgid "Show Toolbar"
+msgstr "Werkbalk tonen"
+
+#. 68ZqS
+#: include/sfx2/strings.hrc:291
+msgctxt "STR_TRACK_CHANGES_BUTTON_HIDE"
+msgid "Hide Toolbar"
+msgstr "Werkbalk verbergen"
+
+#. BzVAA
+#: include/sfx2/strings.hrc:292
+msgctxt "STR_HYPHENATION_BUTTON"
+msgid "Learn more"
+msgstr "Leer meer"
+
+#. BSyb4
+#: include/sfx2/strings.hrc:293
+msgctxt "STR_REFRESH_MASTER_PASSWORD"
+msgid "The master password is stored in an outdated format, you should refresh it"
+msgstr "Het hoofdwachtwoord is opgeslagen in een verouderd formaat, u moet het vernieuwen"
+
+#. ysChU
+#: include/sfx2/strings.hrc:294
+msgctxt "STR_REFRESH_PASSWORD"
+msgid "Refresh Password"
+msgstr "Wachtwoord vernieuwen"
+
+#. kej8D
+#. Translators: default Impress template names
+#: include/sfx2/strings.hrc:297
+msgctxt "STR_TEMPLATE_NAME1"
+msgid "Grey Elegant"
+msgstr "Grijze olifant"
+
+#. FkuLG
+#: include/sfx2/strings.hrc:298
+msgctxt "STR_TEMPLATE_NAME2"
+msgid "Beehive"
+msgstr "Bijenkorf"
+
+#. uwaPH
+#: include/sfx2/strings.hrc:299
+msgctxt "STR_TEMPLATE_NAME3"
+msgid "Blue Curve"
+msgstr "Blauwe kromme"
+
+#. hHRDz
+#: include/sfx2/strings.hrc:300
+msgctxt "STR_TEMPLATE_NAME4"
+msgid "Blueprint Plans"
+msgstr "Blauwdruk planning"
+
+#. MAnPU
+#: include/sfx2/strings.hrc:301
+msgctxt "STR_TEMPLATE_NAME5"
+msgid "Candy"
+msgstr "Snoep"
+
+#. jEiAn
+#: include/sfx2/strings.hrc:302
+msgctxt "STR_TEMPLATE_NAME6"
+msgid "Yellow Idea"
+msgstr "Geel idee"
+
+#. QDNuB
+#: include/sfx2/strings.hrc:303
+msgctxt "STR_TEMPLATE_NAME7"
+msgid "DNA"
+msgstr "DNA"
+
+#. XBrCi
+#: include/sfx2/strings.hrc:304
+msgctxt "STR_TEMPLATE_NAME8"
+msgid "Focus"
+msgstr "Focus"
+
+#. GADdA
+#: include/sfx2/strings.hrc:305
+msgctxt "STR_TEMPLATE_NAME9"
+msgid "Forestbird"
+msgstr "Vogel van het woud"
+
+#. TT8G5
+#: include/sfx2/strings.hrc:306
+msgctxt "STR_TEMPLATE_NAME10"
+msgid "Freshes"
+msgstr "Fris"
+
+#. C5N9D
+#: include/sfx2/strings.hrc:307
+msgctxt "STR_TEMPLATE_NAME11"
+msgid "Inspiration"
+msgstr "Inspiratie"
+
+#. fCKG9
+#: include/sfx2/strings.hrc:308
+msgctxt "STR_TEMPLATE_NAME12"
+msgid "Lights"
+msgstr "Lichten"
+
+#. pcLWs
+#: include/sfx2/strings.hrc:309
+msgctxt "STR_TEMPLATE_NAME13"
+msgid "Growing Liberty"
+msgstr "Groeiende vrijheid"
+
+#. xo2gC
+#: include/sfx2/strings.hrc:310
+msgctxt "STR_TEMPLATE_NAME14"
+msgid "Metropolis"
+msgstr "Metropolis"
+
+#. FFDBk
+#: include/sfx2/strings.hrc:311
+msgctxt "STR_TEMPLATE_NAME15"
+msgid "Midnightblue"
+msgstr "Nachtblauw"
+
+#. yiCzk
+#: include/sfx2/strings.hrc:312
+msgctxt "STR_TEMPLATE_NAME16"
+msgid "Nature Illustration"
+msgstr "Natuur illustratie"
+
+#. cCZzC
+#: include/sfx2/strings.hrc:313
+msgctxt "STR_TEMPLATE_NAME17"
+msgid "Pencil"
+msgstr "Potlood"
+
+#. Ji4Cw
+#: include/sfx2/strings.hrc:314
+msgctxt "STR_TEMPLATE_NAME18"
+msgid "Piano"
+msgstr "Piano"
+
+#. mrbiq
+#: include/sfx2/strings.hrc:315
+msgctxt "STR_TEMPLATE_NAME19"
+msgid "Portfolio"
+msgstr "Portfolio"
+
+#. ysBGy
+#: include/sfx2/strings.hrc:316
+msgctxt "STR_TEMPLATE_NAME20"
+msgid "Progress"
+msgstr "Voortgang"
+
+#. gtPt9
+#: include/sfx2/strings.hrc:317
+msgctxt "STR_TEMPLATE_NAME21"
+msgid "Sunset"
+msgstr "Zonsondergang"
+
+#. 73Y2e
+#: include/sfx2/strings.hrc:318
+msgctxt "STR_TEMPLATE_NAME22"
+msgid "Vintage"
+msgstr "Vintage"
+
+#. MSY8y
+#: include/sfx2/strings.hrc:319
+msgctxt "STR_TEMPLATE_NAME23"
+msgid "Vivid"
+msgstr "Helder"
+
+#. QDZBz
+#. Translators: default Writer template names
+#: include/sfx2/strings.hrc:321
+msgctxt "STR_TEMPLATE_NAME24"
+msgid "CV"
+msgstr "CV"
+
+#. Koe3V
+#: include/sfx2/strings.hrc:322
+msgctxt "STR_TEMPLATE_NAME25"
+msgid "Resume"
+msgstr "Samenvatting"
+
+#. hCpfD
+#: include/sfx2/strings.hrc:323
+msgctxt "STR_TEMPLATE_NAME26"
+msgid "Default"
+msgstr "Standaard"
+
+#. d7Hyk
+#: include/sfx2/strings.hrc:324
+msgctxt "STR_TEMPLATE_NAME27"
+msgid "Modern"
+msgstr "Modern"
+
+#. CVJEC
+#: include/sfx2/strings.hrc:325
+msgctxt "STR_TEMPLATE_NAME28"
+msgid "Modern business letter sans-serif"
+msgstr "Moderne zakelijke brief sans-serif"
+
+#. 95GeB
+#: include/sfx2/strings.hrc:326
+msgctxt "STR_TEMPLATE_NAME29"
+msgid "Modern business letter serif"
+msgstr "Moderne zakelijke brief sans-serif"
+
+#. XdU49
+#: include/sfx2/strings.hrc:327
+msgctxt "STR_TEMPLATE_NAME30"
+msgid "Businesscard with logo"
+msgstr "Visitekaartje met logo"
+
+#. UAmSj
+#: include/sfx2/strings.hrc:328
+msgctxt "STR_TEMPLATE_NAME31"
+msgid "Simple"
+msgstr "Eenvoudig"
+
+#. W7NVH
+#: include/sfx2/strings.hrc:329
+msgctxt "STR_TEMPLATE_NAME32"
+msgid "BPMN"
+msgstr "BPMN"
+
+#. ZaGGB
+#: include/sfx2/strings.hrc:331
+msgctxt "STR_CLEAR_CHAR"
+msgid "Remove"
+msgstr "Verwijderen"
+
+#. JReRY
+#: include/sfx2/strings.hrc:332
+msgctxt "STR_CLEAR_ALL_CHAR"
+msgid "Clear All"
+msgstr "Alles wissen"
+
+#. yC8Gs
+#: include/sfx2/strings.hrc:334
+msgctxt "STR_PASSWORD_LEN"
+msgid "Password length"
+msgstr "Wachtwoordlengte"
+
+#. FKFmJ
+#: include/sfx2/strings.hrc:335
+msgctxt "STR_PASSWORD_WARNING"
+msgid "The password you have entered causes interoperability issues. Please enter a password that is shorter than 52 bytes, or longer than 55 bytes."
+msgstr "Het wachtwoord dat u hebt ingevoerd, veroorzaakt interoperabiliteitsproblemen. Voer een wachtwoord in dat korter is dan 52 bytes of langer dan 55 bytes."
+
+#. jBQFN
+#: include/sfx2/strings.hrc:337
+msgctxt "STR_CTRLCLICKHYPERLINK"
+msgid "%{key}-click to open hyperlink: %{link}"
+msgstr "%{key}-klik om de hyperlink te openen: %{link}"
+
+#. jC3AK
+#: include/sfx2/strings.hrc:338
+msgctxt "STR_CLICKHYPERLINK"
+msgid "Click to open hyperlink: %{link}"
+msgstr "Klik om de hyperlink te openen: %{link}"
+
+#. eFJMp
+#: include/sfx2/strings.hrc:340
+msgctxt "STR_STYLEUSEDBY"
+msgid "(used by: %STYLELIST)"
+msgstr "(gebruikt door: %STYLELIST)"
+
+#. 6UgqW
+#: include/sfx2/strings.hrc:342
+msgctxt "STR_DOCUMENT"
+msgid "Document"
+msgstr "Document"
+
+#. XDGTb
+#: include/sfx2/strings.hrc:343
+msgctxt "STR_SPREADSHEET"
+msgid "Spreadsheet"
+msgstr "Werkblad"
+
+#. 3UZXB
+#: include/sfx2/strings.hrc:344
+msgctxt "STR_PRESENTATION"
+msgid "Presentation"
+msgstr "Presentatie"
+
+#. noN5s
+#: include/sfx2/strings.hrc:345
+msgctxt "STR_DRAWING"
+msgid "Drawing"
+msgstr "Tekening"
+
+#. QpuFo
+#: include/sfx2/strings.hrc:346
+msgctxt "STR_RECENT"
+msgid "Recently used"
+msgstr "Onlangs gebruikt"
+
+#. EcAjb
+#: include/sfx2/strings.hrc:347
+msgctxt "STR_NORECENT"
+msgid "No recent characters"
+msgstr "Geen recente tekens"
+
+#. tfjbD
+#: include/sfx2/strings.hrc:349
+msgctxt "STR_ACTION_RESET_ALL_DEFAULT_TEMPLATES"
+msgid "Reset All De~fault Templates"
+msgstr "Alle standaards~jablonen herstellen"
+
+#. GWuDE
+#: include/sfx2/strings.hrc:350
+msgctxt "STR_ACTION_RESET_WRITER_TEMPLATE"
+msgid "Reset De~fault Text Document"
+msgstr "Standaard~tekstdocument herstellen"
+
+#. j5eV8
+#: include/sfx2/strings.hrc:351
+msgctxt "STR_ACTION_RESET_CALC_TEMPLATE"
+msgid "Reset De~fault Spreadsheet"
+msgstr "Standaard~werkblad herstellen"
+
+#. mWp3t
+#: include/sfx2/strings.hrc:352
+msgctxt "STR_ACTION_RESET_IMPRESS_TEMPLATE"
+msgid "Reset De~fault Presentation"
+msgstr "Standaard~presentatie herstellen"
+
+#. wfExB
+#: include/sfx2/strings.hrc:353
+msgctxt "STR_ACTION_RESET_DRAW_TEMPLATE"
+msgid "Reset De~fault Drawing"
+msgstr "Standaard~tekening herstellen"
+
+#. BFaGA
+#: include/sfx2/strings.hrc:354
+msgctxt "STR_ACTION_IMPORT"
+msgid "~Import"
+msgstr "~Importeren"
+
+#. 8Cwfk
+#: include/sfx2/strings.hrc:355
+msgctxt "STR_ACTION_EXTENSIONS"
+msgid "E~xtensions"
+msgstr "E~xtensies"
+
+#. idGvM
+#: include/sfx2/strings.hrc:356
+msgctxt "STR_WINDOW_TITLE_RENAME_TEMPLATE"
+msgid "Rename"
+msgstr "Naam wijzigen"
+
+#. EyjE3
+#: include/sfx2/strings.hrc:357
+msgctxt "STR_WINDOW_TITLE_RENAME_CATEGORY"
+msgid "Rename Category"
+msgstr "Categorienaam wijzigen"
+
+#. T79Eb
+#: include/sfx2/strings.hrc:358
+msgctxt "STR_WINDOW_TITLE_RENAME_NEW_CATEGORY"
+msgid "New Category"
+msgstr "Nieuwe categorie"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Toevoegen"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_Toepassen"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_Annuleren"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_Sluiten"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_Verwijderen"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_Bewerken"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_Help"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_Nieuw"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_Nee"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_OK"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_Verwijderen"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_Herstellen"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Ja"
+
+#. F5rSU
+#: sfx2/inc/dinfdlg.hrc:29
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Checked by"
+msgstr "Gecontroleerd door"
+
+#. BCYGG
+#: sfx2/inc/dinfdlg.hrc:30
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Client"
+msgstr "Client"
+
+#. nSrT3
+#: sfx2/inc/dinfdlg.hrc:31
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Date completed"
+msgstr "Datum waarop voltooid"
+
+#. HEaEC
+#: sfx2/inc/dinfdlg.hrc:32
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Department"
+msgstr "Afdeling"
+
+#. TxAux
+#: sfx2/inc/dinfdlg.hrc:33
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Destinations"
+msgstr "Bestemmingen"
+
+#. f3nqh
+#: sfx2/inc/dinfdlg.hrc:34
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Disposition"
+msgstr "Struktuur"
+
+#. uznMD
+#: sfx2/inc/dinfdlg.hrc:35
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Division"
+msgstr "Deling"
+
+#. 6DuFF
+#: sfx2/inc/dinfdlg.hrc:36
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Document number"
+msgstr "Documentnummer"
+
+#. XXKuP
+#: sfx2/inc/dinfdlg.hrc:37
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Editor"
+msgstr "Editor"
+
+#. hRRmF
+#: sfx2/inc/dinfdlg.hrc:38
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Email"
+msgstr "E-mail"
+
+#. xNvDx
+#: sfx2/inc/dinfdlg.hrc:39
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Forward to"
+msgstr "Doorsturen naar"
+
+#. xwv85
+#: sfx2/inc/dinfdlg.hrc:40
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Group"
+msgstr "Groep"
+
+#. u59Qp
+#: sfx2/inc/dinfdlg.hrc:41
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Info"
+msgstr "Info"
+
+#. Ltq9H
+#: sfx2/inc/dinfdlg.hrc:42
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Language"
+msgstr "Taal"
+
+#. bv3HC
+#: sfx2/inc/dinfdlg.hrc:43
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Mailstop"
+msgstr "Mailstop"
+
+#. AFGi2
+#: sfx2/inc/dinfdlg.hrc:44
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Matter"
+msgstr "Onderwerp"
+
+#. wGAD6
+#: sfx2/inc/dinfdlg.hrc:45
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Office"
+msgstr "Kantoor"
+
+#. ZqphY
+#: sfx2/inc/dinfdlg.hrc:46
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Owner"
+msgstr "Eigenaar"
+
+#. mK8Th
+#: sfx2/inc/dinfdlg.hrc:47
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Project"
+msgstr "Project"
+
+#. zFeHt
+#: sfx2/inc/dinfdlg.hrc:48
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Publisher"
+msgstr "Uitgever"
+
+#. pF2eJ
+#: sfx2/inc/dinfdlg.hrc:49
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Purpose"
+msgstr "Doel"
+
+#. GTPFZ
+#: sfx2/inc/dinfdlg.hrc:50
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Received from"
+msgstr "Ontvangen van"
+
+#. dvGyQ
+#: sfx2/inc/dinfdlg.hrc:51
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Recorded by"
+msgstr "Opgenomen door"
+
+#. GjVXD
+#: sfx2/inc/dinfdlg.hrc:52
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Recorded date"
+msgstr "Opgenomen op"
+
+#. o5oXa
+#: sfx2/inc/dinfdlg.hrc:53
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Reference"
+msgstr "Verwijzing"
+
+#. ex26g
+#: sfx2/inc/dinfdlg.hrc:54
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Source"
+msgstr "Bron"
+
+#. 4HSZB
+#: sfx2/inc/dinfdlg.hrc:55
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Status"
+msgstr "Status"
+
+#. U3RdC
+#: sfx2/inc/dinfdlg.hrc:56
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Telephone number"
+msgstr "Telefoonnummer"
+
+#. Geeuu
+#: sfx2/inc/dinfdlg.hrc:57
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Typist"
+msgstr "Typist"
+
+#. xxHtR
+#: sfx2/inc/dinfdlg.hrc:58
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "URL"
+msgstr "URL"
+
+#. CxTQY
+#: sfx2/inc/dinfdlg.hrc:73
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Text"
+msgstr "Tekst"
+
+#. MMGFi
+#: sfx2/inc/dinfdlg.hrc:74
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "DateTime"
+msgstr "Datum en Tijd"
+
+#. GvJMH
+#: sfx2/inc/dinfdlg.hrc:75
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Date"
+msgstr "Datum"
+
+#. GyrbX
+#: sfx2/inc/dinfdlg.hrc:76
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Duration"
+msgstr "Tijdsduur"
+
+#. CxZ4Z
+#: sfx2/inc/dinfdlg.hrc:77
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Number"
+msgstr "Getal"
+
+#. CDgvL
+#: sfx2/inc/dinfdlg.hrc:78
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Yes or no"
+msgstr "Ja of nee"
+
+#. WzBG6
+#. accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
+#. in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
+#: sfx2/inc/dinfdlg.hrc:83
+msgctxt "documentinfopage|extended_tip|userdatacb"
+msgid "Saves the user's full name with the file. You can edit the name by choosing Tools - Options - %PRODUCTNAME - User Data."
+msgstr "Slaat de volledige naam van de gebruiker met het bestand op. U kunt de naam bewerken door te kiezen Extra - Opties - %PRODUCTNAME - Gebruikersgegevens."
+
+#. AxhLy
+#: sfx2/inc/doctempl.hrc:29
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "My Templates"
+msgstr "Mijn sjablonen"
+
+#. 5aNp8
+#: sfx2/inc/doctempl.hrc:30
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Styles"
+msgstr "Opmaakprofielen"
+
+#. t5QK9
+#: sfx2/inc/doctempl.hrc:31
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Business Correspondence"
+msgstr "Zakelijke correspondentie"
+
+#. Y79e8
+#: sfx2/inc/doctempl.hrc:32
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Other Business Documents"
+msgstr "Andere zakelijke documenten"
+
+#. 2RCC9
+#: sfx2/inc/doctempl.hrc:33
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Personal Correspondence and Documents"
+msgstr "Privé-correspondentie en -documenten"
+
+#. 6Dgiz
+#: sfx2/inc/doctempl.hrc:34
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Forms and Contracts"
+msgstr "Formulieren en contracten"
+
+#. VCKTG
+#: sfx2/inc/doctempl.hrc:35
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Finances"
+msgstr "Financiën"
+
+#. HmqGP
+#: sfx2/inc/doctempl.hrc:36
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Education"
+msgstr "Opleiding"
+
+#. xopM8
+#: sfx2/inc/doctempl.hrc:37
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Presentation Backgrounds"
+msgstr "Presentatieachtergronden"
+
+#. tSQLA
+#: sfx2/inc/doctempl.hrc:38
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Presentations"
+msgstr "Presentaties"
+
+#. KuNzz
+#: sfx2/inc/doctempl.hrc:39
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Miscellaneous"
+msgstr "Diverse"
+
+#. SC4E5
+#: sfx2/inc/doctempl.hrc:40
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Labels"
+msgstr "Etiketten"
+
+#. Wg9Je
+#: sfx2/source/devtools/DevToolsStrings.hrc:15
+msgctxt "STR_TEXT_PORTION"
+msgid "Text Portion %1"
+msgstr "Tekstgedeelte %1"
+
+#. 5ZXbE
+#: sfx2/source/devtools/DevToolsStrings.hrc:16
+msgctxt "STR_PARAGRAPH"
+msgid "Paragraph %1"
+msgstr "Alinea %1"
+
+#. DJi4i
+#: sfx2/source/devtools/DevToolsStrings.hrc:17
+msgctxt "STR_SHAPE"
+msgid "Shape %1"
+msgstr "Vorm %1"
+
+#. Ucjjh
+#: sfx2/source/devtools/DevToolsStrings.hrc:18
+msgctxt "STR_PAGE"
+msgid "Page %1"
+msgstr "Pagina %1"
+
+#. j9DL6
+#: sfx2/source/devtools/DevToolsStrings.hrc:19
+msgctxt "STR_SLIDE"
+msgid "Slide %1"
+msgstr "Dia %1"
+
+#. YQqL8
+#: sfx2/source/devtools/DevToolsStrings.hrc:20
+msgctxt "STR_MASTER_SLIDE"
+msgid "Master Slide %1"
+msgstr "Diamodel %1"
+
+#. CEfNy
+#: sfx2/source/devtools/DevToolsStrings.hrc:21
+msgctxt "STR_SHEET"
+msgid "Sheet %1"
+msgstr "Blad %1"
+
+#. BaABx
+#: sfx2/source/devtools/DevToolsStrings.hrc:23
+msgctxt "STR_SHAPES_NODE"
+msgid "Shapes"
+msgstr "Vormen"
+
+#. n4VWE
+#: sfx2/source/devtools/DevToolsStrings.hrc:24
+msgctxt "STR_CHARTS_ENTRY"
+msgid "Charts"
+msgstr "Diagrammen"
+
+#. 5GWcX
+#: sfx2/source/devtools/DevToolsStrings.hrc:25
+msgctxt "STR_PIVOT_TABLES_ENTRY"
+msgid "Pivot Tables"
+msgstr "Draaitabellen"
+
+#. BBLBQ
+#: sfx2/source/devtools/DevToolsStrings.hrc:26
+msgctxt "STR_DOCUMENT_ENTRY"
+msgid "Document"
+msgstr "Document"
+
+#. 4dNGV
+#: sfx2/source/devtools/DevToolsStrings.hrc:27
+msgctxt "STR_SHEETS_ENTRY"
+msgid "Sheets"
+msgstr "Bladen"
+
+#. RLwRi
+#: sfx2/source/devtools/DevToolsStrings.hrc:28
+msgctxt "STR_STYLES_ENTRY"
+msgid "Styles"
+msgstr "Opmaakprofielen"
+
+#. P4RF4
+#: sfx2/source/devtools/DevToolsStrings.hrc:29
+msgctxt "STR_SLIDES_ENTRY"
+msgid "Slides"
+msgstr "Dia's"
+
+#. 4bJSH
+#: sfx2/source/devtools/DevToolsStrings.hrc:30
+msgctxt "STR_MASTER_SLIDES_ENTRY"
+msgid "Master Slides"
+msgstr "Diamodellen"
+
+#. LRq2A
+#: sfx2/source/devtools/DevToolsStrings.hrc:31
+msgctxt "STR_PAGES_ENTRY"
+msgid "Pages"
+msgstr "Pagina's"
+
+#. 946kV
+#: sfx2/source/devtools/DevToolsStrings.hrc:32
+msgctxt "STR_PARAGRAPHS_ENTRY"
+msgid "Paragraphs"
+msgstr "Alinea's"
+
+#. JG2qz
+#: sfx2/source/devtools/DevToolsStrings.hrc:33
+msgctxt "STR_TABLES_ENTRY"
+msgid "Tables"
+msgstr "Tabellen"
+
+#. HzFoW
+#: sfx2/source/devtools/DevToolsStrings.hrc:34
+msgctxt "STR_FRAMES_ENTRY"
+msgid "Frames"
+msgstr "Frames"
+
+#. ekGEm
+#: sfx2/source/devtools/DevToolsStrings.hrc:35
+msgctxt "STR_GRAPHIC_OBJECTS_ENTRY"
+msgid "Graphic Objects"
+msgstr "Grafische objecten"
+
+#. cVWmY
+#: sfx2/source/devtools/DevToolsStrings.hrc:36
+msgctxt "STR_EMBEDDED_OBJECTS_ENTRY"
+msgid "Embedded Objects"
+msgstr "Ingesloten objecten"
+
+#. xfnkV
+#: sfx2/source/devtools/DevToolsStrings.hrc:38
+msgctxt "STR_ANY_VALUE_TRUE"
+msgid "True"
+msgstr "WAAR"
+
+#. 2WxdA
+#: sfx2/source/devtools/DevToolsStrings.hrc:39
+msgctxt "STR_ANY_VALUE_FALSE"
+msgid "False"
+msgstr "ONWAAR"
+
+#. RBC8w
+#: sfx2/source/devtools/DevToolsStrings.hrc:40
+msgctxt "STR_ANY_VALUE_NULL"
+msgid "Null"
+msgstr "Leeg"
+
+#. As494
+#: sfx2/source/devtools/DevToolsStrings.hrc:41
+msgctxt "STR_CLASS_UNKNOWN"
+msgid "Unknown"
+msgstr "Onbekend"
+
+#. gAY69
+#: sfx2/source/devtools/DevToolsStrings.hrc:43
+msgctxt "STR_METHOD_TYPE_OBJECT"
+msgid "object"
+msgstr "object"
+
+#. HFgBW
+#: sfx2/source/devtools/DevToolsStrings.hrc:44
+msgctxt "STR_METHOD_TYPE_STRUCT"
+msgid "struct"
+msgstr "structuur"
+
+#. 7DCri
+#: sfx2/source/devtools/DevToolsStrings.hrc:45
+msgctxt "STR_METHOD_TYPE_ENUM"
+msgid "enum"
+msgstr "opsomming"
+
+#. aEuJR
+#: sfx2/source/devtools/DevToolsStrings.hrc:46
+msgctxt "STR_METHOD_TYPE_SEQUENCE"
+msgid "sequence"
+msgstr "volgorde"
+
+#. xXMdD
+#: sfx2/source/devtools/DevToolsStrings.hrc:48
+msgctxt "STR_PROPERTY_TYPE_IS_NAMED_CONTAINER"
+msgid "name container"
+msgstr "containernaam"
+
+#. QLZbz
+#: sfx2/source/devtools/DevToolsStrings.hrc:49
+msgctxt "STR_PROPERTY_TYPE_IS_INDEX_CONTAINER"
+msgid "index container"
+msgstr "containerindex"
+
+#. LLsJf
+#: sfx2/source/devtools/DevToolsStrings.hrc:50
+msgctxt "STR_PROPERTY_TYPE_IS_ENUMERATION"
+msgid "enumeration"
+msgstr "opsomming"
+
+#. aNuA9
+#: sfx2/source/devtools/DevToolsStrings.hrc:52
+msgctxt "STR_PARMETER_MODE_IN"
+msgid "[in]"
+msgstr "[in]"
+
+#. W3AEx
+#: sfx2/source/devtools/DevToolsStrings.hrc:53
+msgctxt "STR_PARMETER_MODE_OUT"
+msgid "[out]"
+msgstr "[uit]"
+
+#. ENF6w
+#: sfx2/source/devtools/DevToolsStrings.hrc:54
+msgctxt "STR_PARMETER_MODE_IN_AND_OUT"
+msgid "[in&out]"
+msgstr "[in&uit]"
+
+#. rw6AB
+#: sfx2/source/devtools/DevToolsStrings.hrc:56
+msgctxt "STR_PROPERTY_ATTRIBUTE_IS_ATTRIBUTE"
+msgid "attribute"
+msgstr "attribuut"
+
+#. BwCGg
+#: sfx2/source/devtools/DevToolsStrings.hrc:57
+msgctxt "STR_PROPERTY_ATTRIBUTE_GET"
+msgid "get"
+msgstr "get"
+
+#. MissY
+#: sfx2/source/devtools/DevToolsStrings.hrc:58
+msgctxt "STR_PROPERTY_ATTRIBUTE_SET"
+msgid "set"
+msgstr "set"
+
+#. Nhmiv
+#: sfx2/source/devtools/DevToolsStrings.hrc:59
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEVOID"
+msgid "may be void"
+msgstr "kan ongeldig zijn"
+
+#. zECkD
+#: sfx2/source/devtools/DevToolsStrings.hrc:60
+msgctxt "STR_PROPERTY_ATTRIBUTE_READONLY"
+msgid "read-only"
+msgstr "alleen-lezen"
+
+#. BtQDx
+#: sfx2/source/devtools/DevToolsStrings.hrc:61
+msgctxt "STR_PROPERTY_ATTRIBUTE_WRITEONLY"
+msgid "write-only"
+msgstr "alleen-schrijven"
+
+#. dBQEu
+#: sfx2/source/devtools/DevToolsStrings.hrc:62
+msgctxt "STR_PROPERTY_ATTRIBUTE_REMOVABLE"
+msgid "removeable"
+msgstr "verwijderbaar"
+
+#. jRo8t
+#: sfx2/source/devtools/DevToolsStrings.hrc:63
+msgctxt "STR_PROPERTY_ATTRIBUTE_BOUND"
+msgid "bound"
+msgstr "gebonden"
+
+#. rBqTG
+#: sfx2/source/devtools/DevToolsStrings.hrc:64
+msgctxt "STR_PROPERTY_ATTRIBUTE_CONSTRAINED"
+msgid "constrained"
+msgstr "beperkt"
+
+#. XLnBt
+#: sfx2/source/devtools/DevToolsStrings.hrc:65
+msgctxt "STR_PROPERTY_ATTRIBUTE_TRANSIENT"
+msgid "transient"
+msgstr "voorbijgaand"
+
+#. BK7Zk
+#: sfx2/source/devtools/DevToolsStrings.hrc:66
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEAMBIGUOUS"
+msgid "may be ambiguous"
+msgstr "kan dubbelzinnig zijn"
+
+#. BDEqD
+#: sfx2/source/devtools/DevToolsStrings.hrc:67
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEDEFAULT"
+msgid "may be default"
+msgstr "kan standaard zijn"
+
+#. TGQhd
+#: sfx2/source/devtools/DevToolsStrings.hrc:69
+msgctxt "STR_PROPERTY_VALUE_SEQUENCE"
+msgid "<Sequence [%1]>"
+msgstr "<Volgorde [%1]>"
+
+#. KZ5M4
+#: sfx2/source/devtools/DevToolsStrings.hrc:70
+msgctxt "STR_PROPERTY_VALUE_OBJECT"
+msgid "<Object@%1>"
+msgstr "<Object@%1>"
+
+#. xKaJy
+#: sfx2/source/devtools/DevToolsStrings.hrc:71
+msgctxt "STR_PROPERTY_VALUE_STRUCT"
+msgid "<Struct>"
+msgstr "<Structuur>"
+
+#. AxfFu
+#: sfx2/uiconfig/ui/addtargetdialog.ui:8
+msgctxt "addtargetdialog|AddTargetDialog"
+msgid "Add Target"
+msgstr "Doel toevoegen"
+
+#. JC8Vd
+#: sfx2/uiconfig/ui/addtargetdialog.ui:89
+msgctxt "addtargetdialog|label_name"
+msgid "Name:"
+msgstr "Naam:"
+
+#. LXpbz
+#: sfx2/uiconfig/ui/addtargetdialog.ui:120
+msgctxt "addtargetdialog|label_type"
+msgid "Type:"
+msgstr "Type:"
+
+#. Sy2A7
+#: sfx2/uiconfig/ui/addtargetdialog.ui:135
+msgctxt "addtargetdialog|label_content"
+msgid "Content:"
+msgstr "Inhoud:"
+
+#. e5sY6
+#: sfx2/uiconfig/ui/addtargetdialog.ui:169
+msgctxt "addtargetdialog|type"
+msgid "Text"
+msgstr "Tekst"
+
+#. dGQqg
+#: sfx2/uiconfig/ui/addtargetdialog.ui:170
+msgctxt "addtargetdialog|type"
+msgid "Regular expression"
+msgstr "Reguliere expressie"
+
+#. wgzA4
+#: sfx2/uiconfig/ui/addtargetdialog.ui:171
+msgctxt "addtargetdialog|type"
+msgid "Predefined"
+msgstr "Voorgedefinieerd"
+
+#. nGjTR
+#: sfx2/uiconfig/ui/addtargetdialog.ui:186
+msgctxt "addtargetdialog|label_content_predef"
+msgid "Content:"
+msgstr "Inhoud:"
+
+#. 7uQgC
+#: sfx2/uiconfig/ui/addtargetdialog.ui:204
+msgctxt "addtargetdialog|content_predef"
+msgid "Credit card numbers"
+msgstr "Creditcardnummers"
+
+#. jze4C
+#: sfx2/uiconfig/ui/addtargetdialog.ui:205
+msgctxt "addtargetdialog|content_predef"
+msgid "Email addresses"
+msgstr "E-mailadressen"
+
+#. wDQAu
+#: sfx2/uiconfig/ui/addtargetdialog.ui:206
+msgctxt "addtargetdialog|content_predef"
+msgid "IP addresses"
+msgstr "IP-adressen"
+
+#. CpoEL
+#: sfx2/uiconfig/ui/addtargetdialog.ui:207
+msgctxt "addtargetdialog|content_predef"
+msgid "Dates (Numerical)"
+msgstr "Datums (numeriek)"
+
+#. 3Nz2x
+#: sfx2/uiconfig/ui/addtargetdialog.ui:208
+msgctxt "addtargetdialog|content_predef"
+msgid "National Insurance Number (UK)"
+msgstr "Nationaal verzekeringsnummer (UK)"
+
+#. jSAay
+#: sfx2/uiconfig/ui/addtargetdialog.ui:209
+msgctxt "addtargetdialog|content_predef"
+msgid "Social Security Number (US)"
+msgstr "Sociaal verzekeringsnummer (US)"
+
+#. kdZJN
+#: sfx2/uiconfig/ui/addtargetdialog.ui:234
+msgctxt "addtargetdialog|checkboxCaseSensitive"
+msgid "Match case"
+msgstr "Overeenkomen"
+
+#. G2u3B
+#: sfx2/uiconfig/ui/addtargetdialog.ui:249
+msgctxt "addtargetdialog|checkboxWholeWords"
+msgid "Whole words only"
+msgstr "Alleen hele woorden"
+
+#. JV66c
+#: sfx2/uiconfig/ui/alienwarndialog.ui:7
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "Confirm File Format"
+msgstr "Bestandsindeling bevestigen"
+
+#. kia7u
+#: sfx2/uiconfig/ui/alienwarndialog.ui:13
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "This document may contain formatting or content that cannot be saved in the currently selected file format “%FORMATNAME”."
+msgstr "Dit document kan opmaak of inhoud bevatten dat niet in de geselecteerde bestandsindeling “%FORMATNAME” kan worden opgeslagen."
+
+#. 3YA5c
+#: sfx2/uiconfig/ui/alienwarndialog.ui:14
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "Use the default ODF file format to be sure that the document is saved correctly."
+msgstr "Gebruik het standaard ODF bestandsindeling om zeker te zijn dat het document juist is opgeslagen."
+
+#. ocqdy
+#: sfx2/uiconfig/ui/alienwarndialog.ui:25
+msgctxt "alienwarndialog|cancel"
+msgid "Use %DEFAULTEXTENSION _Format"
+msgstr "Gebruik %DEFAULTEXTENSION-_indeling"
+
+#. Fzgtz
+#: sfx2/uiconfig/ui/alienwarndialog.ui:40
+msgctxt "alienwarndialog|save"
+msgid "_Use %FORMATNAME Format"
+msgstr "_Gebruik %FORMATNAME-indeling"
+
+#. Fgi6S
+#: sfx2/uiconfig/ui/alienwarndialog.ui:65
+msgctxt "alienwarndialog|ask"
+msgid "_Ask when not saving in ODF or default format"
+msgstr "_Waarschuwen bij niet opslaan in ODF- of standaard-indeling"
+
+#. GVVQ6
+#: sfx2/uiconfig/ui/autoredactdialog.ui:24
+msgctxt "autoredactdialog|AutoRedactDialog"
+msgid "Automatic Redaction"
+msgstr "Automatisch redigeren"
+
+#. QCidi
+#: sfx2/uiconfig/ui/autoredactdialog.ui:122
+msgctxt "autoredactdialog|target"
+msgid "Target Name"
+msgstr "Doelnaam"
+
+#. szYkX
+#: sfx2/uiconfig/ui/autoredactdialog.ui:135
+msgctxt "autoredactdialog|description"
+msgid "Type"
+msgstr "Type"
+
+#. udcn4
+#: sfx2/uiconfig/ui/autoredactdialog.ui:148
+msgctxt "autoredactdialog|target"
+msgid "Content"
+msgstr "Inhoud"
+
+#. BBuAc
+#: sfx2/uiconfig/ui/autoredactdialog.ui:161
+msgctxt "autoredactdialog|target"
+msgid "Match case"
+msgstr "Overeenkomen"
+
+#. obHtC
+#: sfx2/uiconfig/ui/autoredactdialog.ui:174
+msgctxt "autoredactdialog|target"
+msgid "Whole words"
+msgstr "Hele woorden"
+
+#. 4MVdG
+#: sfx2/uiconfig/ui/autoredactdialog.ui:202
+msgctxt "menuassignpage|contentslabel"
+msgid "_Redaction Targets"
+msgstr "_Redactiedoelen"
+
+#. E4GWo
+#: sfx2/uiconfig/ui/autoredactdialog.ui:222
+msgctxt "autoredactdialog|btnLoadTargets"
+msgid "Load Targets"
+msgstr "Doelen laden"
+
+#. tpbYA
+#: sfx2/uiconfig/ui/autoredactdialog.ui:235
+msgctxt "autoredactdialog|btnSaveTargets"
+msgid "Save Targets"
+msgstr "Doelen opslaan"
+
+#. TQg85
+#: sfx2/uiconfig/ui/autoredactdialog.ui:261
+msgctxt "autoredactdialog|add"
+msgid "Add Target"
+msgstr "Doel toevoegen"
+
+#. 4TvHR
+#: sfx2/uiconfig/ui/autoredactdialog.ui:274
+msgctxt "autoredactdialog|edit"
+msgid "Edit Target"
+msgstr "Doel bewerken"
+
+#. knEqb
+#: sfx2/uiconfig/ui/autoredactdialog.ui:287
+msgctxt "autoredactdialog|delete"
+msgid "Delete Target"
+msgstr "Doel verwijderen"
+
+#. iLkdK
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:8
+msgctxt "bookmarkdialog|BookmarkDialog"
+msgid "Add to Bookmarks"
+msgstr "Bladwijzer toevoegen"
+
+#. U6BGv
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:83
+msgctxt "bookmarkdialog|alttitle"
+msgid "Rename Bookmark"
+msgstr "Naam bladwijzer wijzigen"
+
+#. Fq2rD
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:102
+msgctxt "bookmarkdialog|label2"
+msgid "Bookmark:"
+msgstr "Bladwijzer:"
+
+#. 3A3VL
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:12
+msgctxt "bookmarkmenu|display"
+msgid "Display"
+msgstr "Weergave"
+
+#. VDDCt
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:26
+msgctxt "bookmarkmenu|rename"
+msgid "Rename..."
+msgstr "Hernoemen..."
+
+#. fCQ9n
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:34
+msgctxt "bookmarkmenu|delete"
+msgid "Delete"
+msgstr "Verwijderen"
+
+#. WGFBK
+#: sfx2/uiconfig/ui/charmapcontrol.ui:20
+msgctxt "charmapcontrol|label1"
+msgid "Favorites"
+msgstr "Favorieten"
+
+#. HAe2e
+#: sfx2/uiconfig/ui/charmapcontrol.ui:261
+msgctxt "charmapcontrol|label2"
+msgid "Recent"
+msgstr "Recent"
+
+#. BQwCQ
+#: sfx2/uiconfig/ui/charmapcontrol.ui:500
+msgctxt "charmapcontrol|specialchardlg"
+msgid "More Characters…"
+msgstr "Meer lettertekens..."
+
+#. i2ZhQ
+#: sfx2/uiconfig/ui/charviewmenu.ui:12
+msgctxt "charviewmenu|clearchar"
+msgid "Remove"
+msgstr "Verwijderen"
+
+#. bKHTP
+#: sfx2/uiconfig/ui/charviewmenu.ui:20
+msgctxt "charviewmenu|clearallchar"
+msgid "Clear All"
+msgstr "Alles wissen"
+
+#. Y8jYN
+#: sfx2/uiconfig/ui/checkin.ui:8
+msgctxt "checkin|CheckinDialog"
+msgid "Check-In"
+msgstr "Aanmelden"
+
+#. ABZKD
+#: sfx2/uiconfig/ui/checkin.ui:90
+msgctxt "checkin|MajorVersion"
+msgid "New major version"
+msgstr "Nieuwe hoofdversie"
+
+#. PYDWP
+#: sfx2/uiconfig/ui/checkin.ui:106
+msgctxt "checkin|label2"
+msgid "Version comment:"
+msgstr "Versie-opmerking:"
+
+#. CEnTA
+#: sfx2/uiconfig/ui/cmisline.ui:44
+msgctxt "cmisline|type"
+msgid "Type"
+msgstr "Type"
+
+#. g2yBR
+#: sfx2/uiconfig/ui/cmisline.ui:59
+msgctxt "cmisline|yes"
+msgid "Yes"
+msgstr "Ja"
+
+#. BWGuL
+#: sfx2/uiconfig/ui/cmisline.ui:73
+msgctxt "cmisline|no"
+msgid "No"
+msgstr "Nee"
+
+#. kDKBB
+#: sfx2/uiconfig/ui/commandpopup.ui:36
+msgctxt "commandpopup|entry"
+msgid "Search command"
+msgstr "Zoekopdracht"
+
+#. w2G7M
+#: sfx2/uiconfig/ui/custominfopage.ui:15
+msgctxt "custominfopage|add"
+msgid "Add _Property"
+msgstr "Eigenscha_p toevoegen"
+
+#. 85KDm
+#: sfx2/uiconfig/ui/custominfopage.ui:23
+msgctxt "custominfopage|extended_tip|add"
+msgid "Click to add a new row to the Properties list."
+msgstr "Klik er op om een nieuwe rij aan de lijst Eigenschappen toe te voegen."
+
+#. aB3bA
+#: sfx2/uiconfig/ui/custominfopage.ui:42
+msgctxt "custominfopage|name"
+msgid "Name"
+msgstr "Naam"
+
+#. Ja2JC
+#: sfx2/uiconfig/ui/custominfopage.ui:55
+msgctxt "custominfopage|type"
+msgid "Type"
+msgstr "Type"
+
+#. WxjS6
+#: sfx2/uiconfig/ui/custominfopage.ui:68
+msgctxt "custominfopage|value"
+msgid "Value"
+msgstr "Waarde"
+
+#. kSFdB
+#: sfx2/uiconfig/ui/custominfopage.ui:116
+msgctxt "custominfopage|extended_tip|properties"
+msgid "Enter your custom contents. You can change the name, type, and contents of each row. You can add or remove rows. The items will be exported as metadata to other file formats."
+msgstr "Voer uw gebruikergedefinieerde inhoud in. U kunt de naam, type en inhoud van elke rij wijzigen. U kunt rijen toevoegen of verwijderen. De items zullen worden geëxporteerd als metadata naar andere bestandsindelingen."
+
+#. au5jH
+#: sfx2/uiconfig/ui/custominfopage.ui:138
+msgctxt "custominfopage|extended_tip|CustomInfoPage"
+msgid "Allows you to assign custom information fields to your document."
+msgstr "Hier kunt u velden met gebruikersinformatie aan uw document toewijzen."
+
+#. VHwZA
+#: sfx2/uiconfig/ui/deck.ui:101 sfx2/uiconfig/ui/deck.ui:106
+msgctxt "deck|SFX_STR_SIDEBAR_CLOSE_DECK"
+msgid "Close Sidebar Deck"
+msgstr "Zijbalkpaneel sluiten"
+
+#. pxEPn
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:18
+msgctxt "descriptioninfopage|label27"
+msgid "_Title:"
+msgstr "_Titel:"
+
+#. HqzQo
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:32
+msgctxt "descriptioninfopage|label28"
+msgid "_Subject:"
+msgstr "_Onderwerp:"
+
+#. gEGPn
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:46
+msgctxt "descriptioninfopage|label29"
+msgid "_Keywords:"
+msgstr "_Sleutelwoorden:"
+
+#. Nayo4
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:61
+msgctxt "descriptioninfopage|label30"
+msgid "_Comments:"
+msgstr "_Notities:"
+
+#. qw238
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:79
+msgctxt "descriptioninfopage|extended_tip|title"
+msgid "Enter a title for the document."
+msgstr "Voer een titel voor het document in."
+
+#. rvZHi
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:96
+msgctxt "descriptioninfopage|extended_tip|subject"
+msgid "Enter a subject for the document. You can use a subject to group documents with similar contents."
+msgstr "Voer een onderwerp voor het document in. U kunt een onderwerp gebruiken om documenten met gelijksoortige inhoud te groeperen."
+
+#. FoxGh
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:113
+msgctxt "descriptioninfopage|extended_tip|keywords"
+msgid "Enter the words that you want to use to index the content of your document. Keywords must be separated by commas. A keyword can contain white space characters or semicolons."
+msgstr "Voer de woorden in die u wilt gebruken om de inhoud van uw document te indexeren. Sleutelwoorden moeten worden gescheiden door komma's. Een sleutelwoord mag tekens voor witruimte of punt-komma's bevatten."
+
+#. bo2q7
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:137
+msgctxt "descriptioninfopage|extended_tip|comments"
+msgid "Enter comments to help identify the document."
+msgstr "Voer opmerkingen in om het document te kunnen identificeren."
+
+#. sGW3Z
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:150
+msgctxt "descriptioninfopage|extended_tip|DescriptionInfoPage"
+msgid "Contains descriptive information about the document."
+msgstr "Bevat beschrijvende informatie over het document."
+
+#. tC2rt
+#: sfx2/uiconfig/ui/developmenttool.ui:116
+msgctxt "developmenttool|dom_current_selection_toggle-tooltip"
+msgid "Current Selection In Document"
+msgstr "Huidige selectie in het document"
+
+#. Po2S3
+#: sfx2/uiconfig/ui/developmenttool.ui:117
+msgctxt "developmenttool|dom_current_selection_toggle"
+msgid "Current Selection"
+msgstr "Huidige selectie"
+
+#. eB6NR
+#: sfx2/uiconfig/ui/developmenttool.ui:128
+msgctxt "developmenttool|dom_refresh_button-tooltip"
+msgid "Refresh Document Model Tree View"
+msgstr "Vernieuw de structuurweergave van het documentmodel"
+
+#. FD2yt
+#: sfx2/uiconfig/ui/developmenttool.ui:129
+msgctxt "developmenttool|dom_refresh_button"
+msgid "Refresh"
+msgstr "Vernieuwen"
+
+#. qVgcX
+#: sfx2/uiconfig/ui/developmenttool.ui:175
+msgctxt "developmenttool|object"
+msgid "Object"
+msgstr "Object"
+
+#. x6GLB
+#: sfx2/uiconfig/ui/developmenttool.ui:223
+msgctxt "developmenttool|tooltip-back"
+msgid "Back"
+msgstr "Terug"
+
+#. SinPk
+#: sfx2/uiconfig/ui/developmenttool.ui:224
+msgctxt "developmenttool|back"
+msgid "Back"
+msgstr "Terug"
+
+#. 4CBb3
+#: sfx2/uiconfig/ui/developmenttool.ui:236
+msgctxt "developmenttool|tooltip-inspect"
+msgid "Inspect"
+msgstr "Inspecteren"
+
+#. vCciB
+#: sfx2/uiconfig/ui/developmenttool.ui:237
+msgctxt "developmenttool|inspect"
+msgid "Inspect"
+msgstr "Inspecteren"
+
+#. nFMXe
+#: sfx2/uiconfig/ui/developmenttool.ui:249
+msgctxt "developmenttool|tooltip-refresh"
+msgid "Refresh"
+msgstr "Vernieuwen"
+
+#. CFuvW
+#: sfx2/uiconfig/ui/developmenttool.ui:250
+msgctxt "developmenttool|refresh"
+msgid "Refresh"
+msgstr "Vernieuwen"
+
+#. 6gFmn
+#: sfx2/uiconfig/ui/developmenttool.ui:273
+msgctxt "developmenttool|classname"
+msgid "Class name:"
+msgstr "Klassenaam:"
+
+#. a9j7f
+#: sfx2/uiconfig/ui/developmenttool.ui:338
+#: sfx2/uiconfig/ui/developmenttool.ui:387
+#: sfx2/uiconfig/ui/developmenttool.ui:445
+msgctxt "developmenttool|name"
+msgid "Name"
+msgstr "Namen"
+
+#. VFqAa
+#: sfx2/uiconfig/ui/developmenttool.ui:358
+msgctxt "developmenttool|interfaces"
+msgid "Interfaces"
+msgstr "Interfaces"
+
+#. iCdWe
+#: sfx2/uiconfig/ui/developmenttool.ui:410
+msgctxt "developmenttool|services"
+msgid "Services"
+msgstr "Services"
+
+#. H7pYE
+#: sfx2/uiconfig/ui/developmenttool.ui:460
+msgctxt "developmenttool|value"
+msgid "Value"
+msgstr "Waarde"
+
+#. Jjkqh
+#: sfx2/uiconfig/ui/developmenttool.ui:474
+msgctxt "developmenttool|type"
+msgid "Type"
+msgstr "Type"
+
+#. zpXuY
+#: sfx2/uiconfig/ui/developmenttool.ui:488
+msgctxt "developmenttool|info"
+msgid "Info"
+msgstr "Informatie"
+
+#. AUktw
+#: sfx2/uiconfig/ui/developmenttool.ui:539
+msgctxt "developmenttool|properties"
+msgid "Properties"
+msgstr "Eigenschappen"
+
+#. wGJtn
+#: sfx2/uiconfig/ui/developmenttool.ui:569
+msgctxt "developmenttool|method"
+msgid "Method"
+msgstr "Methodes"
+
+#. EnGfg
+#: sfx2/uiconfig/ui/developmenttool.ui:584
+msgctxt "developmenttool|returntype"
+msgid "Return Type"
+msgstr "Retourtype"
+
+#. AKnSa
+#: sfx2/uiconfig/ui/developmenttool.ui:598
+msgctxt "developmenttool|parameters"
+msgid "Parameters"
+msgstr "Parameters"
+
+#. tmttq
+#: sfx2/uiconfig/ui/developmenttool.ui:612
+msgctxt "developmenttool|implementation_class"
+msgid "Implementation Class"
+msgstr "Implementatieklasse"
+
+#. Q2CBK
+#: sfx2/uiconfig/ui/developmenttool.ui:634
+msgctxt "developmenttool|methods"
+msgid "Methods"
+msgstr "Methodes"
+
+#. 68CBk
+#: sfx2/uiconfig/ui/devtoolsmenu.ui:12
+msgctxt "devtoolsmenu|inspect"
+msgid "Inspect"
+msgstr "Inspecteren"
+
+#. zjFgn
+#: sfx2/uiconfig/ui/documentfontspage.ui:28
+msgctxt "documentfontspage|embedFonts"
+msgid "_Embed fonts in the document"
+msgstr "_Lettertypes in het document invoegen"
+
+#. FzuRv
+#: sfx2/uiconfig/ui/documentfontspage.ui:36
+msgctxt "documentfontspage|extended_tip|embedFonts"
+msgid "Mark this box to embed document fonts into the document file, for portability between different computer systems."
+msgstr "Markeer dit vakje om lettertypes in het document in te bedden, voor uitwisselbaarheid tussen verschillende computersystemen."
+
+#. 6rfon
+#: sfx2/uiconfig/ui/documentfontspage.ui:48
+msgctxt "documentfontspage|embedUsedFonts"
+msgid "_Only embed fonts that are used in documents"
+msgstr "_Alleen lettertypes insluiten die in documenten gebruikt worden"
+
+#. V8E5f
+#: sfx2/uiconfig/ui/documentfontspage.ui:67
+msgctxt "documentfontspage|fontEmbeddingLabel"
+msgid "Font Embedding"
+msgstr "Lettertype insluiten"
+
+#. Gip6V
+#: sfx2/uiconfig/ui/documentfontspage.ui:95
+msgctxt "documentfontspage|embedLatinScriptFonts"
+msgid "_Latin fonts"
+msgstr "_Latijnse lettertypes"
+
+#. nFM92
+#: sfx2/uiconfig/ui/documentfontspage.ui:110
+msgctxt "documentfontspage|embedAsianScriptFonts"
+msgid "_Asian fonts"
+msgstr "_Aziatische lettertypes"
+
+#. nSg9b
+#: sfx2/uiconfig/ui/documentfontspage.ui:125
+msgctxt "documentfontspage|embedComplexScriptFonts"
+msgid "_Complex fonts"
+msgstr "_Complexe lettertypes"
+
+#. EFytK
+#: sfx2/uiconfig/ui/documentfontspage.ui:144
+msgctxt "documentfontspage|fontScriptFrameLabel"
+msgid "Font scripts to embed"
+msgstr "In te bedden lettertypescripts"
+
+#. izc2Y
+#: sfx2/uiconfig/ui/documentfontspage.ui:158
+msgctxt "documentfontspage|extended_tip|DocumentFontsPage"
+msgid "Embed document fonts in the current file."
+msgstr "Het insluiten van lettertypes in het huidige bestand."
+
+#. CCxGn
+#: sfx2/uiconfig/ui/documentinfopage.ui:19
+msgctxt "documentinfopage|label13"
+msgid "_Created:"
+msgstr "_Gemaakt:"
+
+#. EZKmF
+#: sfx2/uiconfig/ui/documentinfopage.ui:33
+msgctxt "documentinfopage|label14"
+msgid "_Modified:"
+msgstr "_Gewijzigd:"
+
+#. 4GLKx
+#: sfx2/uiconfig/ui/documentinfopage.ui:47
+msgctxt "documentinfopage|label15"
+msgid "_Digitally signed:"
+msgstr "_Digitaal ondertekend:"
+
+#. gJwUC
+#: sfx2/uiconfig/ui/documentinfopage.ui:61
+msgctxt "documentinfopage|label16"
+msgid "Last pri_nted:"
+msgstr "Laatst afgedr_ukt:"
+
+#. drz3P
+#: sfx2/uiconfig/ui/documentinfopage.ui:75
+msgctxt "documentinfopage|label17"
+msgid "Total _editing time:"
+msgstr "Totale _bewerkingstijd:"
+
+#. MEzSr
+#: sfx2/uiconfig/ui/documentinfopage.ui:89
+msgctxt "documentinfopage|label18"
+msgid "Re_vision number:"
+msgstr "Re_visienummer:"
+
+#. BgTqU
+#: sfx2/uiconfig/ui/documentinfopage.ui:131
+msgctxt "documentinfopage|showsigned"
+msgid "Multiply signed document"
+msgstr "Meermaals ondertekend document"
+
+#. sGFJQ
+#: sfx2/uiconfig/ui/documentinfopage.ui:183
+msgctxt "documentinfopage|userdatacb"
+msgid "_Apply user data"
+msgstr "_Gebruikersgegevens toepassen"
+
+#. JFxmP
+#: sfx2/uiconfig/ui/documentinfopage.ui:197
+msgctxt "documentinfopage|reset"
+msgid "Reset Properties"
+msgstr "Eigenschappen terugzetten"
+
+#. HrN2U
+#: sfx2/uiconfig/ui/documentinfopage.ui:204
+msgctxt "documentinfopage|extended_tip|reset"
+msgid "Resets the editing time to zero, the creation date to the current date and time, and the version number to 1. The modification and printing dates are also deleted."
+msgstr "Stelt de bewerkingstijd opnieuw in op nul, de aanmaakdatum op de huidige datum en tijd, en het versienummer op 1. De wijzigings- en afdrukdatum worden ook verwijderd."
+
+#. qeWvU
+#: sfx2/uiconfig/ui/documentinfopage.ui:215
+msgctxt "documentinfopage|signature"
+msgid "Di_gital Signatures..."
+msgstr "Digitale ondertekening..."
+
+#. rEEgJ
+#: sfx2/uiconfig/ui/documentinfopage.ui:234
+msgctxt "documentinfopage|label11"
+msgid "_Size:"
+msgstr "_Grootte:"
+
+#. WNFYB
+#: sfx2/uiconfig/ui/documentinfopage.ui:247
+msgctxt "documentinfopage|showsize"
+msgid "unknown"
+msgstr "onbekend"
+
+#. EgtLE
+#: sfx2/uiconfig/ui/documentinfopage.ui:262
+msgctxt "documentinfopage|label8"
+msgid "_Location:"
+msgstr "_Locatie:"
+
+#. 9xhwo
+#: sfx2/uiconfig/ui/documentinfopage.ui:276
+msgctxt "documentinfopage|label7"
+msgid "_Type:"
+msgstr "_Soort:"
+
+#. ZLmAo
+#: sfx2/uiconfig/ui/documentinfopage.ui:299
+msgctxt "documentinfopage|changepass"
+msgid "Change _Password"
+msgstr "_Wachtwoord wijzigen"
+
+#. oqAZE
+#: sfx2/uiconfig/ui/documentinfopage.ui:317
+msgctxt "documentinfopage|templateft"
+msgid "Template:"
+msgstr "Sjabloon:"
+
+#. 5pXPV
+#: sfx2/uiconfig/ui/documentinfopage.ui:366
+msgctxt "documentinfopage|extended_tip|nameed"
+msgid "Displays the file name."
+msgstr "Geeft de bestandsnaam weer."
+
+#. LCDUj
+#: sfx2/uiconfig/ui/documentinfopage.ui:397
+msgctxt "documentinfopage|thumbnailsavecb"
+msgid "Save preview image with this document"
+msgstr "Sla voorbeeldafbeelding met dit document op"
+
+#. 2GKBr
+#: sfx2/uiconfig/ui/documentinfopage.ui:415
+msgctxt "documentinfopage|image-preferred-dpi-checkbutton"
+msgid "Image preferred DPI"
+msgstr "Afbeeldingsvoorkeur DPI"
+
+#. VWjRu
+#: sfx2/uiconfig/ui/documentinfopage.ui:479
+msgctxt "documentinfopage|extended_tip|DocumentInfoPage"
+msgid "Contains basic information about the current file."
+msgstr "Basisinformatie over het huidige bestand weergeven."
+
+#. scgsx
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:8
+msgctxt "documentpropertiesdialog|DocumentPropertiesDialog"
+msgid "Properties of “%1”"
+msgstr "Eigenschappen van \"%1\""
+
+#. iTECQ
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:135
+msgctxt "documentpropertiesdialog|general"
+msgid "General "
+msgstr "Algemeen "
+
+#. Vggig
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:182
+msgctxt "documentpropertiesdialog|description"
+msgid "Description"
+msgstr "Beschrijving"
+
+#. HTaxP
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:230
+msgctxt "documentpropertiesdialog|customprops"
+msgid "Custom Properties"
+msgstr "Gebruikergedefinieerde eigenschappen"
+
+#. DccDw
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:278
+msgctxt "documentpropertiesdialog|cmisprops"
+msgid "CMIS Properties"
+msgstr "CMIS Eigenschappen"
+
+#. q9i7y
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:326
+msgctxt "documentpropertiesdialog|security"
+msgid "Security"
+msgstr "Beveiliging"
+
+#. 42uNG
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:7
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "Confirm editing of document"
+msgstr "Bewerken van document bevestigen"
+
+#. bdEZG
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:13
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "Are you sure you want to edit the document?"
+msgstr "Weet u zeker dat u het document wilt bewerken?"
+
+#. AMrnx
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:14
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "The original file can be signed without editing the document. Existing signatures on the document will be lost in case of saving an edited version."
+msgstr "Het originele bestand kan worden ondertekend zonder het document te bewerken. Bestaande handtekeningen in het document zullen verloren gaan, als een bewerkte versie wordt opgeslagen."
+
+#. wRps5
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:25
+msgctxt "editdocumentdialog|edit"
+msgid "Edit Document"
+msgstr "Document bewerken"
+
+#. oWdm6
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:42
+msgctxt "editdocumentdialog|cancel"
+msgid "Cancel"
+msgstr "Annuleren"
+
+#. hrgcD
+#: sfx2/uiconfig/ui/editdurationdialog.ui:43
+msgctxt "editdurationdialog|EditDurationDialog"
+msgid "Edit Duration"
+msgstr "Tijdsduur bewerken"
+
+#. 66AnB
+#: sfx2/uiconfig/ui/editdurationdialog.ui:132
+msgctxt "editdurationdialog|negative"
+msgid "_Negative"
+msgstr "_Negatief"
+
+#. LeAmz
+#: sfx2/uiconfig/ui/editdurationdialog.ui:149
+msgctxt "editdurationdialog|label1"
+msgid "_Years:"
+msgstr "_Jaren:"
+
+#. kFDdM
+#: sfx2/uiconfig/ui/editdurationdialog.ui:163
+msgctxt "editdurationdialog|label"
+msgid "_Months:"
+msgstr "_Maanden:"
+
+#. CHLhB
+#: sfx2/uiconfig/ui/editdurationdialog.ui:177
+msgctxt "editdurationdialog|label3"
+msgid "_Days:"
+msgstr "_Dagen:"
+
+#. 2w5Dd
+#: sfx2/uiconfig/ui/editdurationdialog.ui:191
+msgctxt "editdurationdialog|label4"
+msgid "H_ours:"
+msgstr "_Uren:"
+
+#. TtWAW
+#: sfx2/uiconfig/ui/editdurationdialog.ui:205
+msgctxt "editdurationdialog|label5"
+msgid "Min_utes:"
+msgstr "Min_uten:"
+
+#. TieWF
+#: sfx2/uiconfig/ui/editdurationdialog.ui:219
+msgctxt "editdurationdialog|label6"
+msgid "_Seconds:"
+msgstr "_Seconden:"
+
+#. GxEZZ
+#: sfx2/uiconfig/ui/editdurationdialog.ui:233
+msgctxt "editdurationdialog|label7"
+msgid "Millise_conds:"
+msgstr "Millise_conden:"
+
+#. FLFW8
+#: sfx2/uiconfig/ui/editdurationdialog.ui:340
+msgctxt "editdurationdialog|label2"
+msgid "Duration"
+msgstr "Duur"
+
+#. 9cAb5
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:7
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "No email configuration"
+msgstr "Geen email-configuratie"
+
+#. cFct7
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:14
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "%PRODUCTNAME was unable to find a working email configuration."
+msgstr "%PRODUCTNAME kon geen werkende e-mailconfiguratie vinden."
+
+#. xQi7X
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:15
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "Please save this document locally instead and attach it from within your email client."
+msgstr "Sla dit document lokaal op en voeg het vanuit uw email-client bij."
+
+#. DVQUS
+#: sfx2/uiconfig/ui/floatingrecord.ui:7
+msgctxt "floatingrecord|FloatingRecord"
+msgid "Record Macro"
+msgstr "Macro opnemen"
+
+#. Fa63R
+#: sfx2/uiconfig/ui/helpbookmarkpage.ui:32
+msgctxt "helpbookmarkpage|label1"
+msgid "_Bookmarks"
+msgstr "_Bladwijzers"
+
+#. kZqGE
+#: sfx2/uiconfig/ui/helpbookmarkpage.ui:83
+msgctxt "helpbookmarkpage|display"
+msgid "_Display"
+msgstr "_Weergeven"
+
+#. S7ppr
+#: sfx2/uiconfig/ui/helpcontrol.ui:77
+msgctxt "helpcontrol|contents"
+msgid "Contents"
+msgstr "Inhoud"
+
+#. vxPLh
+#: sfx2/uiconfig/ui/helpcontrol.ui:126
+msgctxt "helpcontrol|index"
+msgid "Index"
+msgstr "Index"
+
+#. HdGQi
+#: sfx2/uiconfig/ui/helpcontrol.ui:176
+msgctxt "helpcontrol|find"
+msgid "Find"
+msgstr "Zoeken"
+
+#. 7fapN
+#: sfx2/uiconfig/ui/helpcontrol.ui:226
+msgctxt "helpcontrol|bookmarks"
+msgid "Bookmarks"
+msgstr "Bladwijzers"
+
+#. UQL8A
+#: sfx2/uiconfig/ui/helpindexpage.ui:30
+msgctxt "helpindexpage|display"
+msgid "_Display"
+msgstr "_Weergeven"
+
+#. 4MkAM
+#: sfx2/uiconfig/ui/helpindexpage.ui:116
+msgctxt "helpindexpage|label1"
+msgid "_Search Term"
+msgstr "_Zoekterm"
+
+#. wKLbH
+#: sfx2/uiconfig/ui/helpmanual.ui:7
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "%PRODUCTNAME Help Not Installed"
+msgstr "%PRODUCTNAME-help niet geïnstalleerd"
+
+#. JBdnz
+#: sfx2/uiconfig/ui/helpmanual.ui:12
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "The %PRODUCTNAME built-in help for current UI language ($UILOCALE) is not installed on your computer."
+msgstr "De ingebouwde Help voor %PRODUCTNAME voor de huidige taal van de gebruikersinterface ($UILOCALE) is niet op uw computer geïnstalleerd."
+
+#. DxMPr
+#: sfx2/uiconfig/ui/helpmanual.ui:13
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "You may either install it from our website or your system’s repositories, or read an online version."
+msgstr "U kunt het installeren vanaf onze website of uit de opslag van uw systeem, of een onlineversie lezen."
+
+#. AaeBL
+#: sfx2/uiconfig/ui/helpmanual.ui:23
+msgctxt "helpmanual|website"
+msgid "Read Help Online"
+msgstr "Onlinehelp lezen"
+
+#. B2Wzh
+#: sfx2/uiconfig/ui/helpmanual.ui:60
+msgctxt "helpmanual|hidedialog"
+msgid "Do not show this dialog again"
+msgstr "Dit dialoogvenster niet meer weergeven"
+
+#. 8FjCk
+#: sfx2/uiconfig/ui/helpsearchpage.ui:30
+msgctxt "helpsearchpage|display"
+msgid "_Display"
+msgstr "_Weergeven"
+
+#. JDsn3
+#: sfx2/uiconfig/ui/helpsearchpage.ui:46
+msgctxt "helpsearchpage|label1"
+msgid "_Search term"
+msgstr "_Zoekterm"
+
+#. VRVyq
+#: sfx2/uiconfig/ui/helpsearchpage.ui:122
+msgctxt "helpsearchpage|find"
+msgid "_Find"
+msgstr "_Zoeken"
+
+#. ZiE8A
+#: sfx2/uiconfig/ui/helpsearchpage.ui:141
+msgctxt "helpsearchpage|completewords"
+msgid "_Complete words only"
+msgstr "_Alleen hele woorden"
+
+#. vzqdb
+#: sfx2/uiconfig/ui/helpsearchpage.ui:155
+msgctxt "helpsearchpage|headings"
+msgid "Find in _headings only"
+msgstr "Alleen in _titels zoeken"
+
+#. JDZho
+#: sfx2/uiconfig/ui/helpwindow.ui:69
+msgctxt "helpwindow|backward|tooltip_text"
+msgid "Previous Page"
+msgstr "Vorige pagina"
+
+#. Gv3uP
+#: sfx2/uiconfig/ui/helpwindow.ui:80
+msgctxt "helpwindow|forward|tooltip_text"
+msgid "Next Page"
+msgstr "Volgende pagina"
+
+#. uaBtK
+#: sfx2/uiconfig/ui/helpwindow.ui:91
+msgctxt "helpwindow|start|tooltip_text"
+msgid "First Page"
+msgstr "Eerste pagina"
+
+#. TizVY
+#: sfx2/uiconfig/ui/helpwindow.ui:112
+msgctxt "helpwindow|print|tooltip_text"
+msgid "Print"
+msgstr "Afdrukken"
+
+#. 7wgqt
+#: sfx2/uiconfig/ui/helpwindow.ui:123
+msgctxt "helpwindow|bookmarks|tooltip_text"
+msgid "Add to Bookmarks"
+msgstr "Toevoegen aan bladwijzers"
+
+#. qPF9A
+#: sfx2/uiconfig/ui/helpwindow.ui:134
+msgctxt "helpwindow|searchdialog|tooltip_text"
+msgid "Find on this Page"
+msgstr "Zoeken op deze pagina"
+
+#. VnXxR
+#: sfx2/uiconfig/ui/infobar.ui:65
+msgctxt "infobar|close|tooltip_text"
+msgid "Close Infobar"
+msgstr "Sluit de infobalk"
+
+#. DpXCY
+#: sfx2/uiconfig/ui/inputdialog.ui:87
+msgctxt "inputdialog|label"
+msgid "Height:"
+msgstr "Hoogte:"
+
+#. HwHjx
+#: sfx2/uiconfig/ui/licensedialog.ui:8
+msgctxt "licensedialog|LicenseDialog"
+msgid "Licensing and Legal information"
+msgstr "Licenties en juridische informatie"
+
+#. yLwba
+#: sfx2/uiconfig/ui/licensedialog.ui:25
+msgctxt "licensedialog|show"
+msgid "_Show License"
+msgstr "_Licentie tonen"
+
+#. 3unZa
+#: sfx2/uiconfig/ui/licensedialog.ui:68
+msgctxt "licensedialog|label"
+msgid ""
+"%PRODUCTNAME is made available subject to the terms of the Mozilla Public License, v. 2.0. A copy of the MPL can be obtained at http://mozilla.org/MPL/2.0/.\n"
+"\n"
+"Third Party Code Additional copyright notices and license terms applicable to portions of the Software are set forth in the LICENSE.html file; choose Show License to see exact details in English.\n"
+"\n"
+"All trademarks and registered trademarks mentioned herein are the property of their respective owners.\n"
+"\n"
+"Copyright © 2000–2022 LibreOffice contributors. All rights reserved.\n"
+"\n"
+"This product was created by %OOOVENDOR, based on OpenOffice.org, which is Copyright 2000, 2011 Oracle and/or its affiliates. %OOOVENDOR acknowledges all community members, please see http://www.libreoffice.org/ for more details."
+msgstr ""
+"%PRODUCTNAME is beschikbaar gemaakt onder voorbehoud van de voorwaarde van de Mozilla Public License, v. 2.0. Een kopie van de MPL kunt u vinden op de website http://mozilla.org/MPL/2.0/.\n"
+"\n"
+"Derde Partij Code extra copyright notities en licentie voorwaarden, van toepassing op gedeeltes van de Software zijn vermeld in het bestand LICENSE.html; kies Show License om de exacte details in het Engels te zien.\n"
+"\n"
+"Alle trademarks en geregistreerde trademarks hierin vermeld zijn eigendom van de  respectieve eigenaars.\n"
+"\n"
+"Copyright © 2000–2022 LibreOffice medewerkers. Alle rechten voorbehouden.\n"
+"\n"
+"Dit product werd gemaakt door %OOOVENDOR, gebaseerd op OpenOffice.org, met Copyright 2000, 2011 Oracle en/of zijn geassocieerden.. %OOOVENDOR bedankt alle gemeenschapsleden, zie http://www.libreoffice.org/ voor meer details."
+
+#. QuVoN
+#: sfx2/uiconfig/ui/linefragment.ui:57
+msgctxt "linefragment|STR_SFX_REMOVE_PROPERTY"
+msgid "Remove Property"
+msgstr "Eigenschap verwijderen"
+
+#. 8gPai
+#: sfx2/uiconfig/ui/linefragment.ui:149
+msgctxt "linefragment|SFX_ST_EDIT"
+msgid "..."
+msgstr "..."
+
+#. x4Fjd
+#: sfx2/uiconfig/ui/linefragment.ui:185
+msgctxt "linefragment|yes"
+msgid "Yes"
+msgstr "Ja"
+
+#. mJFyB
+#: sfx2/uiconfig/ui/linefragment.ui:200
+msgctxt "linefragment|no"
+msgid "No"
+msgstr "Nee"
+
+#. muk9B
+#: sfx2/uiconfig/ui/linkeditdialog.ui:8
+msgctxt "linkeditdialog|title"
+msgid "Modify DDE Link"
+msgstr "Wijzig DDE-koppeling"
+
+#. CZn3G
+#: sfx2/uiconfig/ui/linkeditdialog.ui:102
+msgctxt "linkeditdialog|label2"
+msgid "_Application:"
+msgstr "_Toepassing:"
+
+#. GZsEX
+#: sfx2/uiconfig/ui/linkeditdialog.ui:116
+msgctxt "linkeditdialog|label3"
+msgid "_File:"
+msgstr "_Bestand:"
+
+#. 6Fx6h
+#: sfx2/uiconfig/ui/linkeditdialog.ui:130
+msgctxt "linkeditdialog|label4"
+msgid "_Category:"
+msgstr "_Categorie:"
+
+#. AzB2M
+#: sfx2/uiconfig/ui/linkeditdialog.ui:148
+msgctxt "linkeditdialog|extended_tip|app"
+msgid "Lists the application that last saved the source file. The office suite applications have the server name soffice."
+msgstr "Geeft de toepassing weer die het bronbestand het laatst heeft opgeslagen. De toepassingen van het kantoorpakket hebben de servernaam soffice."
+
+#. cj9do
+#: sfx2/uiconfig/ui/linkeditdialog.ui:166
+msgctxt "linkeditdialog|extended_tip|file"
+msgid "Path to the source file. Relative paths must be expressed by full URI, for example, with file://."
+msgstr "Pad naar het bronbestand. Relatieve paden moeten worden uitgedrukt door een volledige URI, bijvoorbeeld met bestand: //."
+
+#. cMPNq
+#: sfx2/uiconfig/ui/linkeditdialog.ui:184
+msgctxt "linkeditdialog|extended_tip|category"
+msgid "Lists the section or object that the link refers to in the source file. If you want, you can enter a new section or object here."
+msgstr "Geeft de sectie of het object weer waarnaar de koppeling verwijst in het bronbestand. Als u wilt, kunt u hier een nieuwe sectie of een nieuw object invoeren."
+
+#. hiapi
+#: sfx2/uiconfig/ui/linkeditdialog.ui:199
+msgctxt "linkeditdialog|label1"
+msgid "Modify Link"
+msgstr "Koppeling wijzigen"
+
+#. ba2Tn
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:24
+msgctxt "loadtemplatedialog|LoadTemplateDialog"
+msgid "New"
+msgstr "Nieuw"
+
+#. MkW3E
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:40
+msgctxt "loadtemplatedialog|fromfile"
+msgid "From File..."
+msgstr "Uit bestand..."
+
+#. jSrBT
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:45
+msgctxt "loadtemplatedialog|fromfile|tooltip_text"
+msgid "Copy styles from selected external document to current document."
+msgstr "Kopieer opmaakprofielen van het geselecteerde externe document naar het huidige document."
+
+#. GE236
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:48
+msgctxt "loadtemplatedialog|extended_tip|fromfile"
+msgid "Locate the file containing the styles that you want to load, and then click Open."
+msgstr "Zoek het bestand dat de opmaakprofielen bevat die u wilt laden, en klik dan op Openen."
+
+#. YCguC
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:165
+msgctxt "loadtemplatedialog|extended_tip|categories"
+msgid "Lists the available template categories. Click a category to view its contents in the Templates list."
+msgstr "Toont de beschikbare sjablooncategorieën. Klik op een categorie om de inhoud te bekijken in de Sjablonen."
+
+#. PZS7L
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:176
+msgctxt "loadtemplatedialog|label1"
+msgid "Categories"
+msgstr "Categorieën"
+
+#. hkGaT
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:230
+msgctxt "loadtemplatedialog|extended_tip|templates"
+msgid "Lists the available templates for the selected category."
+msgstr "Toont de beschikbare sjablonen voor de geselecteerde categorie."
+
+#. hryGV
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:241
+msgctxt "loadtemplatedialog|label2"
+msgid "Templates"
+msgstr "Sjablonen"
+
+#. LAAM3
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:245
+msgctxt "loadtemplatedialog|label2|tooltip_text"
+msgid "Templates in the selected category"
+msgstr "Sjablonen in de geselecteerde categorie"
+
+#. rFENe
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:264
+msgctxt "loadtemplatedialog|text"
+msgid "_Paragraph and Character"
+msgstr "_Alinea en teken"
+
+#. jCAuA
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:269
+msgctxt "loadtemplatedialog|text|tooltip_text"
+msgid "Copy paragraph and character styles to current document."
+msgstr "Kopieer alinea- en tekenopmaakprofielen naar het huidige document."
+
+#. VLWfZ
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:273
+msgctxt "loadtemplatedialog|extended_tip|text"
+msgid "Loads the paragraph and the character styles from the selected document into the current document."
+msgstr "Laadt de alinea- en tekenopmaakprofielen uit het geselecteerde document in het huidige document."
+
+#. d2q55
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:284
+msgctxt "loadtemplatedialog|frame"
+msgid "_Frame"
+msgstr "_Frame"
+
+#. HSCZj
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:289
+msgctxt "loadtemplatedialog|frame|tooltip_text"
+msgid "Copy frame styles to current document."
+msgstr "Kopieer frame-opmaakprofielen naar het huidige document."
+
+#. 4ZF6u
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:293
+msgctxt "loadtemplatedialog|extended_tip|frame"
+msgid "Loads the frame styles from the selected document into the current document."
+msgstr "Laadt de frame-opmaakprofielen uit het geselecteerde document in het huidige document."
+
+#. vFZLz
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:304
+msgctxt "loadtemplatedialog|pages"
+msgid "Pa_ge"
+msgstr "Pa_gina"
+
+#. hdRo6
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:309
+msgctxt "loadtemplatedialog|pages|tooltip_text"
+msgid "Copy page styles to current document."
+msgstr "Kopieer pagina-opmaakprofielen naar het huidige document."
+
+#. o2C8c
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:313
+msgctxt "loadtemplatedialog|extended_tip|pages"
+msgid "Loads the page styles from the selected document into the current document."
+msgstr "Laadt de pagina-opmaakprofielen uit het geselecteerde document in het huidige document."
+
+#. 2xgCH
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:324
+msgctxt "loadtemplatedialog|numbering"
+msgid "_List"
+msgstr "_Lijst"
+
+#. VZxbf
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:329
+msgctxt "loadtemplatedialog|numbering|tooltip_text"
+msgid "Copy list styles to current document."
+msgstr "Kopieer lijstopmaakprofielen naar het huidige document."
+
+#. PAsEB
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:333
+msgctxt "loadtemplatedialog|extended_tip|numbering"
+msgid "Loads the list styles from the selected document into the current document."
+msgstr "De lijststopmaakprofielen van het geselecteerde document in het huidige document laden."
+
+#. VWzsG
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:344
+msgctxt "loadtemplatedialog|overwrite"
+msgid "_Overwrite"
+msgstr "_Overschrijven"
+
+#. cr86W
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:350
+msgctxt "loadtemplatedialog|overwrite|tooltip_text"
+msgid "Overwrite styles with same name"
+msgstr "Overschrijf opmaakprofielen met dezelfde naam"
+
+#. A9ogA
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:353
+msgctxt "loadtemplatedialog|extended_tip|overwrite"
+msgid "Replaces styles in the current document that have the same name as the styles you are loading."
+msgstr "Vervangt de opmaakprofielen in het huidige document die dezelfde naam hebben als de opmaakprofielen die u laadt."
+
+#. 7ru2R
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:376
+msgctxt "loadtemplatedialog|alttitle"
+msgid "Load Styles from Template"
+msgstr "Opmaakproflelen uit een sjabloon laden"
+
+#. X5Pi5
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:413
+msgctxt "loadtemplatedialog|label3"
+msgid "Pre_view"
+msgstr "_Voorbeeld"
+
+#. hR7cK
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:419
+msgctxt "loadtemplatedialog|extended_tip|expander"
+msgid "Shows or hides a preview of a selected template."
+msgstr "Toont of verbergt een voorbeeld van een geselecteerde sjabloon."
+
+#. CRcca
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:449
+msgctxt "loadtemplatedialog|extended_tip|LoadTemplateDialog"
+msgid "Imports formatting styles from another document or template into the current document."
+msgstr ">Importeert opmaakprofielen uit een ander document of andere sjabloon in het huidige document."
+
+#. EAhup
+#: sfx2/uiconfig/ui/managestylepage.ui:33
+msgctxt "managestylepage|nameft"
+msgid "_Name:"
+msgstr "_Naam:"
+
+#. VroAG
+#: sfx2/uiconfig/ui/managestylepage.ui:47
+msgctxt "managestylepage|nextstyleft"
+msgid "Ne_xt style:"
+msgstr "V_olgend opmaakprofiel:"
+
+#. mJYgm
+#: sfx2/uiconfig/ui/managestylepage.ui:61
+msgctxt "managestylepage|linkedwithft"
+msgid "Inherit from:"
+msgstr "Gebaseerd op:"
+
+#. 9pGL9
+#: sfx2/uiconfig/ui/managestylepage.ui:75
+msgctxt "managestylepage|categoryft"
+msgid "_Category:"
+msgstr "_Categorie:"
+
+#. MMhJQ
+#: sfx2/uiconfig/ui/managestylepage.ui:99
+msgctxt "managestylepage|editstyle"
+msgid "Edit Style"
+msgstr "Opmaakprofiel bewerken"
+
+#. 7XGEs
+#: sfx2/uiconfig/ui/managestylepage.ui:123
+msgctxt "managestylepage|editlinkstyle"
+msgid "Edit Style"
+msgstr "Opmaakprofiel bewerken"
+
+#. cKjrA
+#: sfx2/uiconfig/ui/managestylepage.ui:147
+msgctxt "managestylepage|autoupdate"
+msgid "_AutoUpdate"
+msgstr "_Autom. bijwerken"
+
+#. oTXJz
+#: sfx2/uiconfig/ui/managestylepage.ui:192
+msgctxt "managestylepage|label1"
+msgid "Style"
+msgstr "Opmaakprofiel"
+
+#. NXG9o
+#: sfx2/uiconfig/ui/managestylepage.ui:227
+msgctxt "managestylepage|label2"
+msgid "Contains"
+msgstr "Bevat"
+
+#. WJunC
+#: sfx2/uiconfig/ui/newstyle.ui:16
+msgctxt "newstyle|CreateStyleDialog"
+msgid "New Style from Selection"
+msgstr "Nieuw opmaakprofiel uit selectie"
+
+#. 2XkTt
+#: sfx2/uiconfig/ui/newstyle.ui:140
+msgctxt "newstyle|styles-atkobject"
+msgid "Custom styles for selected category"
+msgstr "Aangepaste opmaakprofielen voor de geselecteerde categorie"
+
+#. UEGSg
+#: sfx2/uiconfig/ui/newstyle.ui:160
+msgctxt "newstyle|stylename-atkobject"
+msgid "Style name"
+msgstr "Naam opmaakprofiel"
+
+#. bjN3T
+#: sfx2/uiconfig/ui/newstyle.ui:175
+msgctxt "newstyle|categorylabel"
+msgid "Custom styles for current document"
+msgstr "Aangepaste opmaakprofielen voor huidige document"
+
+#. 6mnDS
+#: sfx2/uiconfig/ui/newstyle.ui:191
+msgctxt "newstyle|label1"
+msgid "Enter new style name:"
+msgstr "Naam nieuw opmaakprofiel invoeren:"
+
+#. R6zJz
+#: sfx2/uiconfig/ui/notebookbar.ui:74
+msgctxt "notebookbar|label9"
+msgid "File"
+msgstr "Bestand"
+
+#. QAUXF
+#: sfx2/uiconfig/ui/optprintpage.ui:35
+msgctxt "optprintpage|printer"
+msgid "_Printer"
+msgstr "_Printer"
+
+#. PUG9y
+#: sfx2/uiconfig/ui/optprintpage.ui:44
+msgctxt "extended_tip|printer"
+msgid "Specifies whether the print settings apply to direct printing or to printing to a file."
+msgstr "Specificeert of de afdrukinstellingen op directe afdrukken op de printer of op afdrukken naar een bestand worden toegepast."
+
+#. Eyv8g
+#: sfx2/uiconfig/ui/optprintpage.ui:55
+msgctxt "optprintpage|file"
+msgid "Print to _file"
+msgstr "Afdrukken naar _bestand"
+
+#. TMHvE
+#: sfx2/uiconfig/ui/optprintpage.ui:64
+msgctxt "extended_tip|file"
+msgid "Specifies whether the print settings apply to direct printing or to printing to a file."
+msgstr "Specificeert of de afdrukinstellingen op directe afdrukken op de printer of op afdrukken naar een bestand worden toegepast."
+
+#. C8jvp
+#: sfx2/uiconfig/ui/optprintpage.ui:79
+msgctxt "optprintpage|label4"
+msgid "Settings for"
+msgstr "Instellingen voor"
+
+#. 2T5Af
+#: sfx2/uiconfig/ui/optprintpage.ui:109
+msgctxt "optprintpage|papersize"
+msgid "P_aper size"
+msgstr "Papierfor_maat"
+
+#. yj4DA
+#: sfx2/uiconfig/ui/optprintpage.ui:117
+msgctxt "extended_tip|papersize"
+msgid "Mark this check box if a certain paper size is needed for printing the current document."
+msgstr "Vink dit vakje af als er een bepaalde papiergrootte vereist is voor het afdrukken van het huidige document."
+
+#. stDFq
+#: sfx2/uiconfig/ui/optprintpage.ui:128
+msgctxt "optprintpage|paperorient"
+msgid "Pap_er orientation"
+msgstr "Afdruk_stand"
+
+#. FdFNk
+#: sfx2/uiconfig/ui/optprintpage.ui:136
+msgctxt "extended_tip|paperorient"
+msgid "Mark this check box if you need a certain paper orientation for printing the current document."
+msgstr "Markeer dit keuzevakje als u een bepaalde papierrichting voor het afdrukken van het huidige document wilt gebruiken."
+
+#. L6rtF
+#: sfx2/uiconfig/ui/optprintpage.ui:147
+msgctxt "optprintpage|trans"
+msgid "_Transparency"
+msgstr "Tr_ansparantie"
+
+#. F6nF9
+#: sfx2/uiconfig/ui/optprintpage.ui:155
+msgctxt "extended_tip|trans"
+msgid "Mark this check box if you always want to be warned if transparent objects are contained in the document."
+msgstr "Selecteer dit keuzevakje als u altijd wilt worden gewaarschuwd als er transparante objecten in het document zijn opgenomen."
+
+#. C5jZN
+#: sfx2/uiconfig/ui/optprintpage.ui:170
+msgctxt "optprintpage|label2"
+msgid "Warnings"
+msgstr "Waarschuwingen"
+
+#. PJFLE
+#: sfx2/uiconfig/ui/optprintpage.ui:198
+msgctxt "optprintpage|reducegrad"
+msgid "Reduce _gradient"
+msgstr "Kle_urovergangen verminderen"
+
+#. GC8dk
+#: sfx2/uiconfig/ui/optprintpage.ui:206
+msgctxt "extended_tip|reducegrad"
+msgid "If this field is marked, gradients are printed with reduced quality."
+msgstr "Als dit veld gemarkeerd is, worden kleurverlopen met verminderde kwaliteit afgedrukt."
+
+#. skDME
+#: sfx2/uiconfig/ui/optprintpage.ui:230
+msgctxt "optprintpage|reducegradstripes"
+msgid "Gradient _stripes:"
+msgstr "_Strepen in kleurovergangen:"
+
+#. k8zh7
+#: sfx2/uiconfig/ui/optprintpage.ui:239
+msgctxt "extended_tip|reducegradstripes"
+msgid "Specifies the maximum number of gradient stripes for printing."
+msgstr "Geeft u het maximum aantal kleurovergang-strepen voor het afdrukken."
+
+#. 5HCxT
+#: sfx2/uiconfig/ui/optprintpage.ui:257
+msgctxt "extended_tip|reducegradstep"
+msgid "Specifies the maximum number of gradient stripes for printing."
+msgstr "Geeft u het maximum aantal kleurovergang-strepen voor het afdrukken."
+
+#. W8LE7
+#: sfx2/uiconfig/ui/optprintpage.ui:274
+msgctxt "optprintpage|reducegradcolor"
+msgid "Intermediate _color"
+msgstr "Tussenkleu_r"
+
+#. TUbxx
+#: sfx2/uiconfig/ui/optprintpage.ui:283
+msgctxt "extended_tip|reducegradcolor"
+msgid "Specifies that gradients are only printed in a single intermediate color."
+msgstr "Geeft aan dat kleurovergangen alleen worden afgedrukt in een enkele tussenliggende kleur."
+
+#. myMLR
+#: sfx2/uiconfig/ui/optprintpage.ui:304
+msgctxt "optprintpage|label1"
+msgid "Reduce Gradient"
+msgstr "Verloop verminderen"
+
+#. abbre
+#: sfx2/uiconfig/ui/optprintpage.ui:312
+msgctxt "extended_tip|frame2"
+msgid "Defines which warnings appear before printing begins."
+msgstr "Definieert welke waarschuwingen verschijnen voordat het afdrukken begint."
+
+#. ySmQe
+#: sfx2/uiconfig/ui/optprintpage.ui:337
+msgctxt "optprintpage|reducebitmap"
+msgid "Reduce _bitmaps"
+msgstr "K_waliteit aanpassen"
+
+#. nNjfk
+#: sfx2/uiconfig/ui/optprintpage.ui:345
+msgctxt "extended_tip|reducebitmap"
+msgid "Specifies that bitmaps are printed with reduced quality. The resolution can only be reduced and not increased."
+msgstr "Specificeert dat rasterafbeeldingen met gereduceerde kwaliteit worden afgedrukt. De resolutie kan alleen worden verlaagd en niet verhoogd."
+
+#. qF2KM
+#: sfx2/uiconfig/ui/optprintpage.ui:363
+msgctxt "optprintpage|reducebitmapnormal"
+msgid "N_ormal print quality"
+msgstr "_Normale afdrukkwaliteit"
+
+#. i5T3j
+#: sfx2/uiconfig/ui/optprintpage.ui:372
+msgctxt "extended_tip|reducebitmapnormal"
+msgid "High print quality corresponds to a resolution of 300dpi. Normal print quality corresponds to a resolution of 200dpi. "
+msgstr "Hoge afdrukkwaliteit komt overeen met een resolutie van 300dpi. Normale afdrukkwaliteit komt overeen met een resolutie van 200 dpi. "
+
+#. EZGK5
+#: sfx2/uiconfig/ui/optprintpage.ui:389
+msgctxt "optprintpage|reducebitmapresol"
+msgid "Reso_lution:"
+msgstr "Reso_lutie:"
+
+#. q3aJL
+#: sfx2/uiconfig/ui/optprintpage.ui:398
+msgctxt "extended_tip|reducebitmapresol"
+msgid "Specifies the maximum print quality in dpi. The resolution can only be reduced and not increased."
+msgstr "Geeft de maximale afdrukkwaliteit in dpi. De resolutie kan alleen worden verlaagd en niet verhoogd."
+
+#. 6ALtE
+#: sfx2/uiconfig/ui/optprintpage.ui:412
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "72 DPI"
+msgstr "72 DPI"
+
+#. FgpJ3
+#: sfx2/uiconfig/ui/optprintpage.ui:413
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "96 DPI"
+msgstr "96 DPI"
+
+#. d7BqR
+#: sfx2/uiconfig/ui/optprintpage.ui:414
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "150 DPI (Fax)"
+msgstr "150 DPI (Fax)"
+
+#. 46imh
+#: sfx2/uiconfig/ui/optprintpage.ui:415
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "200 DPI (default)"
+msgstr "200 DPI (standaard)"
+
+#. AsLSp
+#: sfx2/uiconfig/ui/optprintpage.ui:416
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "300 DPI"
+msgstr "300 DPI"
+
+#. qZJg5
+#: sfx2/uiconfig/ui/optprintpage.ui:417
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "600 DPI"
+msgstr "600 DPI"
+
+#. 8KFUc
+#: sfx2/uiconfig/ui/optprintpage.ui:421
+msgctxt "extended_tip|reducebitmapdpi"
+msgid "Specifies the maximum print quality in dpi. The resolution can only be reduced and not increased."
+msgstr "Geeft de maximale afdrukkwaliteit in dpi. De resolutie kan alleen worden verlaagd en niet verhoogd."
+
+#. YXTXc
+#: sfx2/uiconfig/ui/optprintpage.ui:438
+msgctxt "optprintpage|reducebitmapoptimal"
+msgid "_High print quality"
+msgstr "Goede afdru_kkwaliteit"
+
+#. BdCpv
+#: sfx2/uiconfig/ui/optprintpage.ui:447
+msgctxt "extended_tip|reducebitmapoptimal"
+msgid "High print quality corresponds to a resolution of 300dpi. Normal print quality corresponds to a resolution of 200dpi. "
+msgstr "Hoge afdrukkwaliteit komt overeen met een resolutie van 300dpi. Normale afdrukkwaliteit komt overeen met een resolutie van 200 dpi. "
+
+#. YxX2s
+#: sfx2/uiconfig/ui/optprintpage.ui:468
+msgctxt "optprintpage|label1"
+msgid "Reduce Bitmaps"
+msgstr "Rasterafbeeldingen aanpassen"
+
+#. 5qQBR
+#: sfx2/uiconfig/ui/optprintpage.ui:496
+msgctxt "optprintpage|reducetrans"
+msgid "_Reduce transparency"
+msgstr "_Transparantie verminderen"
+
+#. yDstT
+#: sfx2/uiconfig/ui/optprintpage.ui:504
+msgctxt "extended_tip|reducetrans"
+msgid "If you mark this field the transparent objects will be printed like normal, non-transparent objects, depending on your selection in the following two option buttons."
+msgstr "Als u dit veld markeert, worden de transparante objecten afgedrukt als normale, niet-transparante objecten, afhankelijk van uw selectie van de volgende twee keuzerondjes."
+
+#. B4C76
+#: sfx2/uiconfig/ui/optprintpage.ui:522
+msgctxt "optprintpage|reducetransauto"
+msgid "Auto_matically"
+msgstr "Auto_matisch"
+
+#. ehRjn
+#: sfx2/uiconfig/ui/optprintpage.ui:531
+msgctxt "extended_tip|reducetransauto"
+msgid "Specifies that the transparency is only printed if the transparent area covers less than a quarter of the entire page."
+msgstr "Geeft aan dat de transparantie alleen wordt afgedrukt als het transparante gebied minder dan een kwart van de gehele pagina beslaat."
+
+#. K7P4C
+#: sfx2/uiconfig/ui/optprintpage.ui:542
+msgctxt "optprintpage|reducetransnone"
+msgid "_No transparency"
+msgstr "_Geen transparantie"
+
+#. ZuLVY
+#: sfx2/uiconfig/ui/optprintpage.ui:551
+msgctxt "extended_tip|reducetransnone"
+msgid "With this option transparency is never printed."
+msgstr "Met deze optie wordt de transparantie nooit afgedrukt."
+
+#. B5Cpd
+#: sfx2/uiconfig/ui/optprintpage.ui:572
+msgctxt "optprintpage|label1"
+msgid "Reduce Transparency"
+msgstr "Transparantie verminderen"
+
+#. GAFzh
+#: sfx2/uiconfig/ui/optprintpage.ui:600
+msgctxt "optprintpage|pdf"
+msgid "_PDF as standard print job format"
+msgstr "_PDF als standaard afdrukformaat"
+
+#. wm7C7
+#: sfx2/uiconfig/ui/optprintpage.ui:614
+msgctxt "optprintpage|converttogray"
+msgid "Con_vert colors to grayscale"
+msgstr "Kleuren naar _grijstinten converteren"
+
+#. UNSqH
+#: sfx2/uiconfig/ui/optprintpage.ui:622
+msgctxt "extended_tip|converttogray"
+msgid "Specifies that all colors are printed only as grayscale."
+msgstr "Geeft aan dat alle kleuren alleen in grijstinten worden afgedrukt."
+
+#. CrFLq
+#: sfx2/uiconfig/ui/optprintpage.ui:633
+msgctxt "optprintpage|reducebitmaptrans"
+msgid "Include transparent objects"
+msgstr "Inclusief transparante objecten"
+
+#. FFAFJ
+#: sfx2/uiconfig/ui/optprintpage.ui:641
+msgctxt "extended_tip|reducebitmaptrans"
+msgid "If this field is marked, the reduction in print quality for bitmaps also applies to the transparent areas of objects."
+msgstr "Als dit veld wordt gemarkeerd, geldt de vermindering van de afdrukkwaliteit voor rasterafbeeldingen ook voor de transparante gebieden van objecten."
+
+#. bWPko
+#: sfx2/uiconfig/ui/optprintpage.ui:656
+msgctxt "optprintpage|label4"
+msgid "Defaults"
+msgstr "Standaarden"
+
+#. mMKbc
+#: sfx2/uiconfig/ui/optprintpage.ui:678
+msgctxt "extended_tip|OptPrintPage"
+msgid "Specifies the print setting options."
+msgstr "Specificeert de opties voor de afdrukinstellingen."
+
+#. NEo7g
+#: sfx2/uiconfig/ui/panel.ui:73 sfx2/uiconfig/ui/panel.ui:78
+msgctxt "panel|SFX_STR_SIDEBAR_MORE_OPTIONS"
+msgid "More Options"
+msgstr "Meer opties"
+
+#. QrtGb
+#: sfx2/uiconfig/ui/password.ui:8
+msgctxt "password|PasswordDialog"
+msgid "Enter Password"
+msgstr "Wachtwoord invoeren"
+
+#. gATKy
+#: sfx2/uiconfig/ui/password.ui:102
+msgctxt "password|userft"
+msgid "User:"
+msgstr "Gebruiker:"
+
+#. FRqiZ
+#: sfx2/uiconfig/ui/password.ui:116
+msgctxt "password|pass1ft"
+msgid "Password:"
+msgstr "Wachtwoord:"
+
+#. HE8mc
+#: sfx2/uiconfig/ui/password.ui:130
+msgctxt "password|confirm1ft"
+msgid "Confirm:"
+msgstr "Bevestigen:"
+
+#. EFJRk
+#: sfx2/uiconfig/ui/password.ui:164
+msgctxt "password|pass1ed-atkobject"
+msgid "Password"
+msgstr "Wachtwoord"
+
+#. yVorz
+#: sfx2/uiconfig/ui/password.ui:165
+msgctxt "password|extended_tip|pass1ed"
+msgid "Type a password. A password is case sensitive."
+msgstr "Typ een wachtwoord. Een wachtwoord is hoofdlettergevoelig."
+
+#. kEcVk
+#: sfx2/uiconfig/ui/password.ui:185
+msgctxt "password|extended_tip|confirm1ed"
+msgid "Re-enter the password."
+msgstr "Bevestigen."
+
+#. JBCUB
+#: sfx2/uiconfig/ui/password.ui:200
+msgctxt "password|label1"
+msgid "Password"
+msgstr "Wachtwoord"
+
+#. zDBUt
+#: sfx2/uiconfig/ui/password.ui:232
+msgctxt "password|pass2ft"
+msgid "Password:"
+msgstr "Wachtwoord:"
+
+#. 8RcEw
+#: sfx2/uiconfig/ui/password.ui:246
+msgctxt "password|confirm2ft"
+msgid "Confirm:"
+msgstr "Bevestigen:"
+
+#. EkHiq
+#: sfx2/uiconfig/ui/password.ui:267
+msgctxt "password|extended_tip|pass2ed"
+msgid "Type a password. A password is case sensitive."
+msgstr "Typ een wachtwoord. Een wachtwoord is hoofdlettergevoelig."
+
+#. c4nGS
+#: sfx2/uiconfig/ui/password.ui:287
+msgctxt "password|extended_tip|confirm2ed"
+msgid "Re-enter the password."
+msgstr "Bevestigen."
+
+#. mCxpj
+#: sfx2/uiconfig/ui/password.ui:302
+msgctxt "password|label2"
+msgid "Second Password"
+msgstr "Tweede wachtwoord"
+
+#. JZhHV
+#: sfx2/uiconfig/ui/password.ui:338
+msgctxt "password|onlyascii"
+msgid "Only Basic Latin characters can be entered"
+msgstr "Alleen Latijn - basis tekens kunnen worden ingevoerd"
+
+#. AFsUP
+#: sfx2/uiconfig/ui/printeroptionsdialog.ui:8
+msgctxt "printeroptionsdialog|PrinterOptionsDialog"
+msgid "Printer Options"
+msgstr "Printeropties"
+
+#. oAzTR
+#: sfx2/uiconfig/ui/querysavedialog.ui:7
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Save Document?"
+msgstr "Document opslaan?"
+
+#. wFiA8
+#: sfx2/uiconfig/ui/querysavedialog.ui:13
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Save changes to document “$(DOC)” before closing?"
+msgstr "Wijzigingen in document \"$(DOC)\" opslaan voor sluiten?"
+
+#. 7mtVz
+#: sfx2/uiconfig/ui/querysavedialog.ui:14
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Your changes will be lost if you don’t save them."
+msgstr "Uw wijzigingen zullen verloren gaan als u ze niet opslaat."
+
+#. sQCdE
+#: sfx2/uiconfig/ui/querysavedialog.ui:25
+msgctxt "querysavedialog|discard"
+msgid "Do_n’t Save"
+msgstr "_Niet opslaan"
+
+#. dzVqL
+#: sfx2/uiconfig/ui/querysavedialog.ui:56
+msgctxt "querysavedialog|save"
+msgid "_Save"
+msgstr "_Opslaan"
+
+#. 6WbvE
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:7
+msgctxt "safemodequerydialog|SafeModeQueryDialog"
+msgid "Enter Safe Mode"
+msgstr "Veilige modus starten"
+
+#. esgus
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:12
+msgctxt "safemodequerydialog|label"
+msgid "Are you sure you want to restart %PRODUCTNAME and enter safe mode?"
+msgstr "Weet u zeker dat u %PRODUCTNAME opnieuw wilt opstarten in de veilige modus?"
+
+#. DpN8R
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:40
+msgctxt "safemodequerydialog|restart"
+msgid "_Restart"
+msgstr "_Opnieuw starten"
+
+#. ejCo9
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:14
+msgctxt "saveastemplatedlg|SaveAsTemplateDialog"
+msgid "Save As Template"
+msgstr "Als sjabloon opslaan"
+
+#. Gjb3A
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:102
+msgctxt "saveastemplatedlg|create_label"
+msgid "Enter Template _Name:"
+msgstr "_Sjabloonnaam invoeren:"
+
+#. NyFdH
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:103
+msgctxt "saveastemplatedlg|create_label"
+msgid "Enter a name for the template."
+msgstr "Naam voor de sjabloon invoeren."
+
+#. Xo6BH
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:126
+msgctxt "saveastemplatedlg|extended_tip|name_entry"
+msgid "Enter a name for the template."
+msgstr "Voer een naam in voor de sjabloon."
+
+#. GLDum
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:154
+msgctxt "saveastemplatedlg|select_label"
+msgid "Select Template _Category:"
+msgstr "Sjablooncategorie selecteren:"
+
+#. 4ANkg
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:155
+msgctxt "saveastemplatedlg|select_label"
+msgid "Save template in selected category."
+msgstr "Sjabloon in de geselecteerde categorie opslaan."
+
+#. JBPKb
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:203
+msgctxt "saveastemplatedlg|extended_tip|categorylb"
+msgid "Select a category in which to save the new template."
+msgstr "Selecteer een categorie waarin de nieuwe sjabloon wordt opgeslagen."
+
+#. wpZGc
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:223
+msgctxt "saveastemplatedlg|defaultcb"
+msgid "_Set as default template"
+msgstr "Als _standaardsjabloon instellen"
+
+#. syB4y
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:231
+msgctxt "saveastemplatedlg|extended_tip|defaultcb"
+msgid "The new template will be used as the default template."
+msgstr "De nieuwe sjabloon zal als standaardsjabloon gebruikt worden."
+
+#. gH8PB
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:259
+msgctxt "saveastemplatedlg|extended_tip|SaveAsTemplateDialog"
+msgid "Saves the current document as a template."
+msgstr "Slaat het huidige document op als sjabloon."
+
+#. 9tSnA
+#: sfx2/uiconfig/ui/searchdialog.ui:8
+msgctxt "searchdialog|SearchDialog"
+msgid "Find on this Page"
+msgstr "Zoeken op deze pagina"
+
+#. LAKYg
+#: sfx2/uiconfig/ui/searchdialog.ui:26
+msgctxt "searchdialog|search"
+msgid "_Find"
+msgstr "_Zoeken"
+
+#. G5Qc9
+#: sfx2/uiconfig/ui/searchdialog.ui:99
+msgctxt "searchdialog|label1"
+msgid "_Search for:"
+msgstr "Zoeken _naar:"
+
+#. TY5bL
+#: sfx2/uiconfig/ui/searchdialog.ui:125
+msgctxt "searchdialog|matchcase"
+msgid "Ma_tch case"
+msgstr "Iden_tieke hoofdletters/kleine letters"
+
+#. B2ksn
+#: sfx2/uiconfig/ui/searchdialog.ui:139
+msgctxt "searchdialog|wholewords"
+msgid "Whole wor_ds only"
+msgstr "Alleen hele woor_den"
+
+#. ycWSx
+#: sfx2/uiconfig/ui/searchdialog.ui:153
+msgctxt "searchdialog|backwards"
+msgid "Bac_kwards"
+msgstr "_Naar achteren"
+
+#. C7fSt
+#: sfx2/uiconfig/ui/searchdialog.ui:167
+msgctxt "searchdialog|wrap"
+msgid "Wrap _around"
+msgstr "_Rondom omlopen"
+
+#. onEmh
+#: sfx2/uiconfig/ui/securityinfopage.ui:22
+msgctxt "securityinfopage|readonly"
+msgid "_Open file read-only"
+msgstr "Bestand _openen als alleen-lezen"
+
+#. HCEUE
+#: sfx2/uiconfig/ui/securityinfopage.ui:31
+msgctxt "securityinfopage|extended_tip|readonly"
+msgid "Select to allow this document to be opened in read-only mode only."
+msgstr "Selecteer deze optie om het document alleen in alleen-lezen modus te kunnen openen."
+
+#. GvCw9
+#: sfx2/uiconfig/ui/securityinfopage.ui:42
+msgctxt "securityinfopage|recordchanges"
+msgid "Record _changes"
+msgstr "_Wijzigingen bijhouden"
+
+#. pNhop
+#: sfx2/uiconfig/ui/securityinfopage.ui:50
+msgctxt "securityinfopage|extended_tip|recordchanges"
+msgid "Select to enable recording changes. This is the same as Edit - Track Changes - Record."
+msgstr "Selecteer om het bijhouden van wijzigingen in te schakelen. Dit is hetzelfde als Bewerken - Wijzigingen bijhouden - Bijhouden."
+
+#. Nv8rA
+#: sfx2/uiconfig/ui/securityinfopage.ui:66
+msgctxt "securityinfopage|protect"
+msgid "Protect..."
+msgstr "Beveiliging instellen"
+
+#. 6T6ZP
+#: sfx2/uiconfig/ui/securityinfopage.ui:72
+msgctxt "securityinfopage|extended_tip|protect"
+msgid "Protects the change recording state with a password. If change recording is protected for the current document, the button is named Unprotect. Click Unprotect and type the correct password to disable the protection."
+msgstr "Beveiligt de status van het bijhouden van wijzigingen met een wachtwoord. Als het bijhouden van wijzigingen is beveiligd voor het huidige document, heet de knop Niet beveiligen. Klik op Niet beveiligen en typ het correcte wachtwoord om de beveiliging uit te schakelen."
+
+#. jgWP4
+#: sfx2/uiconfig/ui/securityinfopage.ui:84
+msgctxt "securityinfopage|unprotect"
+msgid "_Unprotect..."
+msgstr "_Beveiliging opheffen..."
+
+#. UEdGx
+#: sfx2/uiconfig/ui/securityinfopage.ui:91
+msgctxt "securityinfopage|extended_tip|unprotect"
+msgid "Protects the change recording state with a password. If change recording is protected for the current document, the button is named Unprotect. Click Unprotect and type the correct password to disable the protection."
+msgstr "Beveiligt de status van het bijhouden van wijzigingen met een wachtwoord. Als het bijhouden van wijzigingen is beveiligd voor het huidige document, heet de knop Niet beveiligen. Klik op Niet beveiligen en typ het correcte wachtwoord om de beveiliging uit te schakelen."
+
+#. JNezG
+#: sfx2/uiconfig/ui/securityinfopage.ui:113
+msgctxt "securityinfopage|label47"
+msgid "File Sharing Options"
+msgstr "Opties voor delen van bestanden"
+
+#. VXrJ5
+#: sfx2/uiconfig/ui/securityinfopage.ui:121
+msgctxt "securityinfopage|extended_tip|SecurityInfoPage"
+msgid "Sets password options for the current document."
+msgstr "Stelt de opties voor het wachtwoord voor het huidige document in."
+
+#. EDC9x
+#: sfx2/uiconfig/ui/startcenter.ui:17
+msgctxt "startcenter|clear_all"
+msgid "Clear Recent Documents"
+msgstr "Recente documenten wissen"
+
+#. gCfQ9
+#: sfx2/uiconfig/ui/startcenter.ui:38
+msgctxt "startcenter|filter_writer"
+msgid "Writer Templates"
+msgstr "Writer-sjablonen"
+
+#. kj5ts
+#: sfx2/uiconfig/ui/startcenter.ui:45
+msgctxt "startcenter|filter_calc"
+msgid "Calc Templates"
+msgstr "Calc-sjablonen"
+
+#. HEYvU
+#: sfx2/uiconfig/ui/startcenter.ui:52
+msgctxt "startcenter|filter_impress"
+msgid "Impress Templates"
+msgstr "Impress-sjablonen"
+
+#. uWEpu
+#: sfx2/uiconfig/ui/startcenter.ui:59
+msgctxt "startcenter|filter_draw"
+msgid "Draw Templates"
+msgstr "Draw-sjablonen"
+
+#. e3TH8
+#: sfx2/uiconfig/ui/startcenter.ui:72
+msgctxt "startcenter|manage"
+msgid "Manage Templates"
+msgstr "Sjablonen beheren"
+
+#. isnw8
+#: sfx2/uiconfig/ui/startcenter.ui:151
+msgctxt "startcenter|open_all"
+msgid "_Open File"
+msgstr "_Open bestand"
+
+#. 6zjop
+#: sfx2/uiconfig/ui/startcenter.ui:172
+msgctxt "startcenter|open_remote"
+msgid "Remote File_s"
+msgstr "E_xterne bestanden"
+
+#. ZUnZ9
+#: sfx2/uiconfig/ui/startcenter.ui:205
+msgctxt "startcenter|open_recent"
+msgid "_Recent Documents"
+msgstr "_Recente documenten"
+
+#. BnkvG
+#: sfx2/uiconfig/ui/startcenter.ui:229
+msgctxt "startcenter|templates_all"
+msgid "T_emplates"
+msgstr "S_jablonen"
+
+#. JEkqY
+#: sfx2/uiconfig/ui/startcenter.ui:270
+msgctxt "startcenter|create_label"
+msgid "Create:"
+msgstr "Maken:"
+
+#. SY4iY
+#: sfx2/uiconfig/ui/startcenter.ui:281
+msgctxt "startcenter|writer_all"
+msgid "_Writer Document"
+msgstr "Tekst_document"
+
+#. Bvz5c
+#: sfx2/uiconfig/ui/startcenter.ui:301
+msgctxt "startcenter|calc_all"
+msgid "_Calc Spreadsheet"
+msgstr "_Werkblad"
+
+#. RxGP6
+#: sfx2/uiconfig/ui/startcenter.ui:321
+msgctxt "startcenter|impress_all"
+msgid "_Impress Presentation"
+msgstr "_Presentatie"
+
+#. 7fE2M
+#: sfx2/uiconfig/ui/startcenter.ui:341
+msgctxt "startcenter|draw_all"
+msgid "_Draw Drawing"
+msgstr "T_ekening"
+
+#. 7wn8r
+#: sfx2/uiconfig/ui/startcenter.ui:361
+msgctxt "startcenter|math_all"
+msgid "_Math Formula"
+msgstr "For_mule"
+
+#. nnwDC
+#: sfx2/uiconfig/ui/startcenter.ui:381
+msgctxt "startcenter|database_all"
+msgid "_Base Database"
+msgstr "D_atabase"
+
+#. ZEDmn
+#: sfx2/uiconfig/ui/startcenter.ui:403
+msgctxt "startcenter|althelplabel"
+msgid "He_lp"
+msgstr "He_lp"
+
+#. oqVes
+#: sfx2/uiconfig/ui/startcenter.ui:473
+msgctxt "startcenter|extensions"
+msgid "E_xtensions"
+msgstr "Ex_tensies"
+
+#. rDw4E
+#: sfx2/uiconfig/ui/startcenter.ui:498
+msgctxt "startcenter|label1"
+msgid "Application"
+msgstr "Toepassing"
+
+#. UiDMp
+#: sfx2/uiconfig/ui/startcenter.ui:518
+msgctxt "startcenter|all_recent_label"
+msgid "Recent Files List"
+msgstr "Recente bestanden"
+
+#. kho2B
+#: sfx2/uiconfig/ui/startcenter.ui:531
+msgctxt "startcenter|local_view_label"
+msgid "Templates List"
+msgstr "Sjabloonlijst"
+
+#. UHrAZ
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:12
+msgctxt "stylecontextmenu|new"
+msgid "New..."
+msgstr "Nieuw..."
+
+#. hnLax
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:20
+msgctxt "stylecontextmenu|edit"
+msgid "Modify..."
+msgstr "Aanpassen..."
+
+#. TPTqm
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:28
+msgctxt "stylecontextmenu|hide"
+msgid "Hide"
+msgstr "Verbergen"
+
+#. mrCMd
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:36
+msgctxt "stylecontextmenu|show"
+msgid "Show"
+msgstr "Weergeven"
+
+#. 7bAyD
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:44
+msgctxt "stylecontextmenu|delete"
+msgid "Delete..."
+msgstr "Verwijderen..."
+
+#. N4BGe
+#: sfx2/uiconfig/ui/tabbarcontents.ui:24
+msgctxt "tabbar|locktaskpanel"
+msgid "Dock"
+msgstr "Vastgezet"
+
+#. GNBR3
+#: sfx2/uiconfig/ui/tabbarcontents.ui:33
+msgctxt "tabbar|unlocktaskpanel"
+msgid "Undock"
+msgstr "Zwevend"
+
+#. jXux4
+#: sfx2/uiconfig/ui/tabbarcontents.ui:42
+msgctxt "tabbar|hidesidebar"
+msgid "Close Sidebar"
+msgstr "Zijbalk sluiten"
+
+#. hEmHk
+#: sfx2/uiconfig/ui/tabbarcontents.ui:50
+msgctxt "tabbar|customization"
+msgid "Customization"
+msgstr "Aanpassen"
+
+#. 9Hfx6
+#: sfx2/uiconfig/ui/tabbarcontents.ui:66
+msgctxt "tabbar|restoredefault"
+msgid "Restore Default"
+msgstr "Standaard terugzetten"
+
+#. DBWZf
+#: sfx2/uiconfig/ui/tabbarcontents.ui:98
+msgctxt "tabbar|menubutton|tool_tip"
+msgid "Sidebar Settings"
+msgstr "Instellingen van de Zijbalk"
+
+#. XBaqU
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:16
+msgctxt "templatecategorydlg|TemplatesCategoryDialog"
+msgid "Select Category"
+msgstr "Categorie selecteren"
+
+#. HXfot
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:108
+msgctxt "templatecategorydlg|select_label"
+msgid "Select from Existing Category"
+msgstr "Kies uit bestaande categorie"
+
+#. 7eShP
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:178
+msgctxt "templatecategorydlg|create_label"
+msgid "or Create a New Category"
+msgstr "of Een nieuwe categorie aanmaken"
+
+#. eUWTy
+#: sfx2/uiconfig/ui/templatedlg.ui:46
+msgctxt "templatedlg|TemplateDialog"
+msgid "Templates"
+msgstr "Sjablonen"
+
+#. rhuYP
+#: sfx2/uiconfig/ui/templatedlg.ui:77
+msgctxt "templatedlg|hidedialogcb"
+msgid "Show this dialog at startup"
+msgstr "Dit dialoogvenster tonen bij het opstarten"
+
+#. 32zsB
+#: sfx2/uiconfig/ui/templatedlg.ui:144
+msgctxt "templatedlg|search_filter|tooltip_text"
+msgid "Search"
+msgstr "Zoeken"
+
+#. sGZMC
+#: sfx2/uiconfig/ui/templatedlg.ui:148
+msgctxt "templatedlg|search_filter"
+msgid "Search..."
+msgstr "Zoeken…"
+
+#. DF5YC
+#: sfx2/uiconfig/ui/templatedlg.ui:167
+msgctxt "templatedlg|action_menu|label"
+msgid "_Manage"
+msgstr "_Beheren"
+
+#. LUs2m
+#: sfx2/uiconfig/ui/templatedlg.ui:181
+msgctxt "templatedlg|extended_tip|action_menu"
+msgid "Provides commands to create, rename and delete categories, reset default templates, and refresh the template manager."
+msgstr "Biedt opdrachten voor het maken, hernoemen en verwijderen van categorieën, het herstellen van standaardsjablonen en het vernieuwen van Sjabloonbeheer."
+
+#. fXVNY
+#: sfx2/uiconfig/ui/templatedlg.ui:208
+msgctxt "templatedlg|filter_application|tooltip_text"
+msgid "Filter by Application"
+msgstr "Op toepassing filteren"
+
+#. tqVhJ
+#: sfx2/uiconfig/ui/templatedlg.ui:210
+msgctxt "templatedlg|applist"
+msgid "All Applications"
+msgstr "Alle toepassingen"
+
+#. pD6pU
+#: sfx2/uiconfig/ui/templatedlg.ui:211
+msgctxt "templatedlg|applist"
+msgid "Text Documents"
+msgstr "Tekstdocumenten"
+
+#. eECt7
+#: sfx2/uiconfig/ui/templatedlg.ui:212
+msgctxt "templatedlg|applist"
+msgid "Spreadsheets"
+msgstr "Werkbladen"
+
+#. ajLbV
+#: sfx2/uiconfig/ui/templatedlg.ui:213
+msgctxt "templatedlg|applist"
+msgid "Presentations"
+msgstr "Presentaties"
+
+#. LfUzB
+#: sfx2/uiconfig/ui/templatedlg.ui:214
+msgctxt "templatedlg|applist"
+msgid "Drawings"
+msgstr "Tekeningen"
+
+#. t7zE7
+#: sfx2/uiconfig/ui/templatedlg.ui:228
+msgctxt "templatedlg|filter_folder|tooltip_text"
+msgid "Filter by Category"
+msgstr "Op categorie filteren"
+
+#. 93CGw
+#: sfx2/uiconfig/ui/templatedlg.ui:230
+msgctxt "templatedlg|folderlist"
+msgid "All Categories"
+msgstr "Alle categorieën"
+
+#. NF9wE
+#: sfx2/uiconfig/ui/templatedlg.ui:251
+msgctxt "templatedlg|label1"
+msgid "Filter"
+msgstr "Filter"
+
+#. ewTL3
+#: sfx2/uiconfig/ui/templatedlg.ui:357
+msgctxt "templatedlg|treeviewcolumn1"
+msgid "Name"
+msgstr "Naam"
+
+#. 7EJRA
+#: sfx2/uiconfig/ui/templatedlg.ui:374
+msgctxt "templatedlg|treeviewcolumn2"
+msgid "Category"
+msgstr "Categorie"
+
+#. AC27i
+#: sfx2/uiconfig/ui/templatedlg.ui:389
+msgctxt "templatedlg|treeviewcolumn3"
+msgid "Application"
+msgstr "Toepassing"
+
+#. eSaBw
+#: sfx2/uiconfig/ui/templatedlg.ui:404
+msgctxt "templatedlg|treeviewcolumn4"
+msgid "Modified"
+msgstr "Aangepast"
+
+#. pNzYA
+#: sfx2/uiconfig/ui/templatedlg.ui:419
+msgctxt "templatedlg|treeviewcolumn5"
+msgid "Size"
+msgstr "Grootte"
+
+#. j39jM
+#: sfx2/uiconfig/ui/templatedlg.ui:445
+msgctxt "templatedlg|thumbnailviewlabel"
+msgid "Template List"
+msgstr "Sjabloonlijst"
+
+#. yEhgP
+#: sfx2/uiconfig/ui/templatedlg.ui:464
+msgctxt "templatedlg|thumbnail_view_btn|tooltip_text"
+msgid "Thumbnail View"
+msgstr "Miniatuurweergave"
+
+#. j76ke
+#: sfx2/uiconfig/ui/templatedlg.ui:481
+msgctxt "templatedlg|list_view_btn|tooltip_text"
+msgid "List View"
+msgstr "Lijstweergave"
+
+#. pm89q
+#: sfx2/uiconfig/ui/templatepanel.ui:127
+msgctxt "templatepanel|STR_STYLE_FILL_FORMAT_MODE"
+msgid "Fill Format Mode"
+msgstr "Gietermodus"
+
+#. GLRFT
+#: sfx2/uiconfig/ui/templatepanel.ui:139
+msgctxt "templatepanel|STR_STYLE_NEW_STYLE_FROM_SELECTION"
+msgid "New Style from Selection"
+msgstr "Nieuw opmaakprofiel uit selectie"
+
+#. tAdD9
+#: sfx2/uiconfig/ui/templatepanel.ui:151
+msgctxt "templatepanel|STR_STYLE_NEW_STYLE_ACTION"
+msgid "Styles actions"
+msgstr "Acties voor opmaakprofielen"
+
+#. Xk5tD
+#: sfx2/uiconfig/ui/templatepanel.ui:163
+msgctxt "templatepanel|STR_STYLE_UPDATE_STYLE"
+msgid "Update Style"
+msgstr "Opmaakprofiel bijwerken"
+
+#. irBvi
+#: sfx2/uiconfig/ui/templatepanel.ui:220 sfx2/uiconfig/ui/templatepanel.ui:266
+msgctxt "templatepanel|STR_STYLE_ELEMTLIST"
+msgid "Style List"
+msgstr "Lijst met opmaakprofielen"
+
+#. FHud7
+#: sfx2/uiconfig/ui/templatepanel.ui:280
+msgctxt "commontemplate|STR_PREVIEW_CHECKBOX"
+msgid "Show previews"
+msgstr "Voorbeelden tonen"
+
+#. p9AWW
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:8
+msgctxt "versioncommentdialog|VersionCommentDialog"
+msgid "Insert Version Comment"
+msgstr "Voeg versie-opmerking toe"
+
+#. CPwta
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:103
+msgctxt "versioncommentdialog|timestamp"
+msgid "Date and time: "
+msgstr "Datum en tijd: "
+
+#. 2mDfC
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:115
+msgctxt "versioncommentdialog|author"
+msgid "Saved by: "
+msgstr "Opgeslagen door: "
+
+#. T5AY5
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:164
+msgctxt "versioncommentdialog|extended_tip|VersionCommentDialog"
+msgid "Enter a comment here when you are saving a new version. If you clicked Show to open this dialog, you cannot edit the comment."
+msgstr "Voer hier een opmerking in wanneer u een nieuwe versie opslaat. Als u op Weergeven hebt geklikt om dit dialoogvenster te openen, kunt u de opmerking niet bewerken."
+
+#. oBSSb
+#: sfx2/uiconfig/ui/versionscmis.ui:50
+msgctxt "versionscmis|compare"
+msgid "_Compare"
+msgstr "_Vergelijken"
+
+#. WyDoB
+#: sfx2/uiconfig/ui/versionscmis.ui:64
+msgctxt "versionscmis|show"
+msgid "_Show..."
+msgstr "_Tonen..."
+
+#. A8Eqt
+#: sfx2/uiconfig/ui/versionscmis.ui:92
+msgctxt "versionscmis|open"
+msgid "_Open"
+msgstr "_Openen"
+
+#. gRBJa
+#: sfx2/uiconfig/ui/versionscmis.ui:177
+msgctxt "versionscmis|datetime"
+msgid "Date and time"
+msgstr "Datum en tijd"
+
+#. 3VLw3
+#: sfx2/uiconfig/ui/versionscmis.ui:190
+msgctxt "versionscmis|savedby"
+msgid "Saved by"
+msgstr "Opgeslagen door"
+
+#. FzBeT
+#: sfx2/uiconfig/ui/versionscmis.ui:203
+msgctxt "versionscmis|comments"
+msgid "Comments"
+msgstr "Notities"
+
+#. c2cVg
+#: sfx2/uiconfig/ui/versionscmis.ui:226
+msgctxt "versionscmis|label2"
+msgid "Existing Versions"
+msgstr "Bestaande versies"
+
+#. A4BT2
+#: sfx2/uiconfig/ui/versionsofdialog.ui:33
+msgctxt "versionsofdialog|cmis"
+msgid "CMIS"
+msgstr "CMIS"
+
+#. EqmYX
+#: sfx2/uiconfig/ui/versionsofdialog.ui:53
+msgctxt "versionsofdialog|extended_tip|delete"
+msgid "Deletes the selected version."
+msgstr "Verwijdert de geselecteerde versie."
+
+#. erGHD
+#: sfx2/uiconfig/ui/versionsofdialog.ui:65
+msgctxt "versionsofdialog|compare"
+msgid "_Compare"
+msgstr "_Vergelijken"
+
+#. TKEzJ
+#: sfx2/uiconfig/ui/versionsofdialog.ui:72
+msgctxt "versionsofdialog|extended_tip|compare"
+msgid "Compare the changes that were made in each version."
+msgstr "Vergelijk de wijzigingen die in elke versie zijn gemaakt."
+
+#. UkbhC
+#: sfx2/uiconfig/ui/versionsofdialog.ui:84
+msgctxt "versionsofdialog|show"
+msgid "_Show..."
+msgstr "_Tonen..."
+
+#. 4SD7F
+#: sfx2/uiconfig/ui/versionsofdialog.ui:91
+msgctxt "versionsofdialog|extended_tip|show"
+msgid "Displays the entire comment for the selected version."
+msgstr "Geeft de gehele opmerking voor de geselecteerde versie weer."
+
+#. E8yNH
+#: sfx2/uiconfig/ui/versionsofdialog.ui:119
+msgctxt "versionsofdialog|open"
+msgid "_Open"
+msgstr "_Openen"
+
+#. ASJac
+#: sfx2/uiconfig/ui/versionsofdialog.ui:126
+msgctxt "versionsofdialog|extended_tip|open"
+msgid "Opens the selected version in a read-only window."
+msgstr "Opent de geselecteerde versie in een alleen-lezen venster."
+
+#. qKnKv
+#: sfx2/uiconfig/ui/versionsofdialog.ui:184
+msgctxt "versionsofdialog|save"
+msgid "Save _New Version"
+msgstr "Een _nieuwe versie opslaan"
+
+#. gTR6x
+#: sfx2/uiconfig/ui/versionsofdialog.ui:191
+msgctxt "versionsofdialog|extended_tip|save"
+msgid "Saves the current state of the document as a new version. If you want, you can also enter comments in the Insert Version Comment dialog before you save the new version."
+msgstr "Slaat de huidige staat van het document als een nieuwe versie op. U kunt vóórdat u het document opslaat desgewenst ook opmerkingen in het dialoogvenster Versie-opmerking toevoegen invoeren."
+
+#. aCeEr
+#: sfx2/uiconfig/ui/versionsofdialog.ui:202
+msgctxt "versionsofdialog|always"
+msgid "_Always save a new version on closing"
+msgstr "_Steeds een nieuwe versie opslaan bij afsluiten"
+
+#. JxFDN
+#: sfx2/uiconfig/ui/versionsofdialog.ui:210
+msgctxt "versionsofdialog|extended_tip|always"
+msgid "If you have made changes to your document then a new version is automatically saved when you close the document."
+msgstr "Als u wijzigingen in uw document hebt aangebracht, wordt er automatisch een nieuwe versie opgeslagen wanneer u het document sluit."
+
+#. vuHjH
+#: sfx2/uiconfig/ui/versionsofdialog.ui:225
+msgctxt "versionsofdialog|label1"
+msgid "New Versions"
+msgstr "Nieuwe versies"
+
+#. nDGNv
+#: sfx2/uiconfig/ui/versionsofdialog.ui:278
+msgctxt "versionsofdialog|datetime"
+msgid "Date and time"
+msgstr "Datum en tijd"
+
+#. MBoBZ
+#: sfx2/uiconfig/ui/versionsofdialog.ui:291
+msgctxt "versionsofdialog|savedby"
+msgid "Saved by"
+msgstr "Opgeslagen door"
+
+#. kqEcm
+#: sfx2/uiconfig/ui/versionsofdialog.ui:304
+msgctxt "versionsofdialog|comments"
+msgid "Comments"
+msgstr "Opmerkingen"
+
+#. GLD85
+#: sfx2/uiconfig/ui/versionsofdialog.ui:315
+msgctxt "versionsofdialog|extended_tip|versions"
+msgid "Lists the existing versions of the current document, the date and the time they were created, the author and the associated comments."
+msgstr "Geeft alle bestaande versies van het huidige document weer, de datum en tijd waarop ze werden gemaakt, de auteur en de bijbehorende opmerkingen."
+
+#. EbijK
+#: sfx2/uiconfig/ui/versionsofdialog.ui:332
+msgctxt "versionsofdialog|label2"
+msgid "Existing Versions"
+msgstr "Bestaande versies"
+
+#. 5BdCA
+#: sfx2/uiconfig/ui/versionsofdialog.ui:367
+msgctxt "versionsofdialog|extended_tip|VersionsOfDialog"
+msgid "Saves and organizes multiple versions of the current document in the same file. You can also open, delete and compare previous versions."
+msgstr "Slaat meerdere versies van het huidige document in hetzelfde bestand op en beheert deze versies. U kunt ook eerdere versies openen, verwijderen en vergelijken."

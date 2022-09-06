@@ -1,0 +1,1106 @@
+#. extracted from helpcontent2/source/auxiliary
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2021-11-25 19:33+0100\n"
+"PO-Revision-Date: 2018-10-24 14:03+0000\n"
+"Last-Translator: ரேவதி மதியழகன்/ REVATHI.M <revathi@rajula.org>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ta\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1540389790.000000\n"
+
+#. fEEXD
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07\n"
+"help_section.text"
+msgid "Macros and Scripting"
+msgstr "பெருமங்களும் வரிவடிவமைத்தலும்"
+
+#. pDA36
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0701\n"
+"node.text"
+msgid "%PRODUCTNAME BASIC"
+msgstr ""
+
+#. Ua99d
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070101\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr ""
+
+#. ooCCn
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070102\n"
+"node.text"
+msgid "Command Reference"
+msgstr ""
+
+#. ZhxZF
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010202\n"
+"node.text"
+msgid "Functions, Statements and Operators"
+msgstr ""
+
+#. 3SEZD
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010201\n"
+"node.text"
+msgid "Alphabetic List of Functions, Statements and Operators"
+msgstr ""
+
+#. jhVCB
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010205\n"
+"node.text"
+msgid "Advanced Basic Libraries"
+msgstr ""
+
+#. cFRyM
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010305\n"
+"node.text"
+msgid "ScriptForge Library"
+msgstr ""
+
+#. Vkt9E
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070103\n"
+"node.text"
+msgid "Guides"
+msgstr ""
+
+#. f7k4A
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0702\n"
+"node.text"
+msgid "Python Scripts Help"
+msgstr ""
+
+#. pVb5g
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070201\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr ""
+
+#. D6bPQ
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070202\n"
+"node.text"
+msgid "Programming with Python"
+msgstr ""
+
+#. JCHAg
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0703\n"
+"node.text"
+msgid "Script Development Tools"
+msgstr ""
+
+#. KsAjT
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08\n"
+"help_section.text"
+msgid "Spreadsheets (Calc)"
+msgstr "விரிதாள் (கல்க்)"
+
+#. DnZNf
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0801\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "பொது தகவலும் பயனர் முகப்புப் பயனும்"
+
+#. DdtJy
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0802\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "ஆணையும் பட்டி மேற்கோளும்"
+
+#. 8g9EE
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"080201\n"
+"node.text"
+msgid "Menus"
+msgstr "பட்டிகள்"
+
+#. jwFgp
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"080202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "கருவிப்பட்டைகள்"
+
+#. sHFhh
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0803\n"
+"node.text"
+msgid "Functions Types and Operators"
+msgstr "செயல்பாடுகளை வகைகள் மற்றும் இயக்கர்கள்"
+
+#. DSUE2
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0804\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr ""
+
+#. yRwiN
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0805\n"
+"node.text"
+msgid "Formatting"
+msgstr "சீரமைத்தல்"
+
+#. 5wLkU
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0806\n"
+"node.text"
+msgid "Filtering and Sorting"
+msgstr "வடிகட்டி மற்றும் வரிசைப்படுத்தல்"
+
+#. yCyBs
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0807\n"
+"node.text"
+msgid "Printing"
+msgstr "அச்சிடுகிறது"
+
+#. GTRoC
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0808\n"
+"node.text"
+msgid "Data Ranges"
+msgstr "தரவு வரம்புகள்"
+
+#. cM3fi
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0809\n"
+"node.text"
+msgid "Pivot Table"
+msgstr "சுழல் அட்டவணை"
+
+#. ZBuq9
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08091\n"
+"node.text"
+msgid "Pivot Chart"
+msgstr "சுழல் மைய விளக்கப்படம்"
+
+#. RowUw
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0810\n"
+"node.text"
+msgid "Scenarios"
+msgstr "நிகழ்வோட்‌டங்கள்"
+
+#. NHiVG
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08101\n"
+"node.text"
+msgid "Subtotals"
+msgstr ""
+
+#. CzARM
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0811\n"
+"node.text"
+msgid "References"
+msgstr "மேற்கோள்கள்"
+
+#. ELC6F
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0812\n"
+"node.text"
+msgid "Viewing, Selecting, Copying"
+msgstr "பார்த்தல், தெரிவுசெய்தல், நகலெடுத்தல்"
+
+#. VFHig
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0813\n"
+"node.text"
+msgid "Formulas and Calculations"
+msgstr "சூத்திரங்களும் கணக்கீடுகளும்"
+
+#. bCMSS
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0814\n"
+"node.text"
+msgid "Protection"
+msgstr "பாதுகாப்பு"
+
+#. m2Dpj
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0815\n"
+"node.text"
+msgid "Writing Calc Macros"
+msgstr ""
+
+#. Q59GN
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0815\n"
+"node.text"
+msgid "Miscellaneous"
+msgstr "மற்றவை"
+
+#. 6Saoi
+#: schart.tree
+msgctxt ""
+"schart.tree\n"
+"05\n"
+"help_section.text"
+msgid "Charts and Diagrams"
+msgstr "விளக்கப்படங்களும் வரைப்படங்களும்"
+
+#. gu6pZ
+#: schart.tree
+msgctxt ""
+"schart.tree\n"
+"0501\n"
+"node.text"
+msgid "General Information"
+msgstr "பொதுத் தகவல்"
+
+#. Q5EUA
+#: sdatabase.tree
+msgctxt ""
+"sdatabase.tree\n"
+"09\n"
+"help_section.text"
+msgid "Database Functionality (Base)"
+msgstr ""
+
+#. tLWiE
+#: sdatabase.tree
+msgctxt ""
+"sdatabase.tree\n"
+"0901\n"
+"node.text"
+msgid "General Information"
+msgstr ""
+
+#. xU49Q
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11\n"
+"help_section.text"
+msgid "Drawings (Draw)"
+msgstr ""
+
+#. UcMAA
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1101\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr ""
+
+#. ZDeBD
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1102\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr ""
+
+#. kq7Az
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11020201\n"
+"node.text"
+msgid "Menus"
+msgstr ""
+
+#. SFgJ7
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11020202\n"
+"node.text"
+msgid "Toolbars"
+msgstr ""
+
+#. 9ojH7
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1103\n"
+"node.text"
+msgid "Loading, Saving, Importing, and Exporting"
+msgstr ""
+
+#. fJYHX
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1104\n"
+"node.text"
+msgid "Formatting"
+msgstr ""
+
+#. HkVUY
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1105\n"
+"node.text"
+msgid "Printing"
+msgstr ""
+
+#. G8GoF
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1106\n"
+"node.text"
+msgid "Effects"
+msgstr ""
+
+#. fd9tS
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1107\n"
+"node.text"
+msgid "Objects, Graphics, and Bitmaps"
+msgstr ""
+
+#. crdMY
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1108\n"
+"node.text"
+msgid "Groups and Layers"
+msgstr ""
+
+#. G3s8n
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1109\n"
+"node.text"
+msgid "Text in Drawings"
+msgstr ""
+
+#. rxRmL
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1110\n"
+"node.text"
+msgid "Viewing"
+msgstr ""
+
+#. 4zaCG
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"01\n"
+"help_section.text"
+msgid "%PRODUCTNAME Installation"
+msgstr "%PRODUCTNAME நிறுவல்"
+
+#. 3EUAC
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"10\n"
+"help_section.text"
+msgid "Common Help Topics"
+msgstr "பொதுவான உதவி தலைப்புகள்"
+
+#. 3GoWS
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1001\n"
+"node.text"
+msgid "General Information"
+msgstr "பொதுத் தகவல்"
+
+#. vFfKE
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1002\n"
+"node.text"
+msgid "%PRODUCTNAME and Microsoft Office"
+msgstr "%PRODUCTNAME உம் மைக்ரோசாப்ட் ஆபீஸும்"
+
+#. GBR3F
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1004\n"
+"node.text"
+msgid "%PRODUCTNAME Options"
+msgstr "%PRODUCTNAME தேர்வுகள்"
+
+#. d4gAD
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1005\n"
+"node.text"
+msgid "Wizards"
+msgstr "வழிகாட்டிகள்"
+
+#. aXMeh
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100501\n"
+"node.text"
+msgid "Letter Wizard"
+msgstr "கடித வழிகாட்டி"
+
+#. 6qzVL
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100502\n"
+"node.text"
+msgid "Fax Wizard"
+msgstr "தொலைநகல் வழிகாட்டி"
+
+#. GMiKt
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100504\n"
+"node.text"
+msgid "Agenda Wizard"
+msgstr "நிகழ்ச்சி நிரல் வழிகாட்டி"
+
+#. gvsML
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100506\n"
+"node.text"
+msgid "HTML Export Wizard"
+msgstr "HTML ஏற்றுமதி செய்யும் வழிகாட்டி"
+
+#. 8tHJK
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100510\n"
+"node.text"
+msgid "Document Converter Wizard"
+msgstr "ஆவணம் மாற்றி வழிகாட்டி"
+
+#. zhnAF
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1006\n"
+"node.text"
+msgid "Configuring %PRODUCTNAME"
+msgstr "%PRODUCTNAME ஐ நிறுவுகிறது"
+
+#. 2rp8T
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1007\n"
+"node.text"
+msgid "Working with the User Interface"
+msgstr "பயனர் இடைமுகத்துடன் பணியாற்றுதல்"
+
+#. mFuDH
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"10071\n"
+"node.text"
+msgid "Digital Signatures"
+msgstr "எண்மிய கையொப்பங்கள் "
+
+#. drtXn
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1008\n"
+"node.text"
+msgid "Printing, Faxing, Sending"
+msgstr "அச்சிட, தொலைநகலிட, அனுப்ப"
+
+#. ZJbym
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1009\n"
+"node.text"
+msgid "Drag & Drop"
+msgstr "இழுத்து விடு"
+
+#. DFzj6
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1010\n"
+"node.text"
+msgid "Copy and Paste"
+msgstr "நகல் மற்றும் ஒட்டு"
+
+#. hQXmX
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1012\n"
+"node.text"
+msgid "Charts and Diagrams"
+msgstr "நிரல் படங்கள் மற்றும் வரைபடங்கள்"
+
+#. GVohQ
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1013\n"
+"node.text"
+msgid "Load, Save, Import, Export, PDF"
+msgstr ""
+
+#. Ty8Du
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1014\n"
+"node.text"
+msgid "Links and References"
+msgstr "இணைப்புகள் மற்றும் குறிப்புகள்"
+
+#. nDFsH
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1015\n"
+"node.text"
+msgid "Document Version Tracking"
+msgstr "ஆவண பதிப்பு கண்காணிப்பு"
+
+#. AnvYc
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1016\n"
+"node.text"
+msgid "Labels and Business Cards"
+msgstr "அடையாளங்கள் மற்றும் வணிக அட்டைகள்"
+
+#. tEYBw
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1018\n"
+"node.text"
+msgid "Inserting External Data"
+msgstr "புற தரவு சேர்க்கப்படுகின்றது"
+
+#. X2KH4
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1019\n"
+"node.text"
+msgid "Automatic Functions"
+msgstr "தானியங்கி செயல்பாடுகள்"
+
+#. EGqAp
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1020\n"
+"node.text"
+msgid "Searching and Replacing"
+msgstr "தேடல் மற்றும் மாற்றுதல்"
+
+#. 4GGhC
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1021\n"
+"node.text"
+msgid "Guides"
+msgstr "வழிகாட்டிகள்"
+
+#. BjDNf
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04\n"
+"help_section.text"
+msgid "Presentations (Impress)"
+msgstr ""
+
+#. hBFX8
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0401\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "பொதுத்தகவல் மற்றும் பயனர் இடைமுக பயன்பாடு"
+
+#. XaGTA
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0402\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "கட்டளை மற்றும் தெரிவுதிரை குறிப்பு"
+
+#. ADAgH
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04020101\n"
+"node.text"
+msgid "Menus"
+msgstr "தெரிவு திரை"
+
+#. fqLWR
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04020102\n"
+"node.text"
+msgid "Toolbars"
+msgstr "கருவிப்பட்டைகள்"
+
+#. fiLDS
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0403\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr ""
+
+#. jMBsp
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0404\n"
+"node.text"
+msgid "Formatting"
+msgstr "வடிவமைக்கிறது"
+
+#. HtUGZ
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0405\n"
+"node.text"
+msgid "Printing"
+msgstr "அச்சிடல்"
+
+#. FxREt
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0406\n"
+"node.text"
+msgid "Effects"
+msgstr "விளைவுகள்"
+
+#. RX5V8
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0407\n"
+"node.text"
+msgid "Objects, Graphics, and Bitmaps"
+msgstr "பொருட்கள், வரைவியல், மற்றும் பிட்டுபடங்கள்"
+
+#. aDbFG
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0409\n"
+"node.text"
+msgid "Text in Presentations"
+msgstr ""
+
+#. s8GCo
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0410\n"
+"node.text"
+msgid "Viewing"
+msgstr "பார்க்கிறது"
+
+#. Lo4YZ
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0411\n"
+"node.text"
+msgid "Slide Shows"
+msgstr "படவில்லை காட்சிகள்"
+
+#. m5CkC
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"03\n"
+"help_section.text"
+msgid "Formulas (Math)"
+msgstr "சூத்திரங்களும் (மேத்)"
+
+#. kAkAL
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0301\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "பொது தகவல் மற்றும் பயனர் இடைமுகத்தின் பயன்பாடு"
+
+#. 3BZ8j
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"030101\n"
+"node.text"
+msgid "%PRODUCTNAME Formula Elements"
+msgstr ""
+
+#. V99im
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0302\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "ஆணையும் பட்டியல் மேற்கோளும்"
+
+#. CGoih
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0303\n"
+"node.text"
+msgid "Working with Formulas"
+msgstr "சூத்திரங்களைப் பயன்படுத்தல்"
+
+#. FxCSV
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"02\n"
+"help_section.text"
+msgid "Text Documents (Writer)"
+msgstr "உரை ஆவணங்கள் (ரைட்டர்)"
+
+#. jWyEV
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0201\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "பொது தகவலும் பயனர் முகப்புப் பயனும்"
+
+#. mT2iu
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0202\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "ஆணையும் பட்டியல் மேற்கோளும்"
+
+#. 4RREa
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"020201\n"
+"node.text"
+msgid "Menus"
+msgstr "பட்டியல்கள்"
+
+#. SQkvD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"020202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "கருவிப்பட்டைகள்"
+
+#. AExWW
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0210\n"
+"node.text"
+msgid "Navigating Text Documents"
+msgstr "உரை ஆவணங்களை வழிநடத்து"
+
+#. hjKKD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0212\n"
+"node.text"
+msgid "Formatting Text Documents"
+msgstr "உரை ஆவணங்களை வடிவமைக்க"
+
+#. 6gFto
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"021201\n"
+"node.text"
+msgid "Templates and Styles"
+msgstr "முன்வடிவு மற்றும் பாணிகள்"
+
+#. 7BQES
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0204\n"
+"node.text"
+msgid "Graphics in Text Documents"
+msgstr "உரை ஆவணங்களில் உள்ள வரைகலை"
+
+#. QsiTB
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0205\n"
+"node.text"
+msgid "Tables in Text Documents"
+msgstr "உரை ஆவணங்களில் உள்ள அட்டவணைகள்"
+
+#. Xx5Fp
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0206\n"
+"node.text"
+msgid "Objects in Text Documents"
+msgstr "உரை ஆவணங்களில் உள்ள பொருட்களை"
+
+#. 47SjN
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0207\n"
+"node.text"
+msgid "Sections and Frames in Text Documents"
+msgstr "உரை ஆவணங்களிலுள்ள பகுதிகளும் சட்டகங்களும்"
+
+#. E2N9E
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0208\n"
+"node.text"
+msgid "Tables of Contents and Indexes"
+msgstr "உள்ளடக்க, அகவரிசைகளின் அட்டவணைகள்"
+
+#. yi6ro
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0209\n"
+"node.text"
+msgid "Fields in Text Documents"
+msgstr "உரை ஆவணங்களிலுள்ள புலங்கள்"
+
+#. ZgfjA
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0211\n"
+"node.text"
+msgid "Calculating in Text Documents"
+msgstr "உரை ஆவணங்களில் கணக்கிடுகிறது"
+
+#. wVGdF
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0213\n"
+"node.text"
+msgid "Special Text Elements"
+msgstr "சிறப்பு உரை உறுப்புகள்"
+
+#. FxdVR
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0214\n"
+"node.text"
+msgid "Automatic Functions"
+msgstr "தானியங்கி செயல்பாடுகள்"
+
+#. hi36Q
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0215\n"
+"node.text"
+msgid "Numbering and Lists"
+msgstr "எண்ணிடல் மற்றும் பட்டியல்கள்"
+
+#. 2FPcB
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0216\n"
+"node.text"
+msgid "Spellchecking, Thesaurus, and Languages"
+msgstr "எழுத்துப் பிழை சரிபார்த்தல்,நிகண்டு மற்றும் மொழிகள்"
+
+#. vDffD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0218\n"
+"node.text"
+msgid "Troubleshooting Tips"
+msgstr "பழுது இடமறிதல் குறிப்புகள்"
+
+#. qLMLk
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0219\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr ""
+
+#. 8GC4J
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0220\n"
+"node.text"
+msgid "Master Documents"
+msgstr "முதன்மை ஆவணங்கள்"
+
+#. wbJh4
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0221\n"
+"node.text"
+msgid "Links and References"
+msgstr "இணைப்புகள் மற்றும் மேற்கோள்கள்"
+
+#. vHzyn
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0222\n"
+"node.text"
+msgid "Printing"
+msgstr "அச்சிடுதல்"
+
+#. F4LCk
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0223\n"
+"node.text"
+msgid "Searching and Replacing"
+msgstr "தேடுதல் மற்றும் பதிலீடுதல்"
+
+#. CYQr2
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"06\n"
+"help_section.text"
+msgid "HTML Documents (Writer Web)"
+msgstr "HTML ஆவணங்கள் (ரைட்டர் வலை)"

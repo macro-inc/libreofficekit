@@ -1,0 +1,5257 @@
+#. extracted from sfx2
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-08-24 12:29+0200\n"
+"PO-Revision-Date: 2022-02-07 18:38+0000\n"
+"Last-Translator: Євген Кондратюк <lachend@gmail.com>\n"
+"Language-Team: Ukrainian <https://translations.documentfoundation.org/projects/libo_ui-master/sfx2messages/uk/>\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1560423609.000000\n"
+
+#. bHbFE
+#: include/sfx2/strings.hrc:25
+msgctxt "STR_TEMPLATE_FILTER"
+msgid "Templates"
+msgstr "Шаблони"
+
+#. FfusE
+#: include/sfx2/strings.hrc:26
+msgctxt "STR_SAVEDOC"
+msgid "~Save"
+msgstr "З~берегти"
+
+#. CQKYg
+#: include/sfx2/strings.hrc:27
+msgctxt "STR_SAVEASDOC"
+msgid "Save ~As..."
+msgstr "Зберегти ~як..."
+
+#. BdP9V
+#: include/sfx2/strings.hrc:28
+msgctxt "STR_SAVEACOPY"
+msgid "Save a Copy..."
+msgstr "Зберегти копію…"
+
+#. vFaub
+#: include/sfx2/strings.hrc:29
+msgctxt "STR_CLOSEDOC"
+msgid "~Close"
+msgstr "~Закрити"
+
+#. 4jsUR
+#: include/sfx2/strings.hrc:30
+msgctxt "STR_OPEN"
+msgid "~Open"
+msgstr "~Відкрити"
+
+#. ACduP
+#: include/sfx2/strings.hrc:31
+msgctxt "STR_EDIT_TEMPLATE"
+msgid "~Edit"
+msgstr "~Змінити"
+
+#. aKW5U
+#: include/sfx2/strings.hrc:32
+msgctxt "STR_DEFAULT_TEMPLATE"
+msgid "Set as De~fault"
+msgstr "Встановити ~типовим"
+
+#. Bwnha
+#: include/sfx2/strings.hrc:33
+msgctxt "STR_RESET_DEFAULT"
+msgid "Reset De~fault"
+msgstr "Скинути значення до типового"
+
+#. oRvm4
+#: include/sfx2/strings.hrc:34
+msgctxt "STR_DELETE_TEMPLATE"
+msgid "~Delete"
+msgstr "В~идалити"
+
+#. UyfFH
+#: include/sfx2/strings.hrc:35
+msgctxt "STR_SFX_RENAME"
+msgid "~Rename"
+msgstr "Пере~йменувати"
+
+#. Gnhk4
+#: include/sfx2/strings.hrc:36
+msgctxt "STR_ACTION_MOVE"
+msgid "~Move"
+msgstr "Пере~містити"
+
+#. tWE8a
+#: include/sfx2/strings.hrc:37
+msgctxt "STR_ACTION_EXPORT"
+msgid "E~xport"
+msgstr "~Експорт"
+
+#. aEN5D
+#: include/sfx2/strings.hrc:38
+msgctxt "STR_CATEGORY_RENAME"
+msgid "Ren~ame Category"
+msgstr "Перей~менувати категорію"
+
+#. Ys9z4
+#: include/sfx2/strings.hrc:39
+msgctxt "STR_RENAME_TEMPLATE"
+msgid "Enter new template name:"
+msgstr "Введіть назву шаблона:"
+
+#. TVTsi
+#: include/sfx2/strings.hrc:40
+msgctxt "STR_TEMPLATE_TOOLTIP"
+msgid ""
+"Title: $1\n"
+"Category: $2"
+msgstr ""
+"Заголовок: $1\n"
+"Категорія: $2"
+
+#. W2X7Y
+#: include/sfx2/strings.hrc:41
+msgctxt "STR_TEMPLATE_SELECTION"
+msgid "Select a Template"
+msgstr "Виберіть шаблон"
+
+#. ihUZ6
+#: include/sfx2/strings.hrc:42
+msgctxt "STR_AUTOMATICVERSION"
+msgid "Automatically saved version"
+msgstr "Автоматично збережена версія"
+
+#. EfF2v
+#: include/sfx2/strings.hrc:43
+msgctxt "STR_EXPORTBUTTON"
+msgid "Export"
+msgstr "Експорт"
+
+#. q7FND
+#: include/sfx2/strings.hrc:44
+msgctxt "STR_LABEL_FILEFORMAT"
+msgid "File format:"
+msgstr "Формат файлу:"
+
+#. N7LVW
+#: include/sfx2/strings.hrc:45
+msgctxt "STR_HIDDENINFO_CONTAINS"
+msgid ""
+"This document contains:\n"
+"\n"
+msgstr ""
+"Цей документ містить:\n"
+"\n"
+
+#. 8tujE
+#: include/sfx2/strings.hrc:46
+msgctxt "STR_HIDDENINFO_RECORDCHANGES"
+msgid "Recorded changes"
+msgstr "Запис змін"
+
+#. LUUtP
+#: include/sfx2/strings.hrc:47
+msgctxt "STR_HIDDENINFO_NOTES"
+msgid "Notes"
+msgstr "Примітки"
+
+#. tDmMa
+#: include/sfx2/strings.hrc:48
+msgctxt "STR_HIDDENINFO_DOCVERSIONS"
+msgid "Document versions"
+msgstr "Версії документа"
+
+#. ZBKQD
+#: include/sfx2/strings.hrc:49
+msgctxt "STR_HIDDENINFO_CONTINUE_SAVING"
+msgid "Do you want to continue saving the document?"
+msgstr "Продовжити збереження документа?"
+
+#. BzbMB
+#: include/sfx2/strings.hrc:50
+msgctxt "STR_HIDDENINFO_CONTINUE_PRINTING"
+msgid "Do you want to continue printing the document?"
+msgstr "Продовжити друкування документа?"
+
+#. ExQK6
+#: include/sfx2/strings.hrc:51
+msgctxt "STR_HIDDENINFO_CONTINUE_SIGNING"
+msgid "Do you want to continue signing the document?"
+msgstr "Продовжити підписування документа цифровим підписом?"
+
+#. TepyB
+#: include/sfx2/strings.hrc:52
+msgctxt "STR_HIDDENINFO_CONTINUE_CREATEPDF"
+msgid "Do you want to continue creating a PDF file?"
+msgstr "Продовжити створення файлу у форматі PDF?"
+
+#. CbFjm
+#: include/sfx2/strings.hrc:53
+msgctxt "STR_NEW_FILENAME_SAVE"
+msgid "If you do not want to overwrite the original document, you should save your work under a new filename."
+msgstr "Якщо ви не хочете зберігати зміни в початковому документі, збережіть свою роботу в новому файлі."
+
+#. 7stwX
+#. Used in the title of a shared document.
+#: include/sfx2/strings.hrc:55
+msgctxt "STR_SHARED"
+msgid " (shared)"
+msgstr " (спільний доступ)"
+
+#. W5PzH
+#: include/sfx2/strings.hrc:56
+msgctxt "STR_XMLSEC_ODF12_EXPECTED"
+msgid "The document format version is set to ODF 1.1 (OpenOffice.org 2.x) in Tools-Options-Load/Save-General. Signing documents requires ODF 1.2 (OpenOffice.org 3.x)."
+msgstr "Версыю формату документа встановлено у значення ODF 1.1 (OpenOffice.org 2.x) у Tools-Options-Load/Save-General. Для підписання документів вимагається ODF 1.2 (OpenOffice.org 3.x)."
+
+#. tqPCH
+#: include/sfx2/strings.hrc:57
+msgctxt "STR_XMLSEC_QUERY_SAVESIGNEDBEFORESIGN"
+msgid ""
+"The document has to be saved before it can be signed. Saving the document removes all present signatures.\n"
+"Do you want to save the document?"
+msgstr ""
+"Документ треба зберегти перш, ніж він буде підписаний. Збереження документа призведе до вилучення усіх наявних підписів.\n"
+"Зберегти документ?"
+
+#. iFaMb
+#: include/sfx2/strings.hrc:58
+msgctxt "STR_QRYTEMPL_MESSAGE"
+msgid "The template '$(ARG1)' on which this document is based, has been modified. Do you want to update the styles of the current document, using the modified template?"
+msgstr "Шаблон '$(ARG1)', на якому базується цей документ, змінено. Оновити стилі поточного документа, використовуючи змінений шаблон?"
+
+#. ABmvY
+#: include/sfx2/strings.hrc:59
+msgctxt "STR_QRYTEMPL_UPDATE_BTN"
+msgid "~Update Styles"
+msgstr "О~новити стилі"
+
+#. W4thg
+#: include/sfx2/strings.hrc:60
+msgctxt "STR_QRYTEMPL_KEEP_BTN"
+msgid "~Keep Old Styles"
+msgstr "З~берегти старі стилі"
+
+#. X6MGZ
+#: include/sfx2/strings.hrc:61
+msgctxt "STR_CATEGORY_NEW"
+msgid "~New Category"
+msgstr "~Нова категорія"
+
+#. VNfyE
+#: include/sfx2/strings.hrc:62
+msgctxt "STR_CATEGORY_DELETE"
+msgid "~Delete Category"
+msgstr "~Видалити категорію"
+
+#. YdoDu
+#: include/sfx2/strings.hrc:63
+msgctxt "STR_MSG_EXPORT_SUCCESS"
+msgid "$1 templates successfully exported."
+msgstr "Успішно експортовано шаблонів: $1."
+
+#. g6iDa
+#: include/sfx2/strings.hrc:64
+msgctxt "STR_MSG_QUERY_COPY"
+msgid "$1 could not be moved to the category \"$2\". Do you want to copy the template instead?"
+msgstr "Перемістити $1 у категорію «$2» неможиво. Бажаєте натомість скопіювати шаблон?"
+
+#. 9bJN3
+#: include/sfx2/strings.hrc:65
+msgctxt "STR_CREATE_ERROR"
+msgid "Cannot create category: $1"
+msgstr "Не вдається створити категорію: $1"
+
+#. YR7aW
+#: include/sfx2/strings.hrc:66
+msgctxt "STR_ERROR_SAVEAS"
+msgid "Cannot save template: $1"
+msgstr "Не вдається створити шаблон: $1"
+
+#. iE9UD
+#: include/sfx2/strings.hrc:67
+msgctxt "STR_INPUT_NEW"
+msgid "Enter new category name:"
+msgstr "Введіть назву категорії:"
+
+#. yxN3P
+#: include/sfx2/strings.hrc:68
+msgctxt "STR_MSG_ERROR_LOCAL_MOVE"
+msgid ""
+"Error moving the following templates to $1.\n"
+"$2"
+msgstr ""
+"Помилка переміщення таких шаблонів до $1.\n"
+"$2"
+
+#. Sh34g
+#: include/sfx2/strings.hrc:69
+msgctxt "STR_MSG_ERROR_EXPORT"
+msgid ""
+"Error exporting the following templates:\n"
+"$1"
+msgstr ""
+"Помилка експорту таких шаблонів:\n"
+"$1"
+
+#. NFsZu
+#: include/sfx2/strings.hrc:70
+msgctxt "STR_MSG_ERROR_IMPORT"
+msgid ""
+"Error importing the following templates to $1:\n"
+"$2"
+msgstr ""
+"Помилка імпорту таких шаблонів до $1:\n"
+"$2"
+
+#. g5zLe
+#: include/sfx2/strings.hrc:71
+msgctxt "STR_MSG_ERROR_DELETE_TEMPLATE"
+msgid ""
+"The following templates cannot be deleted:\n"
+"$1"
+msgstr ""
+"Неможливо вилучити такі шаблони:\n"
+"$1"
+
+#. 89xV6
+#: include/sfx2/strings.hrc:72
+msgctxt "STR_MSG_ERROR_DELETE_FOLDER"
+msgid ""
+"The following folders cannot be deleted:\n"
+"$1"
+msgstr ""
+"Неможливо вилучити такі теки:\n"
+"$1"
+
+#. buPTz
+#: include/sfx2/strings.hrc:73
+msgctxt "STR_TOOLTIP_ERROR_RENAME_TEMPLATE"
+msgid "There is another template with the name $1 in $2."
+msgstr "Шаблон з назвою $1 вже існує в $2."
+
+#. JiTrQ
+#: include/sfx2/strings.hrc:74
+msgctxt "STR_QMSG_SEL_FOLDER_DELETE"
+msgid "Do you want to delete the selected category?"
+msgstr "Видалити вибрану категорію?"
+
+#. C9pLF
+#: include/sfx2/strings.hrc:75
+msgctxt "STR_QMSG_TEMPLATE_OVERWRITE"
+msgid "A template named $1 already exists in $2. Do you want to overwrite it?"
+msgstr "Шаблон із назвою $1 вже існує в $2. Перезаписати його?"
+
+#. 6MoGu
+#: include/sfx2/strings.hrc:76
+msgctxt "STR_QMSG_SEL_TEMPLATE_DELETE"
+msgid "Do you want to delete the selected templates?"
+msgstr "Хочете вилучити вибрані шаблони?"
+
+#. WR2LD
+#: include/sfx2/strings.hrc:77
+msgctxt "STR_QMSG_ERROR_OPENING_FILE"
+msgid "An error occurred during opening the file. This may be caused by incorrect file contents.\n"
+msgstr "Трапилася помилка під час відкриття файлу. Вона можливо спричинена неправильним його вмістом.\n"
+
+#. AsUee
+#: include/sfx2/strings.hrc:78
+msgctxt "STR_QMSG_ERROR_OPENING_FILE_DETAILS"
+msgid "The error details are:\n"
+msgstr "Подробиці про помилку:\n"
+
+#. D2XDV
+#: include/sfx2/strings.hrc:79
+msgctxt "STR_QMSG_ERROR_OPENING_FILE_CONTINUE"
+msgid ""
+"\n"
+"Proceeding with import may cause data loss or corruption, and application may become unstable or crash.\n"
+"\n"
+"Do you want to ignore the error and attempt to continue loading the file?"
+msgstr ""
+"\n"
+"Продовження імпорту може спричинити втрату або пошкодження даних, а програма може почати працювати нестабільна або взагалі впасти.\n"
+"\n"
+"Бажаєте знехтувати помилку і спробувати продовжити завантаження файлу?"
+
+#. g63UH
+#: include/sfx2/strings.hrc:81
+msgctxt "STR_HELP_WINDOW_TITLE"
+msgid "%PRODUCTNAME Help"
+msgstr "Довідка %PRODUCTNAME"
+
+#. Veb3m
+#: include/sfx2/strings.hrc:82
+msgctxt "STR_HELP_BUTTON_INDEX_ON"
+msgid "Show Navigation Pane"
+msgstr "Показати панель навігації"
+
+#. 3LGpr
+#: include/sfx2/strings.hrc:83
+msgctxt "STR_HELP_BUTTON_INDEX_OFF"
+msgid "Hide Navigation Pane"
+msgstr "Приховати панель навігації"
+
+#. g8Vns
+#: include/sfx2/strings.hrc:84
+msgctxt "STR_HELP_BUTTON_START"
+msgid "First Page"
+msgstr "Перша сторінка"
+
+#. YMoQp
+#: include/sfx2/strings.hrc:85
+msgctxt "STR_HELP_BUTTON_PREV"
+msgid "Previous Page"
+msgstr "Попередня сторінка"
+
+#. mGB7r
+#: include/sfx2/strings.hrc:86
+msgctxt "STR_HELP_BUTTON_NEXT"
+msgid "Next Page"
+msgstr "Наступна сторінка"
+
+#. dys7x
+#: include/sfx2/strings.hrc:87
+msgctxt "STR_HELP_BUTTON_PRINT"
+msgid "Print..."
+msgstr "Друк..."
+
+#. bmCzY
+#: include/sfx2/strings.hrc:88
+msgctxt "STR_HELP_BUTTON_ADDBOOKMARK"
+msgid "Add to Bookmarks..."
+msgstr "Додати закладку..."
+
+#. SGFus
+#: include/sfx2/strings.hrc:89
+msgctxt "STR_HELP_BUTTON_SEARCHDIALOG"
+msgid "Find on this Page..."
+msgstr "Знайти на цій сторінці..."
+
+#. qvTDZ
+#: include/sfx2/strings.hrc:90
+msgctxt "STR_HELP_BUTTON_SOURCEVIEW"
+msgid "HTML Source"
+msgstr "Первинний текст HTML"
+
+#. pHyBm
+#: include/sfx2/strings.hrc:91
+msgctxt "STR_HELP_MENU_TEXT_SELECTION_MODE"
+msgid "Select Text"
+msgstr "Вибрати текст"
+
+#. 5FCCv
+#: include/sfx2/strings.hrc:92
+msgctxt "STR_HELP_MENU_TEXT_COPY"
+msgid "~Copy"
+msgstr "~Копіювати"
+
+#. TQd3C
+#: include/sfx2/strings.hrc:93
+msgctxt "STR_INFO_NOSEARCHRESULTS"
+msgid "No topics found."
+msgstr "Шуканий термін не знайдено."
+
+#. 9D6Ze
+#: include/sfx2/strings.hrc:94
+msgctxt "STR_INFO_NOSEARCHTEXTFOUND"
+msgid "The text you entered was not found."
+msgstr "Введений текст не знайдено."
+
+#. qLPDs
+#: include/sfx2/strings.hrc:95
+msgctxt "RID_HELP_ONSTARTUP_TEXT"
+msgid "~Display %PRODUCTNAME %MODULENAME Help at Startup"
+msgstr "~Показувати довідку %PRODUCTNAME %MODULENAME при старті"
+
+#. TEgzB
+#: include/sfx2/strings.hrc:97
+msgctxt "STR_NONAME"
+msgid "Untitled"
+msgstr "Неназваний"
+
+#. fs5SN
+#: include/sfx2/strings.hrc:98
+msgctxt "STR_STANDARD_SHORTCUT"
+msgid "Standard"
+msgstr "Типовий"
+
+#. 6sRBN
+#: include/sfx2/strings.hrc:99
+msgctxt "STR_BYTES"
+msgid "Bytes"
+msgstr "байт"
+
+#. Z3kKr
+#: include/sfx2/strings.hrc:100
+msgctxt "STR_KB"
+msgid "kB"
+msgstr ""
+
+#. VrFxn
+#: include/sfx2/strings.hrc:101
+msgctxt "STR_MB"
+msgid "MB"
+msgstr "Мб"
+
+#. 9rBAW
+#: include/sfx2/strings.hrc:102
+msgctxt "STR_GB"
+msgid "GB"
+msgstr "Гб"
+
+#. DqwaN
+#: include/sfx2/strings.hrc:103
+msgctxt "STR_QUERY_LASTVERSION"
+msgid "Cancel all changes?"
+msgstr "Скасувати всі зміни?"
+
+#. cCrDG
+#: include/sfx2/strings.hrc:104
+msgctxt "STR_NO_WEBBROWSER_FOUND"
+msgid ""
+"Opening \"$(ARG1)\" failed with error code $(ARG2) and message: \"$(ARG3)\"\n"
+"Maybe no web browser could be found on your system. In that case, please check your Desktop Preferences or install a web browser (for example, Firefox) in the default location requested during the browser installation."
+msgstr ""
+"Відкрити \"$(ARG1)\" не вдалось; отримано код помилки $(ARG2) і повідомлення: \"$(ARG3)\"\n"
+"Можливо, у системі не вдалось знайти переглядач тенет. В такому разі перевірте налаштування стільничного середовища або встановіть переглядач тенет (наприклад, Firefox) у типову теку, запропоновану під час встановлення."
+
+#. QEABe
+#: include/sfx2/strings.hrc:105
+msgctxt "STR_DANGEROUS_TO_OPEN"
+msgid ""
+"It might be dangerous to open \"$(ARG1)\".\n"
+"Do you really want to open it?"
+msgstr ""
+"Може бути небезпечно відкривати \"$(ARG1)\".\n"
+"Ви справді хочете його відкрити?"
+
+#. ADqLM
+#: include/sfx2/strings.hrc:106
+msgctxt "STR_NO_ABS_URI_REF"
+msgid "\"$(ARG1)\" cannot be passed to an external application to open it (e.g., it might not be an absolute URL, or might denote no existing file)."
+msgstr "\"$(ARG1)\" неможливо відкрити в зовнішній програмі (наприклад, це може не бути абсолютним URL, або може позначати відсутній файл)."
+
+#. XDUCY
+#: include/sfx2/strings.hrc:107
+msgctxt "STR_GID_INTERN"
+msgid "Internal"
+msgstr "Внутрішній"
+
+#. 4g9hU
+#: include/sfx2/strings.hrc:108
+msgctxt "STR_GID_APPLICATION"
+msgid "Application"
+msgstr "Застосунок"
+
+#. rBzxu
+#: include/sfx2/strings.hrc:109
+msgctxt "STR_GID_VIEW"
+msgid "View"
+msgstr "Перегляд"
+
+#. NQnym
+#: include/sfx2/strings.hrc:110
+msgctxt "STR_GID_DOCUMENT"
+msgid "Documents"
+msgstr "Документи"
+
+#. DbzDd
+#: include/sfx2/strings.hrc:111
+msgctxt "STR_GID_EDIT"
+msgid "Edit"
+msgstr "Змінити"
+
+#. HqK5g
+#: include/sfx2/strings.hrc:112
+msgctxt "STR_GID_MACRO"
+msgid "BASIC"
+msgstr "BASIC"
+
+#. 3QkTL
+#: include/sfx2/strings.hrc:113
+msgctxt "STR_GID_OPTIONS"
+msgid "Options"
+msgstr "Параметри"
+
+#. GFEQ3
+#: include/sfx2/strings.hrc:114
+msgctxt "STR_GID_MATH"
+msgid "Math"
+msgstr "Math"
+
+#. rFALW
+#: include/sfx2/strings.hrc:115
+msgctxt "STR_GID_NAVIGATOR"
+msgid "Navigate"
+msgstr "Навігація"
+
+#. w7dmG
+#: include/sfx2/strings.hrc:116
+msgctxt "STR_GID_INSERT"
+msgid "Insert"
+msgstr "Вставити"
+
+#. fokQp
+#: include/sfx2/strings.hrc:117
+msgctxt "STR_GID_FORMAT"
+msgid "Format"
+msgstr "Формат"
+
+#. fLTV6
+#: include/sfx2/strings.hrc:118
+msgctxt "STR_GID_TEMPLATE"
+msgid "Templates"
+msgstr "Шаблони"
+
+#. JAdCZ
+#: include/sfx2/strings.hrc:119
+msgctxt "STR_GID_TEXT"
+msgid "Text"
+msgstr "Текст"
+
+#. PSfaP
+#: include/sfx2/strings.hrc:120
+msgctxt "STR_GID_FRAME"
+msgid "Frame"
+msgstr "Рамка"
+
+#. 5V4iR
+#: include/sfx2/strings.hrc:121
+msgctxt "STR_GID_GRAPHIC"
+msgid "Image"
+msgstr "Зображення"
+
+#. DzBoB
+#: include/sfx2/strings.hrc:122
+msgctxt "STR_GID_TABLE"
+msgid "Table"
+msgstr "Таблиця"
+
+#. Cmsi4
+#: include/sfx2/strings.hrc:123
+msgctxt "STR_GID_ENUMERATION"
+msgid "Numbering"
+msgstr "Нумерація"
+
+#. CDFSE
+#: include/sfx2/strings.hrc:124
+msgctxt "STR_GID_DATA"
+msgid "Data"
+msgstr "Дані"
+
+#. CV9Pq
+#: include/sfx2/strings.hrc:125
+msgctxt "STR_GID_SPECIAL"
+msgid "Special Functions"
+msgstr "Спеціальні функції"
+
+#. 5CfQs
+#: include/sfx2/strings.hrc:126
+msgctxt "STR_GID_IMAGE"
+msgid "Image"
+msgstr "Зображення"
+
+#. 5wvK9
+#: include/sfx2/strings.hrc:127
+msgctxt "STR_GID_CHART"
+msgid "Chart"
+msgstr "Діаграма"
+
+#. pNE8F
+#: include/sfx2/strings.hrc:128
+msgctxt "STR_GID_EXPLORER"
+msgid "Explorer"
+msgstr "Оглядач"
+
+#. yBawD
+#: include/sfx2/strings.hrc:129
+msgctxt "STR_GID_CONNECTOR"
+msgid "Connector"
+msgstr "З'єднувальна лінія"
+
+#. 3rGea
+#: include/sfx2/strings.hrc:130
+msgctxt "STR_GID_MODIFY"
+msgid "Modify"
+msgstr "Змінити"
+
+#. WcwGs
+#: include/sfx2/strings.hrc:131
+msgctxt "STR_GID_DRAWING"
+msgid "Drawing"
+msgstr "Малювання"
+
+#. Ajo4w
+#: include/sfx2/strings.hrc:132
+msgctxt "STR_GID_CONTROLS"
+msgid "Controls"
+msgstr "Елементи керування"
+
+#. L5coQ
+#: include/sfx2/strings.hrc:133
+msgctxt "STR_QUITAPP"
+msgid "E~xit %PRODUCTNAME"
+msgstr "Вийти з %PRODUCTNAME"
+
+#. k2PBJ
+#: include/sfx2/strings.hrc:134
+msgctxt "RID_STR_HELP"
+msgid "Help"
+msgstr "Довідка"
+
+#. roDzu
+#: include/sfx2/strings.hrc:135
+msgctxt "RID_STR_HLPFILENOTEXIST"
+msgid "The help file for this topic is not installed."
+msgstr "Не встановлені файли довідки для цього розділу."
+
+#. zjPS7
+#: include/sfx2/strings.hrc:136
+msgctxt "STR_QUICKSTART_EXIT"
+msgid "Exit Quickstarter"
+msgstr "Вихід з швидкого запуску"
+
+#. ecxqC
+#: include/sfx2/strings.hrc:137
+msgctxt "STR_QUICKSTART_TIP"
+msgid "%PRODUCTNAME %PRODUCTVERSION Quickstarter"
+msgstr "Швидкий запуск %PRODUCTNAME %PRODUCTVERSION"
+
+#. G9Gqk
+#: include/sfx2/strings.hrc:138
+msgctxt "STR_QUICKSTART_FILEOPEN"
+msgid "Open Document..."
+msgstr "Відкрити документ..."
+
+#. wecTF
+#: include/sfx2/strings.hrc:139
+msgctxt "STR_QUICKSTART_FROMTEMPLATE"
+msgid "From Template..."
+msgstr "На основі шаблону..."
+
+#. FzJCj
+#: include/sfx2/strings.hrc:140
+msgctxt "STR_QUICKSTART_PRELAUNCH"
+msgid "Load %PRODUCTNAME During System Start-Up"
+msgstr "Завантажувати %PRODUCTNAME під час запуску системи"
+
+#. hMejq
+#: include/sfx2/strings.hrc:141
+msgctxt "STR_QUICKSTART_LNKNAME"
+msgid "%PRODUCTNAME %PRODUCTVERSION"
+msgstr "%PRODUCTNAME %PRODUCTVERSION"
+
+#. CBB6Z
+#: include/sfx2/strings.hrc:142
+msgctxt "STR_QUICKSTART_FILE"
+msgid "File"
+msgstr "Файл"
+
+#. c6wAB
+#: include/sfx2/strings.hrc:143
+msgctxt "STR_QUICKSTART_STARTCENTER"
+msgid "Startcenter"
+msgstr "Центр запуску"
+
+#. Uhn54
+#: include/sfx2/strings.hrc:144
+msgctxt "STR_QUICKSTART_RECENTDOC"
+msgid "Recent Documents"
+msgstr "Попередні ~документи"
+
+#. DirQf
+#: include/sfx2/strings.hrc:145
+msgctxt "STR_QUERY_UPDATE_LINKS"
+msgid ""
+"The document %{filename} contains one or more links to external data.\n"
+"\n"
+"Would you like to change the document, and update all links\n"
+"to get the most recent data?"
+msgstr ""
+"Документ %{filename} містить один або більше зв'язків з зовнішніми даними.\n"
+"\n"
+"Змінити документ, оновивши всі зв'язки, щоб отримати\n"
+"найновіші дані?"
+
+#. zJGEM
+#: include/sfx2/strings.hrc:146
+msgctxt "STR_DDE_ERROR"
+msgid "DDE link to %1 for %2 area %3 are not available."
+msgstr "Зв'язок через DDE з %1 для %2 області %3 недоступний."
+
+#. zECGD
+#: include/sfx2/strings.hrc:147
+msgctxt "STR_SECURITY_WARNING_NO_HYPERLINKS"
+msgid ""
+"For security reasons, the hyperlink cannot be executed.\n"
+"The stated address will not be opened."
+msgstr ""
+"Задля безпеки гіперпосилання не буде запущене.\n"
+"Вказана адреса не буде відкрита."
+
+#. vcMzA
+#: include/sfx2/strings.hrc:148
+msgctxt "RID_SECURITY_WARNING_TITLE"
+msgid "Security Warning"
+msgstr "Попередження про безпеку"
+
+#. vVCon
+#: include/sfx2/strings.hrc:149
+msgctxt "RID_SVXSTR_XMLSEC_QUERY_LOSINGSIGNATURE"
+msgid ""
+"Saving will remove all existing signatures.\n"
+"Do you want to continue saving the document?"
+msgstr ""
+"Збереження призведе до видалення усіх наявних підписів.\n"
+"Зберегти документ?"
+
+#. cGnF9
+#: include/sfx2/strings.hrc:150
+msgctxt "RID_SVXSTR_XMLSEC_QUERY_SAVEBEFORESIGN"
+msgid ""
+"The document has to be saved before it can be signed.\n"
+"Do you want to save the document?"
+msgstr ""
+"Для застосування цифрового підпису документ потрібно зберегти.\n"
+"Зберегти документ?"
+
+#. zNVEd
+#: include/sfx2/strings.hrc:151
+msgctxt "STR_QUERY_CANCELCHECKOUT"
+msgid ""
+"This will discard all changes on the server since check-out.\n"
+"Do you want to proceed?"
+msgstr ""
+"Зміни, зроблені після блокування, буде втрачено на сервері.\n"
+"Продовжити?"
+
+#. jufLD
+#: include/sfx2/strings.hrc:152
+msgctxt "STR_INFO_WRONGDOCFORMAT"
+msgid "This document must be saved in OpenDocument file format before it can be digitally signed."
+msgstr "Перш ніж ставити цифровий підпис під документом, його треба зберегти у форматі OpenDocument."
+
+#. ori9u
+#: include/sfx2/strings.hrc:153
+msgctxt "RID_XMLSEC_DOCUMENTSIGNED"
+msgid " (Signed)"
+msgstr " (Підписано)"
+
+#. kgWZS
+#: include/sfx2/strings.hrc:154
+msgctxt "STR_EMBEDDED_TITLE"
+msgid " (Embedded document)"
+msgstr " (Вбудований документ)"
+
+#. 3nT9T
+#: include/sfx2/strings.hrc:155
+msgctxt "STR_STANDARD"
+msgid "Standard"
+msgstr "Типовий"
+
+#. FjCuJ
+#: include/sfx2/strings.hrc:156
+msgctxt "RID_SVXSTR_FILELINK"
+msgid "Document"
+msgstr "Документ"
+
+#. BfMd3
+#: include/sfx2/strings.hrc:157
+msgctxt "STR_NONE"
+msgid "- None -"
+msgstr "- Немає -"
+
+#. XBXvE
+#: include/sfx2/strings.hrc:158
+msgctxt "saveastemplatedlg|categorylist"
+msgid "None"
+msgstr "Немає"
+
+#. 5kUsi
+#: include/sfx2/strings.hrc:159
+msgctxt "RID_SVXSTR_GRAPHICLINK"
+msgid "Image"
+msgstr "Зображення"
+
+#. dUK2G
+#: include/sfx2/strings.hrc:160
+msgctxt "STR_SFX_FILTERNAME_ALL"
+msgid "All files"
+msgstr "Усі файли"
+
+#. E39E2
+#: include/sfx2/strings.hrc:161
+msgctxt "STR_SFX_FILTERNAME_PDF"
+msgid "PDF files"
+msgstr "Файли PDF"
+
+#. gCHbP
+#: include/sfx2/strings.hrc:162
+msgctxt "RID_SVXSTR_EDITGRFLINK"
+msgid "Link Image"
+msgstr "Пов'язати зображення"
+
+#. u9H7a
+#. i66948 used in project scripting
+#: include/sfx2/strings.hrc:164
+msgctxt "STR_ERRUNOEVENTBINDUNG"
+msgid ""
+"An appropriate component method %1\n"
+"could not be found.\n"
+"\n"
+"Check spelling of method name."
+msgstr ""
+"Не знайдено відповідний метод %1 компонента.\n"
+"\n"
+"Перевірте правильність назви метода."
+
+#. 2FLYB
+#: include/sfx2/strings.hrc:165
+msgctxt "RID_SVXSTR_GRFILTER_OPENERROR"
+msgid "Image file cannot be opened"
+msgstr "Не можна відкрити графічний файл"
+
+#. 6eLsb
+#: include/sfx2/strings.hrc:166
+msgctxt "RID_SVXSTR_GRFILTER_IOERROR"
+msgid "Image file cannot be read"
+msgstr "Неможливо прочитати графічний файл"
+
+#. HGRsV
+#: include/sfx2/strings.hrc:167
+msgctxt "RID_SVXSTR_GRFILTER_FORMATERROR"
+msgid "Unknown image format"
+msgstr "Невідомий формат зображення"
+
+#. YJhGK
+#: include/sfx2/strings.hrc:168
+msgctxt "RID_SVXSTR_GRFILTER_VERSIONERROR"
+msgid "This version of the image file is not supported"
+msgstr "Ця версія граічного файлу не підтримується"
+
+#. Sn8KQ
+#: include/sfx2/strings.hrc:169
+msgctxt "RID_SVXSTR_GRFILTER_FILTERERROR"
+msgid "Image filter not found"
+msgstr "Не знайдено фільтр зображень"
+
+#. huEFV
+#: include/sfx2/strings.hrc:170
+msgctxt "RID_SVXSTR_TXTFILTER_FILTERERROR"
+msgid "This is not a text document"
+msgstr "Це не текстовий документ"
+
+#. ejBgZ
+#: include/sfx2/strings.hrc:171
+msgctxt "RID_SVXSTR_END_REDLINING_WARNING"
+msgid ""
+"This action will exit the change recording mode.\n"
+"No information about changes will be recorded from now on.\n"
+"\n"
+"Exit change recording mode?\n"
+"\n"
+msgstr ""
+"Після цього буде припинено записування змін.\n"
+"Інформація про зміни записуватись не буде.\n"
+"\n"
+"Вийти з режиму записування змін?\n"
+"\n"
+
+#. E2CcY
+#: include/sfx2/strings.hrc:172
+msgctxt "RID_SVXSTR_INCORRECT_PASSWORD"
+msgid "Incorrect password"
+msgstr "Неправильний пароль"
+
+#. 7Ezso
+#: include/sfx2/strings.hrc:173
+msgctxt "RID_SVXSTR_GPG_ENCRYPT_FAILURE"
+msgid "OpenPGP key not trusted, damaged, or encryption failure. Please try again."
+msgstr "Відкритий ключ PGP ненадійний, пошкоджений або трапилась помилка кодування. Спробуйте ще раз."
+
+#. DQCUm
+#: include/sfx2/strings.hrc:175
+msgctxt "STR_PASSWD_MIN_LEN"
+msgid "(Minimum $(MINLEN) characters)"
+msgstr "(Мінімум $(MINLEN) символів)"
+
+#. ZKZnh
+#: include/sfx2/strings.hrc:176
+msgctxt "STR_PASSWD_MIN_LEN1"
+msgid "(Minimum 1 character)"
+msgstr "(Мінімум 1 символ)"
+
+#. B3WoF
+#: include/sfx2/strings.hrc:177
+msgctxt "STR_PASSWD_EMPTY"
+msgid "(The password can be empty)"
+msgstr "(Пароль може бути порожнім)"
+
+#. iBD9D
+#: include/sfx2/strings.hrc:178
+msgctxt "STR_MODULENOTINSTALLED"
+msgid "The action could not be executed. The %PRODUCTNAME program module needed for this action is currently not installed."
+msgstr "Неможливо виконати дію. не встановлено відповідний програмний модуль %PRODUCTNAME."
+
+#. TXAV5
+#: include/sfx2/strings.hrc:180
+msgctxt "STR_FILTER_NOT_INSTALLED"
+msgid ""
+"The selected filter $(FILTER) has not been installed.\n"
+"Would you like to do this now?"
+msgstr ""
+"Вибраний фільтр $(FILTER) не встановлено.\n"
+"Встановити зараз?"
+
+#. gQhYY
+#: include/sfx2/strings.hrc:181
+msgctxt "STR_FILTER_CONSULT_SERVICE"
+msgid ""
+"The selected filter $(FILTER) is not included in your edition.\n"
+"You can find information about orders on our homepage."
+msgstr ""
+"Вибраний фільтр $(FILTER) не включений до вашої версії.\n"
+"Інформацію про можливості отримання фільтра знайдете на нашій домашній сторінці."
+
+#. Y9yeS
+#: include/sfx2/strings.hrc:183
+msgctxt "STR_WELCOME_LINE1"
+msgid "Welcome to %PRODUCTNAME."
+msgstr "Вітаємо у %PRODUCTNAME."
+
+#. DVEkR
+#: include/sfx2/strings.hrc:184
+msgctxt "STR_WELCOME_LINE2"
+msgid "Drop a document here or open an app to create one."
+msgstr "Перетягніть документ сюди або відкрийте програму, щоб створити його."
+
+#. oTVdA
+#. Translators: Target types in Auto-redaction dialog
+#: include/sfx2/strings.hrc:187
+msgctxt "STR_REDACTION_TARGET_TYPE_TEXT"
+msgid "Text"
+msgstr "Текст"
+
+#. eG5qc
+#: include/sfx2/strings.hrc:188
+msgctxt "STR_REDACTION_TARGET_TYPE_REGEX"
+msgid "Regular expression"
+msgstr "Сталий вираз"
+
+#. TaDCG
+#: include/sfx2/strings.hrc:189
+msgctxt "STR_REDACTION_TARGET_TYPE_PREDEF"
+msgid "Predefined"
+msgstr "Попередньо визначений"
+
+#. bDjwW
+#: include/sfx2/strings.hrc:190
+msgctxt "STR_REDACTION_TARGET_TYPE_UNKNOWN"
+msgid "Unknown"
+msgstr "Невідомий"
+
+#. YgzCk
+#. Translators: Values for the Case Sensitive and the Whole Words columns in Auto-redaction dialog
+#: include/sfx2/strings.hrc:193
+msgctxt "STR_REDACTION_YES"
+msgid "Yes"
+msgstr "Так"
+
+#. oZNaM
+#: include/sfx2/strings.hrc:194
+msgctxt "STR_REDACTION_NO"
+msgid "No"
+msgstr "Ні"
+
+#. FM3Gf
+#. Translators: Misc strings of the Auto Redaction dialog
+#: include/sfx2/strings.hrc:197
+msgctxt "STR_REDACTION_TARGET"
+msgid "Target"
+msgstr "Ціль"
+
+#. m2i7V
+#: include/sfx2/strings.hrc:198
+msgctxt "STR_REDACTION_LOAD_TARGETS"
+msgid "Load Targets"
+msgstr "Завантажити цілі"
+
+#. HgrwX
+#: include/sfx2/strings.hrc:199
+msgctxt "STR_REDACTION_SAVE_TARGETS"
+msgid "Save Targets"
+msgstr "Завантажити цілі"
+
+#. MYMTF
+#: include/sfx2/strings.hrc:200
+msgctxt "STR_REDACTION_FIELDS_REQUIRED"
+msgid "All fields are required"
+msgstr "Всі поля обов'язкові"
+
+#. rQS6M
+#: include/sfx2/strings.hrc:201
+msgctxt "STR_REDACTION_TARGET_NAME_CLASH"
+msgid "There is already a target with this name"
+msgstr "Вже існує ціль з такою назвою"
+
+#. s248s
+#: include/sfx2/strings.hrc:202
+msgctxt "STR_REDACTION_MULTI_EDIT"
+msgid "You have selected multiple targets, but only one target can be edited at once."
+msgstr "Вибрано декілька цілей, а змінювати за раз можна лише одну."
+
+#. BTayC
+#: include/sfx2/strings.hrc:203
+msgctxt "STR_REDACTION_MULTI_DELETE"
+msgid "Are you sure you would like to delete $(TARGETSCOUNT) targets at once?"
+msgstr "Справді видалити зразу $(TARGETSCOUNT) цілей?"
+
+#. qFqDC
+#: include/sfx2/strings.hrc:204
+msgctxt "STR_REDACTION_JSON_FILE_FILTER"
+msgid "Target Set (*.json)"
+msgstr "Набір цілей (*.json)"
+
+#. EGCo6
+#: include/sfx2/strings.hrc:205
+msgctxt "STR_REDACTION_EDIT_TARGET"
+msgid "Edit Target"
+msgstr "Змінити ціль"
+
+#. ACY9D
+#: include/sfx2/strings.hrc:206
+msgctxt "STR_REDACTION_TARGET_ADD_ERROR"
+msgid "An error occurred while adding new target. Please report this incident."
+msgstr "Виникла помилка під час додавання цілі. Повідомте про цей випадок."
+
+#. 6Jog7
+#: include/sfx2/strings.hrc:207
+msgctxt "STR_REDACTION_NO_DRAW_WARNING"
+msgid "Draw module is needed for redaction. Please make sure you have %PRODUCTNAME Draw installed and working correctly."
+msgstr "Для редагування потрібен модуль Draw. Переконайтеся, що %PRODUCTNAME Draw встановлено та працює правильно."
+
+#. FQ9kN
+#: include/sfx2/strings.hrc:209
+msgctxt "STR_SFX_FILEDLG_ACTUALVERSION"
+msgid "Current version"
+msgstr "Поточна версія"
+
+#. GFAEM
+#: include/sfx2/strings.hrc:210
+msgctxt "STR_SFX_EXPLORERFILE_EXPORT"
+msgid "Export"
+msgstr "Експорт"
+
+#. 2DBBC
+#: include/sfx2/strings.hrc:211
+msgctxt "STR_SFX_EXPLORERFILE_INSERT"
+msgid "Insert"
+msgstr "Вставити"
+
+#. VBKtt
+#: include/sfx2/strings.hrc:212
+msgctxt "STR_SFX_EXPLORERFILE_BUTTONINSERT"
+msgid "~Insert"
+msgstr "Вст~авити"
+
+#. DcLFD
+#: include/sfx2/strings.hrc:213
+msgctxt "STR_SFX_IMPORT_ALL_IMAGES"
+msgid "<All images>"
+msgstr "<Всі зображення>"
+
+#. tPDwc
+#: include/sfx2/strings.hrc:214
+msgctxt "STR_PB_SAVEACOPY"
+msgid "Save a Copy"
+msgstr "Зберегти копію"
+
+#. T9mMd
+#: include/sfx2/strings.hrc:215
+msgctxt "STR_PB_COMPAREDOC"
+msgid "Compare to"
+msgstr "Порівняти з"
+
+#. 4qMCh
+#: include/sfx2/strings.hrc:216
+msgctxt "STR_PB_MERGEDOC"
+msgid "Merge with"
+msgstr "Об’єднати з"
+
+#. cDMBG
+#: include/sfx2/strings.hrc:218
+msgctxt "STR_SFX_NEWOFFICEDOC"
+msgid "%PRODUCTNAME document"
+msgstr "Документ %PRODUCTNAME"
+
+#. 43QYo
+#: include/sfx2/strings.hrc:219
+msgctxt "SFX_ST_DURATION_FORMAT"
+msgid " Y: %1 M: %2 D: %3 H: %4 M: %5 S: %6"
+msgstr " Р: %1 М: %2 Д: %3 Г: %4 Х: %5 С: %6"
+
+#. jQX7C
+#: include/sfx2/strings.hrc:220
+msgctxt "STR_SFX_QUERY_WRONG_TYPE"
+msgid ""
+"The value entered does not match the specified type.\n"
+"The value will be stored as text."
+msgstr ""
+"Уведене значення не відповідає вказаному типу,\n"
+"тому буде збережене мов текст."
+
+#. cinmA
+#: include/sfx2/strings.hrc:222
+msgctxt "STR_QUERY_OVERWRITE"
+msgid "Style already exists. Overwrite?"
+msgstr "Стиль вже існує. Переписати?"
+
+#. f627N
+#: include/sfx2/strings.hrc:224
+msgctxt "STR_RESET"
+msgid "~Reset"
+msgstr "~Відновити"
+
+#. EXGDb
+#: include/sfx2/strings.hrc:225
+msgctxt "STR_TABPAGE_INVALIDNAME"
+msgid "This name is already in use."
+msgstr "Ця назва вже використовується."
+
+#. N5aeR
+#: include/sfx2/strings.hrc:226
+msgctxt "STR_TABPAGE_INVALIDSTYLE"
+msgid "This Style does not exist."
+msgstr "Стиль не існує."
+
+#. CYQwN
+#: include/sfx2/strings.hrc:227
+msgctxt "STR_TABPAGE_INVALIDPARENT"
+msgid ""
+"This Style cannot be used as a base Style,\n"
+"because it would result in a recursive reference."
+msgstr ""
+"Неможливо взяти цей стиль за основу,\n"
+"позаяк виникне рекурсія."
+
+#. ECPSd
+#: include/sfx2/strings.hrc:228
+msgctxt "STR_POOL_STYLE_NAME"
+msgid ""
+"Name already exists as a default Style.\n"
+"Please choose another name."
+msgstr ""
+"Ця назва вже призначена типовому стилю.\n"
+"Виберіть іншу назву."
+
+#. NWDmA
+#: include/sfx2/strings.hrc:229
+msgctxt "STR_DELETE_STYLE_USED"
+msgid ""
+"One or more of the selected styles is in use in this document.\n"
+"If you will delete it, text or objects using these styles will revert to the parent style.\n"
+"Do you still wish to delete these styles?\n"
+msgstr ""
+"Один або більше з вибраних стилів використовуються в цьому документі.\n"
+"Якщо їх видалити, текст чи об'єкти, що їх використовують, отримають батьківські стилі.\n"
+"Справді видалити ці стилі?\n"
+
+#. kuD77
+#: include/sfx2/strings.hrc:230
+msgctxt "STR_DELETE_STYLE"
+msgid "Styles in use: "
+msgstr "Використовувані стилі: "
+
+#. 4JhEW
+#: include/sfx2/strings.hrc:231
+msgctxt "STR_SID_NAVIGATOR"
+msgid "Navigator"
+msgstr "Навігатор"
+
+#. Acahp
+#: include/sfx2/strings.hrc:232
+msgctxt "STR_ERROR_WRONG_CONFIRM"
+msgid "Faulty password confirmation"
+msgstr "Помилка при підтвердженні паролю"
+
+#. 6uv4b
+#: include/sfx2/strings.hrc:233
+msgctxt "STR_PDF_EXPORT_SEND"
+msgid "Send"
+msgstr "Надіслати"
+
+#. 9HHQw
+#: include/sfx2/strings.hrc:234
+msgctxt "STR_FONT_TABPAGE"
+msgid "Font"
+msgstr "Шрифт"
+
+#. 7baC6
+#: include/sfx2/strings.hrc:236
+msgctxt "STR_VIEWVERSIONCOMMENT"
+msgid "View Version Comment"
+msgstr "Вставити коментар до версії"
+
+#. LGiF8
+#: include/sfx2/strings.hrc:237
+msgctxt "STR_NO_NAME_SET"
+msgid "(no name set)"
+msgstr "(назву не задано)"
+
+#. rZ4Ao
+#: include/sfx2/strings.hrc:239
+msgctxt "STR_STYLE_FILTER_HIERARCHICAL"
+msgid "Hierarchical"
+msgstr "Ієрархічно"
+
+#. 4VXDe
+#: include/sfx2/strings.hrc:241
+msgctxt "STR_MACRO_LOSS"
+msgid "Do you really want to cancel the recording? Any steps recorded up to this point will be lost."
+msgstr "Ви дійсно хочете перервати запис? Всі записані раніше кроки будуть втрачені."
+
+#. 9MnrK
+#: include/sfx2/strings.hrc:242
+msgctxt "STR_CANCEL_RECORDING"
+msgid "Cancel Recording"
+msgstr "Скасувати запис"
+
+#. m9FCm
+#: include/sfx2/strings.hrc:244
+msgctxt "RID_CNT_STR_WAITING"
+msgid "The templates are being initialized for first-time usage."
+msgstr "Перед першим використанням виконується ініціалізація шаблонів."
+
+#. F3ym2
+#: include/sfx2/strings.hrc:246
+msgctxt "STR_NODEFPRINTER"
+msgid ""
+"No default printer found.\n"
+"Please choose a printer and try again."
+msgstr ""
+"Не виявлено типовий принтер.\n"
+"Виберіть принтер та спробуйте ще раз."
+
+#. a3NTu
+#: include/sfx2/strings.hrc:247
+msgctxt "STR_NOSTARTPRINTER"
+msgid ""
+"Could not start printer.\n"
+"Please check your printer configuration."
+msgstr ""
+"Неможливо запустити принтер.\n"
+"Перевірте конфігурацію принтера."
+
+#. acKHX
+#: include/sfx2/strings.hrc:248
+msgctxt "STR_ERROR_PRINTER_BUSY"
+msgid "Printer busy"
+msgstr "Принтер зайнятий"
+
+#. hDEUj
+#: include/sfx2/strings.hrc:249
+msgctxt "STR_READONLY"
+msgid " (read-only)"
+msgstr " (лише для читання)"
+
+#. uL87C
+#: include/sfx2/strings.hrc:250
+msgctxt "STR_PRINT_NEWORI"
+msgid ""
+"The page size and orientation have been modified.\n"
+"Would you like to save the new settings in the\n"
+"active document?"
+msgstr ""
+"Змінено поточну орієнтацію сторінки.\n"
+"Зберегти ці нові налаштування\n"
+" у активному документі?"
+
+#. cxuAH
+#: include/sfx2/strings.hrc:251
+msgctxt "STR_PRINT_NEWSIZE"
+msgid ""
+"The page size has been modified.\n"
+"Should the new settings be saved\n"
+"in the active document?"
+msgstr ""
+"Розмір сторінки був змінений.\n"
+"Зберегти ці нові налаштування\n"
+" у активному документі?"
+
+#. 4QJxB
+#: include/sfx2/strings.hrc:252
+msgctxt "STR_PRINT_NEWORISIZE"
+msgid ""
+"The page size and orientation have been modified.\n"
+"Would you like to save the new settings in the\n"
+"active document?"
+msgstr ""
+"Змінено поточну орієнтацію сторінки.\n"
+"Зберегти ці нові налаштування\n"
+" у активному документі?"
+
+#. RXbfs
+#: include/sfx2/strings.hrc:253
+msgctxt "STR_CANT_CLOSE"
+msgid ""
+"The document cannot be closed because a\n"
+" print job is being carried out."
+msgstr ""
+"Неможливо закрити цей документ,\n"
+" бо виконується завдання друку."
+
+#. YGyQP
+#: include/sfx2/strings.hrc:254
+msgctxt "STR_ERROR_SEND_MAIL"
+msgid ""
+"An error occurred in sending the message. Possible errors could be a missing user account or a defective setup.\n"
+"Please check the %PRODUCTNAME settings or your email program settings."
+msgstr ""
+"Помилка при надсиланні повідомлення. Можливо, помилка виникла через відсутність облікового запису користувача або із-за несправності у встановленні.\n"
+"Перевірте параметри %PRODUCTNAME та програми електронної пошти."
+
+#. 3nzi6
+#. Error codes look like "MAPI_E_FAILURE" or "1234"
+#: include/sfx2/strings.hrc:256
+msgctxt "STR_ERROR_SEND_MAIL_CODE"
+msgid ""
+"An error occurred in sending the message. Possible errors could be a missing user account or a defective setup.\n"
+"\n"
+"Error code is $1"
+msgstr ""
+"Під час надсилання повідомлення сталася помилка. Можливі помилки: відсутній обліковий запис користувача або похибка встановлення.\n"
+"\n"
+"Код помилки: $1"
+
+#. ZWTDr
+#: include/sfx2/strings.hrc:257
+msgctxt "STR_ERROR_SEND_MAIL_HEADER"
+msgid "Error sending mail"
+msgstr "Помилка надсилання пошти"
+
+#. QVS2D
+#: include/sfx2/strings.hrc:258
+msgctxt "STR_QUERY_OPENASTEMPLATE"
+msgid "This document cannot be edited, possibly due to missing access rights. Do you want to edit a copy of the document?"
+msgstr "Неможливо відкрити цей документ для редагування (ймовірно через відсутність прав). Використовувати його у якості шаблону для нового документа?"
+
+#. ZdGNX
+#: include/sfx2/strings.hrc:259
+msgctxt "STR_QUERY_OPENASTEMPLATE_LOCKED"
+msgid ""
+"This document cannot be edited, because it is locked in another session.%LOCKINFO\n"
+"Do you want to edit a copy of the document?"
+msgstr ""
+"Цей документ неможливо змінити, оскільки він заблокований іншим сеансом.%LOCKINFO\n"
+"Бажаєте змінити копію документа?"
+
+#. n3sMB
+#: include/sfx2/strings.hrc:260
+msgctxt "STR_QUERY_OPENASTEMPLATE_ALLOW_IGNORE"
+msgid "You can also try to ignore the lock and open the file for editing."
+msgstr "Можна також спробувати знехтувати блокування і відкрити файл для змінювання?"
+
+#. yaKxR
+#: include/sfx2/strings.hrc:261
+msgctxt "STR_QUERY_OPENASTEMPLATE_OPENCOPY_BTN"
+msgid "Open ~Copy"
+msgstr "Відкрити ~копію"
+
+#. UYkFP
+#: include/sfx2/strings.hrc:262
+msgctxt "STR_QUERY_OPENASTEMPLATE_OPEN_BTN"
+msgid "~Open"
+msgstr "~Відкрити"
+
+#. GcSXH
+#: include/sfx2/strings.hrc:263
+msgctxt "STR_REPAIREDDOCUMENT"
+msgid " (repaired document)"
+msgstr " (відновлений документ)"
+
+#. HPqkX
+#: include/sfx2/strings.hrc:264
+msgctxt "STR_NONCHECKEDOUT_DOCUMENT"
+msgid "This document is not checked out on the server."
+msgstr "Документ не заблоковано на сервері."
+
+#. uPc29
+#: include/sfx2/strings.hrc:265
+msgctxt "STR_GET_INVOLVED_TEXT"
+msgid "Help us make %PRODUCTNAME even better!"
+msgstr "Допоможіть нам зробити %PRODUCTNAME ще кращим!"
+
+#. PboiP
+#: include/sfx2/strings.hrc:266
+msgctxt "STR_GET_INVOLVED_BUTTON"
+msgid "Get involved"
+msgstr "Приєднатися"
+
+#. GuLGH
+#: include/sfx2/strings.hrc:267
+msgctxt "STR_DONATE_TEXT"
+msgid "Your donations support our worldwide community."
+msgstr "Ваші пожертви підтримують нашу всесвітню спільноту."
+
+#. KzgoD
+#: include/sfx2/strings.hrc:268
+msgctxt "STR_DONATE_BUTTON"
+msgid "Donate"
+msgstr "Зробити внесок"
+
+#. G8bbK
+#: include/sfx2/strings.hrc:269
+msgctxt "STR_WHATSNEW"
+msgid "You are running version %PRODUCTVERSION of %PRODUCTNAME for the first time. Do you want to learn what's new?"
+msgstr "Ви вперше запустили версію %PRODUCTVERSION %PRODUCTNAME. Бажаєте дізнатись новини?"
+
+#. J5UkB
+#: include/sfx2/strings.hrc:270
+msgctxt "STR_WHATSNEW_BUTTON"
+msgid "Release Notes"
+msgstr "Зауваги до випуску"
+
+#. c7NPT
+#: include/sfx2/strings.hrc:271
+msgctxt "STR_READONLY_DOCUMENT"
+msgid "This document is open in read-only mode."
+msgstr "Документ відкрито у режимі тільки для читання."
+
+#. KyyFk
+#: include/sfx2/strings.hrc:272
+msgctxt "STR_READONLY_PDF"
+msgid "This PDF is open in read-only mode to allow signing the existing file."
+msgstr "Цей PDF відкритий в режимі тільки для читання для можливості його підписання."
+
+#. MENvD
+#: include/sfx2/strings.hrc:273
+msgctxt "STR_CLASSIFIED_DOCUMENT"
+msgid "The classification label of this document is %1."
+msgstr "Цей документ має класифікаційну мітку %1."
+
+#. 3B3ij
+#: include/sfx2/strings.hrc:274
+msgctxt "STR_TARGET_DOC_NOT_CLASSIFIED"
+msgid "This document must be classified before the clipboard can be pasted."
+msgstr "Перш ніж вставляти з буфера обміну, слід класифікувати документ."
+
+#. BYcYH
+#: include/sfx2/strings.hrc:275
+msgctxt "STR_DOC_CLASSIFICATION_TOO_LOW"
+msgid "This document has a lower classification level than the clipboard."
+msgstr "Документ має нижчий рівень класифікації, ніж вміст буфера обміну."
+
+#. EJPzh
+#: include/sfx2/strings.hrc:276
+msgctxt "STR_CLASSIFIED_INTELLECTUAL_PROPERTY"
+msgid "Level"
+msgstr "Рівень"
+
+#. itVew
+#: include/sfx2/strings.hrc:277
+msgctxt "STR_CLASSIFIED_NATIONAL_SECURITY"
+msgid "National Security:"
+msgstr "Національна безпека:"
+
+#. ZBXbG
+#: include/sfx2/strings.hrc:278
+msgctxt "STR_CLASSIFIED_EXPORT_CONTROL"
+msgid "Export Control:"
+msgstr "Експортні обмеження:"
+
+#. QAnvx
+#: include/sfx2/strings.hrc:279
+msgctxt "STR_CHECKOUT"
+msgid "Check Out"
+msgstr "Заблокувати"
+
+#. PwPNw
+#: include/sfx2/strings.hrc:280
+msgctxt "STR_READONLY_EDIT"
+msgid "Edit Document"
+msgstr "Змінити документ"
+
+#. FCeC5
+#: include/sfx2/strings.hrc:281
+msgctxt "STR_READONLY_SIGN"
+msgid "Sign Document"
+msgstr "Підписати документ"
+
+#. MEfTq
+#: include/sfx2/strings.hrc:282
+msgctxt "STR_READONLY_FINISH_SIGN"
+msgid "Finish Signing"
+msgstr "Підпис завершено"
+
+#. pkWmU
+#: include/sfx2/strings.hrc:283
+msgctxt "STR_SIGNATURE_BROKEN"
+msgid "This document has an invalid signature."
+msgstr "Цей документ має нечинний підпис."
+
+#. Vd3CU
+#: include/sfx2/strings.hrc:284
+msgctxt "STR_SIGNATURE_INVALID"
+msgid "The signature was valid, but the document has been modified"
+msgstr "Підпис був дійсним, але документ був змінений"
+
+#. 2HNfx
+#: include/sfx2/strings.hrc:285
+msgctxt "STR_SIGNATURE_NOTVALIDATED"
+msgid "At least one signature has problems: the certificate could not be validated."
+msgstr "Принаймні один підпис має проблему: дійсність сертифіката неможливо підтвердити."
+
+#. tjCmr
+#: include/sfx2/strings.hrc:286
+msgctxt "STR_SIGNATURE_PARTIAL_OK"
+msgid "At least one signature has problems: the document is only partially signed."
+msgstr "Принаймні один підпис має проблему: документ підписано лише частково."
+
+#. mU6ot
+#: include/sfx2/strings.hrc:287
+msgctxt "STR_SIGNATURE_NOTVALIDATED_PARTIAL_OK"
+msgid "The certificate could not be validated and the document is only partially signed."
+msgstr "Не вдалось перевірити сертифікат, тому документ підписано лише частково."
+
+#. FKDbE
+#: include/sfx2/strings.hrc:288
+msgctxt "STR_SIGNATURE_OK"
+msgid "This document is digitally signed and the signature is valid."
+msgstr "Цей документ має цифровий підпис, який досі дійсний."
+
+#. rMGka
+#: include/sfx2/strings.hrc:289
+msgctxt "STR_SIGNATURE_SHOW"
+msgid "Show Signatures"
+msgstr "Показати підписи"
+
+#. fkzJb
+#: include/sfx2/strings.hrc:290
+msgctxt "STR_TRACK_CHANGES_BUTTON"
+msgid "Show Toolbar"
+msgstr "Показати панель інструментів"
+
+#. 68ZqS
+#: include/sfx2/strings.hrc:291
+msgctxt "STR_TRACK_CHANGES_BUTTON_HIDE"
+msgid "Hide Toolbar"
+msgstr "Приховати панель інструментів"
+
+#. BzVAA
+#: include/sfx2/strings.hrc:292
+msgctxt "STR_HYPHENATION_BUTTON"
+msgid "Learn more"
+msgstr "Дізнайтеся більше"
+
+#. BSyb4
+#: include/sfx2/strings.hrc:293
+msgctxt "STR_REFRESH_MASTER_PASSWORD"
+msgid "The master password is stored in an outdated format, you should refresh it"
+msgstr ""
+
+#. ysChU
+#: include/sfx2/strings.hrc:294
+msgctxt "STR_REFRESH_PASSWORD"
+msgid "Refresh Password"
+msgstr ""
+
+#. kej8D
+#. Translators: default Impress template names
+#: include/sfx2/strings.hrc:297
+msgctxt "STR_TEMPLATE_NAME1"
+msgid "Grey Elegant"
+msgstr "Сірий елегантний"
+
+#. FkuLG
+#: include/sfx2/strings.hrc:298
+msgctxt "STR_TEMPLATE_NAME2"
+msgid "Beehive"
+msgstr "Вулик"
+
+#. uwaPH
+#: include/sfx2/strings.hrc:299
+msgctxt "STR_TEMPLATE_NAME3"
+msgid "Blue Curve"
+msgstr "Синій завиток"
+
+#. hHRDz
+#: include/sfx2/strings.hrc:300
+msgctxt "STR_TEMPLATE_NAME4"
+msgid "Blueprint Plans"
+msgstr "Креслення"
+
+#. MAnPU
+#: include/sfx2/strings.hrc:301
+msgctxt "STR_TEMPLATE_NAME5"
+msgid "Candy"
+msgstr "Цукерка"
+
+#. jEiAn
+#: include/sfx2/strings.hrc:302
+msgctxt "STR_TEMPLATE_NAME6"
+msgid "Yellow Idea"
+msgstr "Жовта ідея"
+
+#. QDNuB
+#: include/sfx2/strings.hrc:303
+msgctxt "STR_TEMPLATE_NAME7"
+msgid "DNA"
+msgstr "ДНК"
+
+#. XBrCi
+#: include/sfx2/strings.hrc:304
+msgctxt "STR_TEMPLATE_NAME8"
+msgid "Focus"
+msgstr "Фокус"
+
+#. GADdA
+#: include/sfx2/strings.hrc:305
+msgctxt "STR_TEMPLATE_NAME9"
+msgid "Forestbird"
+msgstr "Лісовий птах"
+
+#. TT8G5
+#: include/sfx2/strings.hrc:306
+msgctxt "STR_TEMPLATE_NAME10"
+msgid "Freshes"
+msgstr "Прохолода"
+
+#. C5N9D
+#: include/sfx2/strings.hrc:307
+msgctxt "STR_TEMPLATE_NAME11"
+msgid "Inspiration"
+msgstr "Натхнення"
+
+#. fCKG9
+#: include/sfx2/strings.hrc:308
+msgctxt "STR_TEMPLATE_NAME12"
+msgid "Lights"
+msgstr "Освітлення"
+
+#. pcLWs
+#: include/sfx2/strings.hrc:309
+msgctxt "STR_TEMPLATE_NAME13"
+msgid "Growing Liberty"
+msgstr "Зростання свободи"
+
+#. xo2gC
+#: include/sfx2/strings.hrc:310
+msgctxt "STR_TEMPLATE_NAME14"
+msgid "Metropolis"
+msgstr "Урбаністичний"
+
+#. FFDBk
+#: include/sfx2/strings.hrc:311
+msgctxt "STR_TEMPLATE_NAME15"
+msgid "Midnightblue"
+msgstr "Північно-синій"
+
+#. yiCzk
+#: include/sfx2/strings.hrc:312
+msgctxt "STR_TEMPLATE_NAME16"
+msgid "Nature Illustration"
+msgstr "Природа"
+
+#. cCZzC
+#: include/sfx2/strings.hrc:313
+msgctxt "STR_TEMPLATE_NAME17"
+msgid "Pencil"
+msgstr "Олівець"
+
+#. Ji4Cw
+#: include/sfx2/strings.hrc:314
+msgctxt "STR_TEMPLATE_NAME18"
+msgid "Piano"
+msgstr "Піаніно"
+
+#. mrbiq
+#: include/sfx2/strings.hrc:315
+msgctxt "STR_TEMPLATE_NAME19"
+msgid "Portfolio"
+msgstr "Досьє"
+
+#. ysBGy
+#: include/sfx2/strings.hrc:316
+msgctxt "STR_TEMPLATE_NAME20"
+msgid "Progress"
+msgstr "Поступ"
+
+#. gtPt9
+#: include/sfx2/strings.hrc:317
+msgctxt "STR_TEMPLATE_NAME21"
+msgid "Sunset"
+msgstr "Захід"
+
+#. 73Y2e
+#: include/sfx2/strings.hrc:318
+msgctxt "STR_TEMPLATE_NAME22"
+msgid "Vintage"
+msgstr "Старомодний"
+
+#. MSY8y
+#: include/sfx2/strings.hrc:319
+msgctxt "STR_TEMPLATE_NAME23"
+msgid "Vivid"
+msgstr "Яскравий"
+
+#. QDZBz
+#. Translators: default Writer template names
+#: include/sfx2/strings.hrc:321
+msgctxt "STR_TEMPLATE_NAME24"
+msgid "CV"
+msgstr "CV"
+
+#. Koe3V
+#: include/sfx2/strings.hrc:322
+msgctxt "STR_TEMPLATE_NAME25"
+msgid "Resume"
+msgstr "Резюме"
+
+#. hCpfD
+#: include/sfx2/strings.hrc:323
+msgctxt "STR_TEMPLATE_NAME26"
+msgid "Default"
+msgstr "Типовий"
+
+#. d7Hyk
+#: include/sfx2/strings.hrc:324
+msgctxt "STR_TEMPLATE_NAME27"
+msgid "Modern"
+msgstr "Сучасний"
+
+#. CVJEC
+#: include/sfx2/strings.hrc:325
+msgctxt "STR_TEMPLATE_NAME28"
+msgid "Modern business letter sans-serif"
+msgstr "Сучасний діловий лист, шрифт без засічок"
+
+#. 95GeB
+#: include/sfx2/strings.hrc:326
+msgctxt "STR_TEMPLATE_NAME29"
+msgid "Modern business letter serif"
+msgstr "Сучасний діловий лист, шрифт з засічками"
+
+#. XdU49
+#: include/sfx2/strings.hrc:327
+msgctxt "STR_TEMPLATE_NAME30"
+msgid "Businesscard with logo"
+msgstr "Візитівки з логотипом"
+
+#. UAmSj
+#: include/sfx2/strings.hrc:328
+msgctxt "STR_TEMPLATE_NAME31"
+msgid "Simple"
+msgstr "Простий"
+
+#. W7NVH
+#: include/sfx2/strings.hrc:329
+msgctxt "STR_TEMPLATE_NAME32"
+msgid "BPMN"
+msgstr "МНБП"
+
+#. ZaGGB
+#: include/sfx2/strings.hrc:331
+msgctxt "STR_CLEAR_CHAR"
+msgid "Remove"
+msgstr "Вилучити"
+
+#. JReRY
+#: include/sfx2/strings.hrc:332
+msgctxt "STR_CLEAR_ALL_CHAR"
+msgid "Clear All"
+msgstr "Очистити все"
+
+#. yC8Gs
+#: include/sfx2/strings.hrc:334
+msgctxt "STR_PASSWORD_LEN"
+msgid "Password length"
+msgstr "Довжина пароля"
+
+#. FKFmJ
+#: include/sfx2/strings.hrc:335
+msgctxt "STR_PASSWORD_WARNING"
+msgid "The password you have entered causes interoperability issues. Please enter a password that is shorter than 52 bytes, or longer than 55 bytes."
+msgstr "Введений пароль викликає проблеми сумісності. Введіть пароль, коротший за 52 байт або довший за 55 байт."
+
+#. jBQFN
+#: include/sfx2/strings.hrc:337
+msgctxt "STR_CTRLCLICKHYPERLINK"
+msgid "%{key}-click to open hyperlink: %{link}"
+msgstr "%{key}-клацання, щоб відкрити гіперпосилання: %{link}"
+
+#. jC3AK
+#: include/sfx2/strings.hrc:338
+msgctxt "STR_CLICKHYPERLINK"
+msgid "Click to open hyperlink: %{link}"
+msgstr "Клацніть, щоб відкрити гіперпосилання: %{link}"
+
+#. eFJMp
+#: include/sfx2/strings.hrc:340
+msgctxt "STR_STYLEUSEDBY"
+msgid "(used by: %STYLELIST)"
+msgstr "(використовується: %STYLELIST)"
+
+#. 6UgqW
+#: include/sfx2/strings.hrc:342
+msgctxt "STR_DOCUMENT"
+msgid "Document"
+msgstr "Документ"
+
+#. XDGTb
+#: include/sfx2/strings.hrc:343
+msgctxt "STR_SPREADSHEET"
+msgid "Spreadsheet"
+msgstr "Електронна таблиця"
+
+#. 3UZXB
+#: include/sfx2/strings.hrc:344
+msgctxt "STR_PRESENTATION"
+msgid "Presentation"
+msgstr "Презентація"
+
+#. noN5s
+#: include/sfx2/strings.hrc:345
+msgctxt "STR_DRAWING"
+msgid "Drawing"
+msgstr "Графіка"
+
+#. QpuFo
+#: include/sfx2/strings.hrc:346
+msgctxt "STR_RECENT"
+msgid "Recently used"
+msgstr "Недавно використані"
+
+#. EcAjb
+#: include/sfx2/strings.hrc:347
+msgctxt "STR_NORECENT"
+msgid "No recent characters"
+msgstr "Символи не використовували"
+
+#. tfjbD
+#: include/sfx2/strings.hrc:349
+msgctxt "STR_ACTION_RESET_ALL_DEFAULT_TEMPLATES"
+msgid "Reset All De~fault Templates"
+msgstr "Скинути всі ~типові шаблони"
+
+#. GWuDE
+#: include/sfx2/strings.hrc:350
+msgctxt "STR_ACTION_RESET_WRITER_TEMPLATE"
+msgid "Reset De~fault Text Document"
+msgstr "Скинути типовий текстовий документ"
+
+#. j5eV8
+#: include/sfx2/strings.hrc:351
+msgctxt "STR_ACTION_RESET_CALC_TEMPLATE"
+msgid "Reset De~fault Spreadsheet"
+msgstr "Скинути типову електронну таблицю"
+
+#. mWp3t
+#: include/sfx2/strings.hrc:352
+msgctxt "STR_ACTION_RESET_IMPRESS_TEMPLATE"
+msgid "Reset De~fault Presentation"
+msgstr "Скинути типову презентацію"
+
+#. wfExB
+#: include/sfx2/strings.hrc:353
+msgctxt "STR_ACTION_RESET_DRAW_TEMPLATE"
+msgid "Reset De~fault Drawing"
+msgstr "Скинути типовий графічний документ"
+
+#. BFaGA
+#: include/sfx2/strings.hrc:354
+msgctxt "STR_ACTION_IMPORT"
+msgid "~Import"
+msgstr "~Імпорт"
+
+#. 8Cwfk
+#: include/sfx2/strings.hrc:355
+msgctxt "STR_ACTION_EXTENSIONS"
+msgid "E~xtensions"
+msgstr "Роз~ширення"
+
+#. idGvM
+#: include/sfx2/strings.hrc:356
+msgctxt "STR_WINDOW_TITLE_RENAME_TEMPLATE"
+msgid "Rename"
+msgstr "Перейменувати"
+
+#. EyjE3
+#: include/sfx2/strings.hrc:357
+msgctxt "STR_WINDOW_TITLE_RENAME_CATEGORY"
+msgid "Rename Category"
+msgstr "Перейменувати категорію"
+
+#. T79Eb
+#: include/sfx2/strings.hrc:358
+msgctxt "STR_WINDOW_TITLE_RENAME_NEW_CATEGORY"
+msgid "New Category"
+msgstr "Нова категорія"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Додати"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_Застосувати"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_Скасувати"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_Закрити"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "В_идалити"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_Зміни"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_Довідка"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_Створити"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_Ні"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_ОК"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "В_идалити"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_Скинути"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Так"
+
+#. F5rSU
+#: sfx2/inc/dinfdlg.hrc:29
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Checked by"
+msgstr "Перевірено"
+
+#. BCYGG
+#: sfx2/inc/dinfdlg.hrc:30
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Client"
+msgstr "Клієнт"
+
+#. nSrT3
+#: sfx2/inc/dinfdlg.hrc:31
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Date completed"
+msgstr "Дата завершення"
+
+#. HEaEC
+#: sfx2/inc/dinfdlg.hrc:32
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Department"
+msgstr "Відділ"
+
+#. TxAux
+#: sfx2/inc/dinfdlg.hrc:33
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Destinations"
+msgstr "Місця призначення"
+
+#. f3nqh
+#: sfx2/inc/dinfdlg.hrc:34
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Disposition"
+msgstr "Розміщення"
+
+#. uznMD
+#: sfx2/inc/dinfdlg.hrc:35
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Division"
+msgstr "Підрозділ"
+
+#. 6DuFF
+#: sfx2/inc/dinfdlg.hrc:36
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Document number"
+msgstr "Номер документа"
+
+#. XXKuP
+#: sfx2/inc/dinfdlg.hrc:37
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Editor"
+msgstr "Редактор"
+
+#. hRRmF
+#: sfx2/inc/dinfdlg.hrc:38
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Email"
+msgstr "Ел. пошта"
+
+#. xNvDx
+#: sfx2/inc/dinfdlg.hrc:39
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Forward to"
+msgstr "Переслати до"
+
+#. xwv85
+#: sfx2/inc/dinfdlg.hrc:40
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Group"
+msgstr "Група"
+
+#. u59Qp
+#: sfx2/inc/dinfdlg.hrc:41
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Info"
+msgstr "Відомості"
+
+#. Ltq9H
+#: sfx2/inc/dinfdlg.hrc:42
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Language"
+msgstr "Мова"
+
+#. bv3HC
+#: sfx2/inc/dinfdlg.hrc:43
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Mailstop"
+msgstr "Аб. скринька"
+
+#. AFGi2
+#: sfx2/inc/dinfdlg.hrc:44
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Matter"
+msgstr "Тема"
+
+#. wGAD6
+#: sfx2/inc/dinfdlg.hrc:45
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Office"
+msgstr "Офіс"
+
+#. ZqphY
+#: sfx2/inc/dinfdlg.hrc:46
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Owner"
+msgstr "Власник"
+
+#. mK8Th
+#: sfx2/inc/dinfdlg.hrc:47
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Project"
+msgstr "Проєкт"
+
+#. zFeHt
+#: sfx2/inc/dinfdlg.hrc:48
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Publisher"
+msgstr "Видавець"
+
+#. pF2eJ
+#: sfx2/inc/dinfdlg.hrc:49
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Purpose"
+msgstr "Призначення"
+
+#. GTPFZ
+#: sfx2/inc/dinfdlg.hrc:50
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Received from"
+msgstr "Отримано від"
+
+#. dvGyQ
+#: sfx2/inc/dinfdlg.hrc:51
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Recorded by"
+msgstr "Записано"
+
+#. GjVXD
+#: sfx2/inc/dinfdlg.hrc:52
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Recorded date"
+msgstr "Дата запису"
+
+#. o5oXa
+#: sfx2/inc/dinfdlg.hrc:53
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Reference"
+msgstr "Посилання"
+
+#. ex26g
+#: sfx2/inc/dinfdlg.hrc:54
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Source"
+msgstr "Джерело"
+
+#. 4HSZB
+#: sfx2/inc/dinfdlg.hrc:55
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Status"
+msgstr "Стан"
+
+#. U3RdC
+#: sfx2/inc/dinfdlg.hrc:56
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Telephone number"
+msgstr "Номер телефону"
+
+#. Geeuu
+#: sfx2/inc/dinfdlg.hrc:57
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Typist"
+msgstr "Друкарка"
+
+#. xxHtR
+#: sfx2/inc/dinfdlg.hrc:58
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "URL"
+msgstr "URL"
+
+#. CxTQY
+#: sfx2/inc/dinfdlg.hrc:73
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Text"
+msgstr "Текст"
+
+#. MMGFi
+#: sfx2/inc/dinfdlg.hrc:74
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "DateTime"
+msgstr "Дата й час"
+
+#. GvJMH
+#: sfx2/inc/dinfdlg.hrc:75
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Date"
+msgstr "Дата"
+
+#. GyrbX
+#: sfx2/inc/dinfdlg.hrc:76
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Duration"
+msgstr "Тривалість"
+
+#. CxZ4Z
+#: sfx2/inc/dinfdlg.hrc:77
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Number"
+msgstr "Число"
+
+#. CDgvL
+#: sfx2/inc/dinfdlg.hrc:78
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Yes or no"
+msgstr "Так чи ні"
+
+#. WzBG6
+#. accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
+#. in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
+#: sfx2/inc/dinfdlg.hrc:83
+msgctxt "documentinfopage|extended_tip|userdatacb"
+msgid "Saves the user's full name with the file. You can edit the name by choosing Tools - Options - %PRODUCTNAME - User Data."
+msgstr "Зберігає повне ім'я користувача з файлом. Ви можете змінити ім'я, обравши Засоби – Параметри – %PRODUCTNAME – Дані користувача."
+
+#. AxhLy
+#: sfx2/inc/doctempl.hrc:29
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "My Templates"
+msgstr "Мої шаблони"
+
+#. 5aNp8
+#: sfx2/inc/doctempl.hrc:30
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Styles"
+msgstr "Стилі"
+
+#. t5QK9
+#: sfx2/inc/doctempl.hrc:31
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Business Correspondence"
+msgstr "Ділова кореспонденція"
+
+#. Y79e8
+#: sfx2/inc/doctempl.hrc:32
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Other Business Documents"
+msgstr "Інші ділові документи"
+
+#. 2RCC9
+#: sfx2/inc/doctempl.hrc:33
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Personal Correspondence and Documents"
+msgstr "Особиста кореспонденція та документи"
+
+#. 6Dgiz
+#: sfx2/inc/doctempl.hrc:34
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Forms and Contracts"
+msgstr "Форми та контракти"
+
+#. VCKTG
+#: sfx2/inc/doctempl.hrc:35
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Finances"
+msgstr "Фінанси"
+
+#. HmqGP
+#: sfx2/inc/doctempl.hrc:36
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Education"
+msgstr "Освіта"
+
+#. xopM8
+#: sfx2/inc/doctempl.hrc:37
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Presentation Backgrounds"
+msgstr "Тло презентацій"
+
+#. tSQLA
+#: sfx2/inc/doctempl.hrc:38
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Presentations"
+msgstr "Презентації"
+
+#. KuNzz
+#: sfx2/inc/doctempl.hrc:39
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Miscellaneous"
+msgstr "Різне"
+
+#. SC4E5
+#: sfx2/inc/doctempl.hrc:40
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Labels"
+msgstr "Етикетки"
+
+#. Wg9Je
+#: sfx2/source/devtools/DevToolsStrings.hrc:15
+msgctxt "STR_TEXT_PORTION"
+msgid "Text Portion %1"
+msgstr "Частина тексту %1"
+
+#. 5ZXbE
+#: sfx2/source/devtools/DevToolsStrings.hrc:16
+msgctxt "STR_PARAGRAPH"
+msgid "Paragraph %1"
+msgstr "Абзац %1"
+
+#. DJi4i
+#: sfx2/source/devtools/DevToolsStrings.hrc:17
+msgctxt "STR_SHAPE"
+msgid "Shape %1"
+msgstr "Фігура %1"
+
+#. Ucjjh
+#: sfx2/source/devtools/DevToolsStrings.hrc:18
+msgctxt "STR_PAGE"
+msgid "Page %1"
+msgstr "Сторінка %1"
+
+#. j9DL6
+#: sfx2/source/devtools/DevToolsStrings.hrc:19
+msgctxt "STR_SLIDE"
+msgid "Slide %1"
+msgstr "Слайд %1"
+
+#. YQqL8
+#: sfx2/source/devtools/DevToolsStrings.hrc:20
+msgctxt "STR_MASTER_SLIDE"
+msgid "Master Slide %1"
+msgstr "Шаблон слайду %1"
+
+#. CEfNy
+#: sfx2/source/devtools/DevToolsStrings.hrc:21
+msgctxt "STR_SHEET"
+msgid "Sheet %1"
+msgstr "Аркуш %1"
+
+#. BaABx
+#: sfx2/source/devtools/DevToolsStrings.hrc:23
+msgctxt "STR_SHAPES_NODE"
+msgid "Shapes"
+msgstr "Фігури"
+
+#. n4VWE
+#: sfx2/source/devtools/DevToolsStrings.hrc:24
+msgctxt "STR_CHARTS_ENTRY"
+msgid "Charts"
+msgstr "Діаграми"
+
+#. 5GWcX
+#: sfx2/source/devtools/DevToolsStrings.hrc:25
+msgctxt "STR_PIVOT_TABLES_ENTRY"
+msgid "Pivot Tables"
+msgstr "Зведені таблиці"
+
+#. BBLBQ
+#: sfx2/source/devtools/DevToolsStrings.hrc:26
+msgctxt "STR_DOCUMENT_ENTRY"
+msgid "Document"
+msgstr "Документ"
+
+#. 4dNGV
+#: sfx2/source/devtools/DevToolsStrings.hrc:27
+msgctxt "STR_SHEETS_ENTRY"
+msgid "Sheets"
+msgstr "Аркуші"
+
+#. RLwRi
+#: sfx2/source/devtools/DevToolsStrings.hrc:28
+msgctxt "STR_STYLES_ENTRY"
+msgid "Styles"
+msgstr "Стилі"
+
+#. P4RF4
+#: sfx2/source/devtools/DevToolsStrings.hrc:29
+msgctxt "STR_SLIDES_ENTRY"
+msgid "Slides"
+msgstr "Слайди"
+
+#. 4bJSH
+#: sfx2/source/devtools/DevToolsStrings.hrc:30
+msgctxt "STR_MASTER_SLIDES_ENTRY"
+msgid "Master Slides"
+msgstr "Шаблони слайдів"
+
+#. LRq2A
+#: sfx2/source/devtools/DevToolsStrings.hrc:31
+msgctxt "STR_PAGES_ENTRY"
+msgid "Pages"
+msgstr "Сторінки"
+
+#. 946kV
+#: sfx2/source/devtools/DevToolsStrings.hrc:32
+msgctxt "STR_PARAGRAPHS_ENTRY"
+msgid "Paragraphs"
+msgstr "Абзаци"
+
+#. JG2qz
+#: sfx2/source/devtools/DevToolsStrings.hrc:33
+msgctxt "STR_TABLES_ENTRY"
+msgid "Tables"
+msgstr "Таблиці"
+
+#. HzFoW
+#: sfx2/source/devtools/DevToolsStrings.hrc:34
+msgctxt "STR_FRAMES_ENTRY"
+msgid "Frames"
+msgstr "Рамки"
+
+#. ekGEm
+#: sfx2/source/devtools/DevToolsStrings.hrc:35
+msgctxt "STR_GRAPHIC_OBJECTS_ENTRY"
+msgid "Graphic Objects"
+msgstr "Графічні об'єкти"
+
+#. cVWmY
+#: sfx2/source/devtools/DevToolsStrings.hrc:36
+msgctxt "STR_EMBEDDED_OBJECTS_ENTRY"
+msgid "Embedded Objects"
+msgstr "Вбудовані об'єкти"
+
+#. xfnkV
+#: sfx2/source/devtools/DevToolsStrings.hrc:38
+msgctxt "STR_ANY_VALUE_TRUE"
+msgid "True"
+msgstr "Істина"
+
+#. 2WxdA
+#: sfx2/source/devtools/DevToolsStrings.hrc:39
+msgctxt "STR_ANY_VALUE_FALSE"
+msgid "False"
+msgstr "Хиба"
+
+#. RBC8w
+#: sfx2/source/devtools/DevToolsStrings.hrc:40
+msgctxt "STR_ANY_VALUE_NULL"
+msgid "Null"
+msgstr "Порожньо"
+
+#. As494
+#: sfx2/source/devtools/DevToolsStrings.hrc:41
+msgctxt "STR_CLASS_UNKNOWN"
+msgid "Unknown"
+msgstr "Невідомо"
+
+#. gAY69
+#: sfx2/source/devtools/DevToolsStrings.hrc:43
+msgctxt "STR_METHOD_TYPE_OBJECT"
+msgid "object"
+msgstr "об'єкт"
+
+#. HFgBW
+#: sfx2/source/devtools/DevToolsStrings.hrc:44
+msgctxt "STR_METHOD_TYPE_STRUCT"
+msgid "struct"
+msgstr "структура"
+
+#. 7DCri
+#: sfx2/source/devtools/DevToolsStrings.hrc:45
+msgctxt "STR_METHOD_TYPE_ENUM"
+msgid "enum"
+msgstr "перелік"
+
+#. aEuJR
+#: sfx2/source/devtools/DevToolsStrings.hrc:46
+msgctxt "STR_METHOD_TYPE_SEQUENCE"
+msgid "sequence"
+msgstr "послідовність"
+
+#. xXMdD
+#: sfx2/source/devtools/DevToolsStrings.hrc:48
+msgctxt "STR_PROPERTY_TYPE_IS_NAMED_CONTAINER"
+msgid "name container"
+msgstr "контейнер назви"
+
+#. QLZbz
+#: sfx2/source/devtools/DevToolsStrings.hrc:49
+msgctxt "STR_PROPERTY_TYPE_IS_INDEX_CONTAINER"
+msgid "index container"
+msgstr "контейнер індексу"
+
+#. LLsJf
+#: sfx2/source/devtools/DevToolsStrings.hrc:50
+msgctxt "STR_PROPERTY_TYPE_IS_ENUMERATION"
+msgid "enumeration"
+msgstr "перелік"
+
+#. aNuA9
+#: sfx2/source/devtools/DevToolsStrings.hrc:52
+msgctxt "STR_PARMETER_MODE_IN"
+msgid "[in]"
+msgstr "[in]"
+
+#. W3AEx
+#: sfx2/source/devtools/DevToolsStrings.hrc:53
+msgctxt "STR_PARMETER_MODE_OUT"
+msgid "[out]"
+msgstr "[out]"
+
+#. ENF6w
+#: sfx2/source/devtools/DevToolsStrings.hrc:54
+msgctxt "STR_PARMETER_MODE_IN_AND_OUT"
+msgid "[in&out]"
+msgstr "[in&out]"
+
+#. rw6AB
+#: sfx2/source/devtools/DevToolsStrings.hrc:56
+msgctxt "STR_PROPERTY_ATTRIBUTE_IS_ATTRIBUTE"
+msgid "attribute"
+msgstr "атрибут"
+
+#. BwCGg
+#: sfx2/source/devtools/DevToolsStrings.hrc:57
+msgctxt "STR_PROPERTY_ATTRIBUTE_GET"
+msgid "get"
+msgstr "отримати"
+
+#. MissY
+#: sfx2/source/devtools/DevToolsStrings.hrc:58
+msgctxt "STR_PROPERTY_ATTRIBUTE_SET"
+msgid "set"
+msgstr "встановити"
+
+#. Nhmiv
+#: sfx2/source/devtools/DevToolsStrings.hrc:59
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEVOID"
+msgid "may be void"
+msgstr "можна пропустити"
+
+#. zECkD
+#: sfx2/source/devtools/DevToolsStrings.hrc:60
+msgctxt "STR_PROPERTY_ATTRIBUTE_READONLY"
+msgid "read-only"
+msgstr "лише читання"
+
+#. BtQDx
+#: sfx2/source/devtools/DevToolsStrings.hrc:61
+msgctxt "STR_PROPERTY_ATTRIBUTE_WRITEONLY"
+msgid "write-only"
+msgstr "лише запис"
+
+#. dBQEu
+#: sfx2/source/devtools/DevToolsStrings.hrc:62
+msgctxt "STR_PROPERTY_ATTRIBUTE_REMOVABLE"
+msgid "removeable"
+msgstr "можна вилучати"
+
+#. jRo8t
+#: sfx2/source/devtools/DevToolsStrings.hrc:63
+msgctxt "STR_PROPERTY_ATTRIBUTE_BOUND"
+msgid "bound"
+msgstr "межа"
+
+#. rBqTG
+#: sfx2/source/devtools/DevToolsStrings.hrc:64
+msgctxt "STR_PROPERTY_ATTRIBUTE_CONSTRAINED"
+msgid "constrained"
+msgstr "обмежений"
+
+#. XLnBt
+#: sfx2/source/devtools/DevToolsStrings.hrc:65
+msgctxt "STR_PROPERTY_ATTRIBUTE_TRANSIENT"
+msgid "transient"
+msgstr "тимчасовий"
+
+#. BK7Zk
+#: sfx2/source/devtools/DevToolsStrings.hrc:66
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEAMBIGUOUS"
+msgid "may be ambiguous"
+msgstr "може бути неоднозначним"
+
+#. BDEqD
+#: sfx2/source/devtools/DevToolsStrings.hrc:67
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEDEFAULT"
+msgid "may be default"
+msgstr "може бути типовим"
+
+#. TGQhd
+#: sfx2/source/devtools/DevToolsStrings.hrc:69
+msgctxt "STR_PROPERTY_VALUE_SEQUENCE"
+msgid "<Sequence [%1]>"
+msgstr "<Послідовність [%1]>"
+
+#. KZ5M4
+#: sfx2/source/devtools/DevToolsStrings.hrc:70
+msgctxt "STR_PROPERTY_VALUE_OBJECT"
+msgid "<Object@%1>"
+msgstr "<Об'єкт@%1>"
+
+#. xKaJy
+#: sfx2/source/devtools/DevToolsStrings.hrc:71
+msgctxt "STR_PROPERTY_VALUE_STRUCT"
+msgid "<Struct>"
+msgstr "<Структура>"
+
+#. AxfFu
+#: sfx2/uiconfig/ui/addtargetdialog.ui:8
+msgctxt "addtargetdialog|AddTargetDialog"
+msgid "Add Target"
+msgstr "Додати ціль"
+
+#. JC8Vd
+#: sfx2/uiconfig/ui/addtargetdialog.ui:89
+msgctxt "addtargetdialog|label_name"
+msgid "Name:"
+msgstr "Назва:"
+
+#. LXpbz
+#: sfx2/uiconfig/ui/addtargetdialog.ui:120
+msgctxt "addtargetdialog|label_type"
+msgid "Type:"
+msgstr "Тип:"
+
+#. Sy2A7
+#: sfx2/uiconfig/ui/addtargetdialog.ui:135
+msgctxt "addtargetdialog|label_content"
+msgid "Content:"
+msgstr "Вміст:"
+
+#. e5sY6
+#: sfx2/uiconfig/ui/addtargetdialog.ui:169
+msgctxt "addtargetdialog|type"
+msgid "Text"
+msgstr "Текст"
+
+#. dGQqg
+#: sfx2/uiconfig/ui/addtargetdialog.ui:170
+msgctxt "addtargetdialog|type"
+msgid "Regular expression"
+msgstr "Сталий вираз"
+
+#. wgzA4
+#: sfx2/uiconfig/ui/addtargetdialog.ui:171
+msgctxt "addtargetdialog|type"
+msgid "Predefined"
+msgstr "Попередньо визначений"
+
+#. nGjTR
+#: sfx2/uiconfig/ui/addtargetdialog.ui:186
+msgctxt "addtargetdialog|label_content_predef"
+msgid "Content:"
+msgstr "Вміст:"
+
+#. 7uQgC
+#: sfx2/uiconfig/ui/addtargetdialog.ui:204
+msgctxt "addtargetdialog|content_predef"
+msgid "Credit card numbers"
+msgstr "Номери кредитних карток"
+
+#. jze4C
+#: sfx2/uiconfig/ui/addtargetdialog.ui:205
+msgctxt "addtargetdialog|content_predef"
+msgid "Email addresses"
+msgstr "Електронні адреси"
+
+#. wDQAu
+#: sfx2/uiconfig/ui/addtargetdialog.ui:206
+msgctxt "addtargetdialog|content_predef"
+msgid "IP addresses"
+msgstr "IP-адреси"
+
+#. CpoEL
+#: sfx2/uiconfig/ui/addtargetdialog.ui:207
+msgctxt "addtargetdialog|content_predef"
+msgid "Dates (Numerical)"
+msgstr "Дати (числові)"
+
+#. 3Nz2x
+#: sfx2/uiconfig/ui/addtargetdialog.ui:208
+msgctxt "addtargetdialog|content_predef"
+msgid "National Insurance Number (UK)"
+msgstr "National Insurance Number (Велика Британія)"
+
+#. jSAay
+#: sfx2/uiconfig/ui/addtargetdialog.ui:209
+msgctxt "addtargetdialog|content_predef"
+msgid "Social Security Number (US)"
+msgstr "Social Security Number (США)"
+
+#. kdZJN
+#: sfx2/uiconfig/ui/addtargetdialog.ui:234
+msgctxt "addtargetdialog|checkboxCaseSensitive"
+msgid "Match case"
+msgstr "Співпадіння регістру"
+
+#. G2u3B
+#: sfx2/uiconfig/ui/addtargetdialog.ui:249
+msgctxt "addtargetdialog|checkboxWholeWords"
+msgid "Whole words only"
+msgstr "Лише цілі слова"
+
+#. JV66c
+#: sfx2/uiconfig/ui/alienwarndialog.ui:7
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "Confirm File Format"
+msgstr "Підтвердити формат файлу"
+
+#. kia7u
+#: sfx2/uiconfig/ui/alienwarndialog.ui:13
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "This document may contain formatting or content that cannot be saved in the currently selected file format “%FORMATNAME”."
+msgstr "Документ може містити форматування або вміст, які неможливо зберегти у вибраному форматі «%FORMATNAME»."
+
+#. 3YA5c
+#: sfx2/uiconfig/ui/alienwarndialog.ui:14
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "Use the default ODF file format to be sure that the document is saved correctly."
+msgstr "Використовуйте типовий формат файлу ODF, аби бути певним у вірному збереженні файлу."
+
+#. ocqdy
+#: sfx2/uiconfig/ui/alienwarndialog.ui:25
+msgctxt "alienwarndialog|cancel"
+msgid "Use %DEFAULTEXTENSION _Format"
+msgstr "Використовувати _формат %DEFAULTEXTENSION"
+
+#. Fzgtz
+#: sfx2/uiconfig/ui/alienwarndialog.ui:40
+msgctxt "alienwarndialog|save"
+msgid "_Use %FORMATNAME Format"
+msgstr "_Вжити формат %FORMATNAME"
+
+#. Fgi6S
+#: sfx2/uiconfig/ui/alienwarndialog.ui:65
+msgctxt "alienwarndialog|ask"
+msgid "_Ask when not saving in ODF or default format"
+msgstr "_Запитувати, коли не зберігається у ODF або типовому форматі"
+
+#. GVVQ6
+#: sfx2/uiconfig/ui/autoredactdialog.ui:24
+msgctxt "autoredactdialog|AutoRedactDialog"
+msgid "Automatic Redaction"
+msgstr "Автоматичне затушовування"
+
+#. QCidi
+#: sfx2/uiconfig/ui/autoredactdialog.ui:122
+msgctxt "autoredactdialog|target"
+msgid "Target Name"
+msgstr "Назва цілі"
+
+#. szYkX
+#: sfx2/uiconfig/ui/autoredactdialog.ui:135
+msgctxt "autoredactdialog|description"
+msgid "Type"
+msgstr "Тип"
+
+#. udcn4
+#: sfx2/uiconfig/ui/autoredactdialog.ui:148
+msgctxt "autoredactdialog|target"
+msgid "Content"
+msgstr "Вміст"
+
+#. BBuAc
+#: sfx2/uiconfig/ui/autoredactdialog.ui:161
+msgctxt "autoredactdialog|target"
+msgid "Match case"
+msgstr "Враховувати регістр"
+
+#. obHtC
+#: sfx2/uiconfig/ui/autoredactdialog.ui:174
+msgctxt "autoredactdialog|target"
+msgid "Whole words"
+msgstr "Цілі слова"
+
+#. 4MVdG
+#: sfx2/uiconfig/ui/autoredactdialog.ui:202
+msgctxt "menuassignpage|contentslabel"
+msgid "_Redaction Targets"
+msgstr "_Цілі затушовування"
+
+#. E4GWo
+#: sfx2/uiconfig/ui/autoredactdialog.ui:222
+msgctxt "autoredactdialog|btnLoadTargets"
+msgid "Load Targets"
+msgstr "Завантажити цілі"
+
+#. tpbYA
+#: sfx2/uiconfig/ui/autoredactdialog.ui:235
+msgctxt "autoredactdialog|btnSaveTargets"
+msgid "Save Targets"
+msgstr "Зберегти цілі"
+
+#. TQg85
+#: sfx2/uiconfig/ui/autoredactdialog.ui:261
+msgctxt "autoredactdialog|add"
+msgid "Add Target"
+msgstr "Додати ціль"
+
+#. 4TvHR
+#: sfx2/uiconfig/ui/autoredactdialog.ui:274
+msgctxt "autoredactdialog|edit"
+msgid "Edit Target"
+msgstr "Змінити ціль"
+
+#. knEqb
+#: sfx2/uiconfig/ui/autoredactdialog.ui:287
+msgctxt "autoredactdialog|delete"
+msgid "Delete Target"
+msgstr "Видалити ціль"
+
+#. iLkdK
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:8
+msgctxt "bookmarkdialog|BookmarkDialog"
+msgid "Add to Bookmarks"
+msgstr "Додати до закладок"
+
+#. U6BGv
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:83
+msgctxt "bookmarkdialog|alttitle"
+msgid "Rename Bookmark"
+msgstr "Перейменувати закладку"
+
+#. Fq2rD
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:102
+msgctxt "bookmarkdialog|label2"
+msgid "Bookmark:"
+msgstr "Закладка:"
+
+#. 3A3VL
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:12
+msgctxt "bookmarkmenu|display"
+msgid "Display"
+msgstr "Показ"
+
+#. VDDCt
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:26
+msgctxt "bookmarkmenu|rename"
+msgid "Rename..."
+msgstr "Перейменувати..."
+
+#. fCQ9n
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:34
+msgctxt "bookmarkmenu|delete"
+msgid "Delete"
+msgstr "Вилучити"
+
+#. WGFBK
+#: sfx2/uiconfig/ui/charmapcontrol.ui:20
+msgctxt "charmapcontrol|label1"
+msgid "Favorites"
+msgstr "Обране"
+
+#. HAe2e
+#: sfx2/uiconfig/ui/charmapcontrol.ui:261
+msgctxt "charmapcontrol|label2"
+msgid "Recent"
+msgstr "Нещодавні"
+
+#. BQwCQ
+#: sfx2/uiconfig/ui/charmapcontrol.ui:500
+msgctxt "charmapcontrol|specialchardlg"
+msgid "More Characters…"
+msgstr "Інші символи..."
+
+#. i2ZhQ
+#: sfx2/uiconfig/ui/charviewmenu.ui:12
+msgctxt "charviewmenu|clearchar"
+msgid "Remove"
+msgstr "Вилучити"
+
+#. bKHTP
+#: sfx2/uiconfig/ui/charviewmenu.ui:20
+msgctxt "charviewmenu|clearallchar"
+msgid "Clear All"
+msgstr "Очистити все"
+
+#. Y8jYN
+#: sfx2/uiconfig/ui/checkin.ui:8
+msgctxt "checkin|CheckinDialog"
+msgid "Check-In"
+msgstr "Вивантажити"
+
+#. ABZKD
+#: sfx2/uiconfig/ui/checkin.ui:90
+msgctxt "checkin|MajorVersion"
+msgid "New major version"
+msgstr "Нова основна версія"
+
+#. PYDWP
+#: sfx2/uiconfig/ui/checkin.ui:106
+msgctxt "checkin|label2"
+msgid "Version comment:"
+msgstr "Коментар до версії:"
+
+#. CEnTA
+#: sfx2/uiconfig/ui/cmisline.ui:44
+msgctxt "cmisline|type"
+msgid "Type"
+msgstr "Тип"
+
+#. g2yBR
+#: sfx2/uiconfig/ui/cmisline.ui:59
+msgctxt "cmisline|yes"
+msgid "Yes"
+msgstr "Так"
+
+#. BWGuL
+#: sfx2/uiconfig/ui/cmisline.ui:73
+msgctxt "cmisline|no"
+msgid "No"
+msgstr "Ні"
+
+#. kDKBB
+#: sfx2/uiconfig/ui/commandpopup.ui:36
+msgctxt "commandpopup|entry"
+msgid "Search command"
+msgstr "Пошук команд"
+
+#. w2G7M
+#: sfx2/uiconfig/ui/custominfopage.ui:15
+msgctxt "custominfopage|add"
+msgid "Add _Property"
+msgstr "Додати _властивість"
+
+#. 85KDm
+#: sfx2/uiconfig/ui/custominfopage.ui:23
+msgctxt "custominfopage|extended_tip|add"
+msgid "Click to add a new row to the Properties list."
+msgstr "Натисніть, щоб додати новий рядок у списку Властивості."
+
+#. aB3bA
+#: sfx2/uiconfig/ui/custominfopage.ui:42
+msgctxt "custominfopage|name"
+msgid "Name"
+msgstr "Назва"
+
+#. Ja2JC
+#: sfx2/uiconfig/ui/custominfopage.ui:55
+msgctxt "custominfopage|type"
+msgid "Type"
+msgstr "Тип"
+
+#. WxjS6
+#: sfx2/uiconfig/ui/custominfopage.ui:68
+msgctxt "custominfopage|value"
+msgid "Value"
+msgstr "Значення"
+
+#. kSFdB
+#: sfx2/uiconfig/ui/custominfopage.ui:116
+msgctxt "custominfopage|extended_tip|properties"
+msgid "Enter your custom contents. You can change the name, type, and contents of each row. You can add or remove rows. The items will be exported as metadata to other file formats."
+msgstr "Введіть вибраний вами вміст. Ви можете змінювати ім'я, тип та вміст кожного рядка. Ви можете додавати або видаляти рядки. Елементи будуть експортовані у вигляді метаданих в інші формати файлів."
+
+#. au5jH
+#: sfx2/uiconfig/ui/custominfopage.ui:138
+msgctxt "custominfopage|extended_tip|CustomInfoPage"
+msgid "Allows you to assign custom information fields to your document."
+msgstr "Дозволяє вам призначати документу користувацькі поля відомостей."
+
+#. VHwZA
+#: sfx2/uiconfig/ui/deck.ui:101 sfx2/uiconfig/ui/deck.ui:106
+msgctxt "deck|SFX_STR_SIDEBAR_CLOSE_DECK"
+msgid "Close Sidebar Deck"
+msgstr "Закрити бічну панель"
+
+#. pxEPn
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:18
+msgctxt "descriptioninfopage|label27"
+msgid "_Title:"
+msgstr "_Назва:"
+
+#. HqzQo
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:32
+msgctxt "descriptioninfopage|label28"
+msgid "_Subject:"
+msgstr "_Тема:"
+
+#. gEGPn
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:46
+msgctxt "descriptioninfopage|label29"
+msgid "_Keywords:"
+msgstr "_Ключові слова:"
+
+#. Nayo4
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:61
+msgctxt "descriptioninfopage|label30"
+msgid "_Comments:"
+msgstr "_Коментарі:"
+
+#. qw238
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:79
+msgctxt "descriptioninfopage|extended_tip|title"
+msgid "Enter a title for the document."
+msgstr "Введіть назву документа."
+
+#. rvZHi
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:96
+msgctxt "descriptioninfopage|extended_tip|subject"
+msgid "Enter a subject for the document. You can use a subject to group documents with similar contents."
+msgstr "Введіть тему документа. Ви можете використовувати тему для групування документів зі схожим вмістом."
+
+#. FoxGh
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:113
+msgctxt "descriptioninfopage|extended_tip|keywords"
+msgid "Enter the words that you want to use to index the content of your document. Keywords must be separated by commas. A keyword can contain white space characters or semicolons."
+msgstr "Введіть слова, які ви бажаєте використати для індексування вмісту вашого документа. Ключові слова слід відокремити комами. Ключове слово може містити символи пропуску або крапки з комою."
+
+#. bo2q7
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:137
+msgctxt "descriptioninfopage|extended_tip|comments"
+msgid "Enter comments to help identify the document."
+msgstr "Введіть коментарі, що допоможуть ідентифікувати документ."
+
+#. sGW3Z
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:150
+msgctxt "descriptioninfopage|extended_tip|DescriptionInfoPage"
+msgid "Contains descriptive information about the document."
+msgstr "Містить відомості, які описують документ."
+
+#. tC2rt
+#: sfx2/uiconfig/ui/developmenttool.ui:116
+msgctxt "developmenttool|dom_current_selection_toggle-tooltip"
+msgid "Current Selection In Document"
+msgstr "Поточний вибір у документі"
+
+#. Po2S3
+#: sfx2/uiconfig/ui/developmenttool.ui:117
+msgctxt "developmenttool|dom_current_selection_toggle"
+msgid "Current Selection"
+msgstr "Поточний вибір"
+
+#. eB6NR
+#: sfx2/uiconfig/ui/developmenttool.ui:128
+msgctxt "developmenttool|dom_refresh_button-tooltip"
+msgid "Refresh Document Model Tree View"
+msgstr "Оновити дерево моделі документа"
+
+#. FD2yt
+#: sfx2/uiconfig/ui/developmenttool.ui:129
+msgctxt "developmenttool|dom_refresh_button"
+msgid "Refresh"
+msgstr "Оновити"
+
+#. qVgcX
+#: sfx2/uiconfig/ui/developmenttool.ui:175
+msgctxt "developmenttool|object"
+msgid "Object"
+msgstr "Об'єкт"
+
+#. x6GLB
+#: sfx2/uiconfig/ui/developmenttool.ui:223
+msgctxt "developmenttool|tooltip-back"
+msgid "Back"
+msgstr "Назад"
+
+#. SinPk
+#: sfx2/uiconfig/ui/developmenttool.ui:224
+msgctxt "developmenttool|back"
+msgid "Back"
+msgstr "Назад"
+
+#. 4CBb3
+#: sfx2/uiconfig/ui/developmenttool.ui:236
+msgctxt "developmenttool|tooltip-inspect"
+msgid "Inspect"
+msgstr "Оглянути"
+
+#. vCciB
+#: sfx2/uiconfig/ui/developmenttool.ui:237
+msgctxt "developmenttool|inspect"
+msgid "Inspect"
+msgstr "Оглянути"
+
+#. nFMXe
+#: sfx2/uiconfig/ui/developmenttool.ui:249
+msgctxt "developmenttool|tooltip-refresh"
+msgid "Refresh"
+msgstr "Оновити"
+
+#. CFuvW
+#: sfx2/uiconfig/ui/developmenttool.ui:250
+msgctxt "developmenttool|refresh"
+msgid "Refresh"
+msgstr "Оновити"
+
+#. 6gFmn
+#: sfx2/uiconfig/ui/developmenttool.ui:273
+msgctxt "developmenttool|classname"
+msgid "Class name:"
+msgstr "Назва класу:"
+
+#. a9j7f
+#: sfx2/uiconfig/ui/developmenttool.ui:338
+#: sfx2/uiconfig/ui/developmenttool.ui:387
+#: sfx2/uiconfig/ui/developmenttool.ui:445
+msgctxt "developmenttool|name"
+msgid "Name"
+msgstr "Назва"
+
+#. VFqAa
+#: sfx2/uiconfig/ui/developmenttool.ui:358
+msgctxt "developmenttool|interfaces"
+msgid "Interfaces"
+msgstr "Інтерфейси"
+
+#. iCdWe
+#: sfx2/uiconfig/ui/developmenttool.ui:410
+msgctxt "developmenttool|services"
+msgid "Services"
+msgstr "Служби"
+
+#. H7pYE
+#: sfx2/uiconfig/ui/developmenttool.ui:460
+msgctxt "developmenttool|value"
+msgid "Value"
+msgstr "Значення"
+
+#. Jjkqh
+#: sfx2/uiconfig/ui/developmenttool.ui:474
+msgctxt "developmenttool|type"
+msgid "Type"
+msgstr "Тип"
+
+#. zpXuY
+#: sfx2/uiconfig/ui/developmenttool.ui:488
+msgctxt "developmenttool|info"
+msgid "Info"
+msgstr "Інформація"
+
+#. AUktw
+#: sfx2/uiconfig/ui/developmenttool.ui:539
+msgctxt "developmenttool|properties"
+msgid "Properties"
+msgstr "Властивості"
+
+#. wGJtn
+#: sfx2/uiconfig/ui/developmenttool.ui:569
+msgctxt "developmenttool|method"
+msgid "Method"
+msgstr "Метод"
+
+#. EnGfg
+#: sfx2/uiconfig/ui/developmenttool.ui:584
+msgctxt "developmenttool|returntype"
+msgid "Return Type"
+msgstr "Тип результату"
+
+#. AKnSa
+#: sfx2/uiconfig/ui/developmenttool.ui:598
+msgctxt "developmenttool|parameters"
+msgid "Parameters"
+msgstr "Параметри"
+
+#. tmttq
+#: sfx2/uiconfig/ui/developmenttool.ui:612
+msgctxt "developmenttool|implementation_class"
+msgid "Implementation Class"
+msgstr "Клас реалізації"
+
+#. Q2CBK
+#: sfx2/uiconfig/ui/developmenttool.ui:634
+msgctxt "developmenttool|methods"
+msgid "Methods"
+msgstr "Методи"
+
+#. 68CBk
+#: sfx2/uiconfig/ui/devtoolsmenu.ui:12
+msgctxt "devtoolsmenu|inspect"
+msgid "Inspect"
+msgstr "Огляд"
+
+#. zjFgn
+#: sfx2/uiconfig/ui/documentfontspage.ui:28
+msgctxt "documentfontspage|embedFonts"
+msgid "_Embed fonts in the document"
+msgstr "Вбудувати _шрифти в документ"
+
+#. FzuRv
+#: sfx2/uiconfig/ui/documentfontspage.ui:36
+msgctxt "documentfontspage|extended_tip|embedFonts"
+msgid "Mark this box to embed document fonts into the document file, for portability between different computer systems."
+msgstr "Відмітьте це поле, щоб убудувати шрифти у файл документа, на випадок редагування документа на різних комп'ютерах."
+
+#. 6rfon
+#: sfx2/uiconfig/ui/documentfontspage.ui:48
+msgctxt "documentfontspage|embedUsedFonts"
+msgid "_Only embed fonts that are used in documents"
+msgstr "Вбудувати _лише шрифти, використані в документі"
+
+#. V8E5f
+#: sfx2/uiconfig/ui/documentfontspage.ui:67
+msgctxt "documentfontspage|fontEmbeddingLabel"
+msgid "Font Embedding"
+msgstr "Вбудовані шрифти"
+
+#. Gip6V
+#: sfx2/uiconfig/ui/documentfontspage.ui:95
+msgctxt "documentfontspage|embedLatinScriptFonts"
+msgid "_Latin fonts"
+msgstr "_Латинські шрифти"
+
+#. nFM92
+#: sfx2/uiconfig/ui/documentfontspage.ui:110
+msgctxt "documentfontspage|embedAsianScriptFonts"
+msgid "_Asian fonts"
+msgstr "_Азійські шрифти"
+
+#. nSg9b
+#: sfx2/uiconfig/ui/documentfontspage.ui:125
+msgctxt "documentfontspage|embedComplexScriptFonts"
+msgid "_Complex fonts"
+msgstr "_Складні шрифти"
+
+#. EFytK
+#: sfx2/uiconfig/ui/documentfontspage.ui:144
+msgctxt "documentfontspage|fontScriptFrameLabel"
+msgid "Font scripts to embed"
+msgstr "Шрифти для вбудовування"
+
+#. izc2Y
+#: sfx2/uiconfig/ui/documentfontspage.ui:158
+msgctxt "documentfontspage|extended_tip|DocumentFontsPage"
+msgid "Embed document fonts in the current file."
+msgstr "Вбудувати шрифти документа у поточний файл."
+
+#. CCxGn
+#: sfx2/uiconfig/ui/documentinfopage.ui:19
+msgctxt "documentinfopage|label13"
+msgid "_Created:"
+msgstr "_Створено:"
+
+#. EZKmF
+#: sfx2/uiconfig/ui/documentinfopage.ui:33
+msgctxt "documentinfopage|label14"
+msgid "_Modified:"
+msgstr "_Змінено:"
+
+#. 4GLKx
+#: sfx2/uiconfig/ui/documentinfopage.ui:47
+msgctxt "documentinfopage|label15"
+msgid "_Digitally signed:"
+msgstr "_Цифровий підпис:"
+
+#. gJwUC
+#: sfx2/uiconfig/ui/documentinfopage.ui:61
+msgctxt "documentinfopage|label16"
+msgid "Last pri_nted:"
+msgstr "Останній _друк:"
+
+#. drz3P
+#: sfx2/uiconfig/ui/documentinfopage.ui:75
+msgctxt "documentinfopage|label17"
+msgid "Total _editing time:"
+msgstr "Загальний _час редагування:"
+
+#. MEzSr
+#: sfx2/uiconfig/ui/documentinfopage.ui:89
+msgctxt "documentinfopage|label18"
+msgid "Re_vision number:"
+msgstr "Но_мер редакції:"
+
+#. BgTqU
+#: sfx2/uiconfig/ui/documentinfopage.ui:131
+msgctxt "documentinfopage|showsigned"
+msgid "Multiply signed document"
+msgstr "Документ з кількома підписами"
+
+#. sGFJQ
+#: sfx2/uiconfig/ui/documentinfopage.ui:183
+msgctxt "documentinfopage|userdatacb"
+msgid "_Apply user data"
+msgstr "_Застосувати дані користувача"
+
+#. JFxmP
+#: sfx2/uiconfig/ui/documentinfopage.ui:197
+msgctxt "documentinfopage|reset"
+msgid "Reset Properties"
+msgstr "Скинути властивості"
+
+#. HrN2U
+#: sfx2/uiconfig/ui/documentinfopage.ui:204
+msgctxt "documentinfopage|extended_tip|reset"
+msgid "Resets the editing time to zero, the creation date to the current date and time, and the version number to 1. The modification and printing dates are also deleted."
+msgstr "Встановлює час редагування на нуль, дату створення на поточні дату й час та номер редакції на 1. Дати зміни та друку також видаляються."
+
+#. qeWvU
+#: sfx2/uiconfig/ui/documentinfopage.ui:215
+msgctxt "documentinfopage|signature"
+msgid "Di_gital Signatures..."
+msgstr "_Цифрові підписи..."
+
+#. rEEgJ
+#: sfx2/uiconfig/ui/documentinfopage.ui:234
+msgctxt "documentinfopage|label11"
+msgid "_Size:"
+msgstr "_Розмір:"
+
+#. WNFYB
+#: sfx2/uiconfig/ui/documentinfopage.ui:247
+msgctxt "documentinfopage|showsize"
+msgid "unknown"
+msgstr "невідомо"
+
+#. EgtLE
+#: sfx2/uiconfig/ui/documentinfopage.ui:262
+msgctxt "documentinfopage|label8"
+msgid "_Location:"
+msgstr "_Розташування:"
+
+#. 9xhwo
+#: sfx2/uiconfig/ui/documentinfopage.ui:276
+msgctxt "documentinfopage|label7"
+msgid "_Type:"
+msgstr "_Тип:"
+
+#. ZLmAo
+#: sfx2/uiconfig/ui/documentinfopage.ui:299
+msgctxt "documentinfopage|changepass"
+msgid "Change _Password"
+msgstr "Змінити _пароль"
+
+#. oqAZE
+#: sfx2/uiconfig/ui/documentinfopage.ui:317
+msgctxt "documentinfopage|templateft"
+msgid "Template:"
+msgstr "Шаблон:"
+
+#. 5pXPV
+#: sfx2/uiconfig/ui/documentinfopage.ui:366
+msgctxt "documentinfopage|extended_tip|nameed"
+msgid "Displays the file name."
+msgstr "Показує назву файлу."
+
+#. LCDUj
+#: sfx2/uiconfig/ui/documentinfopage.ui:397
+msgctxt "documentinfopage|thumbnailsavecb"
+msgid "Save preview image with this document"
+msgstr "Зберегти попереднє зображення з документом"
+
+#. 2GKBr
+#: sfx2/uiconfig/ui/documentinfopage.ui:415
+msgctxt "documentinfopage|image-preferred-dpi-checkbutton"
+msgid "Image preferred DPI"
+msgstr "Бажаний DPI зображення"
+
+#. VWjRu
+#: sfx2/uiconfig/ui/documentinfopage.ui:479
+msgctxt "documentinfopage|extended_tip|DocumentInfoPage"
+msgid "Contains basic information about the current file."
+msgstr "Містить основну інформацію про поточний файл."
+
+#. scgsx
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:8
+msgctxt "documentpropertiesdialog|DocumentPropertiesDialog"
+msgid "Properties of “%1”"
+msgstr "Властивості “%1”"
+
+#. iTECQ
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:135
+msgctxt "documentpropertiesdialog|general"
+msgid "General "
+msgstr "Загальні "
+
+#. Vggig
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:182
+msgctxt "documentpropertiesdialog|description"
+msgid "Description"
+msgstr "Опис"
+
+#. HTaxP
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:230
+msgctxt "documentpropertiesdialog|customprops"
+msgid "Custom Properties"
+msgstr "Нетипові властивості"
+
+#. DccDw
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:278
+msgctxt "documentpropertiesdialog|cmisprops"
+msgid "CMIS Properties"
+msgstr "Властивості CMIS"
+
+#. q9i7y
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:326
+msgctxt "documentpropertiesdialog|security"
+msgid "Security"
+msgstr "Безпека"
+
+#. 42uNG
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:7
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "Confirm editing of document"
+msgstr "Підтвердити зміну документа"
+
+#. bdEZG
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:13
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "Are you sure you want to edit the document?"
+msgstr "Справді хочете редагувати документ?"
+
+#. AMrnx
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:14
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "The original file can be signed without editing the document. Existing signatures on the document will be lost in case of saving an edited version."
+msgstr "Можна підписати початковий файл без його зміни. При збереженні зміненого документа наявні у ньому підписи будуть втрачені."
+
+#. wRps5
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:25
+msgctxt "editdocumentdialog|edit"
+msgid "Edit Document"
+msgstr "Змінити документ"
+
+#. oWdm6
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:42
+msgctxt "editdocumentdialog|cancel"
+msgid "Cancel"
+msgstr "Скасувати"
+
+#. hrgcD
+#: sfx2/uiconfig/ui/editdurationdialog.ui:43
+msgctxt "editdurationdialog|EditDurationDialog"
+msgid "Edit Duration"
+msgstr "Змінити тривалість"
+
+#. 66AnB
+#: sfx2/uiconfig/ui/editdurationdialog.ui:132
+msgctxt "editdurationdialog|negative"
+msgid "_Negative"
+msgstr "_Від’ємний"
+
+#. LeAmz
+#: sfx2/uiconfig/ui/editdurationdialog.ui:149
+msgctxt "editdurationdialog|label1"
+msgid "_Years:"
+msgstr "_Років:"
+
+#. kFDdM
+#: sfx2/uiconfig/ui/editdurationdialog.ui:163
+msgctxt "editdurationdialog|label"
+msgid "_Months:"
+msgstr "_Місяців:"
+
+#. CHLhB
+#: sfx2/uiconfig/ui/editdurationdialog.ui:177
+msgctxt "editdurationdialog|label3"
+msgid "_Days:"
+msgstr "_Днів:"
+
+#. 2w5Dd
+#: sfx2/uiconfig/ui/editdurationdialog.ui:191
+msgctxt "editdurationdialog|label4"
+msgid "H_ours:"
+msgstr "_Годин:"
+
+#. TtWAW
+#: sfx2/uiconfig/ui/editdurationdialog.ui:205
+msgctxt "editdurationdialog|label5"
+msgid "Min_utes:"
+msgstr "_Хвилин:"
+
+#. TieWF
+#: sfx2/uiconfig/ui/editdurationdialog.ui:219
+msgctxt "editdurationdialog|label6"
+msgid "_Seconds:"
+msgstr "_Секунд:"
+
+#. GxEZZ
+#: sfx2/uiconfig/ui/editdurationdialog.ui:233
+msgctxt "editdurationdialog|label7"
+msgid "Millise_conds:"
+msgstr "_Мілісекунд:"
+
+#. FLFW8
+#: sfx2/uiconfig/ui/editdurationdialog.ui:340
+msgctxt "editdurationdialog|label2"
+msgid "Duration"
+msgstr "Тривалість"
+
+#. 9cAb5
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:7
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "No email configuration"
+msgstr "Немає налаштувань ел. пошти"
+
+#. cFct7
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:14
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "%PRODUCTNAME was unable to find a working email configuration."
+msgstr "%PRODUCTNAME не здатний віднайти налаштування робочої ел. пошти."
+
+#. xQi7X
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:15
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "Please save this document locally instead and attach it from within your email client."
+msgstr "Будь ласка, збережіть натомість цей документ на диску і прикріпіть його з вашого поштового клієнта."
+
+#. DVQUS
+#: sfx2/uiconfig/ui/floatingrecord.ui:7
+msgctxt "floatingrecord|FloatingRecord"
+msgid "Record Macro"
+msgstr "Записати макрос"
+
+#. Fa63R
+#: sfx2/uiconfig/ui/helpbookmarkpage.ui:32
+msgctxt "helpbookmarkpage|label1"
+msgid "_Bookmarks"
+msgstr "_Закладки"
+
+#. kZqGE
+#: sfx2/uiconfig/ui/helpbookmarkpage.ui:83
+msgctxt "helpbookmarkpage|display"
+msgid "_Display"
+msgstr "_Показати"
+
+#. S7ppr
+#: sfx2/uiconfig/ui/helpcontrol.ui:77
+msgctxt "helpcontrol|contents"
+msgid "Contents"
+msgstr "Вміст"
+
+#. vxPLh
+#: sfx2/uiconfig/ui/helpcontrol.ui:126
+msgctxt "helpcontrol|index"
+msgid "Index"
+msgstr "Покажчик"
+
+#. HdGQi
+#: sfx2/uiconfig/ui/helpcontrol.ui:176
+msgctxt "helpcontrol|find"
+msgid "Find"
+msgstr "Пошук"
+
+#. 7fapN
+#: sfx2/uiconfig/ui/helpcontrol.ui:226
+msgctxt "helpcontrol|bookmarks"
+msgid "Bookmarks"
+msgstr "Закладки"
+
+#. UQL8A
+#: sfx2/uiconfig/ui/helpindexpage.ui:30
+msgctxt "helpindexpage|display"
+msgid "_Display"
+msgstr "_Показати"
+
+#. 4MkAM
+#: sfx2/uiconfig/ui/helpindexpage.ui:116
+msgctxt "helpindexpage|label1"
+msgid "_Search Term"
+msgstr "_Шукати термін"
+
+#. wKLbH
+#: sfx2/uiconfig/ui/helpmanual.ui:7
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "%PRODUCTNAME Help Not Installed"
+msgstr "Довідку %PRODUCTNAME не встановлено"
+
+#. JBdnz
+#: sfx2/uiconfig/ui/helpmanual.ui:12
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "The %PRODUCTNAME built-in help for current UI language ($UILOCALE) is not installed on your computer."
+msgstr "Вбудовану довідку %PRODUCTNAME для поточної мови інтерфейсу ($UILOCALE) не встановлено на цьому комп'ютері."
+
+#. DxMPr
+#: sfx2/uiconfig/ui/helpmanual.ui:13
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "You may either install it from our website or your system’s repositories, or read an online version."
+msgstr "Ви можете її встановити через наш веб-сайт, сховища вашої системи або прочитати її версію в Інтернеті."
+
+#. AaeBL
+#: sfx2/uiconfig/ui/helpmanual.ui:23
+msgctxt "helpmanual|website"
+msgid "Read Help Online"
+msgstr "Читати довідку в Інтернеті"
+
+#. B2Wzh
+#: sfx2/uiconfig/ui/helpmanual.ui:60
+msgctxt "helpmanual|hidedialog"
+msgid "Do not show this dialog again"
+msgstr "Більше не показувати це діалогове вікно"
+
+#. 8FjCk
+#: sfx2/uiconfig/ui/helpsearchpage.ui:30
+msgctxt "helpsearchpage|display"
+msgid "_Display"
+msgstr "_Показати"
+
+#. JDsn3
+#: sfx2/uiconfig/ui/helpsearchpage.ui:46
+msgctxt "helpsearchpage|label1"
+msgid "_Search term"
+msgstr "_Ключове слово"
+
+#. VRVyq
+#: sfx2/uiconfig/ui/helpsearchpage.ui:122
+msgctxt "helpsearchpage|find"
+msgid "_Find"
+msgstr "_Знайти"
+
+#. ZiE8A
+#: sfx2/uiconfig/ui/helpsearchpage.ui:141
+msgctxt "helpsearchpage|completewords"
+msgid "_Complete words only"
+msgstr "_Лише цілі слова"
+
+#. vzqdb
+#: sfx2/uiconfig/ui/helpsearchpage.ui:155
+msgctxt "helpsearchpage|headings"
+msgid "Find in _headings only"
+msgstr "_Шукати лише у заголовках"
+
+#. JDZho
+#: sfx2/uiconfig/ui/helpwindow.ui:69
+msgctxt "helpwindow|backward|tooltip_text"
+msgid "Previous Page"
+msgstr "Попередня сторінка"
+
+#. Gv3uP
+#: sfx2/uiconfig/ui/helpwindow.ui:80
+msgctxt "helpwindow|forward|tooltip_text"
+msgid "Next Page"
+msgstr "Наступна сторінка"
+
+#. uaBtK
+#: sfx2/uiconfig/ui/helpwindow.ui:91
+msgctxt "helpwindow|start|tooltip_text"
+msgid "First Page"
+msgstr "Перша сторінка"
+
+#. TizVY
+#: sfx2/uiconfig/ui/helpwindow.ui:112
+msgctxt "helpwindow|print|tooltip_text"
+msgid "Print"
+msgstr "Друк"
+
+#. 7wgqt
+#: sfx2/uiconfig/ui/helpwindow.ui:123
+msgctxt "helpwindow|bookmarks|tooltip_text"
+msgid "Add to Bookmarks"
+msgstr "Додати до закладок"
+
+#. qPF9A
+#: sfx2/uiconfig/ui/helpwindow.ui:134
+msgctxt "helpwindow|searchdialog|tooltip_text"
+msgid "Find on this Page"
+msgstr "Знайти на цій сторінці"
+
+#. VnXxR
+#: sfx2/uiconfig/ui/infobar.ui:65
+msgctxt "infobar|close|tooltip_text"
+msgid "Close Infobar"
+msgstr "Закрити інфо-панель"
+
+#. DpXCY
+#: sfx2/uiconfig/ui/inputdialog.ui:87
+msgctxt "inputdialog|label"
+msgid "Height:"
+msgstr "Висота:"
+
+#. HwHjx
+#: sfx2/uiconfig/ui/licensedialog.ui:8
+msgctxt "licensedialog|LicenseDialog"
+msgid "Licensing and Legal information"
+msgstr "Ліцензування та правова інформація"
+
+#. yLwba
+#: sfx2/uiconfig/ui/licensedialog.ui:25
+msgctxt "licensedialog|show"
+msgid "_Show License"
+msgstr "Показати _ліцензію"
+
+#. 3unZa
+#: sfx2/uiconfig/ui/licensedialog.ui:68
+msgctxt "licensedialog|label"
+msgid ""
+"%PRODUCTNAME is made available subject to the terms of the Mozilla Public License, v. 2.0. A copy of the MPL can be obtained at http://mozilla.org/MPL/2.0/.\n"
+"\n"
+"Third Party Code Additional copyright notices and license terms applicable to portions of the Software are set forth in the LICENSE.html file; choose Show License to see exact details in English.\n"
+"\n"
+"All trademarks and registered trademarks mentioned herein are the property of their respective owners.\n"
+"\n"
+"Copyright © 2000–2022 LibreOffice contributors. All rights reserved.\n"
+"\n"
+"This product was created by %OOOVENDOR, based on OpenOffice.org, which is Copyright 2000, 2011 Oracle and/or its affiliates. %OOOVENDOR acknowledges all community members, please see http://www.libreoffice.org/ for more details."
+msgstr ""
+"%PRODUCTNAME доступний відповідно до умов Mozilla Public License версії 2.0. Копію ліцензії MPL можна знайти на http://mozilla.org/MPL/2.0/.\n"
+"\n"
+"Додаткові повідомлення про авторські права та умови ліцензії на код третіх осіб, що застосовуються до окремих частин програмного забезпечення, викладені у файлі LICENSE.html; виберіть Показати ліцензію для перегляду подробиць англійською мовою.\n"
+"\n"
+"Усі товарні знаки, згадані тут, є власністю їхніх власників.\n"
+"\n"
+"Copyright © 2000–2022 розробники LibreOffice. Всі права захищено.\n"
+"\n"
+"Цей продукт було створено %OOOVENDOR на основі OpenOffice.org, Copyright 2000, 2011 Oracle та/або їх афілійованих осіб. %OOOVENDOR вдячний усім учасникам спільноти, подробиці дивіться за адресою http://www.libreoffice.org/ ."
+
+#. QuVoN
+#: sfx2/uiconfig/ui/linefragment.ui:57
+msgctxt "linefragment|STR_SFX_REMOVE_PROPERTY"
+msgid "Remove Property"
+msgstr "Вилучити властивість"
+
+#. 8gPai
+#: sfx2/uiconfig/ui/linefragment.ui:149
+msgctxt "linefragment|SFX_ST_EDIT"
+msgid "..."
+msgstr "..."
+
+#. x4Fjd
+#: sfx2/uiconfig/ui/linefragment.ui:185
+msgctxt "linefragment|yes"
+msgid "Yes"
+msgstr "Так"
+
+#. mJFyB
+#: sfx2/uiconfig/ui/linefragment.ui:200
+msgctxt "linefragment|no"
+msgid "No"
+msgstr "Ні"
+
+#. muk9B
+#: sfx2/uiconfig/ui/linkeditdialog.ui:8
+msgctxt "linkeditdialog|title"
+msgid "Modify DDE Link"
+msgstr "Змінити зв'язок DDE"
+
+#. CZn3G
+#: sfx2/uiconfig/ui/linkeditdialog.ui:102
+msgctxt "linkeditdialog|label2"
+msgid "_Application:"
+msgstr "_Програма:"
+
+#. GZsEX
+#: sfx2/uiconfig/ui/linkeditdialog.ui:116
+msgctxt "linkeditdialog|label3"
+msgid "_File:"
+msgstr "_Файл:"
+
+#. 6Fx6h
+#: sfx2/uiconfig/ui/linkeditdialog.ui:130
+msgctxt "linkeditdialog|label4"
+msgid "_Category:"
+msgstr "_Категорія:"
+
+#. AzB2M
+#: sfx2/uiconfig/ui/linkeditdialog.ui:148
+msgctxt "linkeditdialog|extended_tip|app"
+msgid "Lists the application that last saved the source file. The office suite applications have the server name soffice."
+msgstr "Виводить список програм, які востаннє зберігали вихідний файл. Програми офісного пакету мають серверну назву «soffice»."
+
+#. cj9do
+#: sfx2/uiconfig/ui/linkeditdialog.ui:166
+msgctxt "linkeditdialog|extended_tip|file"
+msgid "Path to the source file. Relative paths must be expressed by full URI, for example, with file://."
+msgstr "Шлях до вихідного файлу. Відносні шляхи повинні бути описані повним URI, наприклад, через file://"
+
+#. cMPNq
+#: sfx2/uiconfig/ui/linkeditdialog.ui:184
+msgctxt "linkeditdialog|extended_tip|category"
+msgid "Lists the section or object that the link refers to in the source file. If you want, you can enter a new section or object here."
+msgstr "Вказує розділ або об'єкт у файлі джерелі, на який посилається зв'язок. За бажання, ви можете ввести тут новий розділ або об'єкт."
+
+#. hiapi
+#: sfx2/uiconfig/ui/linkeditdialog.ui:199
+msgctxt "linkeditdialog|label1"
+msgid "Modify Link"
+msgstr "Змінити зв'язок"
+
+#. ba2Tn
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:24
+msgctxt "loadtemplatedialog|LoadTemplateDialog"
+msgid "New"
+msgstr "Новий"
+
+#. MkW3E
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:40
+msgctxt "loadtemplatedialog|fromfile"
+msgid "From File..."
+msgstr "З файлу..."
+
+#. jSrBT
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:45
+msgctxt "loadtemplatedialog|fromfile|tooltip_text"
+msgid "Copy styles from selected external document to current document."
+msgstr "Скопіювати в поточний документ стилі з вибраного зовнішнього документа."
+
+#. GE236
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:48
+msgctxt "loadtemplatedialog|extended_tip|fromfile"
+msgid "Locate the file containing the styles that you want to load, and then click Open."
+msgstr "Виберіть файл, що містить стилі, які слід завантажити, а потім натисніть кнопку Відкрити."
+
+#. YCguC
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:165
+msgctxt "loadtemplatedialog|extended_tip|categories"
+msgid "Lists the available template categories. Click a category to view its contents in the Templates list."
+msgstr "Виводить список доступних категорій шаблонів. Виберіть категорію, щоб переглянути її вміст у списку Шаблони."
+
+#. PZS7L
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:176
+msgctxt "loadtemplatedialog|label1"
+msgid "Categories"
+msgstr "Категорії"
+
+#. hkGaT
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:230
+msgctxt "loadtemplatedialog|extended_tip|templates"
+msgid "Lists the available templates for the selected category."
+msgstr "Виводить список доступних шаблонів для обраної категорії."
+
+#. hryGV
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:241
+msgctxt "loadtemplatedialog|label2"
+msgid "Templates"
+msgstr "Шаблони"
+
+#. LAAM3
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:245
+msgctxt "loadtemplatedialog|label2|tooltip_text"
+msgid "Templates in the selected category"
+msgstr "Шаблони у вибраній категорії"
+
+#. rFENe
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:264
+msgctxt "loadtemplatedialog|text"
+msgid "_Paragraph and Character"
+msgstr "_Абзац і символ"
+
+#. jCAuA
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:269
+msgctxt "loadtemplatedialog|text|tooltip_text"
+msgid "Copy paragraph and character styles to current document."
+msgstr "Скопіювати в поточний документ стилі абзаців і символів."
+
+#. VLWfZ
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:273
+msgctxt "loadtemplatedialog|extended_tip|text"
+msgid "Loads the paragraph and the character styles from the selected document into the current document."
+msgstr "Завантажує стилі абзаців і символів з обраного документа в поточний документ."
+
+#. d2q55
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:284
+msgctxt "loadtemplatedialog|frame"
+msgid "_Frame"
+msgstr "_Рамка"
+
+#. HSCZj
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:289
+msgctxt "loadtemplatedialog|frame|tooltip_text"
+msgid "Copy frame styles to current document."
+msgstr "Скопіювати в поточний документ стилі рамок."
+
+#. 4ZF6u
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:293
+msgctxt "loadtemplatedialog|extended_tip|frame"
+msgid "Loads the frame styles from the selected document into the current document."
+msgstr "Завантажує стилі рамок з обраного документа в поточний документ."
+
+#. vFZLz
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:304
+msgctxt "loadtemplatedialog|pages"
+msgid "Pa_ge"
+msgstr "_Сторінка"
+
+#. hdRo6
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:309
+msgctxt "loadtemplatedialog|pages|tooltip_text"
+msgid "Copy page styles to current document."
+msgstr "Скопіювати в поточний документ стилі сторінок."
+
+#. o2C8c
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:313
+msgctxt "loadtemplatedialog|extended_tip|pages"
+msgid "Loads the page styles from the selected document into the current document."
+msgstr "Завантажує стилі сторінки з обраного документа в поточний документ."
+
+#. 2xgCH
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:324
+msgctxt "loadtemplatedialog|numbering"
+msgid "_List"
+msgstr "С_писок"
+
+#. VZxbf
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:329
+msgctxt "loadtemplatedialog|numbering|tooltip_text"
+msgid "Copy list styles to current document."
+msgstr "Скопіювати в поточний документ стилі списків."
+
+#. PAsEB
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:333
+msgctxt "loadtemplatedialog|extended_tip|numbering"
+msgid "Loads the list styles from the selected document into the current document."
+msgstr "Завантажує в поточний документ стилі списків з вибраного документа."
+
+#. VWzsG
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:344
+msgctxt "loadtemplatedialog|overwrite"
+msgid "_Overwrite"
+msgstr "_Переписати"
+
+#. cr86W
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:350
+msgctxt "loadtemplatedialog|overwrite|tooltip_text"
+msgid "Overwrite styles with same name"
+msgstr "Замінити стилі з тією самою назвою"
+
+#. A9ogA
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:353
+msgctxt "loadtemplatedialog|extended_tip|overwrite"
+msgid "Replaces styles in the current document that have the same name as the styles you are loading."
+msgstr "Замінює стилі поточного документа, мають ті ж імена, що й завантажувані стилі."
+
+#. 7ru2R
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:376
+msgctxt "loadtemplatedialog|alttitle"
+msgid "Load Styles from Template"
+msgstr "Завантажити стилі з шаблона"
+
+#. X5Pi5
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:413
+msgctxt "loadtemplatedialog|label3"
+msgid "Pre_view"
+msgstr "Пере_гляд"
+
+#. hR7cK
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:419
+msgctxt "loadtemplatedialog|extended_tip|expander"
+msgid "Shows or hides a preview of a selected template."
+msgstr "Показує або приховує попередній перегляд вибраного шаблону."
+
+#. CRcca
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:449
+msgctxt "loadtemplatedialog|extended_tip|LoadTemplateDialog"
+msgid "Imports formatting styles from another document or template into the current document."
+msgstr "Імпортує стилі форматування з іншого документа або шаблона в поточний документ."
+
+#. EAhup
+#: sfx2/uiconfig/ui/managestylepage.ui:33
+msgctxt "managestylepage|nameft"
+msgid "_Name:"
+msgstr "_Назва:"
+
+#. VroAG
+#: sfx2/uiconfig/ui/managestylepage.ui:47
+msgctxt "managestylepage|nextstyleft"
+msgid "Ne_xt style:"
+msgstr "_Наступний стиль:"
+
+#. mJYgm
+#: sfx2/uiconfig/ui/managestylepage.ui:61
+msgctxt "managestylepage|linkedwithft"
+msgid "Inherit from:"
+msgstr "Успадковує від:"
+
+#. 9pGL9
+#: sfx2/uiconfig/ui/managestylepage.ui:75
+msgctxt "managestylepage|categoryft"
+msgid "_Category:"
+msgstr "_Категорія:"
+
+#. MMhJQ
+#: sfx2/uiconfig/ui/managestylepage.ui:99
+msgctxt "managestylepage|editstyle"
+msgid "Edit Style"
+msgstr "Змінити стиль"
+
+#. 7XGEs
+#: sfx2/uiconfig/ui/managestylepage.ui:123
+msgctxt "managestylepage|editlinkstyle"
+msgid "Edit Style"
+msgstr "Змінити стиль"
+
+#. cKjrA
+#: sfx2/uiconfig/ui/managestylepage.ui:147
+msgctxt "managestylepage|autoupdate"
+msgid "_AutoUpdate"
+msgstr "_Автооновлення"
+
+#. oTXJz
+#: sfx2/uiconfig/ui/managestylepage.ui:192
+msgctxt "managestylepage|label1"
+msgid "Style"
+msgstr "Стиль"
+
+#. NXG9o
+#: sfx2/uiconfig/ui/managestylepage.ui:227
+msgctxt "managestylepage|label2"
+msgid "Contains"
+msgstr "Параметри"
+
+#. WJunC
+#: sfx2/uiconfig/ui/newstyle.ui:16
+msgctxt "newstyle|CreateStyleDialog"
+msgid "New Style from Selection"
+msgstr "Новий стиль на основі вибраного"
+
+#. 2XkTt
+#: sfx2/uiconfig/ui/newstyle.ui:140
+msgctxt "newstyle|styles-atkobject"
+msgid "Custom styles for selected category"
+msgstr "Спеціальні стилі для вибраної категорії"
+
+#. UEGSg
+#: sfx2/uiconfig/ui/newstyle.ui:160
+msgctxt "newstyle|stylename-atkobject"
+msgid "Style name"
+msgstr "Назва стилю"
+
+#. bjN3T
+#: sfx2/uiconfig/ui/newstyle.ui:175
+msgctxt "newstyle|categorylabel"
+msgid "Custom styles for current document"
+msgstr "Спеціальні стилі для поточного документа"
+
+#. 6mnDS
+#: sfx2/uiconfig/ui/newstyle.ui:191
+msgctxt "newstyle|label1"
+msgid "Enter new style name:"
+msgstr "Введіть назву нового стилю:"
+
+#. R6zJz
+#: sfx2/uiconfig/ui/notebookbar.ui:74
+msgctxt "notebookbar|label9"
+msgid "File"
+msgstr "Файл"
+
+#. QAUXF
+#: sfx2/uiconfig/ui/optprintpage.ui:35
+msgctxt "optprintpage|printer"
+msgid "_Printer"
+msgstr "Д_рук"
+
+#. PUG9y
+#: sfx2/uiconfig/ui/optprintpage.ui:44
+msgctxt "extended_tip|printer"
+msgid "Specifies whether the print settings apply to direct printing or to printing to a file."
+msgstr "Вказує, чи застосовуються параметри друку для прямого друку чи друку до файлу."
+
+#. Eyv8g
+#: sfx2/uiconfig/ui/optprintpage.ui:55
+msgctxt "optprintpage|file"
+msgid "Print to _file"
+msgstr "Друк до _файлу"
+
+#. TMHvE
+#: sfx2/uiconfig/ui/optprintpage.ui:64
+msgctxt "extended_tip|file"
+msgid "Specifies whether the print settings apply to direct printing or to printing to a file."
+msgstr "Вказує, чи застосовуються параметри друку для прямого друку чи друку до файлу."
+
+#. C8jvp
+#: sfx2/uiconfig/ui/optprintpage.ui:79
+msgctxt "optprintpage|label4"
+msgid "Settings for"
+msgstr "Налаштування для"
+
+#. 2T5Af
+#: sfx2/uiconfig/ui/optprintpage.ui:109
+msgctxt "optprintpage|papersize"
+msgid "P_aper size"
+msgstr "_Розмір паперу"
+
+#. yj4DA
+#: sfx2/uiconfig/ui/optprintpage.ui:117
+msgctxt "extended_tip|papersize"
+msgid "Mark this check box if a certain paper size is needed for printing the current document."
+msgstr "Позначте цей прапорець, якщо потрібний певний розмір паперу для друку поточного документа."
+
+#. stDFq
+#: sfx2/uiconfig/ui/optprintpage.ui:128
+msgctxt "optprintpage|paperorient"
+msgid "Pap_er orientation"
+msgstr "_Орієнтація паперу"
+
+#. FdFNk
+#: sfx2/uiconfig/ui/optprintpage.ui:136
+msgctxt "extended_tip|paperorient"
+msgid "Mark this check box if you need a certain paper orientation for printing the current document."
+msgstr "Позначте цей прапорець, якщо потрібна певна орієнтація паперу для друку поточного документа."
+
+#. L6rtF
+#: sfx2/uiconfig/ui/optprintpage.ui:147
+msgctxt "optprintpage|trans"
+msgid "_Transparency"
+msgstr "_Прозорість"
+
+#. F6nF9
+#: sfx2/uiconfig/ui/optprintpage.ui:155
+msgctxt "extended_tip|trans"
+msgid "Mark this check box if you always want to be warned if transparent objects are contained in the document."
+msgstr "Позначте цей прапорець, якщо ви завжди хочете бути попереджені, якщо в документі містяться прозорі об'єкти."
+
+#. C5jZN
+#: sfx2/uiconfig/ui/optprintpage.ui:170
+msgctxt "optprintpage|label2"
+msgid "Warnings"
+msgstr "Попередження"
+
+#. PJFLE
+#: sfx2/uiconfig/ui/optprintpage.ui:198
+msgctxt "optprintpage|reducegrad"
+msgid "Reduce _gradient"
+msgstr "Зменшити _градієнти"
+
+#. GC8dk
+#: sfx2/uiconfig/ui/optprintpage.ui:206
+msgctxt "extended_tip|reducegrad"
+msgid "If this field is marked, gradients are printed with reduced quality."
+msgstr "Якщо це поле позначено, градієнти друкуються зі зниженою якістю."
+
+#. skDME
+#: sfx2/uiconfig/ui/optprintpage.ui:230
+msgctxt "optprintpage|reducegradstripes"
+msgid "Gradient _stripes:"
+msgstr "Градієнтні см_уги:"
+
+#. k8zh7
+#: sfx2/uiconfig/ui/optprintpage.ui:239
+msgctxt "extended_tip|reducegradstripes"
+msgid "Specifies the maximum number of gradient stripes for printing."
+msgstr "Вказує найбільшу кількість градієнтних смуг для друку."
+
+#. 5HCxT
+#: sfx2/uiconfig/ui/optprintpage.ui:257
+msgctxt "extended_tip|reducegradstep"
+msgid "Specifies the maximum number of gradient stripes for printing."
+msgstr "Вказує найбільшу кількість градієнтних смуг для друку."
+
+#. W8LE7
+#: sfx2/uiconfig/ui/optprintpage.ui:274
+msgctxt "optprintpage|reducegradcolor"
+msgid "Intermediate _color"
+msgstr "Проміжний _колір"
+
+#. TUbxx
+#: sfx2/uiconfig/ui/optprintpage.ui:283
+msgctxt "extended_tip|reducegradcolor"
+msgid "Specifies that gradients are only printed in a single intermediate color."
+msgstr "Вказує, що градієнти друкуються лише в одному проміжному кольорі."
+
+#. myMLR
+#: sfx2/uiconfig/ui/optprintpage.ui:304
+msgctxt "optprintpage|label1"
+msgid "Reduce Gradient"
+msgstr "Зменшення градієнтів"
+
+#. abbre
+#: sfx2/uiconfig/ui/optprintpage.ui:312
+msgctxt "extended_tip|frame2"
+msgid "Defines which warnings appear before printing begins."
+msgstr "Визначає, які попередження з'являтимуться перед друком."
+
+#. ySmQe
+#: sfx2/uiconfig/ui/optprintpage.ui:337
+msgctxt "optprintpage|reducebitmap"
+msgid "Reduce _bitmaps"
+msgstr "Скоротити _растрові зображення"
+
+#. nNjfk
+#: sfx2/uiconfig/ui/optprintpage.ui:345
+msgctxt "extended_tip|reducebitmap"
+msgid "Specifies that bitmaps are printed with reduced quality. The resolution can only be reduced and not increased."
+msgstr "Вказує, що растрові зображення друкуються зі зниженою якістю. Роздільність можна тільки зменшити, не збільшити."
+
+#. qF2KM
+#: sfx2/uiconfig/ui/optprintpage.ui:363
+msgctxt "optprintpage|reducebitmapnormal"
+msgid "N_ormal print quality"
+msgstr "_Нормальна якість друку"
+
+#. i5T3j
+#: sfx2/uiconfig/ui/optprintpage.ui:372
+msgctxt "extended_tip|reducebitmapnormal"
+msgid "High print quality corresponds to a resolution of 300dpi. Normal print quality corresponds to a resolution of 200dpi. "
+msgstr "Висока якість друку відповідає роздільності 300 точок на дюйм. Нормальна якість друку відповідає роздільності 200 тнд. "
+
+#. EZGK5
+#: sfx2/uiconfig/ui/optprintpage.ui:389
+msgctxt "optprintpage|reducebitmapresol"
+msgid "Reso_lution:"
+msgstr "_Роздільна здатність:"
+
+#. q3aJL
+#: sfx2/uiconfig/ui/optprintpage.ui:398
+msgctxt "extended_tip|reducebitmapresol"
+msgid "Specifies the maximum print quality in dpi. The resolution can only be reduced and not increased."
+msgstr "Визначає найвищу якість друку в точках на дюйм. Роздільність можна зменшити, але не збільшити."
+
+#. 6ALtE
+#: sfx2/uiconfig/ui/optprintpage.ui:412
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "72 DPI"
+msgstr "72 DPI"
+
+#. FgpJ3
+#: sfx2/uiconfig/ui/optprintpage.ui:413
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "96 DPI"
+msgstr "96 DPI"
+
+#. d7BqR
+#: sfx2/uiconfig/ui/optprintpage.ui:414
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "150 DPI (Fax)"
+msgstr "150 dpi (факс)"
+
+#. 46imh
+#: sfx2/uiconfig/ui/optprintpage.ui:415
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "200 DPI (default)"
+msgstr "200 dpi (типово)"
+
+#. AsLSp
+#: sfx2/uiconfig/ui/optprintpage.ui:416
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "300 DPI"
+msgstr "300 DPI"
+
+#. qZJg5
+#: sfx2/uiconfig/ui/optprintpage.ui:417
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "600 DPI"
+msgstr "600 DPI"
+
+#. 8KFUc
+#: sfx2/uiconfig/ui/optprintpage.ui:421
+msgctxt "extended_tip|reducebitmapdpi"
+msgid "Specifies the maximum print quality in dpi. The resolution can only be reduced and not increased."
+msgstr "Визначає найвищу якість друку в точках на дюйм. Роздільність можна зменшити, але не збільшити."
+
+#. YXTXc
+#: sfx2/uiconfig/ui/optprintpage.ui:438
+msgctxt "optprintpage|reducebitmapoptimal"
+msgid "_High print quality"
+msgstr "_Висока якість друку"
+
+#. BdCpv
+#: sfx2/uiconfig/ui/optprintpage.ui:447
+msgctxt "extended_tip|reducebitmapoptimal"
+msgid "High print quality corresponds to a resolution of 300dpi. Normal print quality corresponds to a resolution of 200dpi. "
+msgstr "Висока якість друку відповідає роздільності 300 точок на дюйм. Нормальна якість друку відповідає роздільності 200 тнд. "
+
+#. YxX2s
+#: sfx2/uiconfig/ui/optprintpage.ui:468
+msgctxt "optprintpage|label1"
+msgid "Reduce Bitmaps"
+msgstr "Зменшення растрових зображень"
+
+#. 5qQBR
+#: sfx2/uiconfig/ui/optprintpage.ui:496
+msgctxt "optprintpage|reducetrans"
+msgid "_Reduce transparency"
+msgstr "З_меншити прозорість"
+
+#. yDstT
+#: sfx2/uiconfig/ui/optprintpage.ui:504
+msgctxt "extended_tip|reducetrans"
+msgid "If you mark this field the transparent objects will be printed like normal, non-transparent objects, depending on your selection in the following two option buttons."
+msgstr "Якщо встановлено цей прапорець, прозорі об'єкти будуть друкуватися так само, як звичайні непрозорі об'єкти, в залежності від стану двох наступних перемикачів."
+
+#. B4C76
+#: sfx2/uiconfig/ui/optprintpage.ui:522
+msgctxt "optprintpage|reducetransauto"
+msgid "Auto_matically"
+msgstr "_Автоматично"
+
+#. ehRjn
+#: sfx2/uiconfig/ui/optprintpage.ui:531
+msgctxt "extended_tip|reducetransauto"
+msgid "Specifies that the transparency is only printed if the transparent area covers less than a quarter of the entire page."
+msgstr "Вказує, що прозорість друкується лише у тому випадку, якщо прозора ділянка становить менше чверті всієї сторінки."
+
+#. K7P4C
+#: sfx2/uiconfig/ui/optprintpage.ui:542
+msgctxt "optprintpage|reducetransnone"
+msgid "_No transparency"
+msgstr "_Без прозорості"
+
+#. ZuLVY
+#: sfx2/uiconfig/ui/optprintpage.ui:551
+msgctxt "extended_tip|reducetransnone"
+msgid "With this option transparency is never printed."
+msgstr "З цим параметром прозорість ніколи не друкується."
+
+#. B5Cpd
+#: sfx2/uiconfig/ui/optprintpage.ui:572
+msgctxt "optprintpage|label1"
+msgid "Reduce Transparency"
+msgstr "Зменшення прозорості"
+
+#. GAFzh
+#: sfx2/uiconfig/ui/optprintpage.ui:600
+msgctxt "optprintpage|pdf"
+msgid "_PDF as standard print job format"
+msgstr "_PDF як стандартний формат для завдань друку"
+
+#. wm7C7
+#: sfx2/uiconfig/ui/optprintpage.ui:614
+msgctxt "optprintpage|converttogray"
+msgid "Con_vert colors to grayscale"
+msgstr "_Перетворити кольори на відтінки сірого"
+
+#. UNSqH
+#: sfx2/uiconfig/ui/optprintpage.ui:622
+msgctxt "extended_tip|converttogray"
+msgid "Specifies that all colors are printed only as grayscale."
+msgstr "Вказує, що всі кольори друкуватимуться лише у відтінках сірого."
+
+#. CrFLq
+#: sfx2/uiconfig/ui/optprintpage.ui:633
+msgctxt "optprintpage|reducebitmaptrans"
+msgid "Include transparent objects"
+msgstr "Включити прозорі об'єкти"
+
+#. FFAFJ
+#: sfx2/uiconfig/ui/optprintpage.ui:641
+msgctxt "extended_tip|reducebitmaptrans"
+msgid "If this field is marked, the reduction in print quality for bitmaps also applies to the transparent areas of objects."
+msgstr "Якщо це поле позначено, зменшення якості друку для растрового зображення також стосується прозорих ділянок об'єктів."
+
+#. bWPko
+#: sfx2/uiconfig/ui/optprintpage.ui:656
+msgctxt "optprintpage|label4"
+msgid "Defaults"
+msgstr "Типові"
+
+#. mMKbc
+#: sfx2/uiconfig/ui/optprintpage.ui:678
+msgctxt "extended_tip|OptPrintPage"
+msgid "Specifies the print setting options."
+msgstr "Завдання параметрів друку."
+
+#. NEo7g
+#: sfx2/uiconfig/ui/panel.ui:73 sfx2/uiconfig/ui/panel.ui:78
+msgctxt "panel|SFX_STR_SIDEBAR_MORE_OPTIONS"
+msgid "More Options"
+msgstr "Більше параметрів"
+
+#. QrtGb
+#: sfx2/uiconfig/ui/password.ui:8
+msgctxt "password|PasswordDialog"
+msgid "Enter Password"
+msgstr "Введіть пароль"
+
+#. gATKy
+#: sfx2/uiconfig/ui/password.ui:102
+msgctxt "password|userft"
+msgid "User:"
+msgstr "Користувач:"
+
+#. FRqiZ
+#: sfx2/uiconfig/ui/password.ui:116
+msgctxt "password|pass1ft"
+msgid "Password:"
+msgstr "Пароль:"
+
+#. HE8mc
+#: sfx2/uiconfig/ui/password.ui:130
+msgctxt "password|confirm1ft"
+msgid "Confirm:"
+msgstr "Підтвердити:"
+
+#. EFJRk
+#: sfx2/uiconfig/ui/password.ui:164
+msgctxt "password|pass1ed-atkobject"
+msgid "Password"
+msgstr "Пароль"
+
+#. yVorz
+#: sfx2/uiconfig/ui/password.ui:165
+msgctxt "password|extended_tip|pass1ed"
+msgid "Type a password. A password is case sensitive."
+msgstr "Введіть пароль. Пароль чутливий до регістру."
+
+#. kEcVk
+#: sfx2/uiconfig/ui/password.ui:185
+msgctxt "password|extended_tip|confirm1ed"
+msgid "Re-enter the password."
+msgstr "Введіть пароль ще раз."
+
+#. JBCUB
+#: sfx2/uiconfig/ui/password.ui:200
+msgctxt "password|label1"
+msgid "Password"
+msgstr "~Пароль"
+
+#. zDBUt
+#: sfx2/uiconfig/ui/password.ui:232
+msgctxt "password|pass2ft"
+msgid "Password:"
+msgstr "Пароль:"
+
+#. 8RcEw
+#: sfx2/uiconfig/ui/password.ui:246
+msgctxt "password|confirm2ft"
+msgid "Confirm:"
+msgstr "Підтвердити:"
+
+#. EkHiq
+#: sfx2/uiconfig/ui/password.ui:267
+msgctxt "password|extended_tip|pass2ed"
+msgid "Type a password. A password is case sensitive."
+msgstr "Введіть пароль. Пароль чутливий до регістру."
+
+#. c4nGS
+#: sfx2/uiconfig/ui/password.ui:287
+msgctxt "password|extended_tip|confirm2ed"
+msgid "Re-enter the password."
+msgstr "Введіть пароль ще раз."
+
+#. mCxpj
+#: sfx2/uiconfig/ui/password.ui:302
+msgctxt "password|label2"
+msgid "Second Password"
+msgstr "Другий пароль"
+
+#. JZhHV
+#: sfx2/uiconfig/ui/password.ui:338
+msgctxt "password|onlyascii"
+msgid "Only Basic Latin characters can be entered"
+msgstr ""
+
+#. AFsUP
+#: sfx2/uiconfig/ui/printeroptionsdialog.ui:8
+msgctxt "printeroptionsdialog|PrinterOptionsDialog"
+msgid "Printer Options"
+msgstr "Параметри друку"
+
+#. oAzTR
+#: sfx2/uiconfig/ui/querysavedialog.ui:7
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Save Document?"
+msgstr "Зберегти документ?"
+
+#. wFiA8
+#: sfx2/uiconfig/ui/querysavedialog.ui:13
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Save changes to document “$(DOC)” before closing?"
+msgstr "Зберегти зміни в документі \"$(DOC)\" перед закриттям?"
+
+#. 7mtVz
+#: sfx2/uiconfig/ui/querysavedialog.ui:14
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Your changes will be lost if you don’t save them."
+msgstr "Якщо не зберегти, то зміни будуть втрачені."
+
+#. sQCdE
+#: sfx2/uiconfig/ui/querysavedialog.ui:25
+msgctxt "querysavedialog|discard"
+msgid "Do_n’t Save"
+msgstr "_Не зберігати"
+
+#. dzVqL
+#: sfx2/uiconfig/ui/querysavedialog.ui:56
+msgctxt "querysavedialog|save"
+msgid "_Save"
+msgstr "З_берегти"
+
+#. 6WbvE
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:7
+msgctxt "safemodequerydialog|SafeModeQueryDialog"
+msgid "Enter Safe Mode"
+msgstr "Безпечний режим"
+
+#. esgus
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:12
+msgctxt "safemodequerydialog|label"
+msgid "Are you sure you want to restart %PRODUCTNAME and enter safe mode?"
+msgstr "Справді перезапустити %PRODUCTNAME та увійти в безпечний режим?"
+
+#. DpN8R
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:40
+msgctxt "safemodequerydialog|restart"
+msgid "_Restart"
+msgstr "_Перезапустити"
+
+#. ejCo9
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:14
+msgctxt "saveastemplatedlg|SaveAsTemplateDialog"
+msgid "Save As Template"
+msgstr "Зберегти як шаблон"
+
+#. Gjb3A
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:102
+msgctxt "saveastemplatedlg|create_label"
+msgid "Enter Template _Name:"
+msgstr "Введіть _назву шаблону:"
+
+#. NyFdH
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:103
+msgctxt "saveastemplatedlg|create_label"
+msgid "Enter a name for the template."
+msgstr "Введіть назву для шаблона."
+
+#. Xo6BH
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:126
+msgctxt "saveastemplatedlg|extended_tip|name_entry"
+msgid "Enter a name for the template."
+msgstr "Введіть назву для шаблона."
+
+#. GLDum
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:154
+msgctxt "saveastemplatedlg|select_label"
+msgid "Select Template _Category:"
+msgstr "Виберіть _категорію шаблону:"
+
+#. 4ANkg
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:155
+msgctxt "saveastemplatedlg|select_label"
+msgid "Save template in selected category."
+msgstr "Зберегти шаблон у вибраній категорії."
+
+#. JBPKb
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:203
+msgctxt "saveastemplatedlg|extended_tip|categorylb"
+msgid "Select a category in which to save the new template."
+msgstr "Оберіть категорію, в якій потрібно зберегти новий шаблон."
+
+#. wpZGc
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:223
+msgctxt "saveastemplatedlg|defaultcb"
+msgid "_Set as default template"
+msgstr "_Зробити типовим шаблоном"
+
+#. syB4y
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:231
+msgctxt "saveastemplatedlg|extended_tip|defaultcb"
+msgid "The new template will be used as the default template."
+msgstr "Новий шаблон буде використовуватися у якості шаблону за замовчуванням."
+
+#. gH8PB
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:259
+msgctxt "saveastemplatedlg|extended_tip|SaveAsTemplateDialog"
+msgid "Saves the current document as a template."
+msgstr "Зберігає поточний документ як шаблон."
+
+#. 9tSnA
+#: sfx2/uiconfig/ui/searchdialog.ui:8
+msgctxt "searchdialog|SearchDialog"
+msgid "Find on this Page"
+msgstr "Знайти на цій сторінці"
+
+#. LAKYg
+#: sfx2/uiconfig/ui/searchdialog.ui:26
+msgctxt "searchdialog|search"
+msgid "_Find"
+msgstr "З_найти"
+
+#. G5Qc9
+#: sfx2/uiconfig/ui/searchdialog.ui:99
+msgctxt "searchdialog|label1"
+msgid "_Search for:"
+msgstr "З_найти:"
+
+#. TY5bL
+#: sfx2/uiconfig/ui/searchdialog.ui:125
+msgctxt "searchdialog|matchcase"
+msgid "Ma_tch case"
+msgstr "В_раховувати регістр"
+
+#. B2ksn
+#: sfx2/uiconfig/ui/searchdialog.ui:139
+msgctxt "searchdialog|wholewords"
+msgid "Whole wor_ds only"
+msgstr "_Лише цілі слова"
+
+#. ycWSx
+#: sfx2/uiconfig/ui/searchdialog.ui:153
+msgctxt "searchdialog|backwards"
+msgid "Bac_kwards"
+msgstr "Ш_укати назад"
+
+#. C7fSt
+#: sfx2/uiconfig/ui/searchdialog.ui:167
+msgctxt "searchdialog|wrap"
+msgid "Wrap _around"
+msgstr "_Обтікання навколо"
+
+#. onEmh
+#: sfx2/uiconfig/ui/securityinfopage.ui:22
+msgctxt "securityinfopage|readonly"
+msgid "_Open file read-only"
+msgstr "Відкривати _лише для читання"
+
+#. HCEUE
+#: sfx2/uiconfig/ui/securityinfopage.ui:31
+msgctxt "securityinfopage|extended_tip|readonly"
+msgid "Select to allow this document to be opened in read-only mode only."
+msgstr "Встановіть цей прапорець, щоб дозволити відкривати цей документ лише в режимі читання."
+
+#. GvCw9
+#: sfx2/uiconfig/ui/securityinfopage.ui:42
+msgctxt "securityinfopage|recordchanges"
+msgid "Record _changes"
+msgstr "_Записувати зміни"
+
+#. pNhop
+#: sfx2/uiconfig/ui/securityinfopage.ui:50
+msgctxt "securityinfopage|extended_tip|recordchanges"
+msgid "Select to enable recording changes. This is the same as Edit - Track Changes - Record."
+msgstr "Встановіть цей прапорець для увімкнення запису змін. Це те ж саме, що й Зміни - Відстеження змін - Запис."
+
+#. Nv8rA
+#: sfx2/uiconfig/ui/securityinfopage.ui:66
+msgctxt "securityinfopage|protect"
+msgid "Protect..."
+msgstr "Захистити..."
+
+#. 6T6ZP
+#: sfx2/uiconfig/ui/securityinfopage.ui:72
+msgctxt "securityinfopage|extended_tip|protect"
+msgid "Protects the change recording state with a password. If change recording is protected for the current document, the button is named Unprotect. Click Unprotect and type the correct password to disable the protection."
+msgstr "Захищає стан запису змін за допомогою пароля. Якщо запис змін для поточного документа вже захищено, кнопка має назву Зняти захист. Натисніть Зняти захист та введіть правильний пароль, щоб вимкнути захист."
+
+#. jgWP4
+#: sfx2/uiconfig/ui/securityinfopage.ui:84
+msgctxt "securityinfopage|unprotect"
+msgid "_Unprotect..."
+msgstr "З_няти захист..."
+
+#. UEdGx
+#: sfx2/uiconfig/ui/securityinfopage.ui:91
+msgctxt "securityinfopage|extended_tip|unprotect"
+msgid "Protects the change recording state with a password. If change recording is protected for the current document, the button is named Unprotect. Click Unprotect and type the correct password to disable the protection."
+msgstr "Захищає стан запису змін за допомогою пароля. Якщо запис змін для поточного документа вже захищено, кнопка має назву Зняти захист. Натисніть Зняти захист та введіть правильний пароль, щоб вимкнути захист."
+
+#. JNezG
+#: sfx2/uiconfig/ui/securityinfopage.ui:113
+msgctxt "securityinfopage|label47"
+msgid "File Sharing Options"
+msgstr "Параметри спільного використання файлу"
+
+#. VXrJ5
+#: sfx2/uiconfig/ui/securityinfopage.ui:121
+msgctxt "securityinfopage|extended_tip|SecurityInfoPage"
+msgid "Sets password options for the current document."
+msgstr "Визначає параметри пароля для поточного документа."
+
+#. EDC9x
+#: sfx2/uiconfig/ui/startcenter.ui:17
+msgctxt "startcenter|clear_all"
+msgid "Clear Recent Documents"
+msgstr "Очистити недавні документи"
+
+#. gCfQ9
+#: sfx2/uiconfig/ui/startcenter.ui:38
+msgctxt "startcenter|filter_writer"
+msgid "Writer Templates"
+msgstr "Шаблони Writer"
+
+#. kj5ts
+#: sfx2/uiconfig/ui/startcenter.ui:45
+msgctxt "startcenter|filter_calc"
+msgid "Calc Templates"
+msgstr "Шаблони Calc"
+
+#. HEYvU
+#: sfx2/uiconfig/ui/startcenter.ui:52
+msgctxt "startcenter|filter_impress"
+msgid "Impress Templates"
+msgstr "Шаблони Impress"
+
+#. uWEpu
+#: sfx2/uiconfig/ui/startcenter.ui:59
+msgctxt "startcenter|filter_draw"
+msgid "Draw Templates"
+msgstr "Шаблони Draw"
+
+#. e3TH8
+#: sfx2/uiconfig/ui/startcenter.ui:72
+msgctxt "startcenter|manage"
+msgid "Manage Templates"
+msgstr "Керування шаблонами"
+
+#. isnw8
+#: sfx2/uiconfig/ui/startcenter.ui:151
+msgctxt "startcenter|open_all"
+msgid "_Open File"
+msgstr "_Відкрити файл"
+
+#. 6zjop
+#: sfx2/uiconfig/ui/startcenter.ui:172
+msgctxt "startcenter|open_remote"
+msgid "Remote File_s"
+msgstr "Віддалені фай_ли"
+
+#. ZUnZ9
+#: sfx2/uiconfig/ui/startcenter.ui:205
+msgctxt "startcenter|open_recent"
+msgid "_Recent Documents"
+msgstr "_Недавно відкриті документи"
+
+#. BnkvG
+#: sfx2/uiconfig/ui/startcenter.ui:229
+msgctxt "startcenter|templates_all"
+msgid "T_emplates"
+msgstr "Ш_аблони"
+
+#. JEkqY
+#: sfx2/uiconfig/ui/startcenter.ui:270
+msgctxt "startcenter|create_label"
+msgid "Create:"
+msgstr "Створити:"
+
+#. SY4iY
+#: sfx2/uiconfig/ui/startcenter.ui:281
+msgctxt "startcenter|writer_all"
+msgid "_Writer Document"
+msgstr "Документ _Writer"
+
+#. Bvz5c
+#: sfx2/uiconfig/ui/startcenter.ui:301
+msgctxt "startcenter|calc_all"
+msgid "_Calc Spreadsheet"
+msgstr "Таблицю _Calc"
+
+#. RxGP6
+#: sfx2/uiconfig/ui/startcenter.ui:321
+msgctxt "startcenter|impress_all"
+msgid "_Impress Presentation"
+msgstr "Презентацію _Impress"
+
+#. 7fE2M
+#: sfx2/uiconfig/ui/startcenter.ui:341
+msgctxt "startcenter|draw_all"
+msgid "_Draw Drawing"
+msgstr "Рисунок _Draw"
+
+#. 7wn8r
+#: sfx2/uiconfig/ui/startcenter.ui:361
+msgctxt "startcenter|math_all"
+msgid "_Math Formula"
+msgstr "Формулу _Math"
+
+#. nnwDC
+#: sfx2/uiconfig/ui/startcenter.ui:381
+msgctxt "startcenter|database_all"
+msgid "_Base Database"
+msgstr "Базу даних _Base"
+
+#. ZEDmn
+#: sfx2/uiconfig/ui/startcenter.ui:403
+msgctxt "startcenter|althelplabel"
+msgid "He_lp"
+msgstr "_Довідка"
+
+#. oqVes
+#: sfx2/uiconfig/ui/startcenter.ui:473
+msgctxt "startcenter|extensions"
+msgid "E_xtensions"
+msgstr "Роз_ширення"
+
+#. rDw4E
+#: sfx2/uiconfig/ui/startcenter.ui:498
+msgctxt "startcenter|label1"
+msgid "Application"
+msgstr "Програма"
+
+#. UiDMp
+#: sfx2/uiconfig/ui/startcenter.ui:518
+msgctxt "startcenter|all_recent_label"
+msgid "Recent Files List"
+msgstr "Список недавніх файлів"
+
+#. kho2B
+#: sfx2/uiconfig/ui/startcenter.ui:531
+msgctxt "startcenter|local_view_label"
+msgid "Templates List"
+msgstr "Список шаблонів"
+
+#. UHrAZ
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:12
+msgctxt "stylecontextmenu|new"
+msgid "New..."
+msgstr "Створити..."
+
+#. hnLax
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:20
+msgctxt "stylecontextmenu|edit"
+msgid "Modify..."
+msgstr "Змінити…"
+
+#. TPTqm
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:28
+msgctxt "stylecontextmenu|hide"
+msgid "Hide"
+msgstr "Приховати"
+
+#. mrCMd
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:36
+msgctxt "stylecontextmenu|show"
+msgid "Show"
+msgstr "Показати"
+
+#. 7bAyD
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:44
+msgctxt "stylecontextmenu|delete"
+msgid "Delete..."
+msgstr "Вилучити…"
+
+#. N4BGe
+#: sfx2/uiconfig/ui/tabbarcontents.ui:24
+msgctxt "tabbar|locktaskpanel"
+msgid "Dock"
+msgstr "Приєднати"
+
+#. GNBR3
+#: sfx2/uiconfig/ui/tabbarcontents.ui:33
+msgctxt "tabbar|unlocktaskpanel"
+msgid "Undock"
+msgstr "Від'єднати"
+
+#. jXux4
+#: sfx2/uiconfig/ui/tabbarcontents.ui:42
+msgctxt "tabbar|hidesidebar"
+msgid "Close Sidebar"
+msgstr "Закрити бічну панель"
+
+#. hEmHk
+#: sfx2/uiconfig/ui/tabbarcontents.ui:50
+msgctxt "tabbar|customization"
+msgid "Customization"
+msgstr "Налаштування"
+
+#. 9Hfx6
+#: sfx2/uiconfig/ui/tabbarcontents.ui:66
+msgctxt "tabbar|restoredefault"
+msgid "Restore Default"
+msgstr "Скидання налаштувань"
+
+#. DBWZf
+#: sfx2/uiconfig/ui/tabbarcontents.ui:98
+msgctxt "tabbar|menubutton|tool_tip"
+msgid "Sidebar Settings"
+msgstr "Налаштування бічної панелі"
+
+#. XBaqU
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:16
+msgctxt "templatecategorydlg|TemplatesCategoryDialog"
+msgid "Select Category"
+msgstr "Вибір категорії"
+
+#. HXfot
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:108
+msgctxt "templatecategorydlg|select_label"
+msgid "Select from Existing Category"
+msgstr "Вибрати з наявних категорій"
+
+#. 7eShP
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:178
+msgctxt "templatecategorydlg|create_label"
+msgid "or Create a New Category"
+msgstr "або створити нову категорію"
+
+#. eUWTy
+#: sfx2/uiconfig/ui/templatedlg.ui:46
+msgctxt "templatedlg|TemplateDialog"
+msgid "Templates"
+msgstr "Шаблони"
+
+#. rhuYP
+#: sfx2/uiconfig/ui/templatedlg.ui:77
+msgctxt "templatedlg|hidedialogcb"
+msgid "Show this dialog at startup"
+msgstr "Показувати це вікно при запуску"
+
+#. 32zsB
+#: sfx2/uiconfig/ui/templatedlg.ui:144
+msgctxt "templatedlg|search_filter|tooltip_text"
+msgid "Search"
+msgstr "Пошук"
+
+#. sGZMC
+#: sfx2/uiconfig/ui/templatedlg.ui:148
+msgctxt "templatedlg|search_filter"
+msgid "Search..."
+msgstr "Шукати…"
+
+#. DF5YC
+#: sfx2/uiconfig/ui/templatedlg.ui:167
+msgctxt "templatedlg|action_menu|label"
+msgid "_Manage"
+msgstr "_Керувати"
+
+#. LUs2m
+#: sfx2/uiconfig/ui/templatedlg.ui:181
+msgctxt "templatedlg|extended_tip|action_menu"
+msgid "Provides commands to create, rename and delete categories, reset default templates, and refresh the template manager."
+msgstr "Надає команди для створення, перейменування та видалення категорій, повернення до типових шаблонів та оновлення диспетчера шаблонів."
+
+#. fXVNY
+#: sfx2/uiconfig/ui/templatedlg.ui:208
+msgctxt "templatedlg|filter_application|tooltip_text"
+msgid "Filter by Application"
+msgstr "Фільтр за програмою"
+
+#. tqVhJ
+#: sfx2/uiconfig/ui/templatedlg.ui:210
+msgctxt "templatedlg|applist"
+msgid "All Applications"
+msgstr "Всі застосунки"
+
+#. pD6pU
+#: sfx2/uiconfig/ui/templatedlg.ui:211
+msgctxt "templatedlg|applist"
+msgid "Text Documents"
+msgstr "Текстові документи"
+
+#. eECt7
+#: sfx2/uiconfig/ui/templatedlg.ui:212
+msgctxt "templatedlg|applist"
+msgid "Spreadsheets"
+msgstr "Електронні таблиці"
+
+#. ajLbV
+#: sfx2/uiconfig/ui/templatedlg.ui:213
+msgctxt "templatedlg|applist"
+msgid "Presentations"
+msgstr "Презентації"
+
+#. LfUzB
+#: sfx2/uiconfig/ui/templatedlg.ui:214
+msgctxt "templatedlg|applist"
+msgid "Drawings"
+msgstr "Малюнки"
+
+#. t7zE7
+#: sfx2/uiconfig/ui/templatedlg.ui:228
+msgctxt "templatedlg|filter_folder|tooltip_text"
+msgid "Filter by Category"
+msgstr "Фільтр за категорією"
+
+#. 93CGw
+#: sfx2/uiconfig/ui/templatedlg.ui:230
+msgctxt "templatedlg|folderlist"
+msgid "All Categories"
+msgstr "Всі категорії"
+
+#. NF9wE
+#: sfx2/uiconfig/ui/templatedlg.ui:251
+msgctxt "templatedlg|label1"
+msgid "Filter"
+msgstr "Фільтр"
+
+#. ewTL3
+#: sfx2/uiconfig/ui/templatedlg.ui:357
+msgctxt "templatedlg|treeviewcolumn1"
+msgid "Name"
+msgstr "Назва"
+
+#. 7EJRA
+#: sfx2/uiconfig/ui/templatedlg.ui:374
+msgctxt "templatedlg|treeviewcolumn2"
+msgid "Category"
+msgstr "Категорія"
+
+#. AC27i
+#: sfx2/uiconfig/ui/templatedlg.ui:389
+msgctxt "templatedlg|treeviewcolumn3"
+msgid "Application"
+msgstr "Застосунок"
+
+#. eSaBw
+#: sfx2/uiconfig/ui/templatedlg.ui:404
+msgctxt "templatedlg|treeviewcolumn4"
+msgid "Modified"
+msgstr "Змінено"
+
+#. pNzYA
+#: sfx2/uiconfig/ui/templatedlg.ui:419
+msgctxt "templatedlg|treeviewcolumn5"
+msgid "Size"
+msgstr "Розмір"
+
+#. j39jM
+#: sfx2/uiconfig/ui/templatedlg.ui:445
+msgctxt "templatedlg|thumbnailviewlabel"
+msgid "Template List"
+msgstr "Список шаблонів"
+
+#. yEhgP
+#: sfx2/uiconfig/ui/templatedlg.ui:464
+msgctxt "templatedlg|thumbnail_view_btn|tooltip_text"
+msgid "Thumbnail View"
+msgstr "Перегляд мініатюр"
+
+#. j76ke
+#: sfx2/uiconfig/ui/templatedlg.ui:481
+msgctxt "templatedlg|list_view_btn|tooltip_text"
+msgid "List View"
+msgstr "Перегляд списком"
+
+#. pm89q
+#: sfx2/uiconfig/ui/templatepanel.ui:127
+msgctxt "templatepanel|STR_STYLE_FILL_FORMAT_MODE"
+msgid "Fill Format Mode"
+msgstr "Стильова заливка"
+
+#. GLRFT
+#: sfx2/uiconfig/ui/templatepanel.ui:139
+msgctxt "templatepanel|STR_STYLE_NEW_STYLE_FROM_SELECTION"
+msgid "New Style from Selection"
+msgstr "Новий стиль на основі виділеного"
+
+#. tAdD9
+#: sfx2/uiconfig/ui/templatepanel.ui:151
+msgctxt "templatepanel|STR_STYLE_NEW_STYLE_ACTION"
+msgid "Styles actions"
+msgstr "Дії над стилями"
+
+#. Xk5tD
+#: sfx2/uiconfig/ui/templatepanel.ui:163
+msgctxt "templatepanel|STR_STYLE_UPDATE_STYLE"
+msgid "Update Style"
+msgstr "Оновити стиль"
+
+#. irBvi
+#: sfx2/uiconfig/ui/templatepanel.ui:220 sfx2/uiconfig/ui/templatepanel.ui:266
+msgctxt "templatepanel|STR_STYLE_ELEMTLIST"
+msgid "Style List"
+msgstr "Список стилів"
+
+#. FHud7
+#: sfx2/uiconfig/ui/templatepanel.ui:280
+msgctxt "commontemplate|STR_PREVIEW_CHECKBOX"
+msgid "Show previews"
+msgstr "Показати в піктограмах"
+
+#. p9AWW
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:8
+msgctxt "versioncommentdialog|VersionCommentDialog"
+msgid "Insert Version Comment"
+msgstr "Вставити коментар до версії"
+
+#. CPwta
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:103
+msgctxt "versioncommentdialog|timestamp"
+msgid "Date and time: "
+msgstr "Дата і час: "
+
+#. 2mDfC
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:115
+msgctxt "versioncommentdialog|author"
+msgid "Saved by: "
+msgstr "Збережено: "
+
+#. T5AY5
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:164
+msgctxt "versioncommentdialog|extended_tip|VersionCommentDialog"
+msgid "Enter a comment here when you are saving a new version. If you clicked Show to open this dialog, you cannot edit the comment."
+msgstr "Введіть тут коментар, коли ви зберігаєте нову версію. Якщо ви натиснули кнопку Показати, щоб відкрити це діалогове вікно, ви не зможете відредагувати коментар."
+
+#. oBSSb
+#: sfx2/uiconfig/ui/versionscmis.ui:50
+msgctxt "versionscmis|compare"
+msgid "_Compare"
+msgstr "_Порівняти"
+
+#. WyDoB
+#: sfx2/uiconfig/ui/versionscmis.ui:64
+msgctxt "versionscmis|show"
+msgid "_Show..."
+msgstr "_Показ…"
+
+#. A8Eqt
+#: sfx2/uiconfig/ui/versionscmis.ui:92
+msgctxt "versionscmis|open"
+msgid "_Open"
+msgstr "_Відкрити"
+
+#. gRBJa
+#: sfx2/uiconfig/ui/versionscmis.ui:177
+msgctxt "versionscmis|datetime"
+msgid "Date and time"
+msgstr "Дата й час"
+
+#. 3VLw3
+#: sfx2/uiconfig/ui/versionscmis.ui:190
+msgctxt "versionscmis|savedby"
+msgid "Saved by"
+msgstr "Збережено"
+
+#. FzBeT
+#: sfx2/uiconfig/ui/versionscmis.ui:203
+msgctxt "versionscmis|comments"
+msgid "Comments"
+msgstr "Коментарі"
+
+#. c2cVg
+#: sfx2/uiconfig/ui/versionscmis.ui:226
+msgctxt "versionscmis|label2"
+msgid "Existing Versions"
+msgstr "Наявні версії"
+
+#. A4BT2
+#: sfx2/uiconfig/ui/versionsofdialog.ui:33
+msgctxt "versionsofdialog|cmis"
+msgid "CMIS"
+msgstr "CMIS"
+
+#. EqmYX
+#: sfx2/uiconfig/ui/versionsofdialog.ui:53
+msgctxt "versionsofdialog|extended_tip|delete"
+msgid "Deletes the selected version."
+msgstr "Видаляє вибрану версію."
+
+#. erGHD
+#: sfx2/uiconfig/ui/versionsofdialog.ui:65
+msgctxt "versionsofdialog|compare"
+msgid "_Compare"
+msgstr "_Порівняти"
+
+#. TKEzJ
+#: sfx2/uiconfig/ui/versionsofdialog.ui:72
+msgctxt "versionsofdialog|extended_tip|compare"
+msgid "Compare the changes that were made in each version."
+msgstr "Порівнює зміни, зроблені в кожній версії."
+
+#. UkbhC
+#: sfx2/uiconfig/ui/versionsofdialog.ui:84
+msgctxt "versionsofdialog|show"
+msgid "_Show..."
+msgstr "_Показ…"
+
+#. 4SD7F
+#: sfx2/uiconfig/ui/versionsofdialog.ui:91
+msgctxt "versionsofdialog|extended_tip|show"
+msgid "Displays the entire comment for the selected version."
+msgstr "Показує повний коментар для вибраної версії."
+
+#. E8yNH
+#: sfx2/uiconfig/ui/versionsofdialog.ui:119
+msgctxt "versionsofdialog|open"
+msgid "_Open"
+msgstr "_Відкрити"
+
+#. ASJac
+#: sfx2/uiconfig/ui/versionsofdialog.ui:126
+msgctxt "versionsofdialog|extended_tip|open"
+msgid "Opens the selected version in a read-only window."
+msgstr "Відкриває вибрану версію у вікні тільки для читання."
+
+#. qKnKv
+#: sfx2/uiconfig/ui/versionsofdialog.ui:184
+msgctxt "versionsofdialog|save"
+msgid "Save _New Version"
+msgstr "Зберегти _нову версію"
+
+#. gTR6x
+#: sfx2/uiconfig/ui/versionsofdialog.ui:191
+msgctxt "versionsofdialog|extended_tip|save"
+msgid "Saves the current state of the document as a new version. If you want, you can also enter comments in the Insert Version Comment dialog before you save the new version."
+msgstr "Зберігає поточний стан документа у якості нової версії. За бажання, ви також можете ввести коментарі у діалоговому вікні Вставити коментар до версії перед тим як зберегти нову версію."
+
+#. aCeEr
+#: sfx2/uiconfig/ui/versionsofdialog.ui:202
+msgctxt "versionsofdialog|always"
+msgid "_Always save a new version on closing"
+msgstr "_Завжди зберігати нову версію при закритті"
+
+#. JxFDN
+#: sfx2/uiconfig/ui/versionsofdialog.ui:210
+msgctxt "versionsofdialog|extended_tip|always"
+msgid "If you have made changes to your document then a new version is automatically saved when you close the document."
+msgstr "Якщо Ви внесли зміни до свого документа, нова версія автоматично зберігається, коли Ви закриваєте документ."
+
+#. vuHjH
+#: sfx2/uiconfig/ui/versionsofdialog.ui:225
+msgctxt "versionsofdialog|label1"
+msgid "New Versions"
+msgstr "Нові версії"
+
+#. nDGNv
+#: sfx2/uiconfig/ui/versionsofdialog.ui:278
+msgctxt "versionsofdialog|datetime"
+msgid "Date and time"
+msgstr "Дата і час"
+
+#. MBoBZ
+#: sfx2/uiconfig/ui/versionsofdialog.ui:291
+msgctxt "versionsofdialog|savedby"
+msgid "Saved by"
+msgstr "Збережено"
+
+#. kqEcm
+#: sfx2/uiconfig/ui/versionsofdialog.ui:304
+msgctxt "versionsofdialog|comments"
+msgid "Comments"
+msgstr "Коментарі"
+
+#. GLD85
+#: sfx2/uiconfig/ui/versionsofdialog.ui:315
+msgctxt "versionsofdialog|extended_tip|versions"
+msgid "Lists the existing versions of the current document, the date and the time they were created, the author and the associated comments."
+msgstr "Перелічує наявні версії поточного документа, дату та час, коли вони були створені, авторів та пов'язані коментарі."
+
+#. EbijK
+#: sfx2/uiconfig/ui/versionsofdialog.ui:332
+msgctxt "versionsofdialog|label2"
+msgid "Existing Versions"
+msgstr "Наявні версії"
+
+#. 5BdCA
+#: sfx2/uiconfig/ui/versionsofdialog.ui:367
+msgctxt "versionsofdialog|extended_tip|VersionsOfDialog"
+msgid "Saves and organizes multiple versions of the current document in the same file. You can also open, delete and compare previous versions."
+msgstr "Зберігає та упорядковує декілька версій поточного документа в одному файлі. Ви також можете відкривати, видаляти та порівнювати попередні версії."

@@ -1,0 +1,3617 @@
+#. extracted from helpcontent2/source/text/sbasic/python
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-04-11 15:28+0200\n"
+"PO-Revision-Date: 2022-08-22 14:05+0000\n"
+"Last-Translator: Asier Sarasua Garmendia <asiersar@yahoo.com>\n"
+"Language-Team: Basque <https://translations.documentfoundation.org/projects/libo_help-master/textsbasicpython/eu/>\n"
+"Language: eu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1563601431.000000\n"
+
+#. naSFZ
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python Scripts"
+msgstr "Python scriptak"
+
+#. 9RJv6
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"bm_id491543348147708\n"
+"help.text"
+msgid "<bookmark_value>macros;Python scripts</bookmark_value>        <bookmark_value>Python;macros</bookmark_value>        <bookmark_value>scripts;Python</bookmark_value>"
+msgstr "<bookmark_value>makroak;Python scriptak</bookmark_value>        <bookmark_value>Python;makroak</bookmark_value>        <bookmark_value>scriptak;Python</bookmark_value>"
+
+#. vAoRU
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3154232\n"
+"help.text"
+msgid "<variable id=\"pythonscriptshelp\"><link href=\"text/sbasic/python/main0000.xhp\" name=\"mainpython\">%PRODUCTNAME Python Scripts Help</link></variable>"
+msgstr "<variable id=\"pythonscriptshelp\"><link href=\"text/sbasic/python/main0000.xhp\" name=\"mainpython\">%PRODUCTNAME Python scripten laguntza</link></variable>"
+
+#. snE38
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id3153894\n"
+"help.text"
+msgid "%PRODUCTNAME provides an Application Programming Interface (API) that allows controlling the $[officename] components with different programming languages by using the $[officename] Software Development Kit (SDK). For more information about the $[officename] API and the Software Development Kit, visit <link href=\"https://api.libreoffice.org/\" name=\"api.libreoffice.org\">https://api.libreoffice.org</link>"
+msgstr "%PRODUCTNAME aplikazioak Aplikazio Programen Interfazea (API) eskaintzen du, eta horrek $[officename] osagaiak hainbat programazio-lengoaiaren bidez kontrolatzeko aukera ematen dizu $[officename] Software Development Kit-a (SDK) erabiliz. $[officename] API eta Software Development Kit-ari buruz informazio gehiago lortzeko, bisitatu ondorengo helbidea: <link href=\"https://api.libreoffice.org/\" name=\"api.libreoffice.org\">https://api.libreoffice.org</link>"
+
+#. 9EUoJ
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id3147226\n"
+"help.text"
+msgid "This help section explains the most common Python script functions for %PRODUCTNAME. For more in-depth information please refer to the <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"wiki.documentfoundation.org PYTHON Guide\">Designing & Developing Python Applications</link> on the Wiki."
+msgstr "Laguntza-sekzio honek %PRODUCTNAME aplikazioaren ohiko Python scripten funtzioak azaltzen ditu. Informazio sakonagoa nahi baduzu, kontsultatu <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"wiki.documentfoundation.org PYTHON Guide\">Python aplikazioak diseinatzea eta garatzea</link> wikian."
+
+#. FjaiD
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id3146957\n"
+"help.text"
+msgid "Working with Python Scripts in %PRODUCTNAME"
+msgstr "Python scriptekin lan egitea %PRODUCTNAME aplikazioan"
+
+#. mQFKb
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"N0102\n"
+"help.text"
+msgid "You can execute Python scripts choosing <menuitem>Tools - Macros - Run Macro</menuitem>. Editing scripts can be done with your preferred text editor. Python scripts are present in various locations detailed hereafter. You can refer to Programming examples for macros illustrating how to run the Python interactive console from %PRODUCTNAME."
+msgstr "Python scriptak exekutatzeko, <menuitem>Tresnak - Makroak - Exekutatu makroa</menuitem> aukeratu daiteke. Scriptak editatzeko, edozein testu-editore erabil daiteke. Python scriptek hainbat kokapen dituzte, ondoren azalduko direnak. Makroen programaziorako adibideak begiratu ditzakezu Python %PRODUCTNAME suitean modu interaktiboan kontsolatik nola exekutatzen den irudikatzeko."
+
+#. nytCF
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id131568902936659\n"
+"help.text"
+msgid "The %PRODUCTNAME scripting framework for Python is optional on some GNU/Linux distributions. If it is installed, selecting <menuitem>Tools - Macros - Run Macro</menuitem> and checking <literal>Application Macros</literal> for the presence of <literal>HelloWorld – HelloWorldPython</literal> macro is sufficient. If absent, please refer to your distribution documentation in order to install the %PRODUCTNAME scripting framework for Python."
+msgstr "Pythonerako %PRODUCTNAME scriptgintza-markoa aukerakoa da zenbait GNU/Linux banaketatan. Instalatuta badago, <menuitem>Tresnak - Makroak - Exekutatu makroa</menuitem> hautatzea eta <literal>Aplikazio-makroak</literal> markatzea aski da <literal>HelloWorld – HelloWorldPython</literal> makroa agertu dadin. Ez badago instalatuta, begiratu zure banaketaren dokumentazioa Pythonerako %PRODUCTNAME scriptgintza-markoa nola instalatu jakiteko."
+
+#. naZBV
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python to Basic"
+msgstr "Pythonetik Basic lengoaiara"
+
+#. dkYtk
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0330\n"
+"help.text"
+msgid "<bookmark_value>Python;Calling Basic</bookmark_value> <bookmark_value>ParamArray</bookmark_value>"
+msgstr "<bookmark_value>Python;Basic deitzea</bookmark_value> <bookmark_value>ParamArray</bookmark_value>"
+
+#. rGfKE
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0331\n"
+"help.text"
+msgid "<variable id=\"py2ba_h1\"><link href=\"text/sbasic/python/python_2_basic.xhp\" name=\"Calling Basic macros from Python\">Calling Basic Macros from Python</link></variable>"
+msgstr "<variable id=\"py2ba_h1\"><link href=\"text/sbasic/python/python_2_basic.xhp\" name=\"Calling Basic macros from Python\">Basic makroak deitzea Pythonetik</link></variable>"
+
+#. XzJcA
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0332\n"
+"help.text"
+msgid "You can call %PRODUCTNAME Basic macros from Python scripts, and notable features can be obtained in return such as:"
+msgstr "%PRODUCTNAME Basic makroak deitu ditzakezu Python scriptetatik, horrela eginbide nabarmenak eskuratzeko, adibidez:"
+
+#. ehCg3
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0333\n"
+"help.text"
+msgid "Simple logging facilities out of <literal>Access2Base</literal> library Trace console,"
+msgstr "Egunkari-eginbide sinpleak <literal>Access2Base</literal> liburutegiko Trace kontsolatik,"
+
+#. HhDdS
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0334\n"
+"help.text"
+msgid "<literal>InputBox</literal> and <literal>MsgBox</literal> screen I/O functions based on Basic to ease Python development,"
+msgstr "<literal>InputBox</literal> eta <literal>MsgBox</literal> pantailako S/I funtzioak Basic-en oinarrituta, Python bidezko garapena errazteko,"
+
+#. DzFBB
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0335\n"
+"help.text"
+msgid "<literal>Xray</literal> calls interrupting Python script execution to help inspect variables."
+msgstr "<literal>Xray</literal> deiak Python scripten exekuzioa eteteko, aldagaien ikuskapenean laguntzeko."
+
+#. fDXhz
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0336\n"
+"help.text"
+msgid "The %PRODUCTNAME Application Programming Interface (API) Scripting Framework supports inter-language script execution between Python and Basic, or other supported programming languages for that matter. Arguments can be passed back and forth across calls, provided that they represent primitive data types that both languages recognize, and assuming that the Scripting Framework converts them appropriately."
+msgstr "%PRODUCTNAME Application Programming Interface (API) scriptgintzako lan-markoak lengoaien arteko scripten exekuzioa onartzen du Python eta Basic lengoaien kasuan, baina baita onartutako beste edozein programazio-lengoaiaren kasuan ere. Argumentuak atzera eta aurrera pasatu daitezke deietan, bi lengoaiek ezagutzen dituzten jatorrizko datu motak ordezkatzen badituzte, eta scriptgintzako lan-markoak haiek modu egokian bihurtuko dituztela onartuta."
+
+#. Gn9Bv
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0337\n"
+"help.text"
+msgid "It is recommended to have knowledge of Python standard modules and %PRODUCTNAME API features prior to perform inter-language calls from Python to Basic, JavaScript or any other script engine."
+msgstr "Pythonen modulu estandarrak eta %PRODUCTNAME APIaren eginbideak ezagutzea gomendagarria da lengoaien arteko deiak egin baino lehen Pythonetik Basic, JavaScript edo beste edozein script-motorrera."
+
+#. Sffwq
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0338\n"
+"help.text"
+msgid "When running Python scripts from an Integrated Development Environment (IDE), the %PRODUCTNAME-embedded Basic engine may be absent. Avoid Python-to-%PRODUCTNAME Basic calls in such contexts. However Python environment and Universal Networks Objects (UNO) are fully available. Refer to <link href=\"text/sbasic/python/python_ide.xhp\" name=\"Setting Up an Integrated IDE for Python\">Setting Up an Integrated IDE for Python</link> for more information."
+msgstr "Python scriptsak Integrated Development Environment (IDE) batean exekutatzen direnean, %PRODUCTNAME aplikazioak kapsulatuta duen Basic motorra faltan egon daiteke. Saihestu Python-%PRODUCTNAME Basic deiak testuinguru horretan. Hala ere, Python ingurunea eta Universal Networks Objects (UNO) erabilgarri egongo dira beti. Begiratu <link href=\"text/sbasic/python/python_ide.xhp\" name=\"Setting Up an Integrated IDE for Python\">IDE integratu bat konfiguratzea Python lengoaiarako</link> informazio gehiago jasotzeko."
+
+#. NcuDF
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0339\n"
+"help.text"
+msgid "Retrieving %PRODUCTNAME Basic Scripts"
+msgstr "%PRODUCTNAME Basic scriptak atzitzen"
+
+#. yiTqz
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0340\n"
+"help.text"
+msgid "%PRODUCTNAME Basic macros can be personal, shared, or embedded in documents. In order to execute them, Python run time needs to be provided with Basic macro locations. Implementing the <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\" name=\"XScriptProvider interface\">com.sun.star.script.provider.XScriptProvider</link> interface allows the retrieval of executable scripts:"
+msgstr "%PRODUCTNAME Basic makroak pertsonalak, partekatuak edo dokumentuetan kapsulatuak izan daitezke. Haiek exekutatzeko, Pythonen exekuzio-garaia hornitu behar da Basic makroen kokalekuekin. <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\" name=\"XScriptProvider interface\">com.sun.star.script.provider.XScriptProvider</link> interfazea inplementatuta, script exekutagarriak atzitu daitezke:"
+
+#. w4UAs
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0341\n"
+"help.text"
+msgid "<bookmark_value>API;script.provider.MasterScriptProviderFactory: Retrieving Basic scripts</bookmark_value><bookmark_value>API;script.provider.XScript: Executing Basic scripts</bookmark_value><bookmark_value>API;XScriptProvider: Retrieving Basic scripts</bookmark_value>"
+msgstr "<bookmark_value>API;script.provider.MasterScriptProviderFactory: Basic scriptak atzitzea</bookmark_value><bookmark_value>API;script.provider.XScript: Basic scriptak exekutatzea</bookmark_value><bookmark_value>API;XScriptProvider: Basic scriptak atzitzea</bookmark_value>"
+
+#. iu5YW
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0347\n"
+"help.text"
+msgid "'''Grab Basic script object before invocation.'''"
+msgstr "'''Eskuratu Basic script objektua hari deitu baino lehen.'''"
+
+#. PnPTm
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0363\n"
+"help.text"
+msgid "Executing %PRODUCTNAME Basic Scripts"
+msgstr "%PRODUCTNAME Basic scriptak exekutatzea"
+
+#. GNDbf
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0364ndx\n"
+"help.text"
+msgid "<bookmark_value>API;script.provider.XScript : Executing Basic scripts</bookmark_value>"
+msgstr "<bookmark_value>API;script.provider.XScript : Basic scriptak exekutatzea</bookmark_value>"
+
+#. 7BfDh
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0364\n"
+"help.text"
+msgid "The %PRODUCTNAME Software Development Kit (SDK) documentation for <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html#a11a551f5a2520f74c5109cd8c9f8c7b7\" name=\"XScript interface\">com.sun.star.script.provider.XScript</link> interface details the calling convention for inter-language calls. Invocation of functions requires three arrays:"
+msgstr "<link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html#a11a551f5a2520f74c5109cd8c9f8c7b7\" name=\"XScript interface\">com.sun.star.script.provider.XScript</link> interfazearen %PRODUCTNAME Software Development Kit (SDK) dokumentazioak lengoaien arteko deiak egiteko hitzarmenak xehe azalduta ditu. Funtzioak deitzeko beharrezkoak dira hiru matrize:"
+
+#. UDhtt
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0365\n"
+"help.text"
+msgid "the first lists the arguments of the called routine"
+msgstr "lehenak deitutako errutinaren argumentuak zerrendatzen ditu"
+
+#. A9CMY
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0366\n"
+"help.text"
+msgid "the second identifies modified arguments"
+msgstr "bigarrenak aldatutako argumentuak identifikatzen ditu"
+
+#. v3GcD
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0367\n"
+"help.text"
+msgid "the third stores the return values"
+msgstr "hirugarrenak itzulitako balioak biltegiratzen ditu"
+
+#. TeGwy
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0368\n"
+"help.text"
+msgid "Python Syntax"
+msgstr "Python sintaxia"
+
+#. oWBhX
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0372\n"
+"help.text"
+msgid "Examples of Personal or Shared Scripts"
+msgstr "Script pertsonalen edo partekatuen adibideak"
+
+#. nyNGG
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0373\n"
+"help.text"
+msgid "Examples in <link href=\"text/sbasic/python/python_screen.xhp\" name=\"Input/Output to Screen\">Input/Output to Screen</link> detail Python to Basic invocation calls. <link href=\"text/sbasic/python/python_document_events.xhp\" name=\"Monitoring Document Events\">Monitoring Document Events</link> illustrates the usage of *args Python idiom to print a variable number of parameters to <literal>Access2Base</literal> logging console dialog."
+msgstr "<link href=\"text/sbasic/python/python_screen.xhp\" name=\"Input/Output to Screen\">Sarrera/irteera pantailara</link> ataleko adibideek Pythonetik Basic lengoaiara deiak egiteko moduak xehe azaltzen dituzte. <link href=\"text/sbasic/python/python_document_events.xhp\" name=\"Monitoring Document Events\">Dokumentu-gertaerak monitorizatzea</link> atalak azaltzen du nola erabili *args Python hitza <literal>Access2Base</literal> egunkari-kontsolaren elkarrizketa-koadroan parametro kopuru aldakorra inprimatzeko."
+
+#. dt25D
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0374\n"
+"help.text"
+msgid "At time of development you can interrupt Python script execution using <link href=\"https://berma.pagesperso-orange.fr/index2.html\" name=\"Xray extension\">Xray extension</link> in order to inspect properties and methods of UNO objects. The APSO extension debugger allows object introspection using either Xray either MRI extensions."
+msgstr "Garapan-denboran Python scripta gelditu dezakezu, <link href=\"https://berma.pagesperso-orange.fr/index2.html\" name=\"Xray extension\">Xray hedapena</link> erabilita, UNO objektuen propietateak eta metodoak ikuskatzeko. Hedapenen APSO araztaileak objektuen barne-behaketa ahalbidetzen du Xray erabilita edo MRI hedapenak erabilita."
+
+#. F8dF9
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0378\n"
+"help.text"
+msgid "Examples of Embedded Scripts in Documents"
+msgstr "Dokumentuetan kapsulatutako scripten adibideak"
+
+#. EmqHD
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0379\n"
+"help.text"
+msgid "<literal>*args</literal>Python simplified syntax can be used in conjunction with %PRODUCTNAME Basic routines that accept a variable number of arguments. Below <literal>Print</literal> and <literal>SUM</literal> Python functions call their Basic <literal>Print</literal> and <literal>SUM</literal> counterparts, using aforementioned <literal>getBasicScript</literal> function. Exception handling is not detailed."
+msgstr "<literal>*args</literal>Python sintaxi sinplifikatua erabili daiteke argumentu kopuru aldakorra onartzen duten %PRODUCTNAME Basic errutinekin batera. Azpiko <literal>Print</literal> eta <literal>SUM</literal> Python funtzioek beren Basic <literal>Print</literal> eta <literal>SUM</literal> parekoei deitzen diete, goian aipatutako <literal>getBasicScript</literal> funtzioak. Salbuespenen maneiua ez dago azalduta."
+
+#. ej8XP
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0384\n"
+"help.text"
+msgid "\"\"\"Outputs the specified strings or numeric expressions in a dialog box.\"\"\""
+msgstr "\"\"\"Zehaztutako kateen edo zenbakizko adierazpenen irteera elkarrizketa-koadro batean.\"\"\""
+
+#. RJuGD
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0389\n"
+"help.text"
+msgid "\"\"\"SUM the specified number expression.\"\"\""
+msgstr "\"\"\"BATU zehaztutako zenbakizko adierazpena.\"\"\""
+
+#. aPmSn
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0402\n"
+"help.text"
+msgid "The %PRODUCTNAME Basic <literal>Print</literal> and <literal>SUM</literal> document-based routines accept a variable number of arguments. The <literal>Private</literal> or <literal>Public</literal> attributes have no effect. The arguments type checking is skipped for clarity."
+msgstr "%PRODUCTNAME Basic lengoaiako <literal>Print</literal> eta <literal>SUM</literal> errutinek, dokumentuetan oinarritutakoek, argumentuen kopuru aldakorra onartzen dute. <literal>Private</literal> edo <literal>Public</literal> atributuek ez dute eraginik. Argumentuen motaren egiaztatzea saltatu egin da, argibidea argiagoa izan dadin."
+
+#. jHUxq
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0407\n"
+"help.text"
+msgid "''' Print item list of variable number '''"
+msgstr "''' Inprimatu zenbaki aldakorreko elementu-zerrenda '''"
+
+#. 3pFAj
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0408\n"
+"help.text"
+msgid "' all CStr() convertible args are accepted"
+msgstr "' CStr() argumentu bihurgarri guztiak onartzen dira"
+
+#. G9n5d
+#: python_2_basic.xhp
+msgctxt ""
+"python_2_basic.xhp\n"
+"N0419\n"
+"help.text"
+msgid "''' SUM a variable list of numbers '''"
+msgstr "''' BATU zenbakien zerrenda aldakorra '''"
+
+#. CDJo4
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"tit\n"
+"help.text"
+msgid "Opening a Dialog with Python"
+msgstr "Elkarrizketa-koadro bat irekitzea Python bidez"
+
+#. XWAwA
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0334\n"
+"help.text"
+msgid "<bookmark_value>Python;dialogs</bookmark_value>        <bookmark_value>dialog box;Python</bookmark_value>        <bookmark_value>dialogs;Python</bookmark_value>"
+msgstr "<bookmark_value>Python;elkarrizketa-koadroak</bookmark_value>        <bookmark_value>elkarrizketa-koadroa;Python</bookmark_value>        <bookmark_value>elkarrizketa-koadroak;Python</bookmark_value>"
+
+#. rXdUF
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0336\n"
+"help.text"
+msgid "<variable id=\"pythondialog\"><link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"command_name\">Opening a Dialog with Python</link></variable>"
+msgstr "<variable id=\"pythondialog\"><link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"command_name\">Elkarrizketa-koadro bat irekitzea Python bidez</link></variable>"
+
+#. MZJA9
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0337\n"
+"help.text"
+msgid "%PRODUCTNAME static dialogs are created with the <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"dialog editor\">Dialog editor</link> and are stored in varying places according to their personal (My Macros), shared (Application Macros) or document-embedded nature. In reverse, dynamic dialogs are constructed at runtime, from Basic or Python scripts, or using any other <link href=\"text/shared/guide/scripting.xhp\">%PRODUCTNAME supported language</link> for that matter. Opening static dialogs with Python is illustrated herewith. Exception handling and internationalization are omitted for clarity."
+msgstr "%PRODUCTNAME elkarrizketa-koadro estatikoak <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"dialog editor\">Elkarrizketen editorearekin</link> sortzen dira eta toki batean baino gehiagotan gordetzen dira pertsonalak badira (Nire makroak), partekatuak badira (Aplikazioaren makroak) edo dokumentuan kapsulatutakoak badira. Elkarrizketa-koadro dinamikoak, berriz, exekuzio-garaiak eraikitzen dira Basic edo Python scriptetatik abiatuta, edo <link href=\"text/shared/guide/scripting.xhp\">%PRODUCTNAME programak onartutako beste edozein lengoaia</link> erabilita. Elkarrizketa-koadroak Python bidez irekitzea ondoren azaltzen da. Salbuespenen maneiua eta internazionalizazioa ez dira kontuan hartu, azalpenak argiagoak izan daitezen."
+
+#. AbdfS
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0338\n"
+"help.text"
+msgid "My Macros or Application Macros dialogs"
+msgstr "'Nire makroak' edo 'Aplikazio-makroak' elkarrizketa-koadroak"
+
+#. pcUEy
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0339\n"
+"help.text"
+msgid "The examples below open <literal>Access2Base Trace</literal> console or the imported <literal>TutorialsDialog</literal> dialog with <menuitem>Tools - Macros - Run Macro</menuitem> menu:"
+msgstr "Beheko adibideek <literal>Access2Base Trace</literal> kontsola edo <literal>TutorialsDialog</literal> elkarrizketa-koadroa irekitzen dute honako <menuitem>Tresnak - Makroak - Exekutatu makroa</menuitem> menuarekin:"
+
+#. ChW9B
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0364\n"
+"help.text"
+msgid "Document embedded dialogs"
+msgstr "Dokumentuetan kapsulatutako elkarrizketa-koadroak"
+
+#. uHH6H
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0365\n"
+"help.text"
+msgid "The example below opens a newly edited <literal>Dialog1</literal> dialog from a document with <menuitem>Tools - Macros - Run Macro</menuitem> menu:"
+msgstr "Beheko adibideak berriki editatutako <literal>Dialog1</literal> elkarrizketa-koadroa irekitzen du dokumentu batetik, <menuitem>Tresnak - Makroak - Exekutatu makroa</menuitem> menuarekin:"
+
+#. mMo7w
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0370\n"
+"help.text"
+msgid "\"\"\" Display a doc-based dialog \"\"\""
+msgstr "\"\"\" Bistaratu dokumentu batean oinarritutako elkarrizketa-koadro bat \"\"\""
+
+#. txExG
+#: python_dialogs.xhp
+msgctxt ""
+"python_dialogs.xhp\n"
+"N0381\n"
+"help.text"
+msgid "Refer to <literal>msgbox.py</literal> in <literal>{installation}/program/</literal> directory for Python dynamic dialog examples."
+msgstr "Begiratu <literal>{instalazioa}/program/</literal> direktorioan dagoen <literal>msgbox.py</literal> Pythonen elkarrizketa-koadro dinamikoen adibideak ikusteko."
+
+#. zNyQB
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"tit\n"
+"help.text"
+msgid "Monitoring Document Events"
+msgstr "Dokumentu-gertaerak monitorizatzea"
+
+#. GyBAT
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0526\n"
+"help.text"
+msgid "<bookmark_value>Basic;Monitoring Document Events</bookmark_value>         <bookmark_value>Python;Monitoring Document Events</bookmark_value>         <bookmark_value>Access2Base;Console</bookmark_value>         <bookmark_value>Access2Base;Trace</bookmark_value>         <bookmark_value>API;document.DocumentEvent: Monitoring Document Event</bookmark_value>         <bookmark_value>API;document.XDocumentEventBroadcaster: Monitoring Document Event</bookmark_value>         <bookmark_value>API;document.XDocumentEventListener: Monitoring Document Event</bookmark_value>         <bookmark_value>API;lang.EventObject: Monitoring Document Event</bookmark_value>"
+msgstr "<bookmark_value>Basic;dokumentu-gertaerak monitorizatzea</bookmark_value>         <bookmark_value>Python;dokumentu-gertaerak monitorizatzea</bookmark_value>         <bookmark_value>Access2Base;Console</bookmark_value>         <bookmark_value>Access2Base;Trace</bookmark_value>         <bookmark_value>API;document.DocumentEvent: dokumentu-gertaera monitorizatzea</bookmark_value>         <bookmark_value>API;document.XDocumentEventBroadcaster: dokumentu-gertaera monitorizatzea</bookmark_value>         <bookmark_value>API;document.XDocumentEventListener: dokumentu-gertaera monitorizatzea</bookmark_value>         <bookmark_value>API;lang.EventObject: dokumentu-gertaera monitorizatzea</bookmark_value>"
+
+#. D6i78
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0527\n"
+"help.text"
+msgid "<variable id=\"pythonmonitor\"><link href=\"text/sbasic/python/python_document_events.xhp\" name=\"Monitoring Document Events\">Listening to Document Events</link></variable>"
+msgstr "<variable id=\"pythonmonitor\"><link href=\"text/sbasic/python/python_document_events.xhp\" name=\"Monitoring Document Events\">Dokumentu-gertaerak entzutea</link></variable>"
+
+#. 9kSGW
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id641630582314861\n"
+"help.text"
+msgid "Listening to document events can help in the following situations:"
+msgstr "Dokumentu-gertaerak entzutea lagungarria izan daiteke honako egoeratan:"
+
+#. NEQoZ
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id431630582396327\n"
+"help.text"
+msgid "Identify a new document at opening time, as opposed to existing  ones, and perform a dedicated setup."
+msgstr "Identifikatu dokumentu berri bat irekitze-garaian, lehendik dauden dokumentuekiko, eta gauzatu konfigurazio pertsonalizatu bat."
+
+#. Tror9
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id461630582396782\n"
+"help.text"
+msgid "Control the processing of document save, document copy, print or mailmerge requests."
+msgstr "Kontrolatu dokumentua gordetzeko, kopiatzeko, inprimatzeko edo postaz konbinatzeko eskariak."
+
+#. xrRHB
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id631630582394790\n"
+"help.text"
+msgid "Recalculate table of contents, indexes or table entries of a Writer document when document is going to be closed"
+msgstr "Birkalkulatu Writer dokumentu baten aurkibideak, indizeak edo taula-sarrerak dokumentua ixtera doanean."
+
+#. fCNvj
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id601630582398998\n"
+"help.text"
+msgid "Import math Python packages before opening a Calc document. Release these packages when the document closes."
+msgstr "Inportatu matematikako Python paketeak Calc dokumentu bat ireki baino lehen. Askatu pakete horiek dokumentua ixten denean."
+
+#. bXprs
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0528\n"
+"help.text"
+msgid "Next to <link href=\"text/sbasic/shared/01040000.xhp\" name=\"assigning macros to events\">assigning macros to events</link>, one can monitor events raised by %PRODUCTNAME documents. Application Programming Interface (API) broadcasters are responsible for calling event scripts. Unlike listeners that require to define all supported methods, even if unused, document monitors require only two methods next to hooked event scripts."
+msgstr "<link href=\"text/sbasic/shared/01040000.xhp\" name=\"assigning macros to events\">Gertaerei makroak esleitzeaz</link> gain, posible da %PRODUCTNAME dokumentuek sortutako gertaerak kontrolatzea. Gertaeren scriptak deitzeko, Application Programming Interface (API) igorleak erabiltzen dira. Onartutako metodo guztiak, baita erabiltzen ez direnak ere, definitzea behar duten entzuleek ez bezala, dokumentuen kontrolek bi metodo besterik ez dute behar, gakotutako gertaera-scripten alboan."
+
+#. 6j5Bu
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0529\n"
+"help.text"
+msgid "Monitoring Document Events"
+msgstr "Dokumentu-gertaerak monitorizatzea"
+
+#. VwSwW
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0530\n"
+"help.text"
+msgid "Monitoring is illustrated herewith for Basic and Python languages using object-oriented programming. Assigning <literal>OnLoad</literal> script, to the <menuitem>Open Document</menuitem> event, suffices to initiate and terminate document event monitoring. <menuitem>Tools - Customize</menuitem> menu <menuitem>Events</menuitem> tab is used to assign either scripts."
+msgstr "Kontrolaren adibide bat erakusten da ondoren Basic eta Python lengoaietarako, objektuei orientatutako programazioa erabilita. Aski da <literal>OnLoad</literal> scripta <menuitem>Dokumentu irekia</menuitem> gertaerari esleitzea dokumentu-gertaeren kontrola abiarazteko eta amaitzeko. Scriptak esleitzeko, <menuitem>Tresnak - Pertsonalizatu...</menuitem> menuko <menuitem>Gertareak</menuitem> fitxa erabiltzen da."
+
+#. KgWvt
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0531\n"
+"help.text"
+msgid "Intercepting events helps setting scripts pre- and post-conditions such as loading and unloading libraries or track script processing in the background. <literal>Access2Base.Trace</literal> module usage is illustrating that second context."
+msgstr "Gertaerak atzematen direnean, scripten aurreko eta ondoko baldintzak ezarri daitezke, esaterako liburutegiak kargatzea eta deskargatzea edo scripten prozesatzearen jarraipena egitea atzeko planoan. <literal>Access2Base Trace</literal> moduluaren erabilerak bigarren testuinguru hori irudikatzen du."
+
+#. BG7Xs
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0532\n"
+"help.text"
+msgid "With Python"
+msgstr "Python bidez"
+
+#. B4G2y
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bm_id721622446590963\n"
+"help.text"
+msgid "<bookmark_value>API;frame.Desktop: Monitoring Document Event</bookmark_value>        <bookmark_value>API;script.provider.MasterScriptProviderFactory: Monitoring Document Event</bookmark_value>        <bookmark_value>API;script.provider.XScript: Monitoring Document Event</bookmark_value>"
+msgstr "<bookmark_value>API;frame.Desktop: dokumentu-gertaera monitorizatzea</bookmark_value>        <bookmark_value>API;script.provider.MasterScriptProviderFactory: dokumentu-gertaera monitorizatzea</bookmark_value>        <bookmark_value>API;script.provider.XScript: dokumentu-gertaera monitorizatzea</bookmark_value>"
+
+#. eGKkK
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0533\n"
+"help.text"
+msgid "Events monitoring starts from object instantiation and ultimately stops when Python releases the object. Raised events are reported using <literal>Access2Base</literal> console."
+msgstr "Gertaeren kontrola objektuaren instantzia sortzean hasten da eta Pythonek objektua askatzen duenean gelditzen da. Sortutako gertaerak <literal>Access2Base</literal> kontsola erabilita jakinarazten dira."
+
+#. mCDwK
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0534\n"
+"help.text"
+msgid "<literal>OnLoad</literal> and <literal>OnUnload</literal> events can be used to respectively set and unset Python programs path. They are described as <menuitem>Open document</menuitem> and <menuitem>Document closed</menuitem>."
+msgstr "<literal>OnLoad</literal> eta <literal>OnUnload</literal> gertaerak Python programa-bideak ezartzeko eta ezarpena ezabatzeko erabili daitezke. <menuitem>Dokumentu irekia</menuitem> eta <menuitem>Dokumentu itxia</menuitem> modura deskribatuta daude."
+
+#. i7waD
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0544\n"
+"help.text"
+msgid "\"\"\" Monitor document events \"\"\""
+msgstr "\"\"\" Kontrolatu dokumentu-gertaerak \"\"\""
+
+#. 4k7DQ
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0546\n"
+"help.text"
+msgid "adapted from 'Python script to monitor OnSave event' at"
+msgstr "'Python script to monitor OnSave event' argitalpenetik moldatua, hemen:"
+
+#. AMBQD
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0550\n"
+"help.text"
+msgid "\"\"\" Document events monitor \"\"\""
+msgstr "\"\"\" Dokumentu-gertaeren kontrola \"\"\""
+
+#. FNyTn
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0551\n"
+"help.text"
+msgid "''' report using Access2Base.Trace console OR"
+msgstr "''' jakinarazi Access2Base.Trace kontsola erabilita EDO"
+
+#. ops87
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0552\n"
+"help.text"
+msgid "report in 1st sheet, 1st column for Calc docs '''"
+msgstr "jakinarazi Calc dokumentuen 1. orrian, 1. zutabean '''"
+
+#. SUrHQ
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0558\n"
+"help.text"
+msgid "#self.row = 0  # uncomment for Calc documents only"
+msgstr "#self.row = 0  # kendu iruzkina Calc dokumentuetan soilik"
+
+#. bdxDG
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0560\n"
+"help.text"
+msgid "self.listen()  # Start monitoring doc. events"
+msgstr "self.listen()  # Hasi dokumentu-gertaerak kontrolatzen"
+
+#. 8tXZv
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0569\n"
+"help.text"
+msgid "\"\"\" Output doc. events on 1st column of a Calc spreadsheet \"\"\""
+msgstr "\"\"\" doc. gertaeren irteera Calc kalkulu-orri baten 1. zutabean \"\"\""
+
+#. HEByB
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0575\n"
+"help.text"
+msgid "def listen(self, *args):  # OnLoad/OnNew at the earliest"
+msgstr "def listen(self, *args):  # OnLoad/OnNew ahalik eta lehenen"
+
+#. eq9UC
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0576\n"
+"help.text"
+msgid "\"\"\" Start doc. events monitoring \"\"\""
+msgstr "\"\"\" Hasi dokumentu-gertaerak kontrolatzen \"\"\""
+
+#. o7xSw
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0578\n"
+"help.text"
+msgid "Console.log(\"INFO\", \"Document events are being logged\", True)"
+msgstr "Console.log(\"INFO\", \"Dokumentu-gertaerak egunkarian gordetzen ari dira\", True)"
+
+#. jnyCD
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0580\n"
+"help.text"
+msgid "def sleep(self, *args):  # OnUnload at the latest (optional)"
+msgstr "def sleep(self, *args):  # OnUnload ahalik eta beranduen (aukerakoa)"
+
+#. QiSAD
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0581\n"
+"help.text"
+msgid "\"\"\" Stop doc. events monitoring \"\"\""
+msgstr "\"\"\" Gelditu dokumentu-gertaerak kontrolatzen \"\"\""
+
+#. TyiYD
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0583\n"
+"help.text"
+msgid "Console.log(\"INFO\", \"Document events have been logged\", True)"
+msgstr "Console.log(\"INFO\", \"Dokumentu-gertaerak egunkarian gorde dira\", True)"
+
+#. utJGT
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0587\n"
+"help.text"
+msgid "\"\"\" Intercepts all doc. events \"\"\""
+msgstr "\"\"\" doc. gertaera guztiak atzematen ditu \"\"\""
+
+#. Xwnsi
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0588\n"
+"help.text"
+msgid "#self.setCell(event.Source, event.EventName) # only for Calc docs"
+msgstr "#self.setCell(event.Source, event.EventName) # Calc dokumentuetan soilik"
+
+#. rE9Ep
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0595\n"
+"help.text"
+msgid "\"\"\" Release all activities \"\"\""
+msgstr "\"\"\" Askatu jarduera guztiak \"\"\""
+
+#. XaEoP
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0601\n"
+"help.text"
+msgid "def OnLoad(*args):  # 'Open Document' event"
+msgstr "def OnLoad(*args):  # 'Dokumentu irekia' gertarea"
+
+#. PmjAB
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0602\n"
+"help.text"
+msgid "listener = UiDocument()  # Initiates listening"
+msgstr "listener = UiDocument()  # Entzutea hasieratzen du"
+
+#. CkJg4
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0604\n"
+"help.text"
+msgid "def OnUnload(*args):  # 'Document has been closed' event"
+msgstr "def OnUnload(*args):  # 'Dokumentua itxi da' gertaera"
+
+#. KobNT
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0605\n"
+"help.text"
+msgid "pass  # (optional) performed when disposed"
+msgstr "pass  # (aukerakoa) erabilgarri dagoenean gauzatzen da"
+
+#. xPosR
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0613\n"
+"help.text"
+msgid "(Back/Fore)ground console to report/log program execution."
+msgstr "Atzeko/aurreko planoko kontsola programaren exekuzioaren txostena egiteko/egunkarian jasotzeko."
+
+#. Qph5m
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0617\n"
+"help.text"
+msgid "\"\"\" Print free item list to console \"\"\""
+msgstr "\"\"\" Inprimatu elementu askeen zerrenda kontsolan \"\"\""
+
+#. nzjHS
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0622\n"
+"help.text"
+msgid "\"\"\" Append log message to console, optional user prompt \"\"\""
+msgstr "\"\"\" Erantsi egunkari-mezua kontsolari, aukeran erakutsi gonbita erabiltzaileari \"\"\""
+
+#. HDXPV
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0627\n"
+"help.text"
+msgid "\"\"\" Set log messages lower limit \"\"\""
+msgstr "\"\"\" Ezarri egunkari-mezuen beheko muga \"\"\""
+
+#. fXnMH
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0632\n"
+"help.text"
+msgid "\"\"\" Display console content/dialog \"\"\""
+msgstr "\"\"\" B istaratu kontsolaren edukia/elkarrizkea \"\"\""
+
+#. mPJ3B
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0638\n"
+"help.text"
+msgid "''' Grab application-based Basic script '''"
+msgstr "''' Atzitu aplikazioan oinarritutako Basic scripta '''"
+
+#. 2dfeg
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0647\n"
+"help.text"
+msgid "Mind the misspelled <literal>documentEventOccured</literal> method that inherits a typo from %PRODUCTNAME Application Programming Interface (API)."
+msgstr "Adi gaizki idatzitako <literal>documentEventOccured</literal> metodoari, akats bat heredatu du %PRODUCTNAME APItik (Application Programming Interface)."
+
+#. qNVD4
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0648\n"
+"help.text"
+msgid "<menuitem>Start application</menuitem> and <menuitem>Close application</menuitem> events can respectively be used to set and to unset Python path for user scripts or %PRODUCTNAME scripts. In a similar fashion, document based Python libraries or modules can be loaded and released using <menuitem>Open document</menuitem> and <menuitem>Document closed</menuitem> events. Refer to <link href=\"text/sbasic/python/python_import.xhp\" name=\"Importing Python Modules\">Importing Python Modules</link> for more information."
+msgstr "Erabiltzaile-scriptetarako edo %PRODUCTNAME scriptetarako Python bide-izenak ezartzeko edo ezarpena kentzeko, <menuitem>Hasi aplikazioa</menuitem> eta <menuitem>Itxi aplikazioa</menuitem> gertaerak erabili daitezke, hurrenez hurren. Modu berean, dokumentuetan oinarritutako Python liburutegiak edo moduluak kargatzeko edo askatzeko, <menuitem>Dokumentu irekia</menuitem> eta <menuitem>Dokumentu itxia</menuitem> gertaerak erabili daitezke. Begiratu <link href=\"text/sbasic/python/python_import.xhp\" name=\"Importing Python Modules\">Python moduluak inportatzea</link> informazio gehiagorako."
+
+#. 8pHCg
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0649\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic"
+msgstr "%PRODUCTNAME Basic bidez"
+
+#. QpCjq
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bm_id591622446367707\n"
+"help.text"
+msgid "<bookmark_value>API;GlobalScope.BasicLibraries</bookmark_value>        <bookmark_value>Tools;Strings</bookmark_value>"
+msgstr "<bookmark_value>API;GlobalScope.BasicLibraries</bookmark_value>        <bookmark_value>tresnak;kateak</bookmark_value>"
+
+#. D5Lsi
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0650\n"
+"help.text"
+msgid "Using <menuitem>Tools - Customize</menuitem> menu <menuitem>Events</menuitem> tab, the <menuitem>Open document</menuitem> event fires a <literal>ConsoleLogger</literal> initialisation. <literal>_documentEventOccured</literal> routine - set by <literal>ConsoleLogger</literal> - serves as a unique entry point to trap all document events."
+msgstr "<menuitem>Tresnak - Pertsonalizatu</menuitem> menuko <menuitem>Gertaerak</menuitem> fitxa erabilita, <menuitem>Dokumentu irekia</menuitem> gertaerak <literal>ConsoleLogger</literal> hasieratze bat abiarazten du. <literal>_documentEventOccured</literal> errutinak - <literal>ConsoleLogger</literal>-ek ezartzen duena - dokumentuko gertaera guztiak harrapatzeko sarrera-puntu bakar gisa balio du."
+
+#. gGpkW
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"hd_id421630510141729\n"
+"help.text"
+msgid "controller.Events module"
+msgstr "controller.Events modulua"
+
+#. rJX92
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bas_id431630567378062\n"
+"help.text"
+msgid "Global _obj As Object ' controller.ConsoleLogger instance"
+msgstr "Global _obj As Object ' controller.ConsoleLogger instantzia"
+
+#. PfRq6
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0655\n"
+"help.text"
+msgid "Sub OnLoad(evt As com.sun.star.document.DocumentEvent) ' >> Open Document <<"
+msgstr "Sub OnLoad(evt As com.sun.star.document.DocumentEvent) ' >> Dokumentu irekia <<"
+
+#. p8RfU
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bas_id371630509596674\n"
+"help.text"
+msgid "''' ConsoleLogger unique entry point '''"
+msgstr "''' ConsoleLogger sarrera-puntu bakarra '''"
+
+#. upGWH
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"hd_id721630511986813\n"
+"help.text"
+msgid "controller.ConsoleLogger class module"
+msgstr "controller.ConsoleLogger klase-modulua"
+
+#. AN8tn
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"par_id901630509435225\n"
+"help.text"
+msgid "Events monitoring starts from the moment a <literal>ConsoleLogger</literal> object is instantiated and ultimately stops upon document closure. <literal>StartAdapter</literal> routine loads necessary Basic libraries, while caught events are reported using <literal>Access2Base.Trace</literal> module."
+msgstr "Gertaeren monitorizazioa hasten da <literal>ConsoleLogger</literal> objektuaren instantzia sortzen denean eta amaitzen da dokumentua ixten denean. <literal>StartAdapter</literal> errutinak beharrezkoak diren Basic liburutegiak kargatzen ditu, eta harrapatutako gertaeren berri <literal>Access2Base.Trace</literal> moduluaren bidez ematen da."
+
+#. 2jXHB
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0664\n"
+"help.text"
+msgid "' ADAPTER design pattern object to be instantiated in the \"Open Document\" event"
+msgstr "' MOLDATZAILEA 'Dokumentu irekia' gertaeran instantziatuko den eredu-objektua"
+
+#. ueeGx
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0666\n"
+"help.text"
+msgid "Private Const UI_NOPROMPT = False ' Set it to True to visualise documents events"
+msgstr "Private Const UI_NOPROMPT = False ' Ezarri True dokumentuen gertaerak bistaratu nahi badituzu"
+
+#. EQG8C
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0674\n"
+"help.text"
+msgid "' MEMBERS"
+msgstr "' KIDEAK"
+
+#. r5AkD
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bas_id131630510956418\n"
+"help.text"
+msgid "Private _txtMsg As String ' text message to log in console"
+msgstr "Private _txtMsg As String ' Kontsolan erregistratuko den testu-mezua"
+
+#. JaEhY
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0677\n"
+"help.text"
+msgid "' PROPERTIES"
+msgstr "' PROPIETATEAK"
+
+#. aGuEg
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0679\n"
+"help.text"
+msgid "''' System-dependent filename '''"
+msgstr "''' Sistemaren araberako fitxategi-izena '''"
+
+#. kEEgf
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0686\n"
+"help.text"
+msgid "' METHODS"
+msgstr "' METODOAK"
+
+#. YMAtN
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0688\n"
+"help.text"
+msgid "''' Monitor document events '''"
+msgstr "''' Kontrolatu dokumentu-gertaerak '''"
+
+#. cBx2G
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0701\n"
+"help.text"
+msgid "''' Initialize document events logging '''"
+msgstr "''' Hasieratu dokumentu-gertaerak egunkarian gordetzea '''"
+
+#. hxzE4
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0705\n"
+"help.text"
+msgid "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Document events are being logged\", UI_PROMPT)"
+msgstr "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Dokumentu-gertaerak egunkarian gordetzen ari dira\", UI_PROMPT)"
+
+#. NkHa4
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0714\n"
+"help.text"
+msgid "''' Terminate document events logging '''"
+msgstr "''' Amaitu dokumentu-gertaerak egunkarian gordetzea '''"
+
+#. JEve4
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0717\n"
+"help.text"
+msgid "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Document events have been logged\", UI_PROMPT)"
+msgstr "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Dokumentu-gertaerak egunkarian gorde dira\", UI_PROMPT)"
+
+#. GAD2E
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0719\n"
+"help.text"
+msgid "Access2Base.Trace.TraceConsole() ' Captured events dialog"
+msgstr "Access2Base.Trace.TraceConsole() ' Kapturatutako gertaeren elkarrizketa-koadroa"
+
+#. X8Kdh
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0722\n"
+"help.text"
+msgid "' EVENTS"
+msgstr "' GERTAERAK"
+
+#. uVpJf
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0723\n"
+"help.text"
+msgid "' Your code for handled events goes here"
+msgstr "'Maneiatutako gertaeretarako duzun kodea hemen doa"
+
+#. AJJDf
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0724\n"
+"help.text"
+msgid "Mind the misspelled <literal>_documentEventOccured</literal> method that inherits a typo from %PRODUCTNAME Application Programming Interface (API)."
+msgstr "Adi gaizki idatzitako <literal>_documentEventOccured</literal> metodoari, akats bat heredatu du %PRODUCTNAME APItik (Application Programming Interface)."
+
+#. b3qae
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0725\n"
+"help.text"
+msgid "Discovering Documents Events"
+msgstr "Dokumentu-gertaera aurkitzea"
+
+#. Ys35P
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"bm_id681622445958242\n"
+"help.text"
+msgid "<bookmark_value>API;frame.GlobalEventBroadcaster: Monitoring Document Event</bookmark_value>"
+msgstr "<bookmark_value>API;frame.GlobalEventBroadcaster: dokumentu-gertaera monitorizatzea</bookmark_value>"
+
+#. BDj9Q
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0726\n"
+"help.text"
+msgid "The broadcaster API object provides the list of events it is responsible for:"
+msgstr "Igorlea API objektuak haren ardura diren gertaeren zerrenda bat ematen du:"
+
+#. Z2BhT
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0727\n"
+"help.text"
+msgid "With Python"
+msgstr "Python bidez"
+
+#. 8PCHK
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0734\n"
+"help.text"
+msgid "\"\"\" Display document events \"\"\""
+msgstr "\"\"\" Bistaratu dokumentu-gertaerak \"\"\""
+
+#. SECnV
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0736\n"
+"help.text"
+msgid "adapted from DisplayAvailableEvents() by A. Pitonyak"
+msgstr "A. Pitonyak programatzailearen DisplayAvailableEvents() kodetik moldatua"
+
+#. wXN8p
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0747\n"
+"help.text"
+msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"Alternative Python Script Organizer\">Alternative Python Script Organizer (APSO)</link> extension is used to render events information on screen."
+msgstr "<link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"Alternative Python Script Organizer\">Alternative Python Script Organizer (APSO)</link> hedapena erabiltzen da gertaeren informazioa pantailan idazteko."
+
+#. kgY8m
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0748\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic"
+msgstr "%PRODUCTNAME Basic bidez"
+
+#. KjotC
+#: python_document_events.xhp
+msgctxt ""
+"python_document_events.xhp\n"
+"N0750\n"
+"help.text"
+msgid "''' Display document events '''"
+msgstr "''' Bistaratu dokumentu-gertaerak '''"
+
+#. upkPP
+#: python_examples.xhp
+msgctxt ""
+"python_examples.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python examples"
+msgstr "Python adibideak"
+
+#. Etrfb
+#: python_examples.xhp
+msgctxt ""
+"python_examples.xhp\n"
+"bm_id20191031405\n"
+"help.text"
+msgid "<bookmark_value>Python;examples</bookmark_value>            <bookmark_value>Python;shell</bookmark_value>            <bookmark_value>Python;platform</bookmark_value>            <bookmark_value>Python;session</bookmark_value>            <bookmark_value>Python;screen input/output</bookmark_value>"
+msgstr "<bookmark_value>Python;adibideak</bookmark_value>            <bookmark_value>Python;shell-a</bookmark_value>            <bookmark_value>Python;plataforma</bookmark_value>            <bookmark_value>Python;saioa</bookmark_value>            <bookmark_value>Python;pantailaren sarrera/irteera</bookmark_value>"
+
+#. 2vmkq
+#: python_examples.xhp
+msgctxt ""
+"python_examples.xhp\n"
+"hd_id201901031407\n"
+"help.text"
+msgid "<variable id=\"pythonexamples2\"><link href=\"text/sbasic/python/python_examples.xhp\" name=\"python examples\">Python programming examples</link></variable>"
+msgstr "<variable id=\"pythonexamples2\"><link href=\"text/sbasic/python/python_examples.xhp\" name=\"python examples\">Python programazioko adibideak</link></variable>"
+
+#. xkeov
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"tit\n"
+"help.text"
+msgid "Creating A Dialog Handler"
+msgstr "Elkarrizketa-koadroen maneiatzailea sortzea"
+
+#. WeSDk
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0664\n"
+"help.text"
+msgid "<bookmark_value>Basic;Dialog Handler</bookmark_value>         <bookmark_value>Python;Dialog Handler</bookmark_value>         <bookmark_value>Access2Base;dlgTrace</bookmark_value>         <bookmark_value>Access2Base;_DumpToFile</bookmark_value>         <bookmark_value>API;DialogProvider2</bookmark_value>         <bookmark_value>API;XDialogEventHandler</bookmark_value>"
+msgstr "<bookmark_value>Basic;elkarrizketa-koadroen maneiatzailea</bookmark_value>         <bookmark_value>Python;elkarrizketa-koadroen maneiatzailea</bookmark_value>         <bookmark_value>Access2Base;dlgTrace</bookmark_value>         <bookmark_value>Access2Base;_DumpToFile</bookmark_value>         <bookmark_value>API;DialogProvider2</bookmark_value>         <bookmark_value>API;XDialogEventHandler</bookmark_value>"
+
+#. MQUtw
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0665\n"
+"help.text"
+msgid "<variable id=\"pythonhandler_h1\"><link href=\"text/sbasic/python/python_handler.xhp\" name=\"Creating a Dialog Handler\">Creating a Dialog Handler</link></variable>"
+msgstr "<variable id=\"pythonhandler_h1\"><link href=\"text/sbasic/python/python_handler.xhp\" name=\"Creating a Dialog Handler\">Elkarrizketa-koadroen maneiatzailea sortzea</link></variable>"
+
+#. AxGAd
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0666\n"
+"help.text"
+msgid "Next to <link href=\"text/sbasic/shared/01040000.xhp\" name=\"Assigning macros to events\">assigning macros to events</link> or <link href=\"text/sbasic/basic/python/python_listener\" name=\"creating event listeners\">creating event listeners</link>, one can use dialog handlers, whose principle is to define UNO keywords, or methods, that are mapped to events to watch for. The event handler is responsible for executing methods using the <literal>vnd.sun.star.UNO:<method_name></literal> protocol. Unlike listeners that require to define all supported methods, even if unused, dialog handlers require only two methods on top of intended control hook scripts."
+msgstr "<link href=\"text/sbasic/shared/01040000.xhp\" name=\"Assigning macros to events\">Gertaerei makroak esleitu</link> edo <link href=\"text/sbasic/basic/python/python_listener\" name=\"creating event listeners\">gertaeren entzuleak sortu</link> ondoren, elkarrizketa-koadroen maneiatzaileak erabili daitezke. Horien printzipioa da zaindu behar diren gertaerekin mapatuta egongo diren UNO gako-hitzak edo metodoak sortzea. Gertaeren maneiatzaileak <literal>vnd.sun.star.UNO:<method_name></literal> protokoloaren bidez metodoak exekutatzeko ardura du. Onartutako metodo guztiak (baita erabiliko ez direnak ere) definitzea behar duten entzuleek ez bezala, elkarrizketa-koadroen maneiatzaileek bi metodo soilik behar dituzte kontroleko script gakotuen gainean."
+
+#. Waa56
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0667\n"
+"help.text"
+msgid "The advantages of this approach are:"
+msgstr "Hurbilketa horren abantailak honakoak dira:"
+
+#. bBbcE
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0668\n"
+"help.text"
+msgid "It packs the code that handles event-driven macros,"
+msgstr "Gertaerek gidatutako makroak maneiatzen duen kodea paketatzen du,"
+
+#. NCGBC
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0669\n"
+"help.text"
+msgid "it decorrelates events from macros names which facilitates maintenance or updates, in particular when moving macros or modules."
+msgstr "gertaerak eta makroen izenak elkar askatzen ditu, eta horrek eguneraketak mantentzea errazten du, batez ere makroak edo moduluak lekuz aldatzen direnean."
+
+#. WETAj
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0670\n"
+"help.text"
+msgid "This mechanism is illustrated herewith for Basic and Python languages using an imported copy of <literal>Access2Base</literal> <literal>dlgTrace</literal> dialog. Exception handling and localisation are omitted for clarity."
+msgstr "Mekanismo hori hemen dago azalduta Basic eta Python lengoaietarako, <literal>Access2Base</literal> <literal>dlgTrace</literal> elkarrizketa-koadroaren kopia inportatu bat erabilita. Salbuespenen maneiua eta lokalizazioa ez daude azalduta."
+
+#. qfJEk
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0671\n"
+"help.text"
+msgid "Assigning Dialog methods"
+msgstr "Elkarrizketa-koadroen metodoak esleitzea"
+
+#. 46GAC
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0672\n"
+"help.text"
+msgid "Export <literal>Access2Base</literal> <literal>dlgTrace</literal> dialog and import it into <literal>MyLib</literal> application library."
+msgstr "Esportatu <literal>Access2Base</literal> <literal>dlgTrace</literal> elkarrizketa-koadroa eta inportatu <literal>MyLib</literal> aplikazio-liburutegira."
+
+#. QKmBa
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0673\n"
+"help.text"
+msgid "Inside the control properties pane of the <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Dialog Editor\">Dialog Editor</link>, use the Events tab to replace macro assignments by component assignments, and type in the intended method names:"
+msgstr "<link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Dialog Editor\">Elkarrizketa-koadroen editorearen</link> kontrol-propietateen panelaren barruan, erabili 'Gertaerak' fitxa makroen esleipenak osagaien esleipenekin ordezteko, eta idatzi erabili nahi diren metodoen izenak:"
+
+#. qNEVD
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0674\n"
+"help.text"
+msgid "Set <literal>Dump to file</literal> dialog button component method name to <literal>_dump2File</literal>"
+msgstr "Ezarri <literal>Dump to file</literal> elkarrizketa-koadroaren botoiaren osagaiaren metodoari <literal>_dump2File</literal> izena"
+
+#. t65Et
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0675\n"
+"help.text"
+msgid "Optionally define <literal>txtTracelog</literal> key pressed and mouse button pressed events component method names as <literal>_openHelp</literal>"
+msgstr "Aukeran, ezarri <literal>txtTracelog</literal> tekla-sakatzearen eta sagu-botoiaren sakatzearen gertaeren osagaien metodoei <literal>_openHelp</literal> izena"
+
+#. WMZBj
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0676\n"
+"help.text"
+msgid "Optionally define <literal>Ok</literal> button receiving focus event component method name as <literal>onOkHasfocus</literal>"
+msgstr "Aukeran, ezarri foku-gertaera jasotzen duen <literal>Ados</literal> botoiaren osagaiaren metodoari <literal>onOkHasfocus</literal> izena"
+
+#. Joqhs
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0677\n"
+"help.text"
+msgid "Events assigned actions should mention the <literal>vnd.sun.star.UNO:</literal> protocol."
+msgstr "Gertaerak esleitu zaizkien ekintzek <literal>vnd.sun.star.UNO:</literal> protokoloa aipatu behar dute."
+
+#. BTnaF
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0678\n"
+"help.text"
+msgid "Creating the handler"
+msgstr "Maneiatzailea sortzea"
+
+#. nHvEi
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0679\n"
+"help.text"
+msgid "<literal>createDialogWithHandler</literal> method of <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1awt_1_1DialogProvider2.html\" name=\"com.sun.star.awt.DialogProvider2\">com.sun.star.awt.DialogProvider2</link> service is used to set the dialog and its handler. The handler is responsible for implementing <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1awt_1_1XDialogEventHandler.html\" name=\"com.sun.star.awt.XDialogEventHandler\">com.sun.star.awt.XDialogEventHandler</link> interface."
+msgstr "<literal>createDialogWithHandler</literal> metodoa, <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1awt_1_1DialogProvider2.html\" name=\"com.sun.star.awt.DialogProvider2\">com.sun.star.awt.DialogProvider2</link> zerbitzukoa, elkarrizketa-koadroa eta haren maneiatzailea ezartzeko erabiltzen da. Maneiatzaileak <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1awt_1_1XDialogEventHandler.html\" name=\"com.sun.star.awt.XDialogEventHandler\">com.sun.star.awt.XDialogEventHandler</link> interfazea inplementatzeko ardura du."
+
+#. 2CCEz
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0680\n"
+"help.text"
+msgid "All component method names must be explicitly declared when using a dialog handler."
+msgstr "Osagaien metodo-izen guztiak esplizituki deklaratu behar dira elkarrizketa-koadroen maneiatzaile bat erabiltzean."
+
+#. kBAiZ
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0681\n"
+"help.text"
+msgid "With Python"
+msgstr "Python bidez"
+
+#. rUiYd
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0682\n"
+"help.text"
+msgid "In this example the dialog is located on the computer."
+msgstr "Adibide honetan, elkarrizketa-koadroa ordenagailuan dago."
+
+#. FyaBp
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0692\n"
+"help.text"
+msgid "\"\"\" Access2Base Console Handler \"\"\""
+msgstr "\"\"\" Access2Base kontsola-maneiatzailea \"\"\""
+
+#. dugqK
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0693\n"
+"help.text"
+msgid "''' adapted from « Créer un dialogue avec gestionnaire d'événements » by JM Zambon"
+msgstr "''' hemendik moldatua: « Créer un dialogue avec gestionnaire d'événements », egilea: JM Zambon"
+
+#. 5Cysb
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0716\n"
+"help.text"
+msgid "\"\"\" Create a Dialog from its location \"\"\""
+msgstr "\"\"\" Sortu elkarrizketa-koadro bat bere kokalekutik \"\"\""
+
+#. C9pNa
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0729\n"
+"help.text"
+msgid "''' Ugly MsgBox '''"
+msgstr "''' MsgBox itsusia '''"
+
+#. zcjmD
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0740\n"
+"help.text"
+msgid "As expected, <literal>onOkHasFocus</literal> missing method throws an exception."
+msgstr "Espero bezala, falta den <literal>onOkHasFocus</literal> metodoak salbuespen bat eragin du."
+
+#. 63rxz
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0741\n"
+"help.text"
+msgid "Refer to <link href=\"text/sbasic/python/python_2_basic.xhp\" name=\"Python calls to %PRODUCTNAME Basic\">Python calls to %PRODUCTNAME Basic</link> page for <literal>getBasicScript</literal> routine description and for details about cross-language scripting execution."
+msgstr "Begiratu <link href=\"text/sbasic/python/python_2_basic.xhp\" name=\"Python calls to %PRODUCTNAME Basic\">Python deiak %PRODUCTNAME Basic lengoaiari</link> orria <literal>getBasicScript</literal> errutinaren deskribapenari buruzko eta lengoaien scriptgintza gurutzatuaren exekuzioaren xehetasunei buruzko informazioa jasotzeko."
+
+#. b6xGw
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0742\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic"
+msgstr "%PRODUCTNAME Basic bidez"
+
+#. 5N3MV
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0743\n"
+"help.text"
+msgid "In this example the dialog is embedded in a document, and can equally be located on the computer."
+msgstr "Adibide honetan, elkarrizketa-koadroa dokumentu batean kapsulatuta dago, eta ordenagailuan kokatuta egon daiteke."
+
+#. Ahwda
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0751\n"
+"help.text"
+msgid "dp.Initialize(Array(ThisComponent)) ' if doc-embedded dialog"
+msgstr "dp.Initialize(Array(OsagaiHau)) ' dokumentuan kapsulatutako elkarrizketa-koadroa bada"
+
+#. Cf88b
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0958c\n"
+"help.text"
+msgid "method As String) As Boolean"
+msgstr "method As String) As Boolean"
+
+#. j4aLN
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0770\n"
+"help.text"
+msgid "'dialog.endDialog(1) if computer-based dialog"
+msgstr "'dialog.endDialog(1) ordenagailuan oinarritutako elkarrizketa-koadroa bada"
+
+#. EBBRf
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0779\n"
+"help.text"
+msgid "' adapted from « Créer un dialogue avec gestionnaire d'événements » by JM Zambon"
+msgstr "' hemendik moldatua: « Créer un dialogue avec gestionnaire d'événements » egilea: JM Zambon"
+
+#. NF93B
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0781\n"
+"help.text"
+msgid "As expected, <literal>onOkHasFocus</literal> missing method throws an exception."
+msgstr "Espero bezala, falta den <literal>onOkHasFocus</literal> metodoak salbuespen bat sortu du."
+
+#. 4RevF
+#: python_handler.xhp
+msgctxt ""
+"python_handler.xhp\n"
+"N0505\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/03132000.xhp\" name=\"CreateUnoListener Function\">CreateUnoListener Function</link>"
+msgstr "<link href=\"text/sbasic/shared/03132000.xhp\" name=\"CreateUnoListener Function\">CreateUnoListener funtzioa</link>"
+
+#. Ur3DA
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"tit\n"
+"help.text"
+msgid "IDE for Python"
+msgstr "Pythonerako IDEa"
+
+#. ETCU9
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"bm_id761543349138561\n"
+"help.text"
+msgid "<bookmark_value>APSO</bookmark_value>            <bookmark_value>Alternative Python Scripts Organizer</bookmark_value>            <bookmark_value>python;IDE - integrated development environment</bookmark_value>            <bookmark_value>python;editor</bookmark_value>"
+msgstr "<bookmark_value>APSO</bookmark_value>            <bookmark_value>Alternative Python Scripts Organizer</bookmark_value>            <bookmark_value>python;IDE - garapen integraturako ingurunea</bookmark_value>            <bookmark_value>python;editorea</bookmark_value>"
+
+#. cANSA
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"hd_id151543348965464\n"
+"help.text"
+msgid "<variable id=\"pythonideh1\"><link href=\"text/sbasic/python/python_ide.xhp\" name=\"Python IDE Setup\">Setting up an Integrated Development Environment (IDE) for Python</link></variable>"
+msgstr "<variable id=\"pythonideh1\"><link href=\"text/sbasic/python/python_ide.xhp\" name=\"Python IDE Setup\">Integrated Development Environment (IDE) bat konfiguratzea Python erabiltzeko</link></variable>"
+
+#. k7syF
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"par_id541543348965465\n"
+"help.text"
+msgid "Writing Python macros requires extra configuration steps to set an IDE of choice."
+msgstr "Python makroak idazteko, urrats gehiago egin behar dira IDE bat konfiguratzeko."
+
+#. NGxNi
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"N0106\n"
+"help.text"
+msgid "Unlike Basic language macros development in %PRODUCTNAME, developing Python scripts for %PRODUCTNAME requires to configure an external Integrated Development Environment (IDE). Multiple IDEs are available that range from beginners to advanced Python coders. While using a Python IDE programmers benefit from numerous features such as syntax highlighting, code folding, class browsing, code completion, coding standard enforcement, test driven development, debugging, version control and many more. You can refer to <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"Designing & Developing Python Applications\">Designing & Developing Python Applications</link> on the Wiki for more in-depth information about the setup of a bridge between your IDE and a running instance %PRODUCTNAME."
+msgstr "%PRODUCTNAME suiterako Basic lengoaiako makroen garapenean ez bezala, %PRODUCTNAME Python scripten kasuan kanpoko IDE (Integrated Development Environment) bat konfiguratu behar da. IDE anitz daude eskuragarri, hasiberrientzat direnetatik hasi eta Python kodetzaile aurreratuentzako direnetaraino. Python IDE bat erabiltzean, programatzaileek eginbide aurreratu asko dituzte eskura, esaterako sintaxiaren nabarmentzea, kodearen tolestea, klaseak arakatzea, kodea osatzea, kode-estandarrak behartzea, probetan oinarritutako garapena, arazketa, bertsioen kontrola eta beste hainbat gehiago. <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"Designing & Developing Python Applications\">Python aplikazioak diseinatzea eta garatzea</link> begiratu dezakezu wikian informazio sakonagoa nahi baduzu zure IDEaren eta exekutatzen ari den %PRODUCTNAME instantzia baten arteko zubia nola konfiguratu ikasteko."
+
+#. u2xio
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"hd_id761544698669786\n"
+"help.text"
+msgid "The APSO Extension"
+msgstr "APSO hedapena"
+
+#. 4isF2
+#: python_ide.xhp
+msgctxt ""
+"python_ide.xhp\n"
+"N0104\n"
+"help.text"
+msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"Alternative Python Script Organizer (APSO)\">Alternative Python Script Organizer (APSO)</link> extension eases the edition of Python scripts, in particular when embedded in a document. Using APSO you can configure your preferred source code editor, start the integrated Python shell and debug Python scripts. Extensions exist that help inspect arbitrary UNO objects, refer to <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"eDesigning & Developing Python Applications\">Designing & Developing Python Applications</link> for additional details on such extensions."
+msgstr "<link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"Alternative Python Script Organizer (APSO)\">Alternative Python Script Organizer (APSO)</link> hedapenak Python scriptak editatzen laguntzen du, batez ere dokumentu batean kapsulatuta daudenean. APSO erabilita, iturburu-kodea editatzeko gogokoen duzun editorea konfiguratu dezakezu eta horrekin Pythonen kontsola integratua abiarazi eta Python scriptak araztu. Badaude ausazko UNO objektuak aztertzen laguntzen duten hedapenak ere, begiratu <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"eDesigning & Developing Python Applications\">Python aplikazioak diseinatzea eta garatzea</link> hedapen horiei buruzko informazio gehiago jasotzeko."
+
+#. 5E2EV
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python : Importing Modules"
+msgstr "Python : Moduluak inportatzea"
+
+#. gFTth
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0461\n"
+"help.text"
+msgid "<bookmark_value>Python;import</bookmark_value>        <bookmark_value>Python;Modules</bookmark_value>        <bookmark_value>Python;pythonpath</bookmark_value>        <bookmark_value>PythonLibraries</bookmark_value>"
+msgstr "<bookmark_value>Python;import</bookmark_value>        <bookmark_value>Python;moduluak</bookmark_value>        <bookmark_value>Python;pythonpath</bookmark_value>        <bookmark_value>PythonLibraries</bookmark_value>"
+
+#. 5QqdJ
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0462\n"
+"help.text"
+msgid "<variable id=\"pythonimporth1\"><link href=\"text/sbasic/python/python_import.xhp\" name=\"python imports\">Importing Python Modules</link></variable>"
+msgstr "<variable id=\"pythonimporth1\"><link href=\"text/sbasic/python/python_import.xhp\" name=\"python imports\">Python moduluak inportatzea</link></variable>"
+
+#. VHAM5
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0463\n"
+"help.text"
+msgid "%PRODUCTNAME Python scripts come in three distinct flavors, they can be personal, shared or embedded in documents. They are stored in varying places described in <link href=\"text/sbasic/python/python_locations.xhp\">Python Scripts Organization and Location</link>. In order to import Python modules, their locations must be known from Python at run time."
+msgstr "%PRODUCTNAME Python scriptak hiru motatakoak izan daitezke: pertsonalak, partekatuak edo dokumentuetan kapsulatuak. Hainbat tokitan biltegiratzen dira, begiratu <link href=\"text/sbasic/python/python_locations.xhp\">Python scripten antolaketa eta kokalekua</link>. Python moduluak inportatzeko, Python exekuzio-garaian ezagutu behar ditu haien kokalekuak."
+
+#. zMSfx
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0464\n"
+"help.text"
+msgid "This mechanism is illustrated for file system based modules and document based modules. Exception handling is omitted for clarity. The terms library or directory, scripts or modules are used interchangeably. A Python macro refers to a function inside a module."
+msgstr "Mekanismo hori fitxategi-sistemetan oinarritutako moduluen bidez eta dokumentuetan oinarritutakoen bidez azaldu dira. Salbuespenen kudeaketa kendu egin da, azalpenak argiagoak izateko. Zenbait termino (liburutegia edo direktorioa, scriptak edo moduluak) elkar trukagarriak dira. Python makro bat modulu baten barruan dagoen funtzio bat da."
+
+#. GUdHS
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0465\n"
+"help.text"
+msgid "Note that <literal><User Profile>/Scripts/python/pythonpath</literal> local directory is always explored when running a Python macro from <literal><User Profile>/Scripts/python</literal>."
+msgstr "Kontuan izan <literal><User Profile>/Scripts/python/pythonpath</literal> direktorio lokala beti arakatzen dela <literal><User Profile>/Scripts/python</literal> bideko Python makro bat exekutatzen denean."
+
+#. fyFof
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0466\n"
+"help.text"
+msgid "File System module import"
+msgstr "Fitxategi-sistemako moduluak inportatzea"
+
+#. SRZgQ
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0467\n"
+"help.text"
+msgid "User or Shared Modules"
+msgstr "Erabiltzailearen moduluak edo modulu partekatuak"
+
+#. NAJzP
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0468\n"
+"help.text"
+msgid "Personal & shared Python scripts can be imported once their directories are included in Python run time path. Refer to <link href=\"text/sbasic/python/python_session.xhp\">Getting session information</link> page for more details regarding omitted Session Class."
+msgstr "Python script pertsonalak eta partekatuak inportatzeko, haien direktorioek Pythonen exekuzio-garaiaren bide-izenean egon behar dute. Ikus <link href=\"text/sbasic/python/python_session.xhp\">Saioaren informazioa eskuratzea</link> orria falta diren saio-klaseen inguruko xehetasun gehiago ezagutzeko."
+
+#. A4v4U
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0473\n"
+"help.text"
+msgid "user_lib = Session().UserPythonScripts  # User scripts location"
+msgstr "user_lib = Session().UserPythonScripts  # Erabiltzaile-scripten kokalekua"
+
+#. AAJUq
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0475\n"
+"help.text"
+msgid "sys.path.insert(0, user_lib)  # Add to search path"
+msgstr "sys.path.insert(0, user_lib)  # Gehitu bilaketa-bideari"
+
+#. yFcur
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0476\n"
+"help.text"
+msgid "import screen_io as ui  # 'screen_io.py' module resides in user_lib directory"
+msgstr "import screen_io as ui  # 'screen_io.py' modulua user_lib direktorioan dago"
+
+#. 6KtvD
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0477\n"
+"help.text"
+msgid "# Your code follows here"
+msgstr "# Zure kodea hemen doa"
+
+#. G8bHh
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0478\n"
+"help.text"
+msgid "This Python example exposes a local XSCRIPTCONTEXT variable to an imported module:"
+msgstr "Python adibide honek XSCRIPTCONTEXT aldagai bat inportatutako modulu bati erakusten dio:"
+
+#. uwiPp
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0483\n"
+"help.text"
+msgid "share_lib = Session.SharedPythonScripts()  # Shared scripts location"
+msgstr "share_lib = Session.SharedPythonScripts()  # Partekatutako scripten kokalekua"
+
+#. HugAN
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0485\n"
+"help.text"
+msgid "sys.path.insert(0, share_lib)  # Add to search path"
+msgstr "sys.path.insert(0, share_lib)  # Gehitu bilaketa-bideari"
+
+#. zGybv
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0486\n"
+"help.text"
+msgid "from IDE_utils import ScriptContext  # 'IDE_utils.py' sits with shared Python scripts."
+msgstr "from IDE_utils import ScriptContext  # 'IDE_utils.py' partekatutako Python scriptekin dago."
+
+#. VoPZU
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0488\n"
+"help.text"
+msgid "# Your code follows here"
+msgstr "# Zure kodea hemen doa"
+
+#. AH3MT
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0489\n"
+"help.text"
+msgid "Installation Modules for Applications"
+msgstr "Instalaziorako moduluak aplikazioetarako"
+
+#. VFZdV
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0490\n"
+"help.text"
+msgid "Unlike personal and shared scripts, %PRODUCTNAME installation scripts can be imported any time. Next to <literal>uno</literal> & <literal>unohelper</literal> %PRODUCTNAME Python modules, other scripts present in <literal><installation_path>/program</literal> directory can be imported directly, such as the <literal>msgbox</literal> module."
+msgstr "Script pertsonal eta partekatuak ez bezala, %PRODUCTNAME instalazio scriptak edozein unetan inportatu daitezke. <literal>uno</literal> & <literal>unohelper</literal> %PRODUCTNAME Python moduluen ondoan, <literal><installation_path>/program</literal> direktorioan dauden beste script batzuk zuzenean inportatu daitezke, adibidez <literal>msgbox</literal> modulua."
+
+#. TnQ2j
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0491\n"
+"help.text"
+msgid "With Python shell:"
+msgstr "Python kontsolarekin:"
+
+#. DDinb
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0534\n"
+"help.text"
+msgid "Document Module Import"
+msgstr "Dokumentuko modulua inportatzea"
+
+#. AUzGt
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0535\n"
+"help.text"
+msgid "Importing a Python document embedded module is illustrated below. Error handling is not detailed. Python run time path is updated when document has been opened and before closure. Refer to <link href=\"text/sbasic/shared/01040000.xhp\">Event-Driven Macros</link> to learn how to associate Python macros to document events."
+msgstr "Dokumentu batean kapsulatutako Python modulu bat inportatzea azaltzen da behean. Erroreen maneiua ez da azaltzen. Pythonen exekuzio-garaiko bide-izena eguneratu egiten da dokumentua ireki denean eta itxi baino lehen. Ikus <link href=\"text/sbasic/shared/01040000.xhp\">Gertaeren mendeko makroak</link> Python makroak dokumentu-gertaerekin nola lotu ikasteko."
+
+#. APbCX
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0541\n"
+"help.text"
+msgid "\"\"\" Prepare Python modules import when doc. loaded \"\"\""
+msgstr "\"\"\" Prestatu Python moduluen inportazioa dok. kargatzen denean \"\"\""
+
+#. DJStg
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0542\n"
+"help.text"
+msgid "PythonLibraries.loadLibrary('lib/subdir')  # Add directory to search path"
+msgstr "PythonLibraries.loadLibrary('lib/subdir')  # Gehitu direktorioa bilaketa-bidera"
+
+#. tPsVb
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0543\n"
+"help.text"
+msgid "PythonLibraries.loadLibrary('my_gui', 'screen_io')  # Add dir. & import screen_io"
+msgstr "PythonLibraries.loadLibrary('my_gui', 'screen_io')  # Gehitu direktorioa eta inportatu screen_io"
+
+#. KxLAs
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0546\n"
+"help.text"
+msgid "\"\"\" Cleanup PYTHON_PATH when doc. Gets closed \"\"\""
+msgstr "\"\"\" Garbitu PYTHON_PATH dok. ixten denean \"\"\""
+
+#. siAC7
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0547\n"
+"help.text"
+msgid "PythonLibraries.unloadLibrary('my_gui')  # Python runtime path cleanup"
+msgstr "PythonLibraries.unloadLibrary('my_gui')  # Pythonen exekuzio-garaiko bide-izena garbitzea"
+
+#. zajf5
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0548\n"
+"help.text"
+msgid "# Note: imported modules remain loaded in this example."
+msgstr "# Oharra: Adibide honetan, inportatutako moduluek kargatuta jarraitzen dute."
+
+#. pKa7R
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0553\n"
+"help.text"
+msgid "\"\"\" Python library loader and module importer"
+msgstr "\"\"\" Python liburutegien kargatzailea eta moduluen inportatzailea"
+
+#. ruYCE
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0555\n"
+"help.text"
+msgid "adapted from 'Bibliothèque de fonctions' by Hubert Lambert"
+msgstr "Hubert Lambert garatzailearen 'Bibliothèque de fonctions' lanetik moldatua"
+
+#. 8gpRJ
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0556\n"
+"help.text"
+msgid "at https://forum.openoffice.org/fr/forum/viewtopic.php?p=286213 \"\"\""
+msgstr "https://forum.openoffice.org/fr/forum/viewtopic.php?p=286213 \"\"\""
+
+#. T6bdz
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0558\n"
+"help.text"
+msgid "\"\"\" Check run time module list \"\"\""
+msgstr "\"\"\" Egiaztatu exekuzio-garaiko moduluen zerrenda \"\"\""
+
+#. EFaRv
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0561\n"
+"help.text"
+msgid "\"\"\" Check PYTHON_PATH content \"\"\""
+msgstr "\"\"\" Egiaztatu PYTHON_PATH edukia \"\"\""
+
+#. fvFq9
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0564\n"
+"help.text"
+msgid "\"\"\" add directory to PYTHON_PATH, import named module \"\"\""
+msgstr "\"\"\" gehitu direktorioa PYTHON_PATH bideari, inportatu izendun modulua \"\"\""
+
+#. eCTGx
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0573\n"
+"help.text"
+msgid "\"\"\" remove directory from PYTHON_PATH \"\"\""
+msgstr "\"\"\" kendu direktorioa PYTHON_PATH aldagaitik \"\"\""
+
+#. 5xScE
+#: python_import.xhp
+msgctxt ""
+"python_import.xhp\n"
+"N0580\n"
+"help.text"
+msgid "Refer to <link href=\"text/sbasic/python/python_listener.xhp\">Creating a Python Listener</link> for examples of event-driven macros."
+msgstr "Begiratu <link href=\"text/sbasic/python/python_listener.xhp\">Python entzulea sortzea</link> gertaeren mendeko makroen adibideak ikusteko."
+
+#. 9BBze
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python Listeners : Creating Event Listeners"
+msgstr "Python entzuleak : Gertaeren entzuleak sortzea"
+
+#. ouQd3
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0385\n"
+"help.text"
+msgid "<bookmark_value>Python;Event Listener</bookmark_value>         <bookmark_value>Python;createUnoListener</bookmark_value>         <bookmark_value>Basic;Event Listener</bookmark_value>         <bookmark_value>API;ActionEvent</bookmark_value>         <bookmark_value>API;DialogProvider</bookmark_value>         <bookmark_value>API;EventObject</bookmark_value>         <bookmark_value>API;ExecutableDialogResults</bookmark_value>         <bookmark_value>API;XActionListener</bookmark_value>"
+msgstr "<bookmark_value>Python;gertaeren entzulea</bookmark_value>         <bookmark_value>Python;createUnoListener</bookmark_value>         <bookmark_value>Basic;gertaeren entzulea</bookmark_value>         <bookmark_value>API;ActionEvent</bookmark_value>         <bookmark_value>API;DialogProvider</bookmark_value>         <bookmark_value>API;gertaera objektua</bookmark_value>         <bookmark_value>API;ExecutableDialogResults</bookmark_value>         <bookmark_value>API;XActionListener</bookmark_value>"
+
+#. Pjc9z
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0386\n"
+"help.text"
+msgid "<variable id=\"pythonlistener\"><link href=\"text/sbasic/python/python_listener.xhp\" name=\"python listeners\">Creating Event Listeners</link></variable>"
+msgstr "<variable id=\"pythonlistener\"><link href=\"text/sbasic/python/python_listener.xhp\" name=\"python listeners\">Gertaeren entzuleak sortzea</link></variable>"
+
+#. DGgrp
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0387\n"
+"help.text"
+msgid "Events raised by dialogs, documents, forms or graphical controls can be linked to macros, which is referred to as event-driven programming. The most common method to relate events to macros are the <literal>Events</literal> tab in <menuitem>Tools – Customize</menuitem> menu and the <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Create dialog\">Dialog Editor</link> Control properties pane from <menuitem>Tools - Macros – Organise Dialogs...</menuitem> menu."
+msgstr "Elkarrizketa-koadroek, dokumentuek, inprimakiek edo kontrol grafikoek sortutako gertaerak makroekin lotu daitezke; hain zuzen, horri deritzo gertaeren bidez gidatutako programazioa. Gertaerak makroekin lotzeko metodorik arruntena <menuitem>Tresnak - Pertsonalizatu</menuitem> menuko <literal>Gertaerak</literal> fitxa eta <menuitem>Tresnak - Makroak - Antolatu elkarrizketa-koadroak...</menuitem> menuko <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Create dialog\">Elkarrizketa-koadroen editorea</link> kontrol-propietateen panela dira."
+
+#. Dd2YW
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0388\n"
+"help.text"
+msgid "Graphical artifacts, keyboard inputs, mouse moves and other man/machine interactions can be controlled using UNO listeners that watch for the user’s behavior. Listeners are dynamic program code alternatives to macro assignments. One may create as many UNO listeners as events to watch for. A single listener can also handle multiple user interface controls."
+msgstr "Artefaktu grafikoak, teklatu-sarrerak, saguaren mugimenduak eta gizakien eta makinen arteko beste elkarrekintza batzuk erabiltzailearen portaeraren jarraipena egiten duten UNO entzuleak erabilita kontrolatu daitezke. Entzuleak makro-esleipenen ordezko programa-kode dinamikoak dira. Jarraitu nahi den gertaera bakoitzeko UNO entzule bat sortu daiteke. Entzule bakar batek erabiltzaile-interfazearen kontrol anitz maneiatu ditzake."
+
+#. UVzsE
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0389\n"
+"help.text"
+msgid "Creating an event listener"
+msgstr "Gertaeren entzule bat sortzea"
+
+#. knF23
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0390\n"
+"help.text"
+msgid "Listeners get attached to controls held in dialogs, as well as to document or form events. Listeners are also used when creating runtime dialogs or when adding controls to a dialog on the fly."
+msgstr "Entzuleak elkarrizketa-koadroetako kontrolei lotzen zaizkie, edo dokumentu- edo inprimaki-gertaerei. Entzuleak exekuzio-garaiko elkarrizketa-koadroak sortzeko edo koadro bati kontrolak dinamikoki gehitzeko ere erabiltzen dira."
+
+#. DwE8A
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0391\n"
+"help.text"
+msgid "This example creates a listener for <literal>Button1</literal> control of <literal>Dialog1</literal> dialog in <literal>Standard</literal> library."
+msgstr "Adibide honek entzule bat sortzen du <literal>Standadr</literal> liburutegiko <literal>Dialog1</literal> elkarrizketa-koadroaren <literal>Button1</literal> botoirako."
+
+#. Wsp8E
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0392\n"
+"help.text"
+msgid "With Python"
+msgstr "Python bidez"
+
+#. pPjfw
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0405\n"
+"help.text"
+msgid "_MY_LABEL = 'Python listens..'"
+msgstr "_NIRE_ETIKETA = 'Pythonek entzuten du..'"
+
+#. UJrnb
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0417\n"
+"help.text"
+msgid "MsgBox(\"The user acknowledged the dialog.\")"
+msgstr "MsgBox(\"Erabiltzaileak elkarrizketa-koadroa onartu du.\")"
+
+#. XVRK7
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0419\n"
+"help.text"
+msgid "MsgBox(\"The user canceled the dialog.\")"
+msgstr "MsgBox(\"Erabiltzaileak elkarrizketa-koadroa utzi du.\")"
+
+#. FUuHB
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0424\n"
+"help.text"
+msgid "\"\"\" Create a Dialog from its location \"\"\""
+msgstr "\"\"\" Sortu elkarrizketa-koadro bat bere kokalekutik \"\"\""
+
+#. NeZcJ
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0437\n"
+"help.text"
+msgid "\"\"\" Listen to & count button clicks \"\"\""
+msgstr "\"\"\" Entzun eta zenbatu botoi-klikak \"\"\""
+
+#. WK4DA
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0448\n"
+"help.text"
+msgid "def disposing(self, evt: EventObject):  # mandatory routine"
+msgstr "def disposing(self, evt: EventObject):  # derrigorrezko errutina"
+
+#. 9mtTR
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0457\n"
+"help.text"
+msgid "<emph>msgbox.py</emph> in <emph>{installation}/program/</emph> directory has some examples of button listeners."
+msgstr "<emph>{installation}/program/</emph>  direktorioan dagoen <emph>msgbox.py</emph> scriptak botoi-entzuleen zenbait adibide ditu."
+
+#. MgUyV
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0458\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic"
+msgstr "%PRODUCTNAME Basic lengoaiarekin"
+
+#. CCUMV
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0459d\n"
+"help.text"
+msgid "Const MY_LABEL = \"Basic listens..\""
+msgstr "Const NIRE_ETIKETA = \"Basic-ek entzuten du...\""
+
+#. eJe7e
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0478\n"
+"help.text"
+msgid "Case rc.OK : MsgBox \"The user acknowledged the dialog.\",, \"Basic\""
+msgstr "Case rc.OK : MsgBox \"Erabiltzaileak elkarrizketa-koadroa onartu du.\",, \"Basic\""
+
+#. KVrqd
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0479\n"
+"help.text"
+msgid "Case rc.CANCEL : MsgBox \"The user canceled the dialog.\",, \"Basic\""
+msgstr "Case rc.CANCEL : MsgBox \"Erabiltzaileak elkarrizketa-koadroa utzi du.\",, \"Basic\""
+
+#. 9AeGf
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0486\n"
+"help.text"
+msgid "''' Listen to & count button clicks '''"
+msgstr "''' Entzun eta zenbatu botoi-klikak '''"
+
+#. 5Arxo
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0496\n"
+"help.text"
+msgid "' your code goes here"
+msgstr "' zure kodea hemen doa"
+
+#. AQA8b
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0498\n"
+"help.text"
+msgid "Other Event Listeners"
+msgstr "Gertaeren beste entzule batzuk"
+
+#. HsXBE
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0499\n"
+"help.text"
+msgid "Listeners are usually coded along with <link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"dialog opening\">dialog opening</link>. Numerous listener approaches are possible such as event handlers for dialogs or event monitors for documents or forms."
+msgstr "Entzuleak normalean <link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"dialog opening\">elkarrizketa-koadroa irekitzearekin</link> programatzen dira. Entzuleak sortzeko hainbat modu daude, adibidez elkarrizketa-koadroetako gertaeren maneiuaren bidez edo dokumentuetako edo inprimakietako gertaeren kontrolaren bidez."
+
+#. Xyv2b
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0505\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/03132000.xhp\" name=\"CreateUnoListener Function\">CreateUnoListener Function</link>"
+msgstr "<link href=\"text/sbasic/shared/03132000.xhp\" name=\"CreateUnoListener Function\">CreateUnoListener funtzioa</link>"
+
+#. zKQhy
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0506\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05060700.xhp\" name=\"Events mapping to objects\">Events mapping to objects</link>"
+msgstr "<link href=\"text/swriter/01/05060700.xhp\" name=\"Events mapping to objects\">Gertaerak objektuetara mapatzea</link>"
+
+#. Xbxfm
+#: python_listener.xhp
+msgctxt ""
+"python_listener.xhp\n"
+"N0509\n"
+"help.text"
+msgid "See also <link href=\"text/sbasic/shared/01040000.xhp\" name=\"Document events\">Document events</link>, <link href=\"text/shared/02/01170202.xhp\" name=\"Form events\">Form events</link>."
+msgstr "Ikus, baita ere, <link href=\"text/sbasic/shared/01040000.xhp\" name=\"Document events\">dokumentu-gertaerak</link>, <link href=\"text/shared/02/01170202.xhp\" name=\"Form events\">inprimaki-gertaerak</link>."
+
+#. GC8Ny
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python Scripts Organization"
+msgstr "Python scripten antolaketa"
+
+#. KKGnc
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id391543358231021\n"
+"help.text"
+msgid "<variable id=\"pythonlocations1\"><link href=\"text/sbasic/python/python_locations.xhp\" name=\"command_name\">Python Scripts Organization and Location</link></variable>"
+msgstr "<variable id=\"pythonlocations1\"><link href=\"text/sbasic/python/python_locations.xhp\" name=\"command_name\">Python scripten antolaketa eta kokalekua</link></variable>"
+
+#. rRufi
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id481636114810038\n"
+"help.text"
+msgid "%PRODUCTNAME macros are grouped in module files, modules are usually grouped in library folders, and libraries are grouped in library containers although containers can contain modules too."
+msgstr "%PRODUCTNAME makroak modulu-fitxategietan daude bilduta. Moduluak normalean liburutegi-karpetatan dauden elkartuta eta liburutegiak edukiontzietan daude elkartuta. Edukiontzi horiek zuzenean moduluak ere eduki ditzakete."
+
+#. wGWz9
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id771543358231022\n"
+"help.text"
+msgid "A library is used as a major grouping for either an entire category of macros, or for an entire application. Modules usually split functionality, such as user interaction and calculations. Individual macros are subroutines and functions. The Figure below shows an example of the hierarchical structure of macro libraries in %PRODUCTNAME."
+msgstr "Liburutegiak makroen kategoria osoak edo aplikazio osoarenak talde handietan elkartzeko modu gisa erabiltzen dira. Moduluak sarritan funtzionaltasunaren arabera elkartzen dira, adibidez elkarrekintza motaren edo kalkulu motaren arabera. Banakako makroak azpierrutinak eta funtzioak dira. Beheko irudian, %PRODUCTNAME makro-liburutegien egitura hierarkikoaren adibide bat ikusi daiteke."
+
+#. b8iEG
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id771636279690940\n"
+"help.text"
+msgid "<image src=\"media/helpimg/sbasic/Library-Container.svg\" id=\"img_id121636285791637\" width=\"8cm\" height=\"5.5cm\"><alt id=\"alt_id471636279690940\">Library Container diagram</alt></image>"
+msgstr "<image src=\"media/helpimg/sbasic/Library-Container.svg\" id=\"img_id121636285791637\" width=\"8cm\" height=\"5.5cm\"><alt id=\"alt_id471636279690940\">Liburutegi-edukiontziaren diagrama</alt></image>"
+
+#. JqG95
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id171636114787810\n"
+"help.text"
+msgid "<emph>Figure:</emph> Macro Library hierarchy"
+msgstr "<emph>Irudia:</emph> Makro-liburutegien hierarkia."
+
+#. dbwvM
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id801636114790638\n"
+"help.text"
+msgid "The containers are accessible in all %PRODUCTNAME programs through the user interface. Go to <menuitem>Tools > Macros > Organize Macros > Python</menuitem>, to open the Python Macros dialog."
+msgstr "Edukiontziak erabiltzaile-interfazearen bidez atzitu daitezke %PRODUCTNAME programa guztietan. Joan <menuitem>Tresnak > Makroak > Antolatu makroak > Python</menuitem> aukerara Python makroen elkarrizketa-koadroa irekitzeko."
+
+#. FU5EC
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id801636114808666\n"
+"help.text"
+msgid "Three library containers are shown in the Macro From list:"
+msgstr "'Hemengo makroa' zerrendan hiru liburutegi-edukiontzi erakusten dira:"
+
+#. RnBRr
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id321636114854594\n"
+"help.text"
+msgid "<emph>My Macros:</emph> personal macros available for the %PRODUCTNAME user"
+msgstr "<emph>Nire makroak:</emph> %PRODUCTNAME erabiltzailearentzako erabilgarri dauden makro pertsonalak."
+
+#. bDXrr
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id471636114847530\n"
+"help.text"
+msgid "<emph>Application Macros:</emph> system macros distributed with %PRODUCTNAME for every computer user"
+msgstr "<emph>Aplikazioaren makroak:</emph> %PRODUCTNAME aplikazioarekin ordenagailu erabiltzaile guztientzat instalatutako sistema-makroak"
+
+#. kVY4C
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id191636114858218\n"
+"help.text"
+msgid "<emph>Document macros:</emph>  every document can contain macro libraries available in that document for all users"
+msgstr "<emph>Dokumentu-makroak:</emph> Dokumentu bakoitzak dokumentuan bertan erabiltzaile guztientzat erabilgarri dauden makroak eduki ditzake."
+
+#. iEtmS
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id911544049584458\n"
+"help.text"
+msgid "Python Script Locations"
+msgstr "Python scripten kokapena"
+
+#. cmghv
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id121551089455774\n"
+"help.text"
+msgid "Refer to <link href=\"text/sbasic/python/python_session.xhp\" name=\"Getting Session Information\">Getting Session Information</link> in order to get programmatic access to Python script locations."
+msgstr "Begiratu <link href=\"text/sbasic/python/python_session.xhp\" name=\"Getting Session Information\">Saioaren informazioa eskuratzea</link> Python scripten kokalekuak programazio bidez atzitzeko."
+
+#. GDrUs
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id591544049572647\n"
+"help.text"
+msgid "Application Macros"
+msgstr "Aplikazio-makroak"
+
+#. xBzRT
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id261544049064421\n"
+"help.text"
+msgid "Existing macros in this location (container) were copied by the installation program and are available to every computer user, and any open document can access macros stored the container. You need administrative rights to store or edit macros here."
+msgstr "Kokaleku (edukiontzi) honetan dauden makroak instalazio-programak kopiatu zituen eta ordenagailuko edozein erabiltzailek erabil ditzake, eta edozein dokumentu irekik atzi ditzake edukiontzian biltegiratutako makroak. Administrazio-eskubideak behar dira horko makroak editatzeko edo berriak biltegiratzeko."
+
+#. M8CGu
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id861544210028670\n"
+"help.text"
+msgid "The %PRODUCTNAME  Macros container location in the file system depends on the operating system:"
+msgstr "%PRODUCTNAME Macros edukiontziak fitxategi-sisteman duen kokapena sistema eragilearen araberakoa da:"
+
+#. GMBSF
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id191544210072242\n"
+"help.text"
+msgid "For <emph>Windows</emph>: <literal>{Installation}\\share\\Scripts\\python</literal>."
+msgstr "<emph>Windows</emph> sistemetan: <literal>(Installation)\\share\\Scripts\\python</literal>."
+
+#. DV8TD
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id61544210078654\n"
+"help.text"
+msgid "For <emph>Linux</emph> and <emph>macOS</emph>: <literal>{Installation}/share/Scripts/python</literal>."
+msgstr "<emph>Linux</emph> eta <emph>macOS</emph> sistemetan: <literal>(Installation)/share/Scripts/python</literal>."
+
+#. 5sHwj
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id861544049692222\n"
+"help.text"
+msgid "My Macros"
+msgstr "Nire makroak"
+
+#. aiMzD
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id981544049055996\n"
+"help.text"
+msgid "This container is accessible only by the %PRODUCTNAME user. Any open document can access macros stored the container. Macros in this location are stored in the %PRODUCTNAME user profile."
+msgstr "Edukiontzi hau %PRODUCTNAME erabiltzaileak soilik atzi dezake. Edozein dokumentu irekik atzi ditzake edukiontzian biltegiratutako makroak. Kokaleku honetako makroak %PRODUCTNAME erabiltzailearen profilean biltegiratzen dira."
+
+#. wUjx4
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id341544210187846\n"
+"help.text"
+msgid "The My Macros container location is in the user space and depends on the operating system:"
+msgstr "'Nire makroak' edukiontziaren kokalekua erabiltzaile-espazioan dago eta sistema eragilearen araberakoa da:"
+
+#. mhNtD
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id381544210213190\n"
+"help.text"
+msgid "For <emph>Windows</emph>,<br/><literal>%APPDATA%\\LibreOffice\\4\\user\\Scripts\\python</literal>."
+msgstr "<emph>Windows</emph>en,<br/><literal>%APPDATA%\\LibreOffice\\4\\user\\Scripts\\python</literal>."
+
+#. fQYPE
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id691544210219850\n"
+"help.text"
+msgid "For <emph>Linux</emph> and <emph>macOS</emph>,<br/><literal>$HOME/.config/libreoffice/4/user/Scripts/python</literal>."
+msgstr "<emph>Linux</emph>en eta <emph>macOS</emph>en,<br/><literal>$HOME/.config/libreoffice/4/user/Scripts/python</literal>."
+
+#. CSJC9
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id101544049707712\n"
+"help.text"
+msgid "Document macros"
+msgstr "Dokumentu-makroak"
+
+#. FBmoB
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id31544049046497\n"
+"help.text"
+msgid "Document macros are embedded in the document and are accessible only when the document is open."
+msgstr "Dokumentu-makroak dokumentuan kapsulatuta daude eta hura irekitzen denean soilik daude erabilgarri."
+
+#. qbVc9
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"hd_id171544049715310\n"
+"help.text"
+msgid "Libraries, Modules and Macros"
+msgstr "Liburutegiak, moduluak eta makroak"
+
+#. 24e7J
+#: python_locations.xhp
+msgctxt ""
+"python_locations.xhp\n"
+"par_id181544209916707\n"
+"help.text"
+msgid "Python macros can be organized in libraries, modules and macros. Use the Macro Library hierarchy as a guide when creating or installing new macros in module files, new module files in library folders or new library folders in containers."
+msgstr "Python makroak liburutegietan, moduluetan eta makroetan egon daitezke antolatuta. Erabili makro-liburutegien hierarkia gida modura makro berriak modulu-fitxategietan sortzean edo instalatzean, modulu-fitxategi berriak liburutegi-karpetatan sortzean edo liburutegi-karpeta berriak edukiontzietan sortzean."
+
+#. Zcfxg
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python : Platform class"
+msgstr "Python: Platform klasea"
+
+#. jnNvg
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0508\n"
+"help.text"
+msgid "<bookmark_value>Platform;isLinux</bookmark_value>        <bookmark_value>Platform;isMacOsX</bookmark_value>        <bookmark_value>Platform;isWindows</bookmark_value>        <bookmark_value>Platform;ComputerName</bookmark_value>        <bookmark_value>Platform;OSName</bookmark_value>        <bookmark_value>API;ConfigurationAccess</bookmark_value>        <bookmark_value>Tools;GetRegistryContent</bookmark_value>"
+msgstr "<bookmark_value>Platform;isLinux</bookmark_value>        <bookmark_value>Platform;isMacOsX</bookmark_value>        <bookmark_value>Platform;isWindows</bookmark_value>        <bookmark_value>Platform;ComputerName</bookmark_value>        <bookmark_value>Platform;OSName</bookmark_value>        <bookmark_value>API;ConfigurationAccess</bookmark_value>        <bookmark_value>Tools;GetRegistryContent</bookmark_value>"
+
+#. uMBGn
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0509\n"
+"help.text"
+msgid "<variable id=\"pythonplatform\"><link href=\"text/sbasic/python/python_platform.xhp\" name=\"platform01\">Identifying the operating system</link></variable>"
+msgstr "<variable id=\"pythonplatform\"><link href=\"text/sbasic/python/python_platform.xhp\" name=\"platform01\">Sistema eragilea identifikatzea</link></variable>"
+
+#. vqduy
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0510\n"
+"help.text"
+msgid "Identifying the operating system can be performed with Python or Basic language."
+msgstr "Sistema eragilea Python zein Basic lengoaiekin identifikatu daiteke."
+
+#. gZrHC
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0511\n"
+"help.text"
+msgid "ComputerName property is solely available for Windows. Basic calls to Python macros help overcome %PRODUCTNAME Basic limitations."
+msgstr "ComputerName propietatea Windowserako soilik dago erabilgarri. %PRODUCTNAME Basic lengoaiaren mugak gainditzeko, Python makroak deitu daitezke Basic-etik."
+
+#. sV6Fp
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0512\n"
+"help.text"
+msgid "Using a Python class:"
+msgstr "Python klase bat erabilita:"
+
+#. ikwcW
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0529\n"
+"help.text"
+msgid "Using a Basic classmodule:"
+msgstr "Basic klase-modulu bat erabilita:"
+
+#. 7BpCv
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"NO529b\n"
+"help.text"
+msgid "%PRODUCTNAME Basic lacks MacOS X native recognition. Platform identification is possible using %PRODUCTNAME Application Programming Interface (API)."
+msgstr "%PRODUCTNAME Basic lengoaiak ez du jatorrizko MacOS X ezagutza. Plataformaren identifikazioa %PRODUCTNAME APIa erabilita egin daiteke."
+
+#. tTyE5
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0451\n"
+"help.text"
+msgid "' Return platform name as \"MAC\", \"UNIX\", \"WIN\""
+msgstr "' Itzuli plataformaren izena honela: \"MAC\", \"UNIX\", \"WIN\""
+
+#. AwTGx
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0551\n"
+"help.text"
+msgid "' Inferred from \"Tools.UCB.ShowHelperDialog\" function"
+msgstr "' \"Tools.UCB.ShowHelperDialog\" funtziotik ondorioztatua"
+
+#. jtA2N
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0564\n"
+"help.text"
+msgid "Examples:"
+msgstr "Adibideak:"
+
+#. riK2q
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0565\n"
+"help.text"
+msgid "With Python"
+msgstr "Pythonekin"
+
+#. FELjZ
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0567\n"
+"help.text"
+msgid "<literal>>>> print(Platform().isMacOSX)  # object property</literal>"
+msgstr "<literal>>>> print(Platform().isMacOSX)  # objektu-propietatea</literal>"
+
+#. dAWDs
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0569\n"
+"help.text"
+msgid "<literal>>>> input(Platform().OSName)  # object property</literal>"
+msgstr "<literal>>>> input(Platform().OSName)  # objektu-propietatea</literal>"
+
+#. MkpG4
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0571\n"
+"help.text"
+msgid "From <menuitem>Tools – Macros - Run Macro...</menuitem> menu."
+msgstr "<menuitem>Tresnak - Makroak - Exekutatu makroa...</menuitem> menutik."
+
+#. Qk6MM
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0576\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic"
+msgstr "%PRODUCTNAME Basic lengoaiarekin"
+
+#. Jkyqd
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0578\n"
+"help.text"
+msgid "Dim p As New Platform ' instance of Platform class"
+msgstr "Dim p As New Platform ' Platform klasearen instantzia"
+
+#. HWYHg
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0579\n"
+"help.text"
+msgid "MsgBox p.isLinux ' object property"
+msgstr "MsgBox p.isLinux ' objektu-propietatea"
+
+#. 9FGEv
+#: python_platform.xhp
+msgctxt ""
+"python_platform.xhp\n"
+"N0580\n"
+"help.text"
+msgid "Print p.isWindows, p.OSName ' object properties"
+msgstr "Print p.isWindows, p.OSName ' objektu-propietateak"
+
+#. ej5WE
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python : Programming with Python"
+msgstr "Python : Pythonekin programatzea"
+
+#. g4R9j
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0218\n"
+"help.text"
+msgid "<bookmark_value>Python;Programming</bookmark_value>        <bookmark_value>XSCRIPTCONTEXT;Python</bookmark_value>        <bookmark_value>XSCRIPTCONTEXT;getComponentContext()</bookmark_value>        <bookmark_value>uno.py</bookmark_value>        <bookmark_value>uno.py;getComponentContext()</bookmark_value>"
+msgstr "<bookmark_value>Python;programazioa</bookmark_value>        <bookmark_value>XSCRIPTCONTEXT;Python</bookmark_value>        <bookmark_value>XSCRIPTCONTEXT;getComponentContext()</bookmark_value>        <bookmark_value>uno.py</bookmark_value>        <bookmark_value>uno.py;getComponentContext()</bookmark_value>"
+
+#. CU6JS
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"hd_id691546462755220\n"
+"help.text"
+msgid "<variable id=\"pythonprogrammingheading\"><link href=\"text/sbasic/python/python_programming.xhp\" name=\"python programming\">Programming with Python Scripts</link></variable>"
+msgstr "<variable id=\"pythonprogrammingheading\"><link href=\"text/sbasic/python/python_programming.xhp\" name=\"python programming\">Python scriptekin programatzea</link></variable>"
+
+#. BjiFe
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0220\n"
+"help.text"
+msgid "A Python macro is a function within a .py file, identified as a module. Unlike %PRODUCTNAME Basic and its dozen of <link href=\"text/sbasic/shared/uno_objects.xhp\" name=\"UNO objects functions or services\">UNO objects functions or services</link>, Python macros use the <literal>XSCRIPTCONTEXT</literal> UNO single object, shared with JavaScript and BeanShell. The <literal>g_exportedScripts</literal> global tuple explicitly lists selectable macros from a module. Python modules hold autonomous code logic, and are independent from one another."
+msgstr "Python makro bat .py fitxategi batean dagoen funtzioa bat da, modulu gisa identifikatzen dena. %PRODUCTNAME Basic lengoaian eta haren hamaika <link href=\"text/sbasic/shared/uno_objects.xhp\" name=\"UNO objects functions or services\">UNO objektu, funtzio edo zerbitzuen</link> kasuan ez bezala, Python makroek <literal>XSCRIPTCONTEXT</literal> UNO objektu bakarra erabiltzen dute, JavaScript eta Beanshell lengoaiek ere partekatzen dutena. <literal>g_exportedScripts</literal> tupla globalak modu esplizituan zerrendatzen ditu modulu bateko makro hautagarriak. Python moduluek kode-logika autonomoa dute, eta elkarrekiko independenteak dira."
+
+#. 8Ri8m
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0221\n"
+"help.text"
+msgid "XSCRIPTCONTEXT Global Variable"
+msgstr "XSCRIPTCONTEXT aldagai globala"
+
+#. xnRGE
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0222\n"
+"help.text"
+msgid "Genuine Basic UNO facilities can be inferred from <literal>XSCRIPTCONTEXT</literal> global variable. Refer to %PRODUCTNAME API for a complete <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScriptContext.html\" name=\"description of XSCRIPTCONTEXT\">description of XSCRIPTCONTEXT</link>. <literal>XSCRIPTCONTEXT</literal> methods summarize as:"
+msgstr "Benetako Basic UNO zerbitzuak <literal>XSCRIPTCONTEXT</literal> aldagai globaletik ondoriozta daitezke. Begiratu %PRODUCTNAME APIa <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScriptContext.html\" name=\"description of XSCRIPTCONTEXT\">XSCRIPTCONTEXTen deskribapen</link> osoa ikusteko. <literal>XSCRIPTCONTEXT</literal> metodoen laburpena:"
+
+#. U6KbS
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0224\n"
+"help.text"
+msgid "Methods"
+msgstr "Metodoak"
+
+#. skMQF
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0225\n"
+"help.text"
+msgid "Description"
+msgstr "Deskribapena"
+
+#. onsBW
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0226\n"
+"help.text"
+msgid "Mapped in Basic as"
+msgstr "Basic lengoaian honela mapatua:"
+
+#. 54Nun
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0228\n"
+"help.text"
+msgid "The document reference on which the script can operate."
+msgstr "Scriptak funtzionatuko duen erreferentziako dokumentua."
+
+#. CR7pv
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0231\n"
+"help.text"
+msgid "The desktop reference on which the script can operate."
+msgstr "Scriptak funtzionatuko duen erreferentziako mahaigaina."
+
+#. rAVfx
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0234\n"
+"help.text"
+msgid "The component context which the script can use to create other uno components."
+msgstr "Scriptak beste UNO osagai batzuk sortzeko erabil dezakeen osagai-testuingurua."
+
+#. 5wUcN
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0237\n"
+"help.text"
+msgid "<emph>HelloWorld</emph> and <emph>Capitalise</emph> installation shared scripts illustrate UNO-related macros making use of <literal>XSCRIPTCONTEXT</literal> global variable."
+msgstr "Instalazioan partekatutako <emph>HelloWorld</emph> eta <emph>Capitalise</emph> scriptek <literal>XSCRIPTCONTEXT</literal> aldagai globala erabiltzen duten eta UNOri lotuta dauden makroen adibide dira."
+
+#. RQgKR
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0238\n"
+"help.text"
+msgid "Python standard output file is not available when running Python macros from <menuitem>Tools - Macros - Run Macro</menuitem> menu. Refer to <emph>Input/Output to Screen</emph> for more information."
+msgstr "Pythonen irteerako fitxategi estandarra ez dago erabilgarri Python makroak <menuitem>Tresnak - Makroak - Exekutatu makroa</menuitem> menutik exekutatzean. Begiratu <emph>Sarrera/irteera pantailara</emph> informazio gehiagorako."
+
+#. WuGCs
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0239\n"
+"help.text"
+msgid "Module import"
+msgstr "Moduluen inportazioa"
+
+#. tBVP2
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0240\n"
+"help.text"
+msgid "<literal>XSCRIPTCONTEXT</literal> is not provided to imported modules."
+msgstr "<literal>XSCRIPTCONTEXT</literal> ez zaie hornitzen inportatutako moduluei."
+
+#. dURCV
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0241\n"
+"help.text"
+msgid "%PRODUCTNAME Basic libraries contain classes, routines and variables, Python modules contain classes, functions and variables. Common pieces of reusable Python or UNO features must be stored in <link href=\"text/sbasic/python/python_locations.xhp\" name=\"My macros\">My macros</link> within <literal>(User Profile)/Scripts/python/pythonpath</literal>. Python libraries help organize modules in order to prevent module name collisions. Import <literal>uno.py</literal> inside shared modules."
+msgstr "%PRODUCTNAME Basic liburutegiek klaseak, errutinak eta aldagaiak dituzte; Python moduluek, berriz, klaseak, funtzioak eta aldagaiak dituzte. Python edo UNO eginbideen pieza berrerabilgarri arruntak <link href=\"text/sbasic/python/python_locations.xhp\" name=\"My macros\">Nire makroak</link> karpetan biltegiratu behar dira, <literal>(erabiltzaile-profila)/Scripts/python/pythonpath</literal> barruan. Python liburutegiek moduluak antolatzeko balio dute, moduluen izenen gatazkak sor ez daitezen. Inportatu <literal>uno.py</literal> partekatutako moduluen barruan."
+
+#. a2xVe
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0242\n"
+"help.text"
+msgid "Genuine BASIC UNO facilities can be inferred using <literal>uno.py</literal> module. Use <link href=\"text/sbasic/python/python_shell.xhp\" name=\"Python interactive shell\">Python interactive shell</link> to get a complete module description using <literal>dir()</literal> and <literal>help()</literal> Python commands."
+msgstr "Benetako BASIC UNO hornidurak <literal>uno.py</literal> modulua erabilita ondoriozta daitezke. Erabili <link href=\"text/sbasic/python/python_shell.xhp\" name=\"Python interactive shell\">Python kontsola interaktiboa</link> moduluaren deskribapen osoa eskuratzeko <literal>dir()</literal> eta <literal>help()</literal> Python komandoak erabilita."
+
+#. Gi6iz
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0244\n"
+"help.text"
+msgid "Functions"
+msgstr "Funtzioak"
+
+#. jFADb
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0245\n"
+"help.text"
+msgid "Description"
+msgstr "Deskribapena"
+
+#. 6wDQn
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0246\n"
+"help.text"
+msgid "Mapped in Basic as"
+msgstr "Basic lengoaian honela mapatua:"
+
+#. 7prVF
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0248\n"
+"help.text"
+msgid "Returns an absolute file url from the given urls."
+msgstr "Fitxategi baten URL absolutu bat itzultzen du emandako URLetatik abiatuta."
+
+#. PE7AD
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0251\n"
+"help.text"
+msgid "Creates a UNO struct or exception given by typeName."
+msgstr "UNO struct bat edo typeName-k emandako salbuespen bat sortzen du."
+
+#. FNPMc
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0254\n"
+"help.text"
+msgid "Returns a system path."
+msgstr "Sistemaren bide-izen bat itzultzen du."
+
+#. sFbd9
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0257\n"
+"help.text"
+msgid "Returns the class of a concrete UNO exception, struct, or interface."
+msgstr "UNO salbuespen, struct edo interfaze baten klasea itzultzen du."
+
+#. qAbMv
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0260\n"
+"help.text"
+msgid "Returns the UNO component context used to initialize the Python runtime."
+msgstr "Python exekuzio-garaia hasieratzeko erabilitako UNO osagai-testuinguru itzultzen du."
+
+#. WQBzo
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0264\n"
+"help.text"
+msgid "Looks up the value of an IDL constant by giving its explicit name."
+msgstr "IDL konstante baten balioa begiratzen du, haren izen esplizitua emanda."
+
+#. VD2pr
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0265\n"
+"help.text"
+msgid "See API constant groups"
+msgstr "Ikusi API konstanteen taldeak"
+
+#. RMBST
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0267\n"
+"help.text"
+msgid "Returns True, when obj is a class of a UNO interface."
+msgstr "TRUE (egiazkoa) itzultzen du, obj UNO interfaze baten klasea denean."
+
+#. B84WF
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0270\n"
+"help.text"
+msgid "Returns a file URL for the given system path."
+msgstr "Fitxategi baten URLa itzultzen du emandako sistemaren bide-izenerako."
+
+#. GEMGY
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0272\n"
+"help.text"
+msgid "<emph>LibreLogo</emph> and <emph>TableSample</emph> installation shared scripts use <literal>uno.py</literal> module."
+msgstr "<emph>LibreLogo</emph> eta <emph>TableSample</emph> instalazioek partekatutako scriptek <literal>uno.py</literal> modulua darabilte."
+
+#. 9NieC
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0273\n"
+"help.text"
+msgid "More Python-Basic samples"
+msgstr "Python-Basic lagin gehiago"
+
+#. 6Yct5
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0275\n"
+"help.text"
+msgid "Python UNO"
+msgstr "Python UNO"
+
+#. 8GvqG
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0276\n"
+"help.text"
+msgid "Basic UNO features"
+msgstr "Basic UNO eginbideak"
+
+#. 8EWYh
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0284\n"
+"help.text"
+msgid "See <link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"Opening a Dialog\">Opening a Dialog</link>"
+msgstr "Ikusi <link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"Opening a Dialog\">Elkarrizketa-koadro bat irekitzea</link>"
+
+#. F2cFF
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0286\n"
+"help.text"
+msgid "See <link href=\"text/sbasic/python/python_listener.xhp\" name=\"Creating a Listener\">Creating a Listener</link>"
+msgstr "Ikus <link href=\"text/sbasic/python/python_listener.xhp\" name=\"Creating a Listener\">Entzule bat sortzea</link>"
+
+#. LNUaK
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0288\n"
+"help.text"
+msgid "See UNO data types"
+msgstr "Ikusi UNO datu motak"
+
+#. 4vWGa
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0297\n"
+"help.text"
+msgid "Importing an embedded Module"
+msgstr "Kapsulatutako modulu bat inporatzea"
+
+#. SGVBE
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0298\n"
+"help.text"
+msgid "Similarly to %PRODUCTNAME Basic that supports browsing and dynamic loading of libraries, Python libraries can be explored and imported on demand. For more information on library containers, visit <link href=\"https://api.libreoffice.org/\" name=\"API Documentation site\">%PRODUCTNAME Application Programming Interface</link> (API) or download <link href=\"https://www.libreoffice.org/download/download/\" name=\"SDK download page\">%PRODUCTNAME Software Development Kit</link> (SDK)."
+msgstr "%PRODUCTNAME Basic lengoaiak liburutegien arakatzea eta kargatze dinamikoa onartzen duen bezala, Python liburutegiak ere dinamikoki arakatu eta inportatu daitezke. Liburutegi-edukiontziei buruzko informazio gehiagorako, ikusi <link href=\"https://api.libreoffice.org/\" name=\"API Documentation site\">%PRODUCTNAME Application Programming Interface</link> (API) edo deskargatu <link href=\"https://www.libreoffice.org/download/download/\" name=\"SDK download page\">%PRODUCTNAME Software Development Kit</link> (SDK)."
+
+#. VtFrH
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0299\n"
+"help.text"
+msgid "Importing a Python document embedded module is illustrated below, exception handling is not detailed:"
+msgstr "Dokumentuan kapsulatutako Python modulu bat inportatzea azaltzen da behean, salbuespenen maneiua ez da xehatu:"
+
+#. P2R2D
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0303\n"
+"help.text"
+msgid "\"\"\" load library and import module"
+msgstr "\"\"\" kargatu liburutegia eta inportatu modulua"
+
+#. oBnkG
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0305\n"
+"help.text"
+msgid "Adapted from 'Bibliothèque de fonctions' by Hubert Lambert"
+msgstr "Hubert Lambert garatzailearen 'Bibliothèque de fonctions' lanetik moldatua"
+
+#. FFxTV
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0306\n"
+"help.text"
+msgid "at https://forum.openoffice.org/fr/forum/viewtopic.php?p=286213\"\"\""
+msgstr "https://forum.openoffice.org/fr/forum/viewtopic.php?p=286213\"\"\""
+
+#. A2Zvp
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0307\n"
+"help.text"
+msgid "doc = XSCRIPTCONTEXT.getDocument()  # current document"
+msgstr "doc = XSCRIPTCONTEXT.getDocument()  # uneko dokumentua"
+
+#. qqpCF
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0310\n"
+"help.text"
+msgid "if not url in sys.path:  # add path if necessary"
+msgstr "if not url in sys.path:  # gehitu bide-izena, beharrezkoa bada"
+
+#. HWoLC
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0311\n"
+"help.text"
+msgid "sys.path.insert(0, url)  # doclib takes precedence"
+msgstr "sys.path.insert(0, url)  # doclib elementuak lehentasuna hartzen du"
+
+#. wBdYA
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0312\n"
+"help.text"
+msgid "if module_name:  # import if requested"
+msgstr "if module_name:  # inportatu, eskatzen bada"
+
+#. B9zJW
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0316\n"
+"help.text"
+msgid "ui = load_library(\"my_gui\",'screen_io')  # add <lib> path + import <module>"
+msgstr "ui = load_library(\"my_gui\",'screen_io')  # gehitu <lib> bidea + inportatu <module>"
+
+#. HFcCm
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"N0321\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/uno_objects.xhp\" name=\"UNO objects page\">Basic UNO Objects, Functions and Services</link>"
+msgstr "<link href=\"text/sbasic/shared/uno_objects.xhp\" name=\"UNO objects page\">Oinarrizko UNO objektuak, funtzioak eta zerbitzuak</link>"
+
+#. zRBRa
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python : Screen Input/Output"
+msgstr "Python : Pantailaren sarrera eta irteera"
+
+#. tMEMB
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0433\n"
+"help.text"
+msgid "<bookmark_value>Python;InputBox</bookmark_value>        <bookmark_value>Python;MsgBox</bookmark_value>        <bookmark_value>Python;Print</bookmark_value>        <bookmark_value>API;script.provider.MasterScriptProvider: Screen Input/Output</bookmark_value>        <bookmark_value>API;script.provider.XScript: Screen Input/Output</bookmark_value>"
+msgstr "<bookmark_value>Python;InputBox</bookmark_value>        <bookmark_value>Python;MsgBox</bookmark_value>        <bookmark_value>Python;Print</bookmark_value>        <bookmark_value>API;script.provider.MasterScriptProvider: Sarrea/irteera pantailara</bookmark_value>        <bookmark_value>API;script.provider.XScript: Sarrera/irteera pantailara</bookmark_value>"
+
+#. fovpz
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0434\n"
+"help.text"
+msgid "<variable id=\"ioscreen\"><link href=\"text/sbasic/python/python_screen.xhp\" name=\"IO to screen\">Input/Output to Screen</link></variable>"
+msgstr "<variable id=\"ioscreen\"><link href=\"text/sbasic/python/python_screen.xhp\" name=\"IO to screen\">Sarrera/irteera pantailara</link></variable>"
+
+#. qCLEs
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0435\n"
+"help.text"
+msgid "Python standard output file is not available when running Python macros from <menuitem>Tools – Macros - Run Macro</menuitem>... menu. Presenting the output of a module requires the Python interactive console. Features such as <literal>input()</literal>, <literal>print()</literal>, <literal>repr()</literal> and <literal>str()</literal> are available from the Python shell."
+msgstr "Pythonen irteera-fitxategi estandarra ez dago erabilgarri Python makroak <menuitem>Tresnak – Makroak - Exekutatu makroa</menuitem>... menutik exekutatzen direnean. Modulu baten irteera erakusteko, Pythonen shell interaktiboa behar da. <literal>input()</literal>, <literal>print()</literal>, <literal>repr()</literal> eta <literal>str()</literal> eta beste zenbait eginbide Python kontsolan soilik daude erabilgarri."
+
+#. NHHFB
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0436\n"
+"help.text"
+msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"apso\">Alternative Python Script Organizer</link> (APSO) extension offers a msgbox() function out of its <literal>apso_utils</literal> module."
+msgstr "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"apso\">Alternative Python Script Organizer</link> (APSO) hedapenak msgbox() funtzio bat eskaintzen du <literal>apso_utils</literal> moduluan."
+
+#. aPSDz
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0437\n"
+"help.text"
+msgid "%PRODUCTNAME Basic proposes <literal>InputBox()</literal>, <literal>Msgbox()</literal> and <literal>Print()</literal> screen I/O functions. Python alternatives exist relying either on %PRODUCTNAME API Abstract Windowing Toolkit, either on Python to Basic function calls. The latter proposes a syntax that is intentionally close to that of Basic, and uses a Python module next to a Basic module. The API Scripting Framework is used to perform Basic, BeanShell, JavaScript and Python inter-languages function calls."
+msgstr "%PRODUCTNAME Basic lengoaiak <literal>InputBox()</literal>, <literal>Msgbox()</literal> eta <literal>Print()</literal> funtzioak proposatzen ditu pantailaren sarrerarako/irteerarako. Badaude horretarako Pythonen ordezkoak, %PRODUCTNAME API Abstract Windowing Toolkiten oinarritutakoak edo Pythonetik Basic-erako funtzio-deietan oinarritutakoak. Azkenak proposatzen duen sintaxia Basic lengoaiarenaren antzekoa da, nahita, eta Basic modulu baten hurbilekoa den Python modulu bat erabiltzen du. API Scripting Framework erabiltzen da Basic, BeanShell, JavaScript eta Python lengoaien arteko funtzio-deiak gauzatzeko."
+
+#. hat4k
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0438\n"
+"help.text"
+msgid "Python syntax:"
+msgstr "Python sintaxia:"
+
+#. QypFq
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0442\n"
+"help.text"
+msgid "Examples:"
+msgstr "Adibideak:"
+
+#. DbZVx
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0449\n"
+"help.text"
+msgid "Installation:"
+msgstr "Instalazioa:"
+
+#. QDrDk
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0450\n"
+"help.text"
+msgid "Copy <literal>screen_io</literal> Python module in <link href=\"text/sbasic/python/python_locations.xhp\" name=\"User macros\">My macros</link> within <UserProfile>/Scripts/python/pythonpath,"
+msgstr "Kopiatu <literal>screen_io</literal> Python modulua <link href=\"text/sbasic/python/python_locations.xhp\" name=\"User macros\">Nire makroak</link> karpetan, <UserProfile>/Scripts/python/pythonpath barruan,"
+
+#. bckjW
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0451\n"
+"help.text"
+msgid "Copy <literal>uiScripts</literal> Basic module in <link href=\"text/sbasic/python/python_locations.xhp\" name=\"User macros\">My macros</link> Standard Basic library,"
+msgstr "Kopiatu <literal>uiScripts</literal> Basic modulua <link href=\"text/sbasic/python/python_locations.xhp\" name=\"User macros\">Nire makroak</link> Standard Basic liburutegian,"
+
+#. XAthB
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0452\n"
+"help.text"
+msgid "Restart %PRODUCTNAME."
+msgstr "Berrabiarazi %PRODUCTNAME."
+
+#. jGGGZ
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0453\n"
+"help.text"
+msgid "<literal>screen_io</literal> Python module"
+msgstr "<literal>screen_io</literal> Python modulua"
+
+#. EB2zZ
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0467\n"
+"help.text"
+msgid "\"\"\" Displays a dialog box containing a message and returns a value.\"\"\""
+msgstr "\"\"\" Mezu bat duen elkarrizketa-koadro bat bistaratzen du eta balio bat itzultzen du.\"\"\""
+
+#. nUtxt
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0473\n"
+"help.text"
+msgid "\"\"\" Displays a prompt in a dialog box at which the user can enter text.\"\"\""
+msgstr "\"\"\" Gonbita bistaratzen du elkarrizketa-koadro batean, erabiltzaileak testua sartu ahal izateko.\"\"\""
+
+#. MFz5D
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0479\n"
+"help.text"
+msgid "\"\"\"Outputs the specified strings or numeric expressions in a dialog box.\"\"\""
+msgstr "\"\"\"Elkarrizketa-koadroan zehaztutako kateak edo zenbakizko adierazpenak ematen ditu.\"\"\""
+
+#. EYqxJ
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"N0492\n"
+"help.text"
+msgid "<literal>uiScripts</literal> Basic module"
+msgstr "<literal>uiScripts</literal> Basic modulua"
+
+#. CGnPe
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python_Session : Session class"
+msgstr "Python_Session : Session klasea"
+
+#. vkS8P
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0339\n"
+"help.text"
+msgid "<bookmark_value>Session;UserName</bookmark_value>        <bookmark_value>Session;SharedScripts</bookmark_value>        <bookmark_value>Session;SharedPythonScripts</bookmark_value>        <bookmark_value>Session;UserProfile</bookmark_value>        <bookmark_value>Session;UserScripts</bookmark_value>        <bookmark_value>Session;UserPythonScripts</bookmark_value>        <bookmark_value>API;PathSubstitution</bookmark_value>"
+msgstr "<bookmark_value>saioa;erabiltzaile-izena</bookmark_value>        <bookmark_value>saioa;script partekatuak</bookmark_value>        <bookmark_value>saioa;Python script partekatuak</bookmark_value>        <bookmark_value>saioa;erabiltzaile-profila</bookmark_value>        <bookmark_value>saioa;erabiltzaile-scriptak</bookmark_value>        <bookmark_value>saioa;erabiltzailearen Python scriptak</bookmark_value>        <bookmark_value>APIa;bide-ordezpena</bookmark_value>"
+
+#. EvmoA
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0340\n"
+"help.text"
+msgid "<variable id=\"pythonsession\"><link href=\"text/sbasic/python/python_session.xhp\" name=\"session01\">Getting Session Information</link></variable>"
+msgstr "<variable id=\"pythonsession\"><link href=\"text/sbasic/python/python_session.xhp\" name=\"session01\">Saioaren informazioa eskuratzea</link></variable>"
+
+#. nmTjF
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0341\n"
+"help.text"
+msgid "Computing %PRODUCTNAME user profile and shared modules system file paths can be performed with Python or with Basic languages. BeanShell, Java, JavaScript and Python scripts locations can be derived from this information."
+msgstr "%PRODUCTNAME erabiltzaile-profila eta modulu partekatuen sistemaren fitxategi-izenak kalkulatzeko, Python edo Basic lengoaiak erabil daitezke. BeanShell, Java, JavaScript eta Python scripten kokalekua informazio horretatik eratorri daiteke."
+
+#. gMnyC
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0343\n"
+"help.text"
+msgid "Examples:"
+msgstr "Adibideak:"
+
+#. m498C
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0344\n"
+"help.text"
+msgid "With Python shell."
+msgstr "Python kontsolarekin."
+
+#. yziJv
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0346\n"
+"help.text"
+msgid "<literal>>>> print(Session.SharedPythonScripts())  # static method</literal>"
+msgstr "<literal>>>> print(Session.SharedPythonScripts())  # metodo estatikoa</literal>"
+
+#. ezhbr
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0347\n"
+"help.text"
+msgid "<literal>>>> print(Session().UserName)  # object property</literal>"
+msgstr "<literal>>>> print(Session().UserName)  # objektu-propietatea</literal>"
+
+#. K4Cjj
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0348\n"
+"help.text"
+msgid "<literal>>>> input(Session().UserProfile)  # object property</literal>"
+msgstr "<literal>>>> input(Session().UserProfile)  # objektu-propietatea</literal>"
+
+#. CVdoK
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0349\n"
+"help.text"
+msgid "From <menuitem>Tools – Macros - Run Macro</menuitem>... menu."
+msgstr "<menuitem>Tresnak - Makroak - Exekutatu makroa</menuitem>... menutik."
+
+#. k47pk
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0354\n"
+"help.text"
+msgid "ui.MsgBox(Session.Share(),title='Installation Share')  # static method"
+msgstr "ui.MsgBox(Session.Share(),title='Installation Share')  # metodo estatikoa"
+
+#. mFu9h
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0355\n"
+"help.text"
+msgid "ui.Print(Session.SharedPythonScripts())  # static method"
+msgstr "ui.Print(Session.SharedPythonScripts())  # metodo estatikoa"
+
+#. osmNG
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0356\n"
+"help.text"
+msgid "s = Session()  # instance creation"
+msgstr "s = Session()  # instantziaren sorrera"
+
+#. Gqz8J
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0357\n"
+"help.text"
+msgid "ui.MsgBox(s.UserName,title='Hello')  # object property"
+msgstr "ui.MsgBox(s.UserName,title='Kaixo')  # objektu-propietatea"
+
+#. 8c4GN
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0358\n"
+"help.text"
+msgid "ui.Print(s.UserPythonScripts)  # object property"
+msgstr "ui.Print(s.UserPythonScripts)  # objektu-propietatea"
+
+#. GAffb
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0360\n"
+"help.text"
+msgid "g_exportedScripts = (demo_session,)  # public macros"
+msgstr "g_exportedScripts = (demo_session,)  # makro publikoak"
+
+#. GfLEb
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0361\n"
+"help.text"
+msgid "With %PRODUCTNAME Basic."
+msgstr "%PRODUCTNAME Basic lengoaiarekin."
+
+#. CJAPH
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0364\n"
+"help.text"
+msgid "Print \"Shared scripts location:\", s.SharedScripts"
+msgstr "Print \"Script partekatuen kokalekua:\", s.SharedScripts"
+
+#. nKgLS
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0365\n"
+"help.text"
+msgid "MsgBox s.UserName,,\"Hello\""
+msgstr "MsgBox s.UserName,,\"Kaixo\""
+
+#. Dvp2n
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0368\n"
+"help.text"
+msgid "Using COM/OLE and Visual Basic Scripting language."
+msgstr "COM/OLE eta Visual Basic Scripting lengoaia erabilita."
+
+#. u2czW
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0369\n"
+"help.text"
+msgid "' The service manager is always the entry point"
+msgstr "' Zerbitzu-kudeatzailea beti da sarrera-puntua"
+
+#. BiCRF
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0370\n"
+"help.text"
+msgid "' If there is no office running then an office is started up"
+msgstr "' Bulegotika-aplikazioa exekutatzen ari ez bada, abiarazi egingo da"
+
+#. mepxA
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0372\n"
+"help.text"
+msgid "' PathSubstitution service exhibits information to infer"
+msgstr "' PathSubstitution zerbitzuak ondorioak ateratzeko informazioa erakusten du"
+
+#. njK5P
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0373\n"
+"help.text"
+msgid "' <UserProfile|Share>/Scripts/python locations from"
+msgstr "' <UserProfile|Share>/Scripts/python kokalekuak hemendik:"
+
+#. XPAGf
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0381\n"
+"help.text"
+msgid "Python Session class:"
+msgstr "Pythonen Session klasea:"
+
+#. ePFtK
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0401\n"
+"help.text"
+msgid "@property  # alternative to '$(username)' variable"
+msgstr "@property  # '$(username)' aldaiaren ordezkoa"
+
+#. CBvZv
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0342\n"
+"help.text"
+msgid "Unlike Basic, pathname normalization is performed with Python inside Session class."
+msgstr "Basic lengoaian ez bezala, Pythonen Session klasearen barruan gauzatzen da bide-izenen normalizazioa."
+
+#. 8zUvW
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0412\n"
+"help.text"
+msgid "%PRODUCTNAME Basic Session class:"
+msgstr "%PRODUCTNAME Basic Session klasea:"
+
+#. ivAG6
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0417\n"
+"help.text"
+msgid "Private _ps As Object ' Private member"
+msgstr "Private _ps As Object ' Kide pribatua"
+
+#. Q9sNs
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0422\n"
+"help.text"
+msgid "End Sub ' Constructor"
+msgstr "End Sub ' Eraikitzailea"
+
+#. ELSQJ
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0426\n"
+"help.text"
+msgid "End Sub ' Destructor"
+msgstr "End Sub ' Suntsitzailea"
+
+#. 7neVV
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0439\n"
+"help.text"
+msgid "Public Property Get UserName() As String ' User account name"
+msgstr "Public Property Get UserName() As String ' Erabiltzailearen kontu-izena"
+
+#. NsDBi
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0443\n"
+"help.text"
+msgid "Public Property Get UserProfile() As String ' User profile system path"
+msgstr "Public Property Get UserProfile() As String ' Erabiltzaile-profilaren bidea sisteman"
+
+#. do2CY
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0447\n"
+"help.text"
+msgid "Public Property Get UserScripts() As String ' User scripts system path"
+msgstr "Public Property Get UserScripts() As String ' Erabiltzailearen scripten bidea sisteman"
+
+#. Gg3yg
+#: python_session.xhp
+msgctxt ""
+"python_session.xhp\n"
+"N0451\n"
+"help.text"
+msgid "Public Property Get UserPythonScripts() As String ' User Python scripts system path"
+msgstr "Public Property Get UserPythonScripts() As String ' Erabiltzailearen Python scripten bidea sisteman"
+
+#. DRC4A
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"tit\n"
+"help.text"
+msgid "Python Interactive Shell"
+msgstr "Pythonen kontsola interaktiboa"
+
+#. LUGZ7
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0117\n"
+"help.text"
+msgid "<bookmark_value>Python console</bookmark_value>        <bookmark_value>Python Interactive Shell</bookmark_value>"
+msgstr "<bookmark_value>Python kontsola</bookmark_value>        <bookmark_value>Pythonen shell interaktiboa</bookmark_value>"
+
+#. PmoqF
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0118\n"
+"help.text"
+msgid "<variable id=\"pythonshell1\"><link href=\"text/sbasic/python/python_shell.xhp\" name=\"python shell\">Running Python Interactive Console</link></variable>"
+msgstr "<variable id=\"pythonshell1\"><link href=\"text/sbasic/python/python_shell.xhp\" name=\"python shell\">Python kontsola interaktiboa exekutatzea</link></variable>"
+
+#. Met9b
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0119\n"
+"help.text"
+msgid "The Python interactive console, also known as Python interpreter or Python shell, provides programmers with a quick way to execute commands and try out and test code without creating a file. UNO objects introspection as well as %PRODUCTNAME Python modules documentation can be obtained from the terminal."
+msgstr "Pythonen kontsola interaktiboak (Python interpretatzailea edo Python shell-a ere deitua) komandoak exekutatzeko eta kodea probatzeko modu azkarra eskaintzen die programatzaileei, fitxategi bat sortu beharrik gabe. UNO objektuen barne-behaketaren eta %PRODUCTNAME Python moduluen dokumentazioa terminalean eskuratu daiteke."
+
+#. kFpxo
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"par_id851633601202270\n"
+"help.text"
+msgid "From a full-featured %PRODUCTNAME installed package, use either Basic or Python:"
+msgstr "Eginbide guztiak instalatuta dituen %PRODUCTNAME pakete batean, erabili Basic zein Python:"
+
+#. 5HhXz
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0121\n"
+"help.text"
+msgid "Using a Basic macro"
+msgstr "Basic makroak erabiltzea"
+
+#. KhWLk
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0127\n"
+"help.text"
+msgid "Using a Python macro"
+msgstr "Python makroak erabiltzea"
+
+#. 3FCJH
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0141\n"
+"help.text"
+msgid "Example output"
+msgstr "Adibideko irteera"
+
+#. MxDtE
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0142\n"
+"help.text"
+msgid "<image src=\"media/helpimg/python/python_interactive_console.png\" id=\"N0143\"><alt id=\"N0143\">Python Interactive Console</alt></image>"
+msgstr "<image src=\"media/helpimg/python/python_interactive_console.png\" id=\"N0143\"><alt id=\"N0143\">Python kontsola interaktiboa</alt></image>"
+
+#. fk6sx
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"hd_id381633446811095\n"
+"help.text"
+msgid "Using the Terminal"
+msgstr "Terminala erabiltzea"
+
+#. CNFdD
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"par_id801633601715910\n"
+"help.text"
+msgid "From a %PRODUCTNAME copy included in a GNU/Linux platform, use the terminal as shown:"
+msgstr "GNU/Linux plataforma batean integratutako %PRODUCTNAME kopia batean, erabili terminala hurrengo moduan:"
+
+#. vWPwe
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"par_id531633444780190\n"
+"help.text"
+msgid "<literal>whereis</literal> or <literal>type</literal> terminal commands help locate Python interactive console:"
+msgstr "Terminaleko <literal>whereis</literal> eta <literal>type</literal> komandoek Python kontsola interaktiboa aurkitzen laguntzen dute:"
+
+#. 8Ei5d
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"hd_id311633513620803\n"
+"help.text"
+msgid "Alternative console"
+msgstr "Ordezko kontsola"
+
+#. d8DCA
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"par_id81632760673283\n"
+"help.text"
+msgid "Use <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-Python\" name=\"APSO extension\">APSO extension</link> console as an alternative:"
+msgstr "Erabili <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-Python\" name=\"APSO extension\">APSO hedapenaren</link> kontsola ordezko gisa:"
+
+#. 6h9CS
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"N0144\n"
+"help.text"
+msgid "<image src=\"media/helpimg/python/python_shell.png\" id=\"N0144\"><alt id=\"N0144\">APSO console</alt></image>"
+msgstr "<image src=\"media/helpimg/python/python_shell.png\" id=\"N0144\"><alt id=\"N0144\">APSO kontsola</alt></image>"
+
+#. MxGkV
+#: python_shell.xhp
+msgctxt ""
+"python_shell.xhp\n"
+"par_id351633599611244\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/03/sf_exception.xhp?#PythonShell\" name=\"PythonShell method\"><literal>PythonShell</literal></link> function in <link href=\"text/sbasic/shared/03/sf_exception.xhp\" name=\"ScriptForge.Exception service\"><literal>ScriptForge.Exception</literal></link> service"
+msgstr "<link href=\"text/sbasic/shared/03/sf_exception.xhp?#PythonShell\" name=\"PythonShell method\"><literal>PythonShell</literal></link> funtzioa <link href=\"text/sbasic/shared/03/sf_exception.xhp\" name=\"ScriptForge.Exception service\"><literal>ScriptForge.Exception</literal></link> zerbitzuan"

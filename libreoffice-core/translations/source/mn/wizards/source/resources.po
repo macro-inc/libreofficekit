@@ -1,0 +1,5003 @@
+#. extracted from wizards/source/resources
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2020-10-27 12:31+0100\n"
+"PO-Revision-Date: 2021-11-22 01:38+0000\n"
+"Last-Translator: Bachka <ichinnorovb@gmail.com>\n"
+"Language-Team: Mongolian <https://translations.documentfoundation.org/projects/libo_ui-master/wizardssourceresources/mn/>\n"
+"Language: mn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.8.1\n"
+"X-POOTLE-MTIME: 1521758448.000000\n"
+
+#. 8UKfi
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_0\n"
+"property.text"
+msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
+msgstr "'%1' хавтсыг үүсгэх боломжгүй.<BR>Таны хард дискэнд хангалттай хоосон зай байхгүй байж магадгүй."
+
+#. zDuJi
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_1\n"
+"property.text"
+msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
+msgstr "Бичвэр файлыг үүсгэх боломжгүй.<BR>'PRODUCTNAME Writer' модуль суусан эсэхийг шалгана уу."
+
+#. BydGz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_2\n"
+"property.text"
+msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
+msgstr "Хүснэгтийг үүсгэх боломжгүй.<BR>'PRODUCTNAME Calc' модуль суусан эсэхийг шалгана уу."
+
+#. jAyjL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_3\n"
+"property.text"
+msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
+msgstr "Үзүүлэнг үүсгэх боломжгүй.<BR>'PRODUCTNAME Impress' модуль суусан эсэхийг шалгана уу."
+
+#. 3mrBG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_4\n"
+"property.text"
+msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
+msgstr "Дүрслэл үүсгэх боломжгүй.<BR>'PRODUCTNAME Draw' модуль суусан эсэхийг шалгана уу."
+
+#. rMsgf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_5\n"
+"property.text"
+msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
+msgstr "Томьёог үүсгэх боломжгүй.<BR>'PRODUCTNAME Math' модуль суусан эсэхийг шалгана уу."
+
+#. j5GzW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_6\n"
+"property.text"
+msgid "The files required could not be found.<BR>Please start the %PRODUCTNAME Setup and choose 'Repair'."
+msgstr "Шаардсан файлууд олдохгүй байна.<BR>Суулгац %PRODUCTNAME-ыг эхлүүлээд дараахь тохиргоог нь сонгоно уу 'Засварлах'."
+
+#. BFtze
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_7\n"
+"property.text"
+msgid "The file '<PATH>' already exists.<BR><BR>Would you like to overwrite the existing file?"
+msgstr "Файлын '<PATH>' аль хэдийн байна.<BR><BR>Байгаа файлыг дарж бичихийг хүсч байна уу?"
+
+#. 7AvGR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_8\n"
+"property.text"
+msgid "Yes"
+msgstr "Тийм"
+
+#. GPG93
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_9\n"
+"property.text"
+msgid "Yes to All"
+msgstr "Бүгдийг"
+
+#. oBhQ5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_10\n"
+"property.text"
+msgid "No"
+msgstr "Үгүй"
+
+#. wMBK7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_11\n"
+"property.text"
+msgid "Cancel"
+msgstr "Болих"
+
+#. boSx2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_12\n"
+"property.text"
+msgid "~Finish"
+msgstr "~Дуусгах"
+
+#. apFF8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_13\n"
+"property.text"
+msgid "< ~Back"
+msgstr "< ~Буцах"
+
+#. q8epA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_14\n"
+"property.text"
+msgid "~Next >"
+msgstr "~Үргэлжлүүлэх>"
+
+#. rSt56
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_15\n"
+"property.text"
+msgid "~Help"
+msgstr "~Тусламж"
+
+#. 9GUa6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_16\n"
+"property.text"
+msgid "Steps"
+msgstr "Алхмууд"
+
+#. 9wWVR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_17\n"
+"property.text"
+msgid "Close"
+msgstr "Хаах"
+
+#. zUv9u
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_18\n"
+"property.text"
+msgid "OK"
+msgstr "OK"
+
+#. 6kGc4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_19\n"
+"property.text"
+msgid "The file already exists. Do you want to overwrite it?"
+msgstr "Файл аль хэдийн байна. Үүнийг дарж бичихийг хүсэж байна уу?"
+
+#. BGj7a
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_20\n"
+"property.text"
+msgid "Template created via <wizard_name> on <current_date>."
+msgstr "<wizard_name> хэвийг <current_date>-нд үүсгэсэн."
+
+#. zRGEs
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_21\n"
+"property.text"
+msgid "The wizard could not be run, because important files were not found.\\nUnder 'Tools - Options - %PRODUCTNAME - Paths' click the 'Default' button to reset the paths to the original default settings.\\nThen run the wizard again."
+msgstr "Шaaрдлaгaтaй файлууд олдоогүй учир залуурчийг ажиллуулж чадахгүй бaйнa.\\n'Хэрэгсэл - Тохируулга... - %PRODUCTNAME - Замууд' доторх Зaмуудын үндсэн тохиргоог буцaaж олгохын тулд 'Стaндaрд' гэсэн товч дээр дaрнa.\\nДараа нь залуурчийг ахин ажиллуулна уу."
+
+#. GohbP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_0\n"
+"property.text"
+msgid "Report Wizard"
+msgstr "Тайлангийн залуурч"
+
+#. BZtXG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_3\n"
+"property.text"
+msgid "~Table"
+msgstr "~Хүснэгт"
+
+#. BhUoK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_4\n"
+"property.text"
+msgid "Colu~mns"
+msgstr "~Баганууд"
+
+#. KgzkD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_7\n"
+"property.text"
+msgid "Report_"
+msgstr "Тайлан"
+
+#. uKDkU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_8\n"
+"property.text"
+msgid "- undefined -"
+msgstr "-тодорхойгүй-"
+
+#. ZZqKE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_9\n"
+"property.text"
+msgid "~Fields in report"
+msgstr "~Тайлан дахь талбарууд"
+
+#. hMbDC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_11\n"
+"property.text"
+msgid "Grouping"
+msgstr "Бүлэглэлт"
+
+#. wVXwx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_12\n"
+"property.text"
+msgid "Sort options"
+msgstr "Эрэмбэлэх тохируулга"
+
+#. 7EUD3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_13\n"
+"property.text"
+msgid "Choose layout"
+msgstr "Үзэмж сонгох"
+
+#. 45SFZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_14\n"
+"property.text"
+msgid "Create report"
+msgstr "Тайлан үүсгэх"
+
+#. cKDcw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_15\n"
+"property.text"
+msgid "Layout of data"
+msgstr "Өгөгдлийн бүтэц"
+
+#. HhPzF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_16\n"
+"property.text"
+msgid "Layout of headers and footers"
+msgstr "Хөл ба толгойнуудын бүтэц"
+
+#. bN2Fw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_19\n"
+"property.text"
+msgid "Fields"
+msgstr "Талбарууд"
+
+#. qHq62
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_20\n"
+"property.text"
+msgid "~Sort by"
+msgstr "~Дараахаар эрэмбэлэгдсэн"
+
+#. 8CX4A
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_21\n"
+"property.text"
+msgid "T~hen by"
+msgstr "Бол тэгээд"
+
+#. kvzxk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_22\n"
+"property.text"
+msgid "Orientation"
+msgstr "Хандлага"
+
+#. b3YDa
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_23\n"
+"property.text"
+msgid "Portrait"
+msgstr "Босоо хэлбэр"
+
+#. DT8hG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_24\n"
+"property.text"
+msgid "Landscape"
+msgstr "Хөндлөн"
+
+#. TErmd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_28\n"
+"property.text"
+msgid "Which fields do you want to have in your report?"
+msgstr "Өөрийн тайландаа аль талбарыг оруулахыг хүсэж байна?"
+
+#. HZgJU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_29\n"
+"property.text"
+msgid "Do you want to add grouping levels?"
+msgstr "Та бүлэглэлийн төвшин нэмэхийг хүсэж байна уу?"
+
+#. xPoaP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_30\n"
+"property.text"
+msgid "According to which fields do you want to sort the data?"
+msgstr "Та ямар талбараар өгөгдлийг эрэмбэлэхийг хүсэж байна вэ?"
+
+#. kAjMy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_31\n"
+"property.text"
+msgid "How do you want your report to look?"
+msgstr "Өөрийн тайланг хэрхэн харагдуулахыг хүсэж байна?"
+
+#. QvM65
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_32\n"
+"property.text"
+msgid "Decide how you want to proceed"
+msgstr "Хэрхэн үргэлжлүүлэхээ шийд"
+
+#. GqD3n
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_33\n"
+"property.text"
+msgid "Title of report"
+msgstr "Тайлангийн гарчиг"
+
+#. Nm8v3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_34\n"
+"property.text"
+msgid "Display report"
+msgstr "тайланг харуулах"
+
+#. crCtw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_35\n"
+"property.text"
+msgid "Create report"
+msgstr "Тайлан үүсгэх"
+
+#. EiKBA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_36\n"
+"property.text"
+msgid "Ascending"
+msgstr "Өсөхөөр"
+
+#. BboXx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_37\n"
+"property.text"
+msgid "Descending"
+msgstr "Буурахаар"
+
+#. sHcrv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_40\n"
+"property.text"
+msgid "~Dynamic report"
+msgstr "~Динамик тайлан"
+
+#. CxGG7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_41\n"
+"property.text"
+msgid "~Create report now"
+msgstr "~Шинэ тайлан одоо үүсгэх"
+
+#. FVhkR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_42\n"
+"property.text"
+msgid "~Modify report layout"
+msgstr "~Тайлангийн үзэмж өөрчлөх"
+
+#. BBFba
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_43\n"
+"property.text"
+msgid "Static report"
+msgstr "Статик тайлан"
+
+#. gSyfQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_44\n"
+"property.text"
+msgid "Save as"
+msgstr "Өөрөөр хадгалах"
+
+#. hdCaM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_50\n"
+"property.text"
+msgid "Groupings"
+msgstr "Бүлэглэхүүд"
+
+#. XrhAA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_51\n"
+"property.text"
+msgid "Then b~y"
+msgstr "~Бол тэгээд"
+
+#. dnjA2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_52\n"
+"property.text"
+msgid "~Then by"
+msgstr "~Бол тэгээд"
+
+#. ZuRZA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_53\n"
+"property.text"
+msgid "Asc~ending"
+msgstr "~Өсөхөөр"
+
+#. 2aQcz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_54\n"
+"property.text"
+msgid "Ascend~ing"
+msgstr "~Өсөхөөр"
+
+#. d7S3o
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_55\n"
+"property.text"
+msgid "Ascendin~g"
+msgstr "~Өсөхөөр"
+
+#. 8YKTL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_56\n"
+"property.text"
+msgid "De~scending"
+msgstr "~Буурахаар"
+
+#. 82XcF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_57\n"
+"property.text"
+msgid "Des~cending"
+msgstr "~Буурахаар"
+
+#. SCPyV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_58\n"
+"property.text"
+msgid "De~scending"
+msgstr "~Буурахаар"
+
+#. s4E5A
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_60\n"
+"property.text"
+msgid "Binary fields cannot be displayed in the report."
+msgstr "Бинар талбаруудыг тайлан дээр харуулж чадахгүй"
+
+#. zhqsu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_61\n"
+"property.text"
+msgid "The table '<TABLENAME>' does not exist."
+msgstr "'<TABLENAME>' хүснэгт байхгүй байна."
+
+#. JdC5d
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_62\n"
+"property.text"
+msgid "Creating Report..."
+msgstr "Тайлан үүсгэж байна..."
+
+#. PQ4E9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_63\n"
+"property.text"
+msgid "Number of records inserted: <COUNT>"
+msgstr "Оруулсан бичлэгүүдийн тоо: <COUNT>"
+
+#. BUWNB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_64\n"
+"property.text"
+msgid "The form '<REPORTFORM>' does not exist."
+msgstr "'<REPORTFORM>' маягт алга байна."
+
+#. AyMsD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_65\n"
+"property.text"
+msgid "The query with the statement <BR>'<STATEMENT>' <BR> could not be run. <BR> Check your data source."
+msgstr "<BR>'<STATEMENT>' <BR> илэрхийлэл бүхий асуулга биелэх боломжгүй. <BR> Та өгөгдлийн эхээ шалгана уу."
+
+#. LW9DZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_66\n"
+"property.text"
+msgid "The following hidden control in the form '<REPORTFORM>' could not be read: '<CONTROLNAME>'."
+msgstr "'<REPORTFORM>' маягтанд далдлагдсан дараах контрол элемент уншигдах боломжгүй: '<CONTROLNAME>'."
+
+#. GvE8h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_67\n"
+"property.text"
+msgid "Importing data..."
+msgstr "Өгөгдлийг импортолж байна..."
+
+#. LujCA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_68\n"
+"property.text"
+msgid "Labeling fields"
+msgstr "Талбар тэмдэглэх"
+
+#. HPxDv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_69\n"
+"property.text"
+msgid "How do you want to label the fields?"
+msgstr "Талбаруудыг хэрхэн тэмдэглэхийг хүсэж байна?"
+
+#. C2Caz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_70\n"
+"property.text"
+msgid "Label"
+msgstr "Гарчиг"
+
+#. EknR9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_71\n"
+"property.text"
+msgid "Field"
+msgstr "Талбар"
+
+#. agw3x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_72\n"
+"property.text"
+msgid "An error occurred in the wizard.<BR>The template '%PATH' could be erroneous.<BR>Either the required sections or tables do not exist or exist under the wrong name.<BR>See the Help for more detailed information.<BR>Please select another template."
+msgstr "Залуурчид алдаа гарлаа.<BR>'%PATH' хэв алдаатай байж болно.<BR>Шаардлагатай хэсэг эсвэл хүснэгт байхгүй эсвэл тэд өөр нэрээр оршин байна. <BR>Илүү нарийвчилсан зааврыг Тусламжаас үзнэ үү. <BR>Та өөр баримтын хэв сонгоно уу."
+
+#. Za86f
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_73\n"
+"property.text"
+msgid "There is an invalid user field in a table."
+msgstr "Хүснэгт дотор буруу хэрэглэгчийн талбар байна."
+
+#. rXZZH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_74\n"
+"property.text"
+msgid "The sort criterion '<FIELDNAME>' was chosen twice. Each criterion can only be chosen once."
+msgstr "Журамлах шалгуур '<FIELDNAME>' нь давхар сонгогдсон байна. Шалгуур болгон зөвхөн нэг удаа сонгогдох боломжтой."
+
+#. ZNk6M
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_75\n"
+"property.text"
+msgid "Note: The dummy text will be replaced by data from the database when the report is created."
+msgstr "Санамж: Тайланг бэлтгэх үед хуурмаг бичвэр өгөгдлийн сангийн өгөгдлөөр орлуулагдана."
+
+#. 5VdG4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_76\n"
+"property.text"
+msgid "A report '%REPORTNAME' already exists in the database. Please assign another name."
+msgstr "'%REPORTNAME' тайлан өгөгдлийн сан дотор аль хэдийн байна. Өөр нэр олгоно уу"
+
+#. TD56g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_78\n"
+"property.text"
+msgid "How do you want to proceed after creating the report?"
+msgstr "Тайланг үүсгэсний дараа хэрхэн үргэлжлүүлэхийг хүсэж байна?"
+
+#. fpEwz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_79\n"
+"property.text"
+msgid "What kind of report do you want to create?"
+msgstr "Ямар төрлийн тайлан үүсгэхийг хүсэж байна?"
+
+#. s3vBB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_80\n"
+"property.text"
+msgid "Tabular"
+msgstr "Табулатор"
+
+#. dDWAD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_81\n"
+"property.text"
+msgid "Columnar, single-column"
+msgstr "Баганаар. нэг багана"
+
+#. MwR8x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_82\n"
+"property.text"
+msgid "Columnar, two columns"
+msgstr "Баганаар. хоёр багана"
+
+#. UsKmm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_83\n"
+"property.text"
+msgid "Columnar, three columns"
+msgstr "Баганаар. гурван багана"
+
+#. RG9ds
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_84\n"
+"property.text"
+msgid "In blocks, labels left"
+msgstr "Блокоор, бичээс зүүн"
+
+#. dspnP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_85\n"
+"property.text"
+msgid "In blocks, labels above"
+msgstr "Блокоор, бичээс дээр"
+
+#. FXJtW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_86\n"
+"property.text"
+msgid "Title:"
+msgstr "Гарчиг:"
+
+#. 2z2JH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_87\n"
+"property.text"
+msgid "Author:"
+msgstr "Зохиогч:"
+
+#. uESaE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_88\n"
+"property.text"
+msgid "Date:"
+msgstr "Огноо:"
+
+#. GzkD4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_89\n"
+"property.text"
+msgid "Page #page# of #count#"
+msgstr "#count# хуудасны #page#"
+
+#. 3FXVE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_90\n"
+"property.text"
+msgid "Page number:"
+msgstr "Хуудасны дугаар:"
+
+#. 9HCyq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_91\n"
+"property.text"
+msgid "Page count:"
+msgstr "Хуудасны тоо:"
+
+#. FAa63
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_92\n"
+"property.text"
+msgid "No valid report template was found."
+msgstr "Тайлангийн хүчинтэй хэв маягт олдсонгүй."
+
+#. F6vrA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_93\n"
+"property.text"
+msgid "Page:"
+msgstr "Хуудас:"
+
+#. v8gUF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_94\n"
+"property.text"
+msgid "Align Left - Border"
+msgstr "Зүүнд журамлах - Хүрээ"
+
+#. TV3AA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_95\n"
+"property.text"
+msgid "Align Left - Compact"
+msgstr "Зүүнд журамла - Багцалсан"
+
+#. DL6ZJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_96\n"
+"property.text"
+msgid "Align Left - Elegant"
+msgstr "Зүүнд журамла - Гоё"
+
+#. wRNAq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_97\n"
+"property.text"
+msgid "Align Left - Highlighted"
+msgstr "Зүүнд журамла - Тодотгосон"
+
+#. JnhXj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_98\n"
+"property.text"
+msgid "Align Left - Modern"
+msgstr "Зүүнд журамла - Орчин үеийн"
+
+#. 4Djyg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_99\n"
+"property.text"
+msgid "Align Left - Red & Blue"
+msgstr "Зүүнд журамла - Улаан & Цэнхэр"
+
+#. BvcfB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_100\n"
+"property.text"
+msgid "Default"
+msgstr "Стандард"
+
+#. Bca59
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_101\n"
+"property.text"
+msgid "Outline - Borders"
+msgstr "Хүрээ - Хүрээлэлт"
+
+#. C9umd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_102\n"
+"property.text"
+msgid "Outline - Compact"
+msgstr "Хүрээ - Багцалсан"
+
+#. uYz2T
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_103\n"
+"property.text"
+msgid "Outline - Elegant"
+msgstr "Хүрээ - Эвтэй"
+
+#. iFk6x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_104\n"
+"property.text"
+msgid "Outline - Highlighted"
+msgstr "Хүрээ - Тодруулсан"
+
+#. jhJnN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_105\n"
+"property.text"
+msgid "Outline - Modern"
+msgstr "Хүрээ - Орчин үеийн"
+
+#. mXnKN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_106\n"
+"property.text"
+msgid "Outline - Red & Blue"
+msgstr "Хүрээ - Улаан & Цэнхэр"
+
+#. zKFcj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_107\n"
+"property.text"
+msgid "Outline, indented - Borders"
+msgstr "Хүрээ, шахсан - Хүрээлэлт"
+
+#. 8XBee
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_108\n"
+"property.text"
+msgid "Outline, indented - Compact"
+msgstr "Хүрээ, шахсан - Багцалсан"
+
+#. e47Xn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_109\n"
+"property.text"
+msgid "Outline, indented - Elegant"
+msgstr "Хүрээ, шахсан - Эвлэг"
+
+#. CGQuu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_110\n"
+"property.text"
+msgid "Outline, indented - Highlighted"
+msgstr "Хүрээ, шахсан - Тодруулсан"
+
+#. ABC5q
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_111\n"
+"property.text"
+msgid "Outline, indented - Modern"
+msgstr "Хүрээ, шахсан - Орчин үеийн"
+
+#. urT2J
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_112\n"
+"property.text"
+msgid "Outline, indented - Red & Blue"
+msgstr "Хүрээ, шахсан - Улаан & Цэнхэр"
+
+#. TzXg5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_113\n"
+"property.text"
+msgid "Bubbles"
+msgstr "Агаарын бөмбөлөг"
+
+#. RGiTm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_114\n"
+"property.text"
+msgid "Cinema"
+msgstr "Кино"
+
+#. Eo2jG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_115\n"
+"property.text"
+msgid "Controlling"
+msgstr "Шалгалт"
+
+#. fpiSX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_116\n"
+"property.text"
+msgid "Default"
+msgstr "Стандард"
+
+#. 927HM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_117\n"
+"property.text"
+msgid "Drafting"
+msgstr "Зурсан дүрслэл"
+
+#. BGvCk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_118\n"
+"property.text"
+msgid "Finances"
+msgstr "Санхүү"
+
+#. mhJr6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_119\n"
+"property.text"
+msgid "Flipchart"
+msgstr "Урсгалын диаграмм"
+
+#. t5VdL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_120\n"
+"property.text"
+msgid "Formal with Company Logo"
+msgstr "Албан ёсоор Компаны сүлд тэмдэгтэй"
+
+#. iwANQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_121\n"
+"property.text"
+msgid "Generic"
+msgstr "Универсал"
+
+#. RkArE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_122\n"
+"property.text"
+msgid "Worldmap"
+msgstr "Дэлхийн газрын зураг"
+
+#. wpr5T
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_0\n"
+"property.text"
+msgid "C~reate"
+msgstr "~Үүсгэх"
+
+#. W6xLZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_1\n"
+"property.text"
+msgid "~Cancel"
+msgstr "~Цуцлах"
+
+#. ecMFi
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_2\n"
+"property.text"
+msgid "< ~Back"
+msgstr "< ~Буцах"
+
+#. HvEAE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_3\n"
+"property.text"
+msgid "~Next >"
+msgstr "~Үргэлжлүүлэх>"
+
+#. u5rzd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_4\n"
+"property.text"
+msgid "~Database"
+msgstr "~Өгөгдлийн сан"
+
+#. sCeDP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_5\n"
+"property.text"
+msgid "~Table name"
+msgstr "~Хүснэгтийн нэр"
+
+#. KC4Dw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_6\n"
+"property.text"
+msgid "An error occurred while running the wizard. The wizard will be terminated."
+msgstr "Залуурчийг ажиллуулж байх явцад алдаа тохиолдсон. Залуурч хаагдах болно."
+
+#. ZG95j
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_8\n"
+"property.text"
+msgid "No database has been installed. At least one database is required before the wizard for forms can be started."
+msgstr "Өгөгдлийн сан суулгагдагүй байна. Хүснэгтийн туслагчийг ашиглахын тулд дор хаяж нэг өгөгдлийн сан байх ёстой."
+
+#. GCAgB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_9\n"
+"property.text"
+msgid "The database does not contain any tables."
+msgstr "Өгөгдлийн санд хүснэгт агуулагдaaгүй байна."
+
+#. ikZ7F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_10\n"
+"property.text"
+msgid "This title already exists in the database. Please enter another name."
+msgstr "Энэ нэр нь өгөгдлийн санд байна. Ондоо нэр өгнө үү."
+
+#. Dposv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_11\n"
+"property.text"
+msgid "The title must not contain any spaces or special characters."
+msgstr "Гарчиг нь зай завсаргүйгээс гадна маягт тэмдэгт агуулах боломжгүй."
+
+#. FUgQA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_12\n"
+"property.text"
+msgid "The database service (com.sun.data.DatabaseEngine) could not be instantiated."
+msgstr "Өгөгдлийн сангийн туслагч (com.sun.data.DatabaseEngine) нь эхлүүлэх боломжгүй."
+
+#. HRAeA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_13\n"
+"property.text"
+msgid "The selected table or query could not be opened."
+msgstr "Сонгосон хүснэгт эсвэл дуудалт тань нээх боломжгүй."
+
+#. VAphN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_14\n"
+"property.text"
+msgid "No connection to the database could be established."
+msgstr "Өгөгдлийн эх сурвалж руу нэг ч холболт үүсгэх боломжгүй."
+
+#. z9FhA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_20\n"
+"property.text"
+msgid "~Help"
+msgstr "~Тусламж"
+
+#. eXWrX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_21\n"
+"property.text"
+msgid "~Stop"
+msgstr "~Зогсоох"
+
+#. GiCi2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_30\n"
+"property.text"
+msgid "The document could not be saved."
+msgstr "Баримтыг хадгалж чадахгүй."
+
+#. UkQEx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_33\n"
+"property.text"
+msgid "Exiting the wizard"
+msgstr "Тулагчаас гарч байна."
+
+#. HrveE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_34\n"
+"property.text"
+msgid "Connecting to data source..."
+msgstr "Өгөгдлийн эх сурвалж руу холбогдож байна..."
+
+#. se64P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_35\n"
+"property.text"
+msgid "The connection to the data source could not be established."
+msgstr "Өгөгдлийн эх сурвалж руу холболтыг үүсгэх боломжгүй."
+
+#. Ch5MD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_36\n"
+"property.text"
+msgid "The file path entered is not valid."
+msgstr "Оруулсан файлын зам буруу байна."
+
+#. kPABE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_37\n"
+"property.text"
+msgid "Please select a data source"
+msgstr "Өгөгдлийн эх сурвалжаа сонгоно уу"
+
+#. XDBBC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_38\n"
+"property.text"
+msgid "Please select a table or query"
+msgstr "Асуулга эсвэл хүснэгт сонгоно уу"
+
+#. AgeWk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_39\n"
+"property.text"
+msgid "Add field"
+msgstr "Талбар нэмэх"
+
+#. FoExR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_40\n"
+"property.text"
+msgid "Remove field"
+msgstr "Талбарыг устга"
+
+#. BuUZ5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_41\n"
+"property.text"
+msgid "Add all fields"
+msgstr "Бүх талбарыг нэм"
+
+#. PVELV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_42\n"
+"property.text"
+msgid "Remove all fields"
+msgstr "Бүх талбарыг устга"
+
+#. jAXRw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_43\n"
+"property.text"
+msgid "Move field up"
+msgstr "Талбарыг дээш зөө"
+
+#. Ao2Z6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_44\n"
+"property.text"
+msgid "Move field down"
+msgstr "Талбарыг доош зөө"
+
+#. B4mWx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_45\n"
+"property.text"
+msgid "The field names from '%NAME' could not be retrieved."
+msgstr "'%NAME'-с талбарын нэрсийг дуудах боломжгүй."
+
+#. SNhe5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_0\n"
+"property.text"
+msgid "Query Wizard"
+msgstr "Асуулгын залуурч"
+
+#. RySqB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_1\n"
+"property.text"
+msgid "Query"
+msgstr "Асуулга"
+
+#. wKhwS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_2\n"
+"property.text"
+msgid "Query Wizard"
+msgstr "Асуулгын залуурч"
+
+#. QEtRG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_3\n"
+"property.text"
+msgid "~Tables"
+msgstr "Хүснэгтүүд"
+
+#. s2KnF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_4\n"
+"property.text"
+msgid "A~vailable fields"
+msgstr "~Боломжит талбарууд"
+
+#. Wsx8x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_5\n"
+"property.text"
+msgid "Name ~of the query"
+msgstr "Асуулгын нэр"
+
+#. t9MEU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_6\n"
+"property.text"
+msgid "Display ~Query"
+msgstr "~Асуулгыг харуул"
+
+#. UBWUX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_7\n"
+"property.text"
+msgid "~Modify Query"
+msgstr "Асуулга ~өөрчлөх"
+
+#. AoeET
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_8\n"
+"property.text"
+msgid "~How do you want to proceed after creating the query?"
+msgstr "Асуулга үүсгэсний дараа хэрхэн үргэлжлүүлэхийг хүсэж байна?"
+
+#. kofEg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_9\n"
+"property.text"
+msgid "Match ~all of the following"
+msgstr "Дараахын ~бүгдтэй нь тохирч байвал"
+
+#. 4xM3Z
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_10\n"
+"property.text"
+msgid "~Match any of the following"
+msgstr "Дараахын ямар ~нэгтэй нь ч тохирч байвал"
+
+#. WLFFc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_11\n"
+"property.text"
+msgid "~Detailed query (Shows all records of the query.)"
+msgstr "~Нарийвчилсан асуулга (Асуулгын бүх бичлэгийг харуулна.)"
+
+#. fnzhE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_12\n"
+"property.text"
+msgid "~Summary query (Shows only results of aggregate functions.)"
+msgstr "~Дүгнэлт асуулга (Зөвхөн нэгтгэл функцүүдийн үр дүнг харуулна.)"
+
+#. SdQBk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_16\n"
+"property.text"
+msgid "Aggregate functions"
+msgstr "Нэгтгэл функцууд"
+
+#. tFNb2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_17\n"
+"property.text"
+msgid "Fields"
+msgstr "Талбарууд"
+
+#. D9sGR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_18\n"
+"property.text"
+msgid "~Group by"
+msgstr "Дараахаар ~бүлэглэх"
+
+#. E5N85
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_19\n"
+"property.text"
+msgid "Field"
+msgstr "Талбар"
+
+#. 2dqd2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_20\n"
+"property.text"
+msgid "Alias"
+msgstr "Хуурмаг"
+
+#. 8eMER
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_21\n"
+"property.text"
+msgid "Table:"
+msgstr "Хүснэгт:"
+
+#. jaKR7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_22\n"
+"property.text"
+msgid "Query:"
+msgstr "Хайлт:"
+
+#. TpbSv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_24\n"
+"property.text"
+msgid "Condition"
+msgstr "Нөхцөл"
+
+#. Dvk6K
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_25\n"
+"property.text"
+msgid "Value"
+msgstr "Утга"
+
+#. oP8P9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_26\n"
+"property.text"
+msgid "is equal to"
+msgstr "тэнцүү"
+
+#. D7K36
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_27\n"
+"property.text"
+msgid "is not equal to"
+msgstr "тэнцүү биш"
+
+#. n9gFB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_28\n"
+"property.text"
+msgid "is smaller than"
+msgstr "аас бага"
+
+#. FAiPg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_29\n"
+"property.text"
+msgid "is greater than"
+msgstr "бол дараахаас их"
+
+#. pFsPY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_30\n"
+"property.text"
+msgid "is equal or less than"
+msgstr "тэнцүү эсвэл бага"
+
+#. yT9cM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_31\n"
+"property.text"
+msgid "is equal or greater than"
+msgstr "тэнцүү эсвэл их"
+
+#. GFnAN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_32\n"
+"property.text"
+msgid "like"
+msgstr "шиг"
+
+#. JZCLd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_33\n"
+"property.text"
+msgid "not like"
+msgstr "ба"
+
+#. TiHHv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_34\n"
+"property.text"
+msgid "is null"
+msgstr "эсвэл"
+
+#. dpAdZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_35\n"
+"property.text"
+msgid "is not null"
+msgstr "нь null биш"
+
+#. ZnCKf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_36\n"
+"property.text"
+msgid "true"
+msgstr "үнэн"
+
+#. AwCQp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_37\n"
+"property.text"
+msgid "false"
+msgstr "худал"
+
+#. GEGKb
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_38\n"
+"property.text"
+msgid "and"
+msgstr "ба"
+
+#. GDvQV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_39\n"
+"property.text"
+msgid "or"
+msgstr "буюу"
+
+#. BaA5J
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_40\n"
+"property.text"
+msgid "get the sum of"
+msgstr "нийлбэрийг авах"
+
+#. uCRgg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_41\n"
+"property.text"
+msgid "get the average of"
+msgstr "дунджийг авах"
+
+#. UjEVW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_42\n"
+"property.text"
+msgid "get the minimum of"
+msgstr "хамгийн багыг авах"
+
+#. qpN4C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_43\n"
+"property.text"
+msgid "get the maximum of"
+msgstr "хамгийн ихийг авах"
+
+#. DAZUE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_44\n"
+"property.text"
+msgid "get the count of"
+msgstr "Дараахийн нийлбэрийг ав"
+
+#. BBEEj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_48\n"
+"property.text"
+msgid "(none)"
+msgstr "байхгүй"
+
+#. agTUo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_50\n"
+"property.text"
+msgid "Fie~lds in the Query:"
+msgstr "Дуудлага доторхи талбарууд:"
+
+#. CScUQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_51\n"
+"property.text"
+msgid "Sorting order:"
+msgstr "Дарааллаар эрэмбэлж байна:"
+
+#. JDHFH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_52\n"
+"property.text"
+msgid "No sorting fields were assigned."
+msgstr "Эрэмбэлэгдээгүй талбарууд олгогдсон байна."
+
+#. GLtfA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_53\n"
+"property.text"
+msgid "Search conditions:"
+msgstr "Хайх нөхцөлүүд:"
+
+#. DocWB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_54\n"
+"property.text"
+msgid "No conditions were assigned."
+msgstr "Нэг ч нөхцөл олгогдоогүй байна."
+
+#. BfAEG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_55\n"
+"property.text"
+msgid "Aggregate functions:"
+msgstr "Нэгтгэл функцууд:"
+
+#. mArUE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_56\n"
+"property.text"
+msgid "No aggregate functions were assigned."
+msgstr "Нэг ч нэгтгэл функц олгогдоогүй байна."
+
+#. uDTRV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_57\n"
+"property.text"
+msgid "Grouped by:"
+msgstr "Бүлэглэгдсэн:"
+
+#. WXLSS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_58\n"
+"property.text"
+msgid "No Groups were assigned."
+msgstr "Нэг ч бүлэглэлт олгогдоогүй байна."
+
+#. jhPaR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_59\n"
+"property.text"
+msgid "Grouping conditions:"
+msgstr "Бүлэглэх нөхцөлүүд:"
+
+#. EoMHV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_60\n"
+"property.text"
+msgid "No grouping conditions were assigned."
+msgstr "Нэг ч бүлэглэх нөхцөл олгогдоогүй байна."
+
+#. NNF8b
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_70\n"
+"property.text"
+msgid "Select the fields (columns) for your query"
+msgstr "Асуулгын талбаруудыг (баганууд) сонгох"
+
+#. kX9cK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_71\n"
+"property.text"
+msgid "Select the sorting order"
+msgstr "Эрэмбэлэх дарааллаа сонгоно уу"
+
+#. 7jmnS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_72\n"
+"property.text"
+msgid "Select the search conditions"
+msgstr "Хайх нөхцөл сонгох"
+
+#. UHCrm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_73\n"
+"property.text"
+msgid "Select the type of query"
+msgstr "Асуулгын төрлөө сонгоно уу"
+
+#. ZY6MS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_74\n"
+"property.text"
+msgid "Select the groups"
+msgstr "Бүлгүүд сонгох"
+
+#. N8n8X
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_75\n"
+"property.text"
+msgid "Select the grouping conditions"
+msgstr "Бүлэг болгох нөхцөлүүд сонгох"
+
+#. sy7Lt
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_76\n"
+"property.text"
+msgid "Assign aliases if desired"
+msgstr "Хуурамчийг олго хэрвээ шаардлагатай бол"
+
+#. exiZ6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_77\n"
+"property.text"
+msgid "Check the overview and decide how to proceed"
+msgstr "Гарчиг шалгаад хэрхэн үргэлжлүүлэхээ шийд"
+
+#. 2uhKR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_80\n"
+"property.text"
+msgid "Field selection"
+msgstr "Талбар сонголт"
+
+#. LzPyD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_81\n"
+"property.text"
+msgid "Sorting order"
+msgstr "Эрэмбэ дараалал"
+
+#. pVVLS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_82\n"
+"property.text"
+msgid "Search conditions"
+msgstr "Хайлтын нөхцөлүүд"
+
+#. Z22GZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_83\n"
+"property.text"
+msgid "Detail or summary"
+msgstr "Нарийвчлал эсвэл дүгнэлт"
+
+#. 4EYC7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_84\n"
+"property.text"
+msgid "Grouping"
+msgstr "Бүлэглэлт"
+
+#. MziCd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_85\n"
+"property.text"
+msgid "Grouping conditions"
+msgstr "Бүлэг болгох нөхцөлүүд"
+
+#. EB7JF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_86\n"
+"property.text"
+msgid "Aliases"
+msgstr "Алиасууд"
+
+#. WzptL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_87\n"
+"property.text"
+msgid "Overview"
+msgstr "Тойм"
+
+#. f4xrP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_88\n"
+"property.text"
+msgid "A field that has not been assigned an aggregate function must be used in a group."
+msgstr "Та нэгтгэлийн (агрегат) функц олгогдоогүй талбарыг бүлэглэлтээр хэрэглэх ёстой."
+
+#. 2C2nu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_89\n"
+"property.text"
+msgid "The condition '<FIELDNAME> <LOGICOPERATOR> <VALUE>' was chosen twice. Each condition can only be chosen once"
+msgstr "'<FIELDNAME> <LOGICOPERATOR> <VALUE>' нөхцөлийг хоёр удаа сонгосон байна. Нөхцөл бүрийг нэг л удаа сонгох боломжтой."
+
+#. ZAHzB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_90\n"
+"property.text"
+msgid "The aggregate function <FUNCTION> has been assigned twice to the fieldname '<NUMERICFIELD>'."
+msgstr "<FUNCTION> нэгтгэл функцийг '<NUMERICFIELD>' талбарын нэр рүү хоёр удаа олгосон."
+
+#. s2MGE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_91\n"
+"property.text"
+msgid ","
+msgstr ","
+
+#. D8bmB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_92\n"
+"property.text"
+msgid "<FIELDTITLE> (<FIELDNAME>)"
+msgstr "<FIELDTITLE> (<FIELDNAME>)"
+
+#. dGCJv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_93\n"
+"property.text"
+msgid "<FIELDNAME> (<SORTMODE>)"
+msgstr "<FIELDNAME> (<SORTMODE>)"
+
+#. RAt2h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_94\n"
+"property.text"
+msgid "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+msgstr "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+
+#. pbBGo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_95\n"
+"property.text"
+msgid "<CALCULATEDFUNCTION> <FIELDNAME>"
+msgstr "<CALCULATEDFUNCTION> <FIELDNAME>"
+
+#. MBwoM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_96\n"
+"property.text"
+msgid "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+msgstr "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+
+#. yheet
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_0\n"
+"property.text"
+msgid "Form Wizard"
+msgstr "Маягт залуурч"
+
+#. H4MXV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_1\n"
+"property.text"
+msgid "Fields in ~the form"
+msgstr "~Маягт дахь талбарууд"
+
+#. 6J6EJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_2\n"
+"property.text"
+msgid "Binary fields are always listed and selectable from the left list.\\nIf possible, they are interpreted as images."
+msgstr "Зүүн жагсаалтад хоёртын талбарууд нь үргэлж байх ба сонгогдох боломжтой.\\nХэрвээ боломжтой бол тэд нар зурган хэлбэрээр тавигдсан байгаа."
+
+#. BCBCd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_3\n"
+"property.text"
+msgid "A subform is a form that is inserted in another form.\\nUse subforms to show data from tables or queries with a one-to-many relationship."
+msgstr "Дэд маягт гэж өөр маягтад орсон маягт юм.\\nДэд маягтууд нь хүснэгт эсвэл асуулгын өгөгдлийг 1:n холбоос руу олгоход нэн тохиромжтой."
+
+#. h4XzG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_4\n"
+"property.text"
+msgid "~Add Subform"
+msgstr "~Дэд маягт нэмэх"
+
+#. GSiwE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_5\n"
+"property.text"
+msgid "~Subform based on existing relation"
+msgstr "~Байгаа холбоосон дээр үүсгэсэг дэд маягт"
+
+#. oFM6V
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_6\n"
+"property.text"
+msgid "Tables or queries"
+msgstr "Хүснэгтүүд эсвэл асуулгууд"
+
+#. 2BEab
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_7\n"
+"property.text"
+msgid "Subform based on ~manual selection of fields"
+msgstr "Гараар сонгогдсон талбарууд дээр үүсгэгдсэн дэд маягт"
+
+#. PShA6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_8\n"
+"property.text"
+msgid "~Which relation do you want to add?"
+msgstr "Аль холбоосыг та нэмэхийг хүсэж байна?"
+
+#. yGGuc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_9\n"
+"property.text"
+msgid "Fields in the ~subform"
+msgstr "~Дэд маягт дахь талбарууд"
+
+#. KG4Hj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_12\n"
+"property.text"
+msgid "~Available fields"
+msgstr "~Боломжтой талбарууд"
+
+#. pB2Mv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_13\n"
+"property.text"
+msgid "Fields in form"
+msgstr "Анкет дахь талбарууд"
+
+#. fFuDk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_19\n"
+"property.text"
+msgid "The join '<FIELDNAME1>' and '<FIELDNAME2>' has been selected twice.\\nBut joins may only be used once."
+msgstr "'<FIELDNAME1>' ба '<FIELDNAME2>' холболт хоёр удаа сонгогдсон байна.\\nХолболтууд зөвхөн нэг удаа л хэрэглэгдэх боломжтой."
+
+#. 9uFd2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_20\n"
+"property.text"
+msgid "~First joined subform field"
+msgstr "~Эхний дэд талбар"
+
+#. NfpyC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_21\n"
+"property.text"
+msgid "~Second joined subform field"
+msgstr "Х~оёрдугаар дэд талбар"
+
+#. 5F4nf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_22\n"
+"property.text"
+msgid "~Third joined subform field"
+msgstr "~Гуравдугаар дэд талбар"
+
+#. BJBzR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_23\n"
+"property.text"
+msgid "~Fourth joined subform field"
+msgstr "~Дөрөвдүгээр дэд талбар"
+
+#. EAJxx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_24\n"
+"property.text"
+msgid "F~irst joined main form field"
+msgstr "~Эхний үндсэн талбар"
+
+#. S72RL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_25\n"
+"property.text"
+msgid "S~econd joined main form field"
+msgstr "Х~оёрдугаар үндсэн талбар"
+
+#. C73ZZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_26\n"
+"property.text"
+msgid "T~hird joined main form field"
+msgstr "~Гуравдугаар үндсэн талбар"
+
+#. AwNUu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_27\n"
+"property.text"
+msgid "F~ourth joined main form field"
+msgstr "~Дөрөвдүгээр үндсэн талбар"
+
+#. KCNEY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_28\n"
+"property.text"
+msgid "Field border"
+msgstr "Талбарын хүрээ"
+
+#. oQq6u
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_29\n"
+"property.text"
+msgid "No border"
+msgstr "Хүрээгүй"
+
+#. hk9Xa
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_30\n"
+"property.text"
+msgid "3D look"
+msgstr "3D харагдалт"
+
+#. noMiL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_31\n"
+"property.text"
+msgid "Flat"
+msgstr "Хавтгай"
+
+#. kCBjw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_32\n"
+"property.text"
+msgid "Label placement"
+msgstr "Бичээс байрлуулалт"
+
+#. Vrww6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_33\n"
+"property.text"
+msgid "Align left"
+msgstr "Зүүн тал руу жигдэрсэн"
+
+#. Qrt6U
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_34\n"
+"property.text"
+msgid "Align right"
+msgstr "Баруун тал руу жигдэрсэн"
+
+#. KNG6r
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_35\n"
+"property.text"
+msgid "Arrangement of DB fields"
+msgstr "DB талбаруудын цэгц"
+
+#. nRTak
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_36\n"
+"property.text"
+msgid "Columnar - Labels Left"
+msgstr "Баганан - бичээс зүүн"
+
+#. HcbRM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_37\n"
+"property.text"
+msgid "Columnar - Labels on Top"
+msgstr "Баганан - бичээс дээр"
+
+#. dRw3C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_38\n"
+"property.text"
+msgid "In Blocks - Labels Left"
+msgstr "Блокууд доторх - бичээс зүүн"
+
+#. m99kS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_39\n"
+"property.text"
+msgid "In Blocks - Labels Above"
+msgstr "Блокууд доторх - бичээс дээр"
+
+#. ZNTvC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_40\n"
+"property.text"
+msgid "As Data Sheet"
+msgstr "Өгөгдлийн хүснэгтээр"
+
+#. F5dN5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_41\n"
+"property.text"
+msgid "Arrangement of the main form"
+msgstr "Үндсэн маягтын цэгц"
+
+#. BEN4F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_42\n"
+"property.text"
+msgid "Arrangement of the subform"
+msgstr "Дэд маягтын цэгц"
+
+#. ZAxZE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_44\n"
+"property.text"
+msgid "The form is to be ~used for entering new data only."
+msgstr "Маягт зөвхөн шинэ өгөгдөл оруулах үед ашиглагдана."
+
+#. epRse
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_45\n"
+"property.text"
+msgid "Existing data will not be displayed"
+msgstr "Байгаа өгөгдлүүд нь харагдахгүй"
+
+#. hrpiG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_46\n"
+"property.text"
+msgid "T~he form is to display all data"
+msgstr "Маягтын бүх өгөгдлийг харуулна."
+
+#. jqEHe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_47\n"
+"property.text"
+msgid "Do not allow ~modification of existing data"
+msgstr "Байгаа өгөгдлийн өөрчлөлтийг бүү зөвшөөр."
+
+#. FE9no
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_48\n"
+"property.text"
+msgid "Do not allow ~deletion of existing data"
+msgstr "Байгаа өгөгдлийн устгалыг бүү зөвшөөр"
+
+#. KwdDp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_49\n"
+"property.text"
+msgid "Do not allow ~addition of new data"
+msgstr "Шинэ өгөгдөл нэмэлтийг бүү зөвшөөр"
+
+#. Z7Wzp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_50\n"
+"property.text"
+msgid "Name of ~the form"
+msgstr "Маягтын нэр"
+
+#. AdLhz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_51\n"
+"property.text"
+msgid "How do you want to proceed after creating the form?"
+msgstr "Маягтыг үүсгэсний дараа хэрхэн үргэлжлүүлэхийг хүсэж байна?"
+
+#. G7CYq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_52\n"
+"property.text"
+msgid "~Work with the form"
+msgstr "Маягттай ажиллах"
+
+#. iCnFm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_53\n"
+"property.text"
+msgid "~Modify the form"
+msgstr "Маягтыг өөрчлөх"
+
+#. 5EgBu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_55\n"
+"property.text"
+msgid "~Page Styles"
+msgstr "Хуудасны хэлбэрүүд"
+
+#. D99cE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_80\n"
+"property.text"
+msgid "Field selection"
+msgstr "Талбар сонголт"
+
+#. AspWz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_81\n"
+"property.text"
+msgid "Set up a subform"
+msgstr "Дэд маягт"
+
+#. YayFB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_82\n"
+"property.text"
+msgid "Add subform fields"
+msgstr "Дэд маягтын талбарууд нэмэх"
+
+#. V2Q6R
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_83\n"
+"property.text"
+msgid "Get joined fields"
+msgstr "Холбогдсон талбаруудыг авах"
+
+#. orBm4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_84\n"
+"property.text"
+msgid "Arrange controls"
+msgstr "Хяналтыг эмхлэх"
+
+#. QGCau
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_85\n"
+"property.text"
+msgid "Set data entry"
+msgstr "Өгөгдлийн бичлэгийг тогтоох"
+
+#. vFeqn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_86\n"
+"property.text"
+msgid "Apply styles"
+msgstr "Хэлбэрүүд олгох"
+
+#. 24keF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_87\n"
+"property.text"
+msgid "Set name"
+msgstr "Нэр олго"
+
+#. H25LH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_88\n"
+"property.text"
+msgid "(Date)"
+msgstr "(Огноо)"
+
+#. EACeJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_89\n"
+"property.text"
+msgid "(Time)"
+msgstr "(Цаг)"
+
+#. scXkg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_90\n"
+"property.text"
+msgid "Select the fields of your form"
+msgstr "Өөрийн маягтын талбарыг сонгоно уу"
+
+#. s6xRo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_91\n"
+"property.text"
+msgid "Decide if you want to set up a subform"
+msgstr "Дэд маягтыг бүтээх эсэх ээ шийднэ үү"
+
+#. 4pHsF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_92\n"
+"property.text"
+msgid "Select the fields of your subform"
+msgstr "Өөрийн маягтын талбарыг сонгоно уу"
+
+#. WT3Gn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_93\n"
+"property.text"
+msgid "Select the joins between your forms"
+msgstr "Өөрийн маягтуудын хооронд холболтуудыг сонгох"
+
+#. DWvza
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_94\n"
+"property.text"
+msgid "Arrange the controls on your form"
+msgstr "Өөрийн маягт дээрх хяналтыг эмхлэх"
+
+#. j6uv4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_95\n"
+"property.text"
+msgid "Select the data entry mode"
+msgstr "Өгөгдлийн бичвэрийн горимыг сонгох"
+
+#. TWztZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_96\n"
+"property.text"
+msgid "Apply the style of your form"
+msgstr "Өөрийн маягтын хэлбэрийг ашиглах"
+
+#. zZiae
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_97\n"
+"property.text"
+msgid "Set the name of the form"
+msgstr "Маягтын нэрийг тогтоох"
+
+#. JTRXV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_98\n"
+"property.text"
+msgid "A form with the name '%FORMNAME' already exists.\\nChoose another name."
+msgstr "Дараахь '%FORMNAME' нэртэй маягт нь аль хэдийн байна.\\nӨөр нэр сонгоно уу."
+
+#. KJkgf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_1\n"
+"property.text"
+msgid "Table Wizard"
+msgstr "Хүснэгтийн залуурч"
+
+#. hGMoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_2\n"
+"property.text"
+msgid "Select fields"
+msgstr "Талбаруудыг сонгох"
+
+#. XEQgp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_3\n"
+"property.text"
+msgid "Set types and formats"
+msgstr "Хэлбэржүүлэлт ба төрлийг тогтоох"
+
+#. Lww9c
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_4\n"
+"property.text"
+msgid "Set primary key"
+msgstr "Анхдагч түлхүүрийг олгох"
+
+#. LkTBf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_5\n"
+"property.text"
+msgid "Create table"
+msgstr "Хүснэгт үүсгэх"
+
+#. hei5Y
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_8\n"
+"property.text"
+msgid "Select fields for your table"
+msgstr "Өөрийн хүснэгтийн талбарыг сонгох"
+
+#. 5DXT6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_9\n"
+"property.text"
+msgid "Set field types and formats"
+msgstr "Талбарын хэлбэржүүлэлт ба төрлийг тогтоох"
+
+#. bAfiP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_10\n"
+"property.text"
+msgid "Set primary key"
+msgstr "Анхдагч түлхүүрийг олгох"
+
+#. UHTbE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_11\n"
+"property.text"
+msgid "Create table"
+msgstr "Хүснэгт үүсгэх"
+
+#. XyCFc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_14\n"
+"property.text"
+msgid "This wizard helps you to create a table for your database. After selecting a table category and a sample table, choose the fields you want to include in your table. You can include fields from more than one sample table."
+msgstr "Энэ залуурч танд өгөгдлийн сангийн хүснэгт үүсгэхэд тань тусална. Хүснэгтийн ангилалыг сонгосны дараа, та өөрийн хүснэгтэнд оруулахыг хүссэн жишээ хүснэгт ба талбарыг сонгоно уу. Таны хүснэгт хэд хэдэн хүснэгтийн талбараас агуулах боломжтой."
+
+#. FEU9Q
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_15\n"
+"property.text"
+msgid "Ca~tegory"
+msgstr "~Ангилал"
+
+#. aBFKF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_16\n"
+"property.text"
+msgid "B~usiness"
+msgstr "~Бизнес"
+
+#. nfCjy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_17\n"
+"property.text"
+msgid "P~ersonal"
+msgstr "~Хувийн"
+
+#. NrVBB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_18\n"
+"property.text"
+msgid "~Sample tables"
+msgstr "~Жишээ хүснэгтүүд"
+
+#. itXJ9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_19\n"
+"property.text"
+msgid "A~vailable fields"
+msgstr "~Боломжит талбарууд"
+
+#. JteH7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_20\n"
+"property.text"
+msgid "Field information"
+msgstr "Талбарын мэдээлэл"
+
+#. NqEog
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_21\n"
+"property.text"
+msgid "+"
+msgstr "+"
+
+#. BhFze
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_22\n"
+"property.text"
+msgid "-"
+msgstr "-"
+
+#. B8Qeu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_23\n"
+"property.text"
+msgid "Field name"
+msgstr "Талбарын нэр"
+
+#. gF5v4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_24\n"
+"property.text"
+msgid "Field type"
+msgstr "Талбарын төрөл"
+
+#. S82Up
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_25\n"
+"property.text"
+msgid "~Selected fields"
+msgstr "~Сонгогдсон талбарууд"
+
+#. iWG72
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_26\n"
+"property.text"
+msgid "A primary key uniquely identifies each record in a database table. Primary keys ease the linking of information in separate tables, and it is recommended that you have a primary key in every table. Without a primary key, it will not be possible to enter data into this table."
+msgstr "Өгөгдлийн сангийн хүснэгт дэх бичвэр бүр анхдагч түлхүүрээр нэгэн утгатай ялгагдана. Анхдагч түлхүүр нь янз бүрийн хүснэгтээс мэдээлэл холбохыг хялбарчилна. Тиймээс хүснэгт бүрд анхдагч түлхүүр тодорхойлохыг зөвлөдөг. Анхдагч түлхүүргүйгээр энэ хүснэгтэнд өгөгдөл оруулах боломжгүй."
+
+#. 3kaaw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_27\n"
+"property.text"
+msgid "~Create a primary key"
+msgstr "~Анхдагч түлхүүр үүсгэх"
+
+#. xGC6Z
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_28\n"
+"property.text"
+msgid "~Automatically add a primary key"
+msgstr "~Автоматаар анхдагч түлхүүр нэмэх"
+
+#. aP3ai
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_29\n"
+"property.text"
+msgid "~Use an existing field as a primary key"
+msgstr "~Байгаа талбарыг анхдагч түлхүүр маягаар ашиглах"
+
+#. KBVAL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_30\n"
+"property.text"
+msgid "Define p~rimary key as a combination of several fields"
+msgstr "~Анхдагч түлхүүрийг хэд хэдэн талбаруудын хослол маягаар тодорхойлох"
+
+#. PQfF2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_31\n"
+"property.text"
+msgid "F~ieldname"
+msgstr "~Талбарын нэр"
+
+#. AK4Vf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_32\n"
+"property.text"
+msgid "~Primary key fields"
+msgstr "~Анхдагч түлхүүрийн талбарууд"
+
+#. ZykVT
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_33\n"
+"property.text"
+msgid "Auto ~value"
+msgstr "~Автомат утга"
+
+#. AnaDG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_34\n"
+"property.text"
+msgid "What do you want to name your table?"
+msgstr "Өөрийн хүснэгтийг юу гэж нэрлэхийг хүсэж байна?"
+
+#. vVHAs
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_35\n"
+"property.text"
+msgid "Congratulations. You have entered all the information needed to create your table."
+msgstr "Баяр хүргэе. Өөрийн хүснэгтийг үүсгэхэд хэрэгтэй бүх мэдээллийг оруулсан байна."
+
+#. 9wGua
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_36\n"
+"property.text"
+msgid "What do you want to do next?"
+msgstr "Цааш нь яаж хийх вэ?"
+
+#. satRX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_37\n"
+"property.text"
+msgid "Modify the table design"
+msgstr "Хүснэгтийн загварыг өөрчлөх"
+
+#. GEjDE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_38\n"
+"property.text"
+msgid "Insert data immediately"
+msgstr "Өгөгдлийг даруй оруул"
+
+#. E8SB9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_39\n"
+"property.text"
+msgid "C~reate a form based on this table"
+msgstr "~Энэ хүснэгтэн дээр суурилсан маягт үүсгэх"
+
+#. FkbmE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_40\n"
+"property.text"
+msgid "The table you have created could not be opened."
+msgstr "Таны үүсгэсэн хүснэгтийг нээж чадахгүй."
+
+#. mZMcY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_41\n"
+"property.text"
+msgid "The table name '%TABLENAME' contains a character ('%SPECIALCHAR') that might not be supported by the database."
+msgstr "Хүснэгтийн '%TABLENAME' нэр нь өгөгдлийн санаар дэмжигдээгүй байж магадгүй ('%SPECIALCHAR') тэмдэгтийг агуулж байна."
+
+#. GGfLR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_42\n"
+"property.text"
+msgid "The field name '%FIELDNAME' contains a special character ('%SPECIALCHAR') that might not be supported by the database."
+msgstr "Талбарын '%FIELDNAME' нэр нь өгөгдлийн санаар дэмжигдээгүй байж магадгүй ('%SPECIALCHAR') тусгай тэмдэгтийг агуулж байна."
+
+#. CtXqK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_43\n"
+"property.text"
+msgid "Field"
+msgstr "Талбар"
+
+#. LCMUy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_44\n"
+"property.text"
+msgid "MyTable"
+msgstr "Миний Хүснэг"
+
+#. g7GJC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_45\n"
+"property.text"
+msgid "Add a Field"
+msgstr "Талбар нэмэх"
+
+#. EC4Xn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_46\n"
+"property.text"
+msgid "Remove the selected Field"
+msgstr "Сонгогдсон талбаруудыг устгах"
+
+#. rhV9g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_47\n"
+"property.text"
+msgid "The field cannot be inserted because this would exceed the maximum number of %COUNT possible fields in the database table"
+msgstr "Өгөгдлийн сангийн хүснэгтийн агуулах талбарын хязгаар тоо болох %COUNT-с давсан тул талбарыг нэмэх боломжгүй."
+
+#. jbZRo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_48\n"
+"property.text"
+msgid "The name '%TABLENAME' already exists.\\nPlease enter another name."
+msgstr "'%TABLENAME' нэр аль хэдийн байна.\\nӨөр нэр оруулна уу."
+
+#. CSsZM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_49\n"
+"property.text"
+msgid "Catalog of the table"
+msgstr "Хүснэгтийн каталог"
+
+#. vYCp3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_50\n"
+"property.text"
+msgid "Schema of the table"
+msgstr "Хүснэгтийн схем"
+
+#. UnUxG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_51\n"
+"property.text"
+msgid "The field '%FIELDNAME' already exists."
+msgstr "Талбарын '%FIELDNAME' нэр аль хэдийн байна."
+
+#. Jqd4i
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_0\n"
+"property.text"
+msgid "~Cancel"
+msgstr "~Цуцлах"
+
+#. t9bGA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_1\n"
+"property.text"
+msgid "~Help"
+msgstr "~Тусламж"
+
+#. TQ8fA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_2\n"
+"property.text"
+msgid "< ~Back"
+msgstr "< ~Буцах"
+
+#. XD8JL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_3\n"
+"property.text"
+msgid "~Convert"
+msgstr "~Хувиргах"
+
+#. tGJBz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_4\n"
+"property.text"
+msgid "Note: Currency amounts from external links and currency conversion factors in formulas cannot be converted."
+msgstr "Санамж: Гадаад холбоосноос авсан мөнгөн тэмдэгтийн хэмжээ ба томьёон дахь мөнгөн тэмдэгт хөрвүүлэлтийн фактор нь шилжүүлэх боломжгүй байна."
+
+#. GdxoQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_5\n"
+"property.text"
+msgid "First, unprotect all sheets."
+msgstr "Эхлээд, бүх хүснэгтүүдийн хамгаалалтын ав"
+
+#. fUudC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_6\n"
+"property.text"
+msgid "Currencies:"
+msgstr "Мөнгөн тэмдэгтүүд:"
+
+#. 5Uug9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_7\n"
+"property.text"
+msgid "C~ontinue >"
+msgstr "~Үргэлжлүүлэх >"
+
+#. 9JLmA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_8\n"
+"property.text"
+msgid "C~lose"
+msgstr "~Хаах"
+
+#. pkLZp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_0\n"
+"property.text"
+msgid "~Entire document"
+msgstr "~Бүтэн баримт"
+
+#. KTycA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_1\n"
+"property.text"
+msgid "Selection"
+msgstr "Сонголт"
+
+#. NCtfG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_2\n"
+"property.text"
+msgid "Cell S~tyles"
+msgstr "Нүдний ~загварууд"
+
+#. W4CcY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_3\n"
+"property.text"
+msgid "Currency cells in the current ~sheet"
+msgstr "Идэвхтэй ~хүснэгт доторх мөнгөний нүднүүд"
+
+#. XBbAm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_4\n"
+"property.text"
+msgid "Currency cells in the entire ~document"
+msgstr "Нийт ~баримт доторх мөнгөний нүднүүд"
+
+#. dRGpU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_5\n"
+"property.text"
+msgid "~Selected range"
+msgstr "~Сонгогдсон муж"
+
+#. KGDmq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_6\n"
+"property.text"
+msgid "Select Cell Styles"
+msgstr "Нүдний загварыгсонгох"
+
+#. rEiCE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_7\n"
+"property.text"
+msgid "Select currency cells"
+msgstr "Мөнгөний нүдийг сонгоно уу"
+
+#. yXtpS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_8\n"
+"property.text"
+msgid "Currency ranges:"
+msgstr "Мөнгө тэмдэгтийн мужууд:"
+
+#. d2faA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_9\n"
+"property.text"
+msgid "Templates:"
+msgstr "Хэвүүд:"
+
+#. 63WRQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_0\n"
+"property.text"
+msgid "Extent"
+msgstr "Хүрээ"
+
+#. CDmMh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_1\n"
+"property.text"
+msgid "~Single %PRODUCTNAME Calc document"
+msgstr "Ганц %PRODUCTNAME Calc баримт"
+
+#. nUcAR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_2\n"
+"property.text"
+msgid "Complete ~directory"
+msgstr "Бүрэн ~хавтас"
+
+#. eUtmF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_3\n"
+"property.text"
+msgid "Source Document:"
+msgstr "Эх баримт:"
+
+#. iQj6g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_4\n"
+"property.text"
+msgid "Source directory:"
+msgstr "Эх хавтас:"
+
+#. JM8cN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_5\n"
+"property.text"
+msgid "~Including subfolders"
+msgstr "Дэд хавтаснуудын хамт"
+
+#. BFR2F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_6\n"
+"property.text"
+msgid "Target directory:"
+msgstr "Зорилго хавтас:"
+
+#. 2q8vo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_7\n"
+"property.text"
+msgid "Temporarily unprotect sheet without query"
+msgstr "Асуултгүйгээр хүснэгтийн хамгаалалтыг түр авах."
+
+#. BVhae
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_10\n"
+"property.text"
+msgid "Also convert fields and tables in text documents"
+msgstr "Бичвэр баримт дахь талбарууд ба хүснэгтүүдийг бас хөрвүүл"
+
+#. sFtH8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_0\n"
+"property.text"
+msgid "Conversion status:"
+msgstr "Хөрвүүлэлтийн төлөв:"
+
+#. 8EcKA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_1\n"
+"property.text"
+msgid "Conversion status of the cell templates:"
+msgstr "Нүдний хэвүүдийн хөрвүүлэлтийн төлөв:"
+
+#. BAX9w
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_2\n"
+"property.text"
+msgid "Registration of the relevant ranges: Sheet %1Number%1 of %2TotPageCount%2"
+msgstr "Хамаатай мужуудын бүртгэл: Sheet %1Number%1 of %2TotPageCount%2"
+
+#. EbBJf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_3\n"
+"property.text"
+msgid "Entry of the ranges to be converted..."
+msgstr "Хөрвүүлэх мужуудын элемент..."
+
+#. f3Erf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_4\n"
+"property.text"
+msgid "Sheet protection for each sheet will be restored..."
+msgstr "Хүснэгт тус бүр дэх хүснэгтийн хамгаалалт сэргээгдэнэ..."
+
+#. 5sPuS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_5\n"
+"property.text"
+msgid "Conversion of the currency units in the cell templates..."
+msgstr "Нүдний хэвүүд доторх мөнгөн дэвсгэртийн нэгжүүдийн хөрвүүлэлт..."
+
+#. JuVQA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_0\n"
+"property.text"
+msgid "~Finish"
+msgstr "~Дуусгах"
+
+#. xsatA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_1\n"
+"property.text"
+msgid "Select directory"
+msgstr "Лавлах сонго"
+
+#. o4Myk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_2\n"
+"property.text"
+msgid "Select file"
+msgstr "Файл сонго"
+
+#. 5khdm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_3\n"
+"property.text"
+msgid "Select target directory"
+msgstr "Товлосон лавлахыг сонгоно уу"
+
+#. Ldc4o
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_4\n"
+"property.text"
+msgid "non-existent"
+msgstr "Байхгүй байна"
+
+#. bh9MB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_5\n"
+"property.text"
+msgid "Euro Converter"
+msgstr "Евро хөрвүүлэгч"
+
+#. tb9sF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_6\n"
+"property.text"
+msgid "Should protected spreadsheets be temporarily unprotected?"
+msgstr "Хамгаалагдсан хүснэгтүүд түр зуур үл-хамгаалагдах шаардлагатай юу?"
+
+#. zFqxc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_7\n"
+"property.text"
+msgid "Enter the password to unprotect the table %1TableName%1"
+msgstr "%1TableName%1 хүснэгтийг үл-хамгаалахын тулд нууц үгээ оруулна уу."
+
+#. t2n9c
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_8\n"
+"property.text"
+msgid "Wrong Password!"
+msgstr "Буруу нууц үг!"
+
+#. YPd7L
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_9\n"
+"property.text"
+msgid "Protected Sheet"
+msgstr "Хамгаалагдсан хүснэгт"
+
+#. JbEyK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_10\n"
+"property.text"
+msgid "Warning!"
+msgstr "Сануулга!"
+
+#. tYfDo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_11\n"
+"property.text"
+msgid "Protection for the sheets will not be removed."
+msgstr "Хүснэгтэд зориулагдсан хамгаалалт устгагдахгүй."
+
+#. YfPkn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_12\n"
+"property.text"
+msgid "Sheet cannot be unprotected"
+msgstr "Хүснэгт үл-хамгаалагдаж болохгүй"
+
+#. PisTE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_13\n"
+"property.text"
+msgid "The Wizard cannot edit this document as cell formats cannot be modified in documents containing protected spreadsheets."
+msgstr "Залуурч энэ баримтыг нүдэн форматаар засварлах боломжгүй ба энэ баримтад агуулагдаж буй хамгаалалттай хүснэгтүүд мөн засварлагдах боломжгүй байна."
+
+#. t5jgU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_14\n"
+"property.text"
+msgid "Please note that the Euro Converter will, otherwise, not be able to edit this document!"
+msgstr "Евро хөрвүүлэгч энэ баримтыг засварлах боломжгүйг анхаарна уу!"
+
+#. MwoXF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_15\n"
+"property.text"
+msgid "Please choose a currency to be converted first!"
+msgstr "Хөрвүүлэгдэх мөнгөн дэвсгэртээ эхлээд сонгоно уу!"
+
+#. CzTMy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_16\n"
+"property.text"
+msgid "Password:"
+msgstr "Нууц үг:"
+
+#. QBznu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_17\n"
+"property.text"
+msgid "OK"
+msgstr "OK"
+
+#. ALxZG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_18\n"
+"property.text"
+msgid "Cancel"
+msgstr "Болих"
+
+#. bTNoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_19\n"
+"property.text"
+msgid "Please select a %PRODUCTNAME Calc document for editing!"
+msgstr "Засварлагдах %PRODUCTNAME Calc баримтаа сонгоно уу!"
+
+#. 8QobR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_20\n"
+"property.text"
+msgid "'<1>' is not a directory!"
+msgstr "'<1>' хавтас биш!"
+
+#. saw7C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_21\n"
+"property.text"
+msgid "Document is read-only!"
+msgstr "Баримт зөвхөн уншигдана!"
+
+#. GZECF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_22\n"
+"property.text"
+msgid "The '<1>' file already exists.<CR>Do you want to overwrite it?"
+msgstr "Файл '<1>' нь хэдийн байна.<CR>Үүнийг дээр нь дарж бичмээр байна уу?"
+
+#. 9dJcF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_23\n"
+"property.text"
+msgid "Do you really want to terminate conversion at this point?"
+msgstr "Та яг одоо хөрвүүлэлтийг дуусгамаар байна уу?"
+
+#. ufpoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_24\n"
+"property.text"
+msgid "Cancel Wizard"
+msgstr "Залуурчийг хүчингүй болго"
+
+#. HCfhF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_0\n"
+"property.text"
+msgid "Portuguese Escudo"
+msgstr "Португалийн Эскудо"
+
+#. 4PAvX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_1\n"
+"property.text"
+msgid "Dutch Guilder"
+msgstr "Данийн Гүйлдэр"
+
+#. VzRz9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_2\n"
+"property.text"
+msgid "French Franc"
+msgstr "Францын Франк"
+
+#. rQFWP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_3\n"
+"property.text"
+msgid "Spanish Peseta"
+msgstr "Испанийн Писета"
+
+#. tc8KC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_4\n"
+"property.text"
+msgid "Italian Lira"
+msgstr "Италийн Лийр"
+
+#. XgEB3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_5\n"
+"property.text"
+msgid "German Mark"
+msgstr "Германы марк"
+
+#. 7sBxK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_6\n"
+"property.text"
+msgid "Belgian Franc"
+msgstr "Белгийн франк"
+
+#. nLYJf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_7\n"
+"property.text"
+msgid "Irish Punt"
+msgstr "Ирландын Пунт"
+
+#. rujpn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_8\n"
+"property.text"
+msgid "Luxembourg Franc"
+msgstr "Люксембүргийн Франк"
+
+#. jR3cM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_9\n"
+"property.text"
+msgid "Austrian Schilling"
+msgstr "Австралийн Шиллинг"
+
+#. 8x4oF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_10\n"
+"property.text"
+msgid "Finnish Mark"
+msgstr "Финляндын Марк"
+
+#. LsUXE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_11\n"
+"property.text"
+msgid "Greek Drachma"
+msgstr "Грекийн Драчма"
+
+#. cks9C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_12\n"
+"property.text"
+msgid "Slovenian Tolar"
+msgstr "Словенийн Толар"
+
+#. CMbyy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_13\n"
+"property.text"
+msgid "Cypriot Pound"
+msgstr "Баримтад тогтоогдсон мөнгөн тэмдэгт Европийн мөнгөн тэмдэгт биш!"
+
+#. HyCde
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_14\n"
+"property.text"
+msgid "Maltese Lira"
+msgstr "Таны үйлдлийн системд тогтоогдсон хэл Европийн холбооны хэл биш байна."
+
+#. GAtT3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_15\n"
+"property.text"
+msgid "Slovak Koruna"
+msgstr "Словакын Крона"
+
+#. iXDND
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_16\n"
+"property.text"
+msgid "Estonian Kroon"
+msgstr "Эстонын Крона"
+
+#. NRqiA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_17\n"
+"property.text"
+msgid "Latvian Lats"
+msgstr "Латвийн лат"
+
+#. N9Psc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_18\n"
+"property.text"
+msgid "Lithuanian Litas"
+msgstr "Литвийн лит"
+
+#. eDjBr
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_0\n"
+"property.text"
+msgid "Progress"
+msgstr "Явц"
+
+#. JhTCq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_1\n"
+"property.text"
+msgid "Retrieving the relevant documents..."
+msgstr "Хамаатай баримтуудыг дуудаж байна..."
+
+#. CLY8k
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_2\n"
+"property.text"
+msgid "Converting the documents..."
+msgstr "Баримтуудыг хөрвүүлж байна..."
+
+#. Fh3Fg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_3\n"
+"property.text"
+msgid "Settings:"
+msgstr "Тохиргоо:"
+
+#. C3AGk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_4\n"
+"property.text"
+msgid "Sheet is always unprotected"
+msgstr "Хүснэгт үргэлж үл-хамгаалагдсан байна."
+
+#. BBZaA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_0\n"
+"property.text"
+msgid "Theme Selection"
+msgstr "Загвар сонголт"
+
+#. DbGhN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_1\n"
+"property.text"
+msgid "Error while saving the document to the clipboard! The following action cannot be undone."
+msgstr "Клипборд руу баримтыг хадгалж байх явц дахь алдаа! Дараах үйлдлүүд эс-хийгдэхгүй байж чадахгүй."
+
+#. LTS44
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_2\n"
+"property.text"
+msgid "~Cancel"
+msgstr "~Цуцлах"
+
+#. qXu5G
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_3\n"
+"property.text"
+msgid "~OK"
+msgstr "~OK"
+
+#. VkFhm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_0\n"
+"property.text"
+msgid "(Standard)"
+msgstr "(Стандарт)"
+
+#. YUTxB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_1\n"
+"property.text"
+msgid "Autumn Leaves"
+msgstr "Намрын навчис"
+
+#. Bmx9P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_2\n"
+"property.text"
+msgid "Be"
+msgstr "Байх"
+
+#. AYcUq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_3\n"
+"property.text"
+msgid "Black and White"
+msgstr "Хар ба цагаан"
+
+#. kNA76
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_4\n"
+"property.text"
+msgid "Blackberry Bush"
+msgstr "Жимсний бут"
+
+#. AsnuA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_5\n"
+"property.text"
+msgid "Blue Jeans"
+msgstr "Цэнхэр жинс"
+
+#. VgzDD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_6\n"
+"property.text"
+msgid "Fifties Diner"
+msgstr "Тавин оны"
+
+#. YDRhE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_7\n"
+"property.text"
+msgid "Glacier"
+msgstr "Мөнх цас"
+
+#. 769K8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_8\n"
+"property.text"
+msgid "Green Grapes"
+msgstr "Ногоон усан үзэм"
+
+#. bNeCA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_9\n"
+"property.text"
+msgid "Marine"
+msgstr "Далай"
+
+#. LYvgg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_10\n"
+"property.text"
+msgid "Millennium"
+msgstr "Мянгат он"
+
+#. 2dsey
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_11\n"
+"property.text"
+msgid "Nature"
+msgstr "Байгаль"
+
+#. sobFj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_12\n"
+"property.text"
+msgid "Neon"
+msgstr "Неон"
+
+#. E9VPF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_13\n"
+"property.text"
+msgid "Night"
+msgstr "Шөнө"
+
+#. VFByN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_14\n"
+"property.text"
+msgid "PC Nostalgia"
+msgstr "Санашран хүссэн"
+
+#. FCRpD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_15\n"
+"property.text"
+msgid "Pastel"
+msgstr "Пастель"
+
+#. uAsPp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_16\n"
+"property.text"
+msgid "Pool Party"
+msgstr "Баяр цэнгүүн"
+
+#. GDi2u
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_17\n"
+"property.text"
+msgid "Pumpkin"
+msgstr "Хулуу"
+
+#. piSqr
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_0\n"
+"property.text"
+msgid "Addressee"
+msgstr "Хүлээн авагч"
+
+#. Cy8W9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_1\n"
+"property.text"
+msgid "One recipient"
+msgstr "Нэг хүлээн авагч"
+
+#. rH3a3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_2\n"
+"property.text"
+msgid "Several recipients (address database)"
+msgstr "Хэд хэдэн хүлээн авагч (хаягийн өгөгдлийн сан)"
+
+#. G8T6x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_3\n"
+"property.text"
+msgid "Use of This Template"
+msgstr "Энэ хэвийн ашиглалт"
+
+#. wTrM9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceMsgError\n"
+"property.text"
+msgid "An error has occurred."
+msgstr "Алдаа гарлаа."
+
+#. K77VB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_0\n"
+"property.text"
+msgid "Click placeholder and overwrite"
+msgstr "Зай оруулагч дээр дараад дарж бич."
+
+#. hRJRf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_1\n"
+"property.text"
+msgid "Company"
+msgstr "Компани"
+
+#. c6Zjp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_2\n"
+"property.text"
+msgid "Department"
+msgstr "Салбар"
+
+#. cYzGQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_3\n"
+"property.text"
+msgid "First Name"
+msgstr "Нэр"
+
+#. BEmdM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_4\n"
+"property.text"
+msgid "Last Name"
+msgstr "Овог"
+
+#. fxfq5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_5\n"
+"property.text"
+msgid "Street"
+msgstr "Гудамж"
+
+#. DxdCD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_6\n"
+"property.text"
+msgid "Country"
+msgstr "Улс"
+
+#. uNexF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_7\n"
+"property.text"
+msgid "ZIP/Postal Code"
+msgstr "Зип/Шуудангийн код"
+
+#. qHMFm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_8\n"
+"property.text"
+msgid "City"
+msgstr "Хот"
+
+#. AqdCs
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_9\n"
+"property.text"
+msgid "Title"
+msgstr "Гарчиг"
+
+#. s8G9A
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_10\n"
+"property.text"
+msgid "Position"
+msgstr "Байрлал"
+
+#. Wa8WF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_11\n"
+"property.text"
+msgid "Form of Address"
+msgstr "Хаягийн Форм"
+
+#. 5FwLR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_12\n"
+"property.text"
+msgid "Initials"
+msgstr "Нэрийн эхний үсэг"
+
+#. zH6b3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_13\n"
+"property.text"
+msgid "Salutation"
+msgstr "Цол гуншин"
+
+#. wDEfh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_14\n"
+"property.text"
+msgid "Home Phone"
+msgstr "Гэрийн Утас"
+
+#. LJ5ou
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_15\n"
+"property.text"
+msgid "Work Phone"
+msgstr "Ажлын Утас"
+
+#. hJQtY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_16\n"
+"property.text"
+msgid "Fax"
+msgstr "Факс"
+
+#. jmiN2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_17\n"
+"property.text"
+msgid "Email"
+msgstr "Имэйл"
+
+#. w7uK5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_18\n"
+"property.text"
+msgid "URL"
+msgstr "Хаяг (URL)"
+
+#. bgJJe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_19\n"
+"property.text"
+msgid "Notes"
+msgstr "Тэмдэглэлүүд"
+
+#. EhQEg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_20\n"
+"property.text"
+msgid "Alt. Field 1"
+msgstr "Alt. Талбар 1"
+
+#. bZ4za
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_21\n"
+"property.text"
+msgid "Alt. Field 2"
+msgstr "Alt. Талбар 2"
+
+#. vgr7W
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_22\n"
+"property.text"
+msgid "Alt. Field 3"
+msgstr "Alt. Талбар 3"
+
+#. TGKbX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_23\n"
+"property.text"
+msgid "Alt. Field 4"
+msgstr "Alt. Талбар 4"
+
+#. HTUTU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_24\n"
+"property.text"
+msgid "ID"
+msgstr "Дугаар"
+
+#. BkAJF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_25\n"
+"property.text"
+msgid "State"
+msgstr "Муж"
+
+#. 8NXAm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_26\n"
+"property.text"
+msgid "Office Phone"
+msgstr "Офисын Утас"
+
+#. RvvuS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_27\n"
+"property.text"
+msgid "Pager"
+msgstr "Пэйжир"
+
+#. M65e8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_28\n"
+"property.text"
+msgid "Mobile Phone"
+msgstr "Гар Утас"
+
+#. hNCCT
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_29\n"
+"property.text"
+msgid "Other Phone"
+msgstr "Бусад Утас"
+
+#. jNWYd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_30\n"
+"property.text"
+msgid "Calendar URL"
+msgstr "Хуанлийн URL"
+
+#. Ad3kk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_31\n"
+"property.text"
+msgid "Invite"
+msgstr "Урих"
+
+#. gpGUV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceNoTextmark_0\n"
+"property.text"
+msgid "The bookmark 'Recipient' is missing."
+msgstr "Тэмдэглэгээд 'Хүлээн авагч'  алга."
+
+#. G6KuE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceNoTextmark_1\n"
+"property.text"
+msgid "Form letter fields can not be included."
+msgstr "Маягтын үсгийн талбар агуулагдаж чадахгүй."
+
+#. WM8Eu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgName\n"
+"property.text"
+msgid "Minutes Template"
+msgstr "Минутын арьс"
+
+#. 3Yeqe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgNoCancel\n"
+"property.text"
+msgid "An option must be confirmed."
+msgstr "Сонголт баталгаажигдах ёстой."
+
+#. BEWBh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgFrame\n"
+"property.text"
+msgid "Minutes Type"
+msgstr "Минутын төрөл"
+
+#. hyGRE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgButton1\n"
+"property.text"
+msgid "Results Minutes"
+msgstr "Минутын үр дүнгүүд"
+
+#. DMfQn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgButton2\n"
+"property.text"
+msgid "Evaluation Minutes"
+msgstr "Үнэлгээний минутууд"
+
+#. 9zy6P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextField\n"
+"property.text"
+msgid "User data field is not defined!"
+msgstr "Хэрэглэгчийн өгөгдлийн талбар тодорхойлогдоогүй байна."
+
+#. DzUkS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"NoDirCreation\n"
+"property.text"
+msgid "The '%1' directory cannot be created:"
+msgstr "Энэ '%1' хавтас үүсгэгдэх боломжгүй:"
+
+#. JDcBR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MsgDirNotThere\n"
+"property.text"
+msgid "The '%1' directory does not exist."
+msgstr "'%1' хавтас алга."
+
+#. WcmGg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"QueryfornewCreation\n"
+"property.text"
+msgid "Do you want to create it now?"
+msgstr "Үүнийг одоо үүсгэмээр байна уу?"
+
+#. 6rvR2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"HelpButton\n"
+"property.text"
+msgid "~Help"
+msgstr "~Тусламж"
+
+#. qeDY7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CancelButton\n"
+"property.text"
+msgid "~Cancel"
+msgstr "~Цуцлах"
+
+#. yZGTC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"BackButton\n"
+"property.text"
+msgid "< ~Back"
+msgstr "< ~Буцах"
+
+#. Wc2Fp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"NextButton\n"
+"property.text"
+msgid "Ne~xt >"
+msgstr "~Үргэлжлүүлэх >"
+
+#. tntS5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"BeginButton\n"
+"property.text"
+msgid "~Convert"
+msgstr "~Хувиргах"
+
+#. CL4tm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CloseButton\n"
+"property.text"
+msgid "~Close"
+msgstr "~Хаах"
+
+#. 3FYU3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"WelcometextLabel1\n"
+"property.text"
+msgid "This wizard convert legacy format documents to Open Document Format for Office Applications."
+msgstr "Энэ програм нь хуучирсан баримт бичгийн форматыг офисийн Open Document Format - руу хувиргана."
+
+#. ZQwGS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"WelcometextLabel3\n"
+"property.text"
+msgid "Select the document type for conversion:"
+msgstr "Та хөрвүүлэх баримтын төрлөө сонгоно уу:"
+
+#. 8QmDc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_1_\n"
+"property.text"
+msgid "Word templates"
+msgstr "Ворд хэвүүд"
+
+#. AujXQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_2_\n"
+"property.text"
+msgid "Excel templates"
+msgstr "Эксел хэвүүд"
+
+#. hPB75
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_3_\n"
+"property.text"
+msgid "PowerPoint templates"
+msgstr "Поверпойнт хэвүүд"
+
+#. QUiMA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_1_\n"
+"property.text"
+msgid "Word documents"
+msgstr "Ворд баримтууд"
+
+#. BDr26
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_2_\n"
+"property.text"
+msgid "Excel documents"
+msgstr "Эксел баримтууд"
+
+#. 9RwAv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_3_\n"
+"property.text"
+msgid "PowerPoint/Publisher documents"
+msgstr "PowerPoint/Publisher-Баримт бичгүүд"
+
+#. uCxvB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSContainerName\n"
+"property.text"
+msgid "Microsoft Office"
+msgstr "Майкрософт Офис"
+
+#. s4vuw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SummaryHeader\n"
+"property.text"
+msgid "Summary:"
+msgstr "Дүгнэлт:"
+
+#. uAmbh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"GroupnameDefault\n"
+"property.text"
+msgid "Imported_Templates"
+msgstr "Импортлогдсон_хэвүүд"
+
+#. As7iy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressMoreDocs\n"
+"property.text"
+msgid "Documents"
+msgstr "Баримтууд"
+
+#. tbXgc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressMoreTemplates\n"
+"property.text"
+msgid "Templates"
+msgstr "Хэвүүд"
+
+#. foG9h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"FileExists\n"
+"property.text"
+msgid "The '<1>' file already exists.<CR>Do you want to overwrite it?"
+msgstr "Файл '<1>' нь хэдийн байна.<CR>Үүнийг дээр нь дарж бичмээр байна уу?"
+
+#. bvMuH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MorePathsError3\n"
+"property.text"
+msgid "Directories do not exist"
+msgstr "Лавлахууд алга байна"
+
+#. Jh3WF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ConvertError1\n"
+"property.text"
+msgid "Do you really want to terminate conversion at this point?"
+msgstr "Та яг одоо хөрвүүлэлтийг дуусгамаар байна уу?"
+
+#. zuFo9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ConvertError2\n"
+"property.text"
+msgid "Cancel Wizard"
+msgstr "Залуурчийг хүчингүй болго"
+
+#. MNVFe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RTErrorDesc\n"
+"property.text"
+msgid "An error has occurred in the wizard."
+msgstr "Залуурчад алдаа гарлаа."
+
+#. VzQoq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RTErrorHeader\n"
+"property.text"
+msgid "Error"
+msgstr "Алдаа"
+
+#. mFTyW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"OverwriteallFiles\n"
+"property.text"
+msgid "Do you want to overwrite documents without being asked?"
+msgstr "Асуулга байхгүйгээр баримтуудыг дарж бичмээр байна уу?"
+
+#. rWgBN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ReeditMacro\n"
+"property.text"
+msgid "Document macro has to be revised."
+msgstr "Баримтын макро дахин шалгагдах ёстой."
+
+#. GDbH6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CouldNotsaveDocument\n"
+"property.text"
+msgid "Document '<1>' could not be saved."
+msgstr "'<1>' баримт хадгалагдаж чадахгүй."
+
+#. GcGjC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CouldNotopenDocument\n"
+"property.text"
+msgid "Document '<1>' could not be opened."
+msgstr "'<1>' баримт хадгалагдаж чадахгүй."
+
+#. XG3Dg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"PathDialogMessage\n"
+"property.text"
+msgid "Select a directory"
+msgstr "Лавлах сонго"
+
+#. 8DV2D
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"DialogTitle\n"
+"property.text"
+msgid "Document Converter"
+msgstr "Баримт хөрвүүлэгч"
+
+#. 6hySA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SearchInSubDir\n"
+"property.text"
+msgid "Including subdirectories"
+msgstr "Дэд хавтаснууд агуулж байна"
+
+#. Juv8i
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage1\n"
+"property.text"
+msgid "Progress"
+msgstr "Явц"
+
+#. EWECA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage2\n"
+"property.text"
+msgid "Retrieving the relevant documents:"
+msgstr "Хамаатай баримтуудыг дуудах:"
+
+#. zTpAx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage3\n"
+"property.text"
+msgid "Converting the documents"
+msgstr "Баримтыг хөрвүүлж байна"
+
+#. B6PuJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressFound\n"
+"property.text"
+msgid "Found:"
+msgstr "Олдсон:"
+
+#. 9G86q
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage5\n"
+"property.text"
+msgid "\"%1 found"
+msgstr "\"%1 олдсон"
+
+#. GmveL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"Ready\n"
+"property.text"
+msgid "Finished"
+msgstr "Дууссан"
+
+#. yZCLk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SourceDocuments\n"
+"property.text"
+msgid "Source documents"
+msgstr "Эх баримтууд"
+
+#. vDd4X
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TargetDocuments\n"
+"property.text"
+msgid "Target documents"
+msgstr "Товлосон баримтууд"
+
+#. VyLKU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"LogfileSummary\n"
+"property.text"
+msgid "<COUNT> documents converted"
+msgstr "<COUNT> баримтууд хөрвүүлэгдсэн"
+
+#. D8KY3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumInclusiveSubDir\n"
+"property.text"
+msgid "All subdirectories will be taken into account"
+msgstr "Бүх дэд хавтаснууд бүртгэл рүү орно."
+
+#. 8Bmz9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumSaveDokumente\n"
+"property.text"
+msgid "These will be exported to the following directory:"
+msgstr "Эдгээрүүд дараахь хавтас руу экспорт хийгдэнэ."
+
+#. 8atHD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextImportLabel\n"
+"property.text"
+msgid "Import from:"
+msgstr "Дараахаас импортол"
+
+#. zpCFk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextExportLabel\n"
+"property.text"
+msgid "Save to:"
+msgstr "Дараах руу хадгал"
+
+#. C7a2B
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CreateLogfile\n"
+"property.text"
+msgid "Create log file"
+msgstr "Бичлэг файл үүсгэх"
+
+#. pzBG4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"LogfileHelpText\n"
+"property.text"
+msgid "A log file will be created in your work directory"
+msgstr "Бичлэг файл таны ажлын хавтас дотор үүсэх болно."
+
+#. mDG8Y
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ShowLogfile\n"
+"property.text"
+msgid "Show log file"
+msgstr "Протокол файл харах"
+
+#. 7S3Ct
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTextDocuments\n"
+"property.text"
+msgid "All Word documents contained in the following directory will be imported:"
+msgstr "Дараах хавтас дотор агуулагдаж буй бүх Ворд баримтууд импортлогдоно."
+
+#. iBJo8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTableDocuments\n"
+"property.text"
+msgid "All Excel documents contained in the following directory will be imported:"
+msgstr "Дараах хавтас дотор агуулагдаж буй бүх Эксел баримтууд импортлогдоно."
+
+#. kZfUh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSDrawDocuments\n"
+"property.text"
+msgid "All PowerPoint/Publisher documents contained in the following directory will be imported:"
+msgstr "Дараах хавтас дотор агуулагдаж буй бүх PowerPoint/Publisher баримт бичгүүд импортлогдоно."
+
+#. AEPyE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTextTemplates\n"
+"property.text"
+msgid "All Word templates contained in the following directory will be imported:"
+msgstr "Дараах хавтас дотор агуулагдаж буй бүх Ворд хэвүүд импортлогдоно."
+
+#. G2vMa
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTableTemplates\n"
+"property.text"
+msgid "All Excel templates contained in the following directory will be imported:"
+msgstr "Дараах хавтас дотор агуулагдаж буй бүх Эксел хэвүүд импортлогдоно."
+
+#. AEEwA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSDrawTemplates\n"
+"property.text"
+msgid "All PowerPoint templates contained in the following directory will be imported:"
+msgstr "Дараах хавтас дотор агуулагдаж буй бүх Поверпойнт хэвүүд импортлогдоно."

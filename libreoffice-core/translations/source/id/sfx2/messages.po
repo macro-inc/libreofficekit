@@ -1,0 +1,5258 @@
+#. extracted from sfx2
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-08-24 12:29+0200\n"
+"PO-Revision-Date: 2022-07-12 03:33+0000\n"
+"Last-Translator: Rizal Muttaqin <riz_17_oke@yahoo.co.id>\n"
+"Language-Team: Indonesian <https://translations.documentfoundation.org/projects/libo_ui-master/sfx2messages/id/>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1563639732.000000\n"
+
+#. bHbFE
+#: include/sfx2/strings.hrc:25
+msgctxt "STR_TEMPLATE_FILTER"
+msgid "Templates"
+msgstr "Templat"
+
+#. FfusE
+#: include/sfx2/strings.hrc:26
+msgctxt "STR_SAVEDOC"
+msgid "~Save"
+msgstr "~Simpan"
+
+#. CQKYg
+#: include/sfx2/strings.hrc:27
+msgctxt "STR_SAVEASDOC"
+msgid "Save ~As..."
+msgstr "Simpan Seb~agai..."
+
+#. BdP9V
+#: include/sfx2/strings.hrc:28
+msgctxt "STR_SAVEACOPY"
+msgid "Save a Copy..."
+msgstr "Simpan Salinan..."
+
+#. vFaub
+#: include/sfx2/strings.hrc:29
+msgctxt "STR_CLOSEDOC"
+msgid "~Close"
+msgstr "~Tutup"
+
+#. 4jsUR
+#: include/sfx2/strings.hrc:30
+msgctxt "STR_OPEN"
+msgid "~Open"
+msgstr "~Buka"
+
+#. ACduP
+#: include/sfx2/strings.hrc:31
+msgctxt "STR_EDIT_TEMPLATE"
+msgid "~Edit"
+msgstr "~Sunting"
+
+#. aKW5U
+#: include/sfx2/strings.hrc:32
+msgctxt "STR_DEFAULT_TEMPLATE"
+msgid "Set as De~fault"
+msgstr "Atur sebagai Ba~ku"
+
+#. Bwnha
+#: include/sfx2/strings.hrc:33
+msgctxt "STR_RESET_DEFAULT"
+msgid "Reset De~fault"
+msgstr "Atur Ulang Ba~ku"
+
+#. oRvm4
+#: include/sfx2/strings.hrc:34
+msgctxt "STR_DELETE_TEMPLATE"
+msgid "~Delete"
+msgstr "~Hapus"
+
+#. UyfFH
+#: include/sfx2/strings.hrc:35
+msgctxt "STR_SFX_RENAME"
+msgid "~Rename"
+msgstr "~Ganti Nama"
+
+#. Gnhk4
+#: include/sfx2/strings.hrc:36
+msgctxt "STR_ACTION_MOVE"
+msgid "~Move"
+msgstr "~Pindah"
+
+#. tWE8a
+#: include/sfx2/strings.hrc:37
+msgctxt "STR_ACTION_EXPORT"
+msgid "E~xport"
+msgstr "E~kspor"
+
+#. aEN5D
+#: include/sfx2/strings.hrc:38
+msgctxt "STR_CATEGORY_RENAME"
+msgid "Ren~ame Category"
+msgstr "Ganti N~ama Kategori"
+
+#. Ys9z4
+#: include/sfx2/strings.hrc:39
+msgctxt "STR_RENAME_TEMPLATE"
+msgid "Enter new template name:"
+msgstr "Ketikkan nama templat baru:"
+
+#. TVTsi
+#: include/sfx2/strings.hrc:40
+msgctxt "STR_TEMPLATE_TOOLTIP"
+msgid ""
+"Title: $1\n"
+"Category: $2"
+msgstr ""
+"Judul: $1\n"
+"Kategori: $2"
+
+#. W2X7Y
+#: include/sfx2/strings.hrc:41
+msgctxt "STR_TEMPLATE_SELECTION"
+msgid "Select a Template"
+msgstr "Pilih sebuah Templat"
+
+#. ihUZ6
+#: include/sfx2/strings.hrc:42
+msgctxt "STR_AUTOMATICVERSION"
+msgid "Automatically saved version"
+msgstr "Versi tersimpan otomatis"
+
+#. EfF2v
+#: include/sfx2/strings.hrc:43
+msgctxt "STR_EXPORTBUTTON"
+msgid "Export"
+msgstr "Ekspor"
+
+#. q7FND
+#: include/sfx2/strings.hrc:44
+msgctxt "STR_LABEL_FILEFORMAT"
+msgid "File format:"
+msgstr "Format berkas:"
+
+#. N7LVW
+#: include/sfx2/strings.hrc:45
+msgctxt "STR_HIDDENINFO_CONTAINS"
+msgid ""
+"This document contains:\n"
+"\n"
+msgstr ""
+"Dokumen ini mengandung:\n"
+"\n"
+
+#. 8tujE
+#: include/sfx2/strings.hrc:46
+msgctxt "STR_HIDDENINFO_RECORDCHANGES"
+msgid "Recorded changes"
+msgstr "Perubahan tercatat"
+
+#. LUUtP
+#: include/sfx2/strings.hrc:47
+msgctxt "STR_HIDDENINFO_NOTES"
+msgid "Notes"
+msgstr "Catatan"
+
+#. tDmMa
+#: include/sfx2/strings.hrc:48
+msgctxt "STR_HIDDENINFO_DOCVERSIONS"
+msgid "Document versions"
+msgstr "Versi Dokumen"
+
+#. ZBKQD
+#: include/sfx2/strings.hrc:49
+msgctxt "STR_HIDDENINFO_CONTINUE_SAVING"
+msgid "Do you want to continue saving the document?"
+msgstr "Lanjut menyimpan dokumen?"
+
+#. BzbMB
+#: include/sfx2/strings.hrc:50
+msgctxt "STR_HIDDENINFO_CONTINUE_PRINTING"
+msgid "Do you want to continue printing the document?"
+msgstr "Lanjut mencetak dokumen?"
+
+#. ExQK6
+#: include/sfx2/strings.hrc:51
+msgctxt "STR_HIDDENINFO_CONTINUE_SIGNING"
+msgid "Do you want to continue signing the document?"
+msgstr "Lanjut menandatangani dokumen?"
+
+#. TepyB
+#: include/sfx2/strings.hrc:52
+msgctxt "STR_HIDDENINFO_CONTINUE_CREATEPDF"
+msgid "Do you want to continue creating a PDF file?"
+msgstr "Lanjut membuat berkas PDF?"
+
+#. CbFjm
+#: include/sfx2/strings.hrc:53
+msgctxt "STR_NEW_FILENAME_SAVE"
+msgid "If you do not want to overwrite the original document, you should save your work under a new filename."
+msgstr "Jika Anda tidak ingin menimpa dokumen yang asli, Anda harus menyimpan dokumen tersebut dengan nama yang lain."
+
+#. 7stwX
+#. Used in the title of a shared document.
+#: include/sfx2/strings.hrc:55
+msgctxt "STR_SHARED"
+msgid " (shared)"
+msgstr " (digunakan bersama)"
+
+#. W5PzH
+#: include/sfx2/strings.hrc:56
+msgctxt "STR_XMLSEC_ODF12_EXPECTED"
+msgid "The document format version is set to ODF 1.1 (OpenOffice.org 2.x) in Tools-Options-Load/Save-General. Signing documents requires ODF 1.2 (OpenOffice.org 3.x)."
+msgstr "Versi format dokumen diatur ke ODF 1.1 (OpenOffice.org 2.x) pada Perkakas-Pilihan-Muat/Simpan-Umum. Menandatangani dokumen membutuhkan ODF 1.2 (OpenOffice.org 3.x)."
+
+#. tqPCH
+#: include/sfx2/strings.hrc:57
+msgctxt "STR_XMLSEC_QUERY_SAVESIGNEDBEFORESIGN"
+msgid ""
+"The document has to be saved before it can be signed. Saving the document removes all present signatures.\n"
+"Do you want to save the document?"
+msgstr ""
+"Dokumen harus disimpan sebelum bisa ditandatangani. Menyimpan dokumen menghapus semua tandatangan yang sudah ada.\n"
+"Apakah Anda ingin menyimpan dokumen tersebut?"
+
+#. iFaMb
+#: include/sfx2/strings.hrc:58
+msgctxt "STR_QRYTEMPL_MESSAGE"
+msgid "The template '$(ARG1)' on which this document is based, has been modified. Do you want to update the styles of the current document, using the modified template?"
+msgstr "Templat '$(ARG1)' yang menjadi dasar dokumen ini, telah diubah. Apakah Anda ingin memperbarui gaya dokumen saat ini menggunakan templat yang telah diubah?"
+
+#. ABmvY
+#: include/sfx2/strings.hrc:59
+msgctxt "STR_QRYTEMPL_UPDATE_BTN"
+msgid "~Update Styles"
+msgstr "Perbahar~ui Gaya"
+
+#. W4thg
+#: include/sfx2/strings.hrc:60
+msgctxt "STR_QRYTEMPL_KEEP_BTN"
+msgid "~Keep Old Styles"
+msgstr "~Pertahankan Gaya Lama"
+
+#. X6MGZ
+#: include/sfx2/strings.hrc:61
+msgctxt "STR_CATEGORY_NEW"
+msgid "~New Category"
+msgstr "Kategori ~Baru"
+
+#. VNfyE
+#: include/sfx2/strings.hrc:62
+msgctxt "STR_CATEGORY_DELETE"
+msgid "~Delete Category"
+msgstr "~Hapus Kategori"
+
+#. YdoDu
+#: include/sfx2/strings.hrc:63
+msgctxt "STR_MSG_EXPORT_SUCCESS"
+msgid "$1 templates successfully exported."
+msgstr "$1 templat sukses diekspor."
+
+#. g6iDa
+#: include/sfx2/strings.hrc:64
+msgctxt "STR_MSG_QUERY_COPY"
+msgid "$1 could not be moved to the category \"$2\". Do you want to copy the template instead?"
+msgstr "$1 tidak bisa dipindah ke kategori \"$2\". Apakah Anda ingin menyalin templat sebagai gantinya?"
+
+#. 9bJN3
+#: include/sfx2/strings.hrc:65
+msgctxt "STR_CREATE_ERROR"
+msgid "Cannot create category: $1"
+msgstr "Tidak bisa membuat kategori: $1"
+
+#. YR7aW
+#: include/sfx2/strings.hrc:66
+msgctxt "STR_ERROR_SAVEAS"
+msgid "Cannot save template: $1"
+msgstr "Tidak bisa menyimpan templat: $1"
+
+#. iE9UD
+#: include/sfx2/strings.hrc:67
+msgctxt "STR_INPUT_NEW"
+msgid "Enter new category name:"
+msgstr "Ketikkan nama kategori baru:"
+
+#. yxN3P
+#: include/sfx2/strings.hrc:68
+msgctxt "STR_MSG_ERROR_LOCAL_MOVE"
+msgid ""
+"Error moving the following templates to $1.\n"
+"$2"
+msgstr ""
+"Galat saat memindah templat berikut ke $1.\n"
+"$2"
+
+#. Sh34g
+#: include/sfx2/strings.hrc:69
+msgctxt "STR_MSG_ERROR_EXPORT"
+msgid ""
+"Error exporting the following templates:\n"
+"$1"
+msgstr ""
+"Galat saat mengekspor templat berikut:\n"
+"$1"
+
+#. NFsZu
+#: include/sfx2/strings.hrc:70
+msgctxt "STR_MSG_ERROR_IMPORT"
+msgid ""
+"Error importing the following templates to $1:\n"
+"$2"
+msgstr ""
+"Galat saat mengimpor templat berikut ke $1:\n"
+"$2"
+
+#. g5zLe
+#: include/sfx2/strings.hrc:71
+msgctxt "STR_MSG_ERROR_DELETE_TEMPLATE"
+msgid ""
+"The following templates cannot be deleted:\n"
+"$1"
+msgstr ""
+"Templat berikut tak bisa dihapus:\n"
+"$1"
+
+#. 89xV6
+#: include/sfx2/strings.hrc:72
+msgctxt "STR_MSG_ERROR_DELETE_FOLDER"
+msgid ""
+"The following folders cannot be deleted:\n"
+"$1"
+msgstr ""
+"Folder berikut tak bisa dihapus:\n"
+"$1"
+
+#. buPTz
+#: include/sfx2/strings.hrc:73
+msgctxt "STR_TOOLTIP_ERROR_RENAME_TEMPLATE"
+msgid "There is another template with the name $1 in $2."
+msgstr "Terdapat templat lain dengan nama $1 di $2."
+
+#. JiTrQ
+#: include/sfx2/strings.hrc:74
+msgctxt "STR_QMSG_SEL_FOLDER_DELETE"
+msgid "Do you want to delete the selected category?"
+msgstr "Apakah Anda ingin menghapus kategori yang dipilih?"
+
+#. C9pLF
+#: include/sfx2/strings.hrc:75
+msgctxt "STR_QMSG_TEMPLATE_OVERWRITE"
+msgid "A template named $1 already exists in $2. Do you want to overwrite it?"
+msgstr "Templat bernama $1 sudah ada pada $2. Apakah Anda ingin menimpanya?"
+
+#. 6MoGu
+#: include/sfx2/strings.hrc:76
+msgctxt "STR_QMSG_SEL_TEMPLATE_DELETE"
+msgid "Do you want to delete the selected templates?"
+msgstr "Apakah Anda ingin menghapus templat yang dipilih?"
+
+#. WR2LD
+#: include/sfx2/strings.hrc:77
+msgctxt "STR_QMSG_ERROR_OPENING_FILE"
+msgid "An error occurred during opening the file. This may be caused by incorrect file contents.\n"
+msgstr "Terjadi kesalahan saat membuka berkas. Ini mungkin disebabkan oleh isi berkas yang salah.\n"
+
+#. AsUee
+#: include/sfx2/strings.hrc:78
+msgctxt "STR_QMSG_ERROR_OPENING_FILE_DETAILS"
+msgid "The error details are:\n"
+msgstr "Rincian kesalahannya:\n"
+
+#. D2XDV
+#: include/sfx2/strings.hrc:79
+msgctxt "STR_QMSG_ERROR_OPENING_FILE_CONTINUE"
+msgid ""
+"\n"
+"Proceeding with import may cause data loss or corruption, and application may become unstable or crash.\n"
+"\n"
+"Do you want to ignore the error and attempt to continue loading the file?"
+msgstr ""
+"\n"
+"Melanjutkan mengimpor bisa menyebabkan kehilangan data atau kerusakan, dan aplikasi bisa menjadi tidak stabil atau kres.\n"
+"\n"
+"Anda hendak mengabaikan kesalahan dan mencoba melanjutkan memuat berkas?"
+
+#. g63UH
+#: include/sfx2/strings.hrc:81
+msgctxt "STR_HELP_WINDOW_TITLE"
+msgid "%PRODUCTNAME Help"
+msgstr "Bantuan %PRODUCTNAME"
+
+#. Veb3m
+#: include/sfx2/strings.hrc:82
+msgctxt "STR_HELP_BUTTON_INDEX_ON"
+msgid "Show Navigation Pane"
+msgstr "Tampilkan Jendela Navigasi"
+
+#. 3LGpr
+#: include/sfx2/strings.hrc:83
+msgctxt "STR_HELP_BUTTON_INDEX_OFF"
+msgid "Hide Navigation Pane"
+msgstr "Sembunyikan Jendela Navigasi"
+
+#. g8Vns
+#: include/sfx2/strings.hrc:84
+msgctxt "STR_HELP_BUTTON_START"
+msgid "First Page"
+msgstr "Halaman Pertama"
+
+#. YMoQp
+#: include/sfx2/strings.hrc:85
+msgctxt "STR_HELP_BUTTON_PREV"
+msgid "Previous Page"
+msgstr "Halaman Sebelumnya"
+
+#. mGB7r
+#: include/sfx2/strings.hrc:86
+msgctxt "STR_HELP_BUTTON_NEXT"
+msgid "Next Page"
+msgstr "Halaman Selanjutnya"
+
+#. dys7x
+#: include/sfx2/strings.hrc:87
+msgctxt "STR_HELP_BUTTON_PRINT"
+msgid "Print..."
+msgstr "Cetak..."
+
+#. bmCzY
+#: include/sfx2/strings.hrc:88
+msgctxt "STR_HELP_BUTTON_ADDBOOKMARK"
+msgid "Add to Bookmarks..."
+msgstr "Tambah ke Markah..."
+
+#. SGFus
+#: include/sfx2/strings.hrc:89
+msgctxt "STR_HELP_BUTTON_SEARCHDIALOG"
+msgid "Find on this Page..."
+msgstr "Cari dalam Halaman ini..."
+
+#. qvTDZ
+#: include/sfx2/strings.hrc:90
+msgctxt "STR_HELP_BUTTON_SOURCEVIEW"
+msgid "HTML Source"
+msgstr "Sumber HTML"
+
+#. pHyBm
+#: include/sfx2/strings.hrc:91
+msgctxt "STR_HELP_MENU_TEXT_SELECTION_MODE"
+msgid "Select Text"
+msgstr "Pilih Teks"
+
+#. 5FCCv
+#: include/sfx2/strings.hrc:92
+msgctxt "STR_HELP_MENU_TEXT_COPY"
+msgid "~Copy"
+msgstr "~Salin"
+
+#. TQd3C
+#: include/sfx2/strings.hrc:93
+msgctxt "STR_INFO_NOSEARCHRESULTS"
+msgid "No topics found."
+msgstr "Tidak ada topik yang ditemukan."
+
+#. 9D6Ze
+#: include/sfx2/strings.hrc:94
+msgctxt "STR_INFO_NOSEARCHTEXTFOUND"
+msgid "The text you entered was not found."
+msgstr "Teks yang Anda masukkan tidak ditemukan."
+
+#. qLPDs
+#: include/sfx2/strings.hrc:95
+msgctxt "RID_HELP_ONSTARTUP_TEXT"
+msgid "~Display %PRODUCTNAME %MODULENAME Help at Startup"
+msgstr "~Tampilkan Bantuan %PRODUCTNAME %MODULENAME saat Pemulaan"
+
+#. TEgzB
+#: include/sfx2/strings.hrc:97
+msgctxt "STR_NONAME"
+msgid "Untitled"
+msgstr "Tidak Berjudul"
+
+#. fs5SN
+#: include/sfx2/strings.hrc:98
+msgctxt "STR_STANDARD_SHORTCUT"
+msgid "Standard"
+msgstr "Standar"
+
+#. 6sRBN
+#: include/sfx2/strings.hrc:99
+msgctxt "STR_BYTES"
+msgid "Bytes"
+msgstr "Bita"
+
+#. Z3kKr
+#: include/sfx2/strings.hrc:100
+msgctxt "STR_KB"
+msgid "kB"
+msgstr "kB"
+
+#. VrFxn
+#: include/sfx2/strings.hrc:101
+msgctxt "STR_MB"
+msgid "MB"
+msgstr "MB"
+
+#. 9rBAW
+#: include/sfx2/strings.hrc:102
+msgctxt "STR_GB"
+msgid "GB"
+msgstr "GB"
+
+#. DqwaN
+#: include/sfx2/strings.hrc:103
+msgctxt "STR_QUERY_LASTVERSION"
+msgid "Cancel all changes?"
+msgstr "Batalkan semua perubahan?"
+
+#. cCrDG
+#: include/sfx2/strings.hrc:104
+msgctxt "STR_NO_WEBBROWSER_FOUND"
+msgid ""
+"Opening \"$(ARG1)\" failed with error code $(ARG2) and message: \"$(ARG3)\"\n"
+"Maybe no web browser could be found on your system. In that case, please check your Desktop Preferences or install a web browser (for example, Firefox) in the default location requested during the browser installation."
+msgstr ""
+"Membuka \"$(ARG1)\" gagal dengan kode kesalahan $(ARG2) dan pesan: \"$(ARG3)\"\n"
+"Mungkin tidak ada peramban web pada sistem Anda. Jika demikian, harap periksa Preferensi Desktop Anda atau pasang suatu peramban web (misalnya, Firefox) dalam lokasi baku yang diminta selama pemasangan peramban."
+
+#. QEABe
+#: include/sfx2/strings.hrc:105
+msgctxt "STR_DANGEROUS_TO_OPEN"
+msgid ""
+"It might be dangerous to open \"$(ARG1)\".\n"
+"Do you really want to open it?"
+msgstr ""
+"Mungkin berbahaya untuk membuka \"$(ARG1)\".\n"
+"Anda yakin hendak membukanya?"
+
+#. ADqLM
+#: include/sfx2/strings.hrc:106
+msgctxt "STR_NO_ABS_URI_REF"
+msgid "\"$(ARG1)\" cannot be passed to an external application to open it (e.g., it might not be an absolute URL, or might denote no existing file)."
+msgstr "\"$(ARG1)\" tidak dapat diteruskan ke suatu aplikasi eksternal untuk membukanya (mis., itu mungkin bukan URL absolut, atau mungkin tidak mengacu ke berkas yang ada)."
+
+#. XDUCY
+#: include/sfx2/strings.hrc:107
+msgctxt "STR_GID_INTERN"
+msgid "Internal"
+msgstr "Internal"
+
+#. 4g9hU
+#: include/sfx2/strings.hrc:108
+msgctxt "STR_GID_APPLICATION"
+msgid "Application"
+msgstr "Aplikasi"
+
+#. rBzxu
+#: include/sfx2/strings.hrc:109
+msgctxt "STR_GID_VIEW"
+msgid "View"
+msgstr "Tampilan"
+
+#. NQnym
+#: include/sfx2/strings.hrc:110
+msgctxt "STR_GID_DOCUMENT"
+msgid "Documents"
+msgstr "Dokumen"
+
+#. DbzDd
+#: include/sfx2/strings.hrc:111
+msgctxt "STR_GID_EDIT"
+msgid "Edit"
+msgstr "Sunting"
+
+#. HqK5g
+#: include/sfx2/strings.hrc:112
+msgctxt "STR_GID_MACRO"
+msgid "BASIC"
+msgstr "BASIC"
+
+#. 3QkTL
+#: include/sfx2/strings.hrc:113
+msgctxt "STR_GID_OPTIONS"
+msgid "Options"
+msgstr "Pilihan"
+
+#. GFEQ3
+#: include/sfx2/strings.hrc:114
+msgctxt "STR_GID_MATH"
+msgid "Math"
+msgstr "Matematika"
+
+#. rFALW
+#: include/sfx2/strings.hrc:115
+msgctxt "STR_GID_NAVIGATOR"
+msgid "Navigate"
+msgstr "Navigasi"
+
+#. w7dmG
+#: include/sfx2/strings.hrc:116
+msgctxt "STR_GID_INSERT"
+msgid "Insert"
+msgstr "Sisip"
+
+#. fokQp
+#: include/sfx2/strings.hrc:117
+msgctxt "STR_GID_FORMAT"
+msgid "Format"
+msgstr "Format"
+
+#. fLTV6
+#: include/sfx2/strings.hrc:118
+msgctxt "STR_GID_TEMPLATE"
+msgid "Templates"
+msgstr "Templat"
+
+#. JAdCZ
+#: include/sfx2/strings.hrc:119
+msgctxt "STR_GID_TEXT"
+msgid "Text"
+msgstr "Teks"
+
+#. PSfaP
+#: include/sfx2/strings.hrc:120
+msgctxt "STR_GID_FRAME"
+msgid "Frame"
+msgstr "Bingkai"
+
+#. 5V4iR
+#: include/sfx2/strings.hrc:121
+msgctxt "STR_GID_GRAPHIC"
+msgid "Image"
+msgstr "Citra"
+
+#. DzBoB
+#: include/sfx2/strings.hrc:122
+msgctxt "STR_GID_TABLE"
+msgid "Table"
+msgstr "Tabel"
+
+#. Cmsi4
+#: include/sfx2/strings.hrc:123
+msgctxt "STR_GID_ENUMERATION"
+msgid "Numbering"
+msgstr "Penomoran"
+
+#. CDFSE
+#: include/sfx2/strings.hrc:124
+msgctxt "STR_GID_DATA"
+msgid "Data"
+msgstr "Data"
+
+#. CV9Pq
+#: include/sfx2/strings.hrc:125
+msgctxt "STR_GID_SPECIAL"
+msgid "Special Functions"
+msgstr "Fungsi Khusus"
+
+#. 5CfQs
+#: include/sfx2/strings.hrc:126
+msgctxt "STR_GID_IMAGE"
+msgid "Image"
+msgstr "Citra"
+
+#. 5wvK9
+#: include/sfx2/strings.hrc:127
+msgctxt "STR_GID_CHART"
+msgid "Chart"
+msgstr "Bagan"
+
+#. pNE8F
+#: include/sfx2/strings.hrc:128
+msgctxt "STR_GID_EXPLORER"
+msgid "Explorer"
+msgstr "Penelusur"
+
+#. yBawD
+#: include/sfx2/strings.hrc:129
+msgctxt "STR_GID_CONNECTOR"
+msgid "Connector"
+msgstr "Konektor"
+
+#. 3rGea
+#: include/sfx2/strings.hrc:130
+msgctxt "STR_GID_MODIFY"
+msgid "Modify"
+msgstr "Ubah"
+
+#. WcwGs
+#: include/sfx2/strings.hrc:131
+msgctxt "STR_GID_DRAWING"
+msgid "Drawing"
+msgstr "Menggambar"
+
+#. Ajo4w
+#: include/sfx2/strings.hrc:132
+msgctxt "STR_GID_CONTROLS"
+msgid "Controls"
+msgstr "Kendali"
+
+#. L5coQ
+#: include/sfx2/strings.hrc:133
+msgctxt "STR_QUITAPP"
+msgid "E~xit %PRODUCTNAME"
+msgstr "~Keluar %PRODUCTNAME"
+
+#. k2PBJ
+#: include/sfx2/strings.hrc:134
+msgctxt "RID_STR_HELP"
+msgid "Help"
+msgstr "Bantuan"
+
+#. roDzu
+#: include/sfx2/strings.hrc:135
+msgctxt "RID_STR_HLPFILENOTEXIST"
+msgid "The help file for this topic is not installed."
+msgstr "Berkas bantuan untuk topik ini tidak terpasang."
+
+#. zjPS7
+#: include/sfx2/strings.hrc:136
+msgctxt "STR_QUICKSTART_EXIT"
+msgid "Exit Quickstarter"
+msgstr "Keluar dari Pelancar"
+
+#. ecxqC
+#: include/sfx2/strings.hrc:137
+msgctxt "STR_QUICKSTART_TIP"
+msgid "%PRODUCTNAME %PRODUCTVERSION Quickstarter"
+msgstr "Pelancar %PRODUCTNAME %PRODUCTVERSION"
+
+#. G9Gqk
+#: include/sfx2/strings.hrc:138
+msgctxt "STR_QUICKSTART_FILEOPEN"
+msgid "Open Document..."
+msgstr "Buka Dokumen..."
+
+#. wecTF
+#: include/sfx2/strings.hrc:139
+msgctxt "STR_QUICKSTART_FROMTEMPLATE"
+msgid "From Template..."
+msgstr "Dari Templat..."
+
+#. FzJCj
+#: include/sfx2/strings.hrc:140
+msgctxt "STR_QUICKSTART_PRELAUNCH"
+msgid "Load %PRODUCTNAME During System Start-Up"
+msgstr "Memuat %PRODUCTNAME Sewaktu Pemulaan Sistem"
+
+#. hMejq
+#: include/sfx2/strings.hrc:141
+msgctxt "STR_QUICKSTART_LNKNAME"
+msgid "%PRODUCTNAME %PRODUCTVERSION"
+msgstr "%PRODUCTNAME %PRODUCTVERSION"
+
+#. CBB6Z
+#: include/sfx2/strings.hrc:142
+msgctxt "STR_QUICKSTART_FILE"
+msgid "File"
+msgstr "Berkas"
+
+#. c6wAB
+#: include/sfx2/strings.hrc:143
+msgctxt "STR_QUICKSTART_STARTCENTER"
+msgid "Startcenter"
+msgstr "Pusat"
+
+#. Uhn54
+#: include/sfx2/strings.hrc:144
+msgctxt "STR_QUICKSTART_RECENTDOC"
+msgid "Recent Documents"
+msgstr "Dokumen Baru-baru ini"
+
+#. DirQf
+#: include/sfx2/strings.hrc:145
+msgctxt "STR_QUERY_UPDATE_LINKS"
+msgid ""
+"The document %{filename} contains one or more links to external data.\n"
+"\n"
+"Would you like to change the document, and update all links\n"
+"to get the most recent data?"
+msgstr ""
+"Dokumen %{filename} memuat satu atau lebih tautan ke data luar.\n"
+"\n"
+"Apakah Anda hendak mengubah dokumen, dan memperbarui semua\n"
+"tautan untuk memperoleh data terkini?"
+
+#. zJGEM
+#: include/sfx2/strings.hrc:146
+msgctxt "STR_DDE_ERROR"
+msgid "DDE link to %1 for %2 area %3 are not available."
+msgstr "Taut DDE ke %1 untuk %2 wilayah %3 tidak tersedia."
+
+#. zECGD
+#: include/sfx2/strings.hrc:147
+msgctxt "STR_SECURITY_WARNING_NO_HYPERLINKS"
+msgid ""
+"For security reasons, the hyperlink cannot be executed.\n"
+"The stated address will not be opened."
+msgstr ""
+"Untuk alasan keamanan, pranala itu tidak bisa dieksekusi.\n"
+"Alamat yang dinyatakan tidak akan dibuka."
+
+#. vcMzA
+#: include/sfx2/strings.hrc:148
+msgctxt "RID_SECURITY_WARNING_TITLE"
+msgid "Security Warning"
+msgstr "Peringatan Keamanan"
+
+#. vVCon
+#: include/sfx2/strings.hrc:149
+msgctxt "RID_SVXSTR_XMLSEC_QUERY_LOSINGSIGNATURE"
+msgid ""
+"Saving will remove all existing signatures.\n"
+"Do you want to continue saving the document?"
+msgstr ""
+"Melakukan penyimpanan akan membuang semua tanda tangan yang ada.\n"
+"Apakah Anda hendak melanjutkan menyimpan dokumen?"
+
+#. cGnF9
+#: include/sfx2/strings.hrc:150
+msgctxt "RID_SVXSTR_XMLSEC_QUERY_SAVEBEFORESIGN"
+msgid ""
+"The document has to be saved before it can be signed.\n"
+"Do you want to save the document?"
+msgstr ""
+"Dokumen harus disimpan sebelum bisa ditandatangani.\n"
+"Apakah Anda hendak menyimpan dokumen?"
+
+#. zNVEd
+#: include/sfx2/strings.hrc:151
+msgctxt "STR_QUERY_CANCELCHECKOUT"
+msgid ""
+"This will discard all changes on the server since check-out.\n"
+"Do you want to proceed?"
+msgstr ""
+"Ini akan membuang semua perubahan pada server semenjak check-out.\n"
+"Apakah Anda hendak melanjutkan?"
+
+#. jufLD
+#: include/sfx2/strings.hrc:152
+msgctxt "STR_INFO_WRONGDOCFORMAT"
+msgid "This document must be saved in OpenDocument file format before it can be digitally signed."
+msgstr "Dokumen ini harus disimpan dalam format berkas OpenDocument sebelum bisa ditandatangani secara digital."
+
+#. ori9u
+#: include/sfx2/strings.hrc:153
+msgctxt "RID_XMLSEC_DOCUMENTSIGNED"
+msgid " (Signed)"
+msgstr " (Ditandatangani)"
+
+#. kgWZS
+#: include/sfx2/strings.hrc:154
+msgctxt "STR_EMBEDDED_TITLE"
+msgid " (Embedded document)"
+msgstr " (Dokumen tertanam)"
+
+#. 3nT9T
+#: include/sfx2/strings.hrc:155
+msgctxt "STR_STANDARD"
+msgid "Standard"
+msgstr "Standar"
+
+#. FjCuJ
+#: include/sfx2/strings.hrc:156
+msgctxt "RID_SVXSTR_FILELINK"
+msgid "Document"
+msgstr "Dokumen"
+
+#. BfMd3
+#: include/sfx2/strings.hrc:157
+msgctxt "STR_NONE"
+msgid "- None -"
+msgstr "- Nihil -"
+
+#. XBXvE
+#: include/sfx2/strings.hrc:158
+msgctxt "saveastemplatedlg|categorylist"
+msgid "None"
+msgstr "Nihil"
+
+#. 5kUsi
+#: include/sfx2/strings.hrc:159
+msgctxt "RID_SVXSTR_GRAPHICLINK"
+msgid "Image"
+msgstr "Citra"
+
+#. dUK2G
+#: include/sfx2/strings.hrc:160
+msgctxt "STR_SFX_FILTERNAME_ALL"
+msgid "All files"
+msgstr "Semua berkas"
+
+#. E39E2
+#: include/sfx2/strings.hrc:161
+msgctxt "STR_SFX_FILTERNAME_PDF"
+msgid "PDF files"
+msgstr "Berkas PDF"
+
+#. gCHbP
+#: include/sfx2/strings.hrc:162
+msgctxt "RID_SVXSTR_EDITGRFLINK"
+msgid "Link Image"
+msgstr "Tautkan Gambar"
+
+#. u9H7a
+#. i66948 used in project scripting
+#: include/sfx2/strings.hrc:164
+msgctxt "STR_ERRUNOEVENTBINDUNG"
+msgid ""
+"An appropriate component method %1\n"
+"could not be found.\n"
+"\n"
+"Check spelling of method name."
+msgstr ""
+"Komponen metode %1 yang sesuai\n"
+"tidak ketemu.\n"
+"\n"
+"Periksa ejaan nama metode."
+
+#. 2FLYB
+#: include/sfx2/strings.hrc:165
+msgctxt "RID_SVXSTR_GRFILTER_OPENERROR"
+msgid "Image file cannot be opened"
+msgstr "Berkas gambar tak dapat dibuka"
+
+#. 6eLsb
+#: include/sfx2/strings.hrc:166
+msgctxt "RID_SVXSTR_GRFILTER_IOERROR"
+msgid "Image file cannot be read"
+msgstr "Berkas gambar tak dapat dibaca"
+
+#. HGRsV
+#: include/sfx2/strings.hrc:167
+msgctxt "RID_SVXSTR_GRFILTER_FORMATERROR"
+msgid "Unknown image format"
+msgstr "Format gambar tak dikenal"
+
+#. YJhGK
+#: include/sfx2/strings.hrc:168
+msgctxt "RID_SVXSTR_GRFILTER_VERSIONERROR"
+msgid "This version of the image file is not supported"
+msgstr "Versi berkas gambar ini tak didukung"
+
+#. Sn8KQ
+#: include/sfx2/strings.hrc:169
+msgctxt "RID_SVXSTR_GRFILTER_FILTERERROR"
+msgid "Image filter not found"
+msgstr "Penyaring gambar tak ditemukan"
+
+#. huEFV
+#: include/sfx2/strings.hrc:170
+msgctxt "RID_SVXSTR_TXTFILTER_FILTERERROR"
+msgid "This is not a text document"
+msgstr "Ini bukan sebuah dokumen teks"
+
+#. ejBgZ
+#: include/sfx2/strings.hrc:171
+msgctxt "RID_SVXSTR_END_REDLINING_WARNING"
+msgid ""
+"This action will exit the change recording mode.\n"
+"No information about changes will be recorded from now on.\n"
+"\n"
+"Exit change recording mode?\n"
+"\n"
+msgstr ""
+"Aksi ini akan membuat keluar dari modus perekaman perubahan.\n"
+"Tidak ada informasi tentang perubahan yang akan direkam dari sekarang.\n"
+"\n"
+"Keluar dari modus perekaman perubahan?\n"
+"\n"
+
+#. E2CcY
+#: include/sfx2/strings.hrc:172
+msgctxt "RID_SVXSTR_INCORRECT_PASSWORD"
+msgid "Incorrect password"
+msgstr "Sandi salah"
+
+#. 7Ezso
+#: include/sfx2/strings.hrc:173
+msgctxt "RID_SVXSTR_GPG_ENCRYPT_FAILURE"
+msgid "OpenPGP key not trusted, damaged, or encryption failure. Please try again."
+msgstr "Kunci OpenPGP tidak dipercaya, rusak, atau kegagalan enkripsi. Harap coba lagi."
+
+#. DQCUm
+#: include/sfx2/strings.hrc:175
+msgctxt "STR_PASSWD_MIN_LEN"
+msgid "(Minimum $(MINLEN) characters)"
+msgstr "(Minimal $(MINLEN) karakter)"
+
+#. ZKZnh
+#: include/sfx2/strings.hrc:176
+msgctxt "STR_PASSWD_MIN_LEN1"
+msgid "(Minimum 1 character)"
+msgstr "(Minimum 1 karakter)"
+
+#. B3WoF
+#: include/sfx2/strings.hrc:177
+msgctxt "STR_PASSWD_EMPTY"
+msgid "(The password can be empty)"
+msgstr "(Sandi bisa saja kosong)"
+
+#. iBD9D
+#: include/sfx2/strings.hrc:178
+msgctxt "STR_MODULENOTINSTALLED"
+msgid "The action could not be executed. The %PRODUCTNAME program module needed for this action is currently not installed."
+msgstr "Aksi tersebut tidak dapat dieksekusi. Modul program %PRODUCTNAME yang diperlukan untuk aksi ini tidak terpasang."
+
+#. TXAV5
+#: include/sfx2/strings.hrc:180
+msgctxt "STR_FILTER_NOT_INSTALLED"
+msgid ""
+"The selected filter $(FILTER) has not been installed.\n"
+"Would you like to do this now?"
+msgstr ""
+"Penyaring $(FILTER) yang dipilih belum terpasang.\n"
+"Apakah Anda hendak memasangnya sekarang?"
+
+#. gQhYY
+#: include/sfx2/strings.hrc:181
+msgctxt "STR_FILTER_CONSULT_SERVICE"
+msgid ""
+"The selected filter $(FILTER) is not included in your edition.\n"
+"You can find information about orders on our homepage."
+msgstr ""
+"Penyaring $(FILTER) yang dipilih tidak termasuk pada edisi Anda.\n"
+"Anda bisa menemukan informasi untuk pemesanannya di situs kami."
+
+#. Y9yeS
+#: include/sfx2/strings.hrc:183
+msgctxt "STR_WELCOME_LINE1"
+msgid "Welcome to %PRODUCTNAME."
+msgstr "Selamat datang ke %PRODUCTNAME."
+
+#. DVEkR
+#: include/sfx2/strings.hrc:184
+msgctxt "STR_WELCOME_LINE2"
+msgid "Drop a document here or open an app to create one."
+msgstr "Jatuhkan sebuah dokumen ke sini atau buka sebuah aplikasi untuk membuat satu dokumen yang baru."
+
+#. oTVdA
+#. Translators: Target types in Auto-redaction dialog
+#: include/sfx2/strings.hrc:187
+msgctxt "STR_REDACTION_TARGET_TYPE_TEXT"
+msgid "Text"
+msgstr "Teks"
+
+#. eG5qc
+#: include/sfx2/strings.hrc:188
+msgctxt "STR_REDACTION_TARGET_TYPE_REGEX"
+msgid "Regular expression"
+msgstr "Ekspresi reguler"
+
+#. TaDCG
+#: include/sfx2/strings.hrc:189
+msgctxt "STR_REDACTION_TARGET_TYPE_PREDEF"
+msgid "Predefined"
+msgstr "Terpradefinisi"
+
+#. bDjwW
+#: include/sfx2/strings.hrc:190
+msgctxt "STR_REDACTION_TARGET_TYPE_UNKNOWN"
+msgid "Unknown"
+msgstr "Tak dikenal"
+
+#. YgzCk
+#. Translators: Values for the Case Sensitive and the Whole Words columns in Auto-redaction dialog
+#: include/sfx2/strings.hrc:193
+msgctxt "STR_REDACTION_YES"
+msgid "Yes"
+msgstr "Ya"
+
+#. oZNaM
+#: include/sfx2/strings.hrc:194
+msgctxt "STR_REDACTION_NO"
+msgid "No"
+msgstr "Tidak"
+
+#. FM3Gf
+#. Translators: Misc strings of the Auto Redaction dialog
+#: include/sfx2/strings.hrc:197
+msgctxt "STR_REDACTION_TARGET"
+msgid "Target"
+msgstr "Sasaran"
+
+#. m2i7V
+#: include/sfx2/strings.hrc:198
+msgctxt "STR_REDACTION_LOAD_TARGETS"
+msgid "Load Targets"
+msgstr "Muat Sasaran"
+
+#. HgrwX
+#: include/sfx2/strings.hrc:199
+msgctxt "STR_REDACTION_SAVE_TARGETS"
+msgid "Save Targets"
+msgstr "Simpan Sasaran"
+
+#. MYMTF
+#: include/sfx2/strings.hrc:200
+msgctxt "STR_REDACTION_FIELDS_REQUIRED"
+msgid "All fields are required"
+msgstr "Semua ruas diperlukan"
+
+#. rQS6M
+#: include/sfx2/strings.hrc:201
+msgctxt "STR_REDACTION_TARGET_NAME_CLASH"
+msgid "There is already a target with this name"
+msgstr "Sudah ada sasaran dengan nama ini"
+
+#. s248s
+#: include/sfx2/strings.hrc:202
+msgctxt "STR_REDACTION_MULTI_EDIT"
+msgid "You have selected multiple targets, but only one target can be edited at once."
+msgstr "Anda telah memilih beberapa sasaran, tapi hanya satu sasaran yang dapat disunting pada suatu saat."
+
+#. BTayC
+#: include/sfx2/strings.hrc:203
+msgctxt "STR_REDACTION_MULTI_DELETE"
+msgid "Are you sure you would like to delete $(TARGETSCOUNT) targets at once?"
+msgstr "Anda yakin hendak menghapus $(TARGETSCOUNT) sasaran sekaligus?"
+
+#. qFqDC
+#: include/sfx2/strings.hrc:204
+msgctxt "STR_REDACTION_JSON_FILE_FILTER"
+msgid "Target Set (*.json)"
+msgstr "Set Sasaran (*.json)"
+
+#. EGCo6
+#: include/sfx2/strings.hrc:205
+msgctxt "STR_REDACTION_EDIT_TARGET"
+msgid "Edit Target"
+msgstr "Sunting Sasaran"
+
+#. ACY9D
+#: include/sfx2/strings.hrc:206
+msgctxt "STR_REDACTION_TARGET_ADD_ERROR"
+msgid "An error occurred while adding new target. Please report this incident."
+msgstr "Kesalahan terjadi saat menambahkan sasaran baru. Harap laporkan insiden ini."
+
+#. 6Jog7
+#: include/sfx2/strings.hrc:207
+msgctxt "STR_REDACTION_NO_DRAW_WARNING"
+msgid "Draw module is needed for redaction. Please make sure you have %PRODUCTNAME Draw installed and working correctly."
+msgstr "Modul Draw diperlukan untuk redaksi. Pastikan %PRODUCTNAME Draw telah terpasang dan bekerja dengan benar."
+
+#. FQ9kN
+#: include/sfx2/strings.hrc:209
+msgctxt "STR_SFX_FILEDLG_ACTUALVERSION"
+msgid "Current version"
+msgstr "Versi terkini"
+
+#. GFAEM
+#: include/sfx2/strings.hrc:210
+msgctxt "STR_SFX_EXPLORERFILE_EXPORT"
+msgid "Export"
+msgstr "Ekspor"
+
+#. 2DBBC
+#: include/sfx2/strings.hrc:211
+msgctxt "STR_SFX_EXPLORERFILE_INSERT"
+msgid "Insert"
+msgstr "Sisip"
+
+#. VBKtt
+#: include/sfx2/strings.hrc:212
+msgctxt "STR_SFX_EXPLORERFILE_BUTTONINSERT"
+msgid "~Insert"
+msgstr "S~isip"
+
+#. DcLFD
+#: include/sfx2/strings.hrc:213
+msgctxt "STR_SFX_IMPORT_ALL_IMAGES"
+msgid "<All images>"
+msgstr "<Semua gambar>"
+
+#. tPDwc
+#: include/sfx2/strings.hrc:214
+msgctxt "STR_PB_SAVEACOPY"
+msgid "Save a Copy"
+msgstr "Simpan Salinan"
+
+#. T9mMd
+#: include/sfx2/strings.hrc:215
+msgctxt "STR_PB_COMPAREDOC"
+msgid "Compare to"
+msgstr "Bandingkan dengan"
+
+#. 4qMCh
+#: include/sfx2/strings.hrc:216
+msgctxt "STR_PB_MERGEDOC"
+msgid "Merge with"
+msgstr "Gabungkan dengan"
+
+#. cDMBG
+#: include/sfx2/strings.hrc:218
+msgctxt "STR_SFX_NEWOFFICEDOC"
+msgid "%PRODUCTNAME document"
+msgstr "Dokumen %PRODUCTNAME"
+
+#. 43QYo
+#: include/sfx2/strings.hrc:219
+msgctxt "SFX_ST_DURATION_FORMAT"
+msgid " Y: %1 M: %2 D: %3 H: %4 M: %5 S: %6"
+msgstr " T: %1 B: %2 H: %3 J: %4 M: %5 D: %6"
+
+#. jQX7C
+#: include/sfx2/strings.hrc:220
+msgctxt "STR_SFX_QUERY_WRONG_TYPE"
+msgid ""
+"The value entered does not match the specified type.\n"
+"The value will be stored as text."
+msgstr ""
+"Nilai yang dimasukkan tidak sesuai dengan tipe yang dinyatakan.\n"
+"Nilai akan disimpan sebagai teks."
+
+#. cinmA
+#: include/sfx2/strings.hrc:222
+msgctxt "STR_QUERY_OVERWRITE"
+msgid "Style already exists. Overwrite?"
+msgstr "Gaya sudah ada. Ditimpa?"
+
+#. f627N
+#: include/sfx2/strings.hrc:224
+msgctxt "STR_RESET"
+msgid "~Reset"
+msgstr "Atu~r Ulang"
+
+#. EXGDb
+#: include/sfx2/strings.hrc:225
+msgctxt "STR_TABPAGE_INVALIDNAME"
+msgid "This name is already in use."
+msgstr "Nama ini telah dipakai."
+
+#. N5aeR
+#: include/sfx2/strings.hrc:226
+msgctxt "STR_TABPAGE_INVALIDSTYLE"
+msgid "This Style does not exist."
+msgstr "Gaya ini tidak ada."
+
+#. CYQwN
+#: include/sfx2/strings.hrc:227
+msgctxt "STR_TABPAGE_INVALIDPARENT"
+msgid ""
+"This Style cannot be used as a base Style,\n"
+"because it would result in a recursive reference."
+msgstr ""
+"Gaya ini tidak bisa digunakan sebagai Gaya basis,\n"
+"karena ini akan menyebabkan referensi rekursif."
+
+#. ECPSd
+#: include/sfx2/strings.hrc:228
+msgctxt "STR_POOL_STYLE_NAME"
+msgid ""
+"Name already exists as a default Style.\n"
+"Please choose another name."
+msgstr ""
+"Nama sudah ada sebagai Gaya baku.\n"
+"Silakan pilih nama lain."
+
+#. NWDmA
+#: include/sfx2/strings.hrc:229
+msgctxt "STR_DELETE_STYLE_USED"
+msgid ""
+"One or more of the selected styles is in use in this document.\n"
+"If you will delete it, text or objects using these styles will revert to the parent style.\n"
+"Do you still wish to delete these styles?\n"
+msgstr ""
+"Satu atau lebih dari gaya yang dipilih sedang dipakai di dalam dokumen ini.\n"
+"Bila Anda menghapusnya, teks atau objek yang memakai gaya ini akan beralih ke gaya induknya.\n"
+"Apakah Anda masih hendak menghapus gaya ini?\n"
+
+#. kuD77
+#: include/sfx2/strings.hrc:230
+msgctxt "STR_DELETE_STYLE"
+msgid "Styles in use: "
+msgstr "Gaya yang dipakai: "
+
+#. 4JhEW
+#: include/sfx2/strings.hrc:231
+msgctxt "STR_SID_NAVIGATOR"
+msgid "Navigator"
+msgstr "Navigator"
+
+#. Acahp
+#: include/sfx2/strings.hrc:232
+msgctxt "STR_ERROR_WRONG_CONFIRM"
+msgid "Faulty password confirmation"
+msgstr "Konfirmasi sandi yang bermasalah"
+
+#. 6uv4b
+#: include/sfx2/strings.hrc:233
+msgctxt "STR_PDF_EXPORT_SEND"
+msgid "Send"
+msgstr "Kirim"
+
+#. 9HHQw
+#: include/sfx2/strings.hrc:234
+msgctxt "STR_FONT_TABPAGE"
+msgid "Font"
+msgstr "Fonta"
+
+#. 7baC6
+#: include/sfx2/strings.hrc:236
+msgctxt "STR_VIEWVERSIONCOMMENT"
+msgid "View Version Comment"
+msgstr "Tampilkan Komentar Versi"
+
+#. LGiF8
+#: include/sfx2/strings.hrc:237
+msgctxt "STR_NO_NAME_SET"
+msgid "(no name set)"
+msgstr "(nama tak ditata)"
+
+#. rZ4Ao
+#: include/sfx2/strings.hrc:239
+msgctxt "STR_STYLE_FILTER_HIERARCHICAL"
+msgid "Hierarchical"
+msgstr "Hierarkis"
+
+#. 4VXDe
+#: include/sfx2/strings.hrc:241
+msgctxt "STR_MACRO_LOSS"
+msgid "Do you really want to cancel the recording? Any steps recorded up to this point will be lost."
+msgstr "Apakah Anda yakin untuk membatalkan perekaman? Semua langkah yang direkam hingga titik ini akan dihilangkan."
+
+#. 9MnrK
+#: include/sfx2/strings.hrc:242
+msgctxt "STR_CANCEL_RECORDING"
+msgid "Cancel Recording"
+msgstr "Batalkan Perekaman"
+
+#. m9FCm
+#: include/sfx2/strings.hrc:244
+msgctxt "RID_CNT_STR_WAITING"
+msgid "The templates are being initialized for first-time usage."
+msgstr "Templat sedang diinisialisasi untuk pemakaian pertama."
+
+#. F3ym2
+#: include/sfx2/strings.hrc:246
+msgctxt "STR_NODEFPRINTER"
+msgid ""
+"No default printer found.\n"
+"Please choose a printer and try again."
+msgstr ""
+"Tidak ada pencetak utama yang ditemukan.\n"
+"Harap pilih sebuah pencetak dan coba lagi."
+
+#. a3NTu
+#: include/sfx2/strings.hrc:247
+msgctxt "STR_NOSTARTPRINTER"
+msgid ""
+"Could not start printer.\n"
+"Please check your printer configuration."
+msgstr ""
+"Tak dapat menjalankan pencetak.\n"
+"Harap periksa konfigurasi pencetak Anda."
+
+#. acKHX
+#: include/sfx2/strings.hrc:248
+msgctxt "STR_ERROR_PRINTER_BUSY"
+msgid "Printer busy"
+msgstr "Pencetak sibuk"
+
+#. hDEUj
+#: include/sfx2/strings.hrc:249
+msgctxt "STR_READONLY"
+msgid " (read-only)"
+msgstr " (hanya-baca)"
+
+#. uL87C
+#: include/sfx2/strings.hrc:250
+msgctxt "STR_PRINT_NEWORI"
+msgid ""
+"The page size and orientation have been modified.\n"
+"Would you like to save the new settings in the\n"
+"active document?"
+msgstr ""
+"Ukuran dan orientasi kertas telah diubah.\n"
+"Apakah Anda ingin menyimpan pengaturan baru\n"
+"di dalam dokumen yang aktif?"
+
+#. cxuAH
+#: include/sfx2/strings.hrc:251
+msgctxt "STR_PRINT_NEWSIZE"
+msgid ""
+"The page size has been modified.\n"
+"Should the new settings be saved\n"
+"in the active document?"
+msgstr ""
+"Ukuran halaman telah dimodifikasi.\n"
+"Apakah pengaturan baru tersebut\n"
+"disimpan pada dokumen yang aktif?"
+
+#. 4QJxB
+#: include/sfx2/strings.hrc:252
+msgctxt "STR_PRINT_NEWORISIZE"
+msgid ""
+"The page size and orientation have been modified.\n"
+"Would you like to save the new settings in the\n"
+"active document?"
+msgstr ""
+"Ukuran dan orientasi kertas telah diubah.\n"
+"Apakah Anda ingin menyimpan pengaturan baru\n"
+"di dalam dokumen yang aktif?"
+
+#. RXbfs
+#: include/sfx2/strings.hrc:253
+msgctxt "STR_CANT_CLOSE"
+msgid ""
+"The document cannot be closed because a\n"
+" print job is being carried out."
+msgstr ""
+"Dokumen tidak bisa ditutup karena\n"
+"  suatu tugas cetak sedang dikerjakan."
+
+#. YGyQP
+#: include/sfx2/strings.hrc:254
+msgctxt "STR_ERROR_SEND_MAIL"
+msgid ""
+"An error occurred in sending the message. Possible errors could be a missing user account or a defective setup.\n"
+"Please check the %PRODUCTNAME settings or your email program settings."
+msgstr ""
+"Terjadi kesalahan dalam mengirim pesan. Kemungkinan kesalahan bisa berupa akun pengguna yang hilang atau pengaturan yang rusak.\n"
+"Silakan periksa pengaturan %PRODUCTNAME atau pengaturan program surel Anda."
+
+#. 3nzi6
+#. Error codes look like "MAPI_E_FAILURE" or "1234"
+#: include/sfx2/strings.hrc:256
+msgctxt "STR_ERROR_SEND_MAIL_CODE"
+msgid ""
+"An error occurred in sending the message. Possible errors could be a missing user account or a defective setup.\n"
+"\n"
+"Error code is $1"
+msgstr ""
+"Terjadi galat saat mengirim pesan. Kemungkinan galat bisa jadi akun pengguna yang hilang atau pengaturan yang rusak.\n"
+"\n"
+"Kode galat adalah $1"
+
+#. ZWTDr
+#: include/sfx2/strings.hrc:257
+msgctxt "STR_ERROR_SEND_MAIL_HEADER"
+msgid "Error sending mail"
+msgstr "Galat saat mengirim surat."
+
+#. QVS2D
+#: include/sfx2/strings.hrc:258
+msgctxt "STR_QUERY_OPENASTEMPLATE"
+msgid "This document cannot be edited, possibly due to missing access rights. Do you want to edit a copy of the document?"
+msgstr "Dokumen tidak bisa disunting, mungkin karena tidak adanya hak akses. Apakah Anda hendak menyunting salinan dokumen tersebut?"
+
+#. ZdGNX
+#: include/sfx2/strings.hrc:259
+msgctxt "STR_QUERY_OPENASTEMPLATE_LOCKED"
+msgid ""
+"This document cannot be edited, because it is locked in another session.%LOCKINFO\n"
+"Do you want to edit a copy of the document?"
+msgstr ""
+"Dokumen ini tidak dapat disunting, karena dikunci dalam session.%LOCKINFO lain\n"
+"Apakah Anda hendak menyunting suatu salinan dokumen?"
+
+#. n3sMB
+#: include/sfx2/strings.hrc:260
+msgctxt "STR_QUERY_OPENASTEMPLATE_ALLOW_IGNORE"
+msgid "You can also try to ignore the lock and open the file for editing."
+msgstr "Anda juga dapat mencoba mengabaikan kunci dan membuka berkas untuk penyuntingan."
+
+#. yaKxR
+#: include/sfx2/strings.hrc:261
+msgctxt "STR_QUERY_OPENASTEMPLATE_OPENCOPY_BTN"
+msgid "Open ~Copy"
+msgstr "Buka ~Salinan"
+
+#. UYkFP
+#: include/sfx2/strings.hrc:262
+msgctxt "STR_QUERY_OPENASTEMPLATE_OPEN_BTN"
+msgid "~Open"
+msgstr "~Buka"
+
+#. GcSXH
+#: include/sfx2/strings.hrc:263
+msgctxt "STR_REPAIREDDOCUMENT"
+msgid " (repaired document)"
+msgstr " (dokumen yang diperbaiki)"
+
+#. HPqkX
+#: include/sfx2/strings.hrc:264
+msgctxt "STR_NONCHECKEDOUT_DOCUMENT"
+msgid "This document is not checked out on the server."
+msgstr "Dokumen ini tak di-check-out pada server."
+
+#. uPc29
+#: include/sfx2/strings.hrc:265
+msgctxt "STR_GET_INVOLVED_TEXT"
+msgid "Help us make %PRODUCTNAME even better!"
+msgstr "Bantu kami membuat %PRODUCTNAME lebih baik!"
+
+#. PboiP
+#: include/sfx2/strings.hrc:266
+msgctxt "STR_GET_INVOLVED_BUTTON"
+msgid "Get involved"
+msgstr "Terlibat"
+
+#. GuLGH
+#: include/sfx2/strings.hrc:267
+msgctxt "STR_DONATE_TEXT"
+msgid "Your donations support our worldwide community."
+msgstr "Donasi Anda mendukung komunitas kami di seluruh dunia."
+
+#. KzgoD
+#: include/sfx2/strings.hrc:268
+msgctxt "STR_DONATE_BUTTON"
+msgid "Donate"
+msgstr "Sumbang"
+
+#. G8bbK
+#: include/sfx2/strings.hrc:269
+msgctxt "STR_WHATSNEW"
+msgid "You are running version %PRODUCTVERSION of %PRODUCTNAME for the first time. Do you want to learn what's new?"
+msgstr "Anda menjalankan versi %PRODUCTVERSION dari %PRODUCTNAME untuk pertama kali. Apakah Anda ingin mempelajari apa yang baru?"
+
+#. J5UkB
+#: include/sfx2/strings.hrc:270
+msgctxt "STR_WHATSNEW_BUTTON"
+msgid "Release Notes"
+msgstr "Catatan Rilis"
+
+#. c7NPT
+#: include/sfx2/strings.hrc:271
+msgctxt "STR_READONLY_DOCUMENT"
+msgid "This document is open in read-only mode."
+msgstr "Dokumen dibuka dalam modus hanya-baca."
+
+#. KyyFk
+#: include/sfx2/strings.hrc:272
+msgctxt "STR_READONLY_PDF"
+msgid "This PDF is open in read-only mode to allow signing the existing file."
+msgstr "PDF ini dibuka dalam modus hanya-baca untuk mengizinkan penandatanganan berkas yang ada."
+
+#. MENvD
+#: include/sfx2/strings.hrc:273
+msgctxt "STR_CLASSIFIED_DOCUMENT"
+msgid "The classification label of this document is %1."
+msgstr "Label klasifikasi dokumen ini adalah %1."
+
+#. 3B3ij
+#: include/sfx2/strings.hrc:274
+msgctxt "STR_TARGET_DOC_NOT_CLASSIFIED"
+msgid "This document must be classified before the clipboard can be pasted."
+msgstr "Dokumen ini mesti diklasifikasikan sebelum papan klip dapat ditempelkan."
+
+#. BYcYH
+#: include/sfx2/strings.hrc:275
+msgctxt "STR_DOC_CLASSIFICATION_TOO_LOW"
+msgid "This document has a lower classification level than the clipboard."
+msgstr "Dokumen ini punya tingkat klasifikasi lebih rendah daripada papan klip."
+
+#. EJPzh
+#: include/sfx2/strings.hrc:276
+msgctxt "STR_CLASSIFIED_INTELLECTUAL_PROPERTY"
+msgid "Level"
+msgstr "Tingkat"
+
+#. itVew
+#: include/sfx2/strings.hrc:277
+msgctxt "STR_CLASSIFIED_NATIONAL_SECURITY"
+msgid "National Security:"
+msgstr "Keamanan Nasional:"
+
+#. ZBXbG
+#: include/sfx2/strings.hrc:278
+msgctxt "STR_CLASSIFIED_EXPORT_CONTROL"
+msgid "Export Control:"
+msgstr "Kendali Ekspor:"
+
+#. QAnvx
+#: include/sfx2/strings.hrc:279
+msgctxt "STR_CHECKOUT"
+msgid "Check Out"
+msgstr "Check Out"
+
+#. PwPNw
+#: include/sfx2/strings.hrc:280
+msgctxt "STR_READONLY_EDIT"
+msgid "Edit Document"
+msgstr "Sunting Dokumen"
+
+#. FCeC5
+#: include/sfx2/strings.hrc:281
+msgctxt "STR_READONLY_SIGN"
+msgid "Sign Document"
+msgstr "Tandatangani Dokumen"
+
+#. MEfTq
+#: include/sfx2/strings.hrc:282
+msgctxt "STR_READONLY_FINISH_SIGN"
+msgid "Finish Signing"
+msgstr "Akhiri Penandatanganan"
+
+#. pkWmU
+#: include/sfx2/strings.hrc:283
+msgctxt "STR_SIGNATURE_BROKEN"
+msgid "This document has an invalid signature."
+msgstr "Dokumen ini punya tanda tangan yang tidak valid."
+
+#. Vd3CU
+#: include/sfx2/strings.hrc:284
+msgctxt "STR_SIGNATURE_INVALID"
+msgid "The signature was valid, but the document has been modified"
+msgstr "Tanda tangan valid, tapi dokumen telah diubah"
+
+#. 2HNfx
+#: include/sfx2/strings.hrc:285
+msgctxt "STR_SIGNATURE_NOTVALIDATED"
+msgid "At least one signature has problems: the certificate could not be validated."
+msgstr "Paling tidak satu tanda tangan punya masalah: sertifikat tidak bisa divalidasi."
+
+#. tjCmr
+#: include/sfx2/strings.hrc:286
+msgctxt "STR_SIGNATURE_PARTIAL_OK"
+msgid "At least one signature has problems: the document is only partially signed."
+msgstr "Paling tidak satu tanda tangan punya masalah: dokumen hanya ditandatangani sebagian."
+
+#. mU6ot
+#: include/sfx2/strings.hrc:287
+msgctxt "STR_SIGNATURE_NOTVALIDATED_PARTIAL_OK"
+msgid "The certificate could not be validated and the document is only partially signed."
+msgstr "Sertifikat tidak dapat divalidasi dan dokumen hanya ditandai sebagian."
+
+#. FKDbE
+#: include/sfx2/strings.hrc:288
+msgctxt "STR_SIGNATURE_OK"
+msgid "This document is digitally signed and the signature is valid."
+msgstr "Dokumen ini ditandatangani secara digital dan tanda tangannya valid."
+
+#. rMGka
+#: include/sfx2/strings.hrc:289
+msgctxt "STR_SIGNATURE_SHOW"
+msgid "Show Signatures"
+msgstr "Tampilkan Tanda Tangan"
+
+#. fkzJb
+#: include/sfx2/strings.hrc:290
+msgctxt "STR_TRACK_CHANGES_BUTTON"
+msgid "Show Toolbar"
+msgstr "Tampilkan Bilah Alat"
+
+#. 68ZqS
+#: include/sfx2/strings.hrc:291
+msgctxt "STR_TRACK_CHANGES_BUTTON_HIDE"
+msgid "Hide Toolbar"
+msgstr "Sembunyikan Bilah Alat"
+
+#. BzVAA
+#: include/sfx2/strings.hrc:292
+msgctxt "STR_HYPHENATION_BUTTON"
+msgid "Learn more"
+msgstr "Pelajari lebih lanjut"
+
+#. BSyb4
+#: include/sfx2/strings.hrc:293
+msgctxt "STR_REFRESH_MASTER_PASSWORD"
+msgid "The master password is stored in an outdated format, you should refresh it"
+msgstr "Kata sandi utama disimpan dalam format yang sudah ketinggalan zaman, Anda harus menyegarkannya"
+
+#. ysChU
+#: include/sfx2/strings.hrc:294
+msgctxt "STR_REFRESH_PASSWORD"
+msgid "Refresh Password"
+msgstr "Segarkan Kata Sandi"
+
+#. kej8D
+#. Translators: default Impress template names
+#: include/sfx2/strings.hrc:297
+msgctxt "STR_TEMPLATE_NAME1"
+msgid "Grey Elegant"
+msgstr "Abu-abu Elegan"
+
+#. FkuLG
+#: include/sfx2/strings.hrc:298
+msgctxt "STR_TEMPLATE_NAME2"
+msgid "Beehive"
+msgstr "Sarang Lebah"
+
+#. uwaPH
+#: include/sfx2/strings.hrc:299
+msgctxt "STR_TEMPLATE_NAME3"
+msgid "Blue Curve"
+msgstr "Kurva Biru"
+
+#. hHRDz
+#: include/sfx2/strings.hrc:300
+msgctxt "STR_TEMPLATE_NAME4"
+msgid "Blueprint Plans"
+msgstr "Rencana Cetak Biru"
+
+#. MAnPU
+#: include/sfx2/strings.hrc:301
+msgctxt "STR_TEMPLATE_NAME5"
+msgid "Candy"
+msgstr "Permen"
+
+#. jEiAn
+#: include/sfx2/strings.hrc:302
+msgctxt "STR_TEMPLATE_NAME6"
+msgid "Yellow Idea"
+msgstr "Gagasan Kuning"
+
+#. QDNuB
+#: include/sfx2/strings.hrc:303
+msgctxt "STR_TEMPLATE_NAME7"
+msgid "DNA"
+msgstr "DNA"
+
+#. XBrCi
+#: include/sfx2/strings.hrc:304
+msgctxt "STR_TEMPLATE_NAME8"
+msgid "Focus"
+msgstr "Fokus"
+
+#. GADdA
+#: include/sfx2/strings.hrc:305
+msgctxt "STR_TEMPLATE_NAME9"
+msgid "Forestbird"
+msgstr "Burung hutan"
+
+#. TT8G5
+#: include/sfx2/strings.hrc:306
+msgctxt "STR_TEMPLATE_NAME10"
+msgid "Freshes"
+msgstr "Segar"
+
+#. C5N9D
+#: include/sfx2/strings.hrc:307
+msgctxt "STR_TEMPLATE_NAME11"
+msgid "Inspiration"
+msgstr "Inspirasi"
+
+#. fCKG9
+#: include/sfx2/strings.hrc:308
+msgctxt "STR_TEMPLATE_NAME12"
+msgid "Lights"
+msgstr "Cahaya"
+
+#. pcLWs
+#: include/sfx2/strings.hrc:309
+msgctxt "STR_TEMPLATE_NAME13"
+msgid "Growing Liberty"
+msgstr "Kebebasan yang Tumbuh"
+
+#. xo2gC
+#: include/sfx2/strings.hrc:310
+msgctxt "STR_TEMPLATE_NAME14"
+msgid "Metropolis"
+msgstr "Metropolis"
+
+#. FFDBk
+#: include/sfx2/strings.hrc:311
+msgctxt "STR_TEMPLATE_NAME15"
+msgid "Midnightblue"
+msgstr "Biru malam"
+
+#. yiCzk
+#: include/sfx2/strings.hrc:312
+msgctxt "STR_TEMPLATE_NAME16"
+msgid "Nature Illustration"
+msgstr "Ilustrasi Alam"
+
+#. cCZzC
+#: include/sfx2/strings.hrc:313
+msgctxt "STR_TEMPLATE_NAME17"
+msgid "Pencil"
+msgstr "Pensil"
+
+#. Ji4Cw
+#: include/sfx2/strings.hrc:314
+msgctxt "STR_TEMPLATE_NAME18"
+msgid "Piano"
+msgstr "Piano"
+
+#. mrbiq
+#: include/sfx2/strings.hrc:315
+msgctxt "STR_TEMPLATE_NAME19"
+msgid "Portfolio"
+msgstr "Portofolio"
+
+#. ysBGy
+#: include/sfx2/strings.hrc:316
+msgctxt "STR_TEMPLATE_NAME20"
+msgid "Progress"
+msgstr "Perkembangan"
+
+#. gtPt9
+#: include/sfx2/strings.hrc:317
+msgctxt "STR_TEMPLATE_NAME21"
+msgid "Sunset"
+msgstr "Matahari Terbenam"
+
+#. 73Y2e
+#: include/sfx2/strings.hrc:318
+msgctxt "STR_TEMPLATE_NAME22"
+msgid "Vintage"
+msgstr "Antik"
+
+#. MSY8y
+#: include/sfx2/strings.hrc:319
+msgctxt "STR_TEMPLATE_NAME23"
+msgid "Vivid"
+msgstr "Terang"
+
+#. QDZBz
+#. Translators: default Writer template names
+#: include/sfx2/strings.hrc:321
+msgctxt "STR_TEMPLATE_NAME24"
+msgid "CV"
+msgstr "CV"
+
+#. Koe3V
+#: include/sfx2/strings.hrc:322
+msgctxt "STR_TEMPLATE_NAME25"
+msgid "Resume"
+msgstr "Lanjutkan"
+
+#. hCpfD
+#: include/sfx2/strings.hrc:323
+msgctxt "STR_TEMPLATE_NAME26"
+msgid "Default"
+msgstr "Baku"
+
+#. d7Hyk
+#: include/sfx2/strings.hrc:324
+msgctxt "STR_TEMPLATE_NAME27"
+msgid "Modern"
+msgstr "Modern"
+
+#. CVJEC
+#: include/sfx2/strings.hrc:325
+msgctxt "STR_TEMPLATE_NAME28"
+msgid "Modern business letter sans-serif"
+msgstr "Surat bisnis modern sans-serif"
+
+#. 95GeB
+#: include/sfx2/strings.hrc:326
+msgctxt "STR_TEMPLATE_NAME29"
+msgid "Modern business letter serif"
+msgstr "Surat bisnis modern serif"
+
+#. XdU49
+#: include/sfx2/strings.hrc:327
+msgctxt "STR_TEMPLATE_NAME30"
+msgid "Businesscard with logo"
+msgstr "Kartu nama dengan logo"
+
+#. UAmSj
+#: include/sfx2/strings.hrc:328
+msgctxt "STR_TEMPLATE_NAME31"
+msgid "Simple"
+msgstr "Sederhana"
+
+#. W7NVH
+#: include/sfx2/strings.hrc:329
+msgctxt "STR_TEMPLATE_NAME32"
+msgid "BPMN"
+msgstr "BPMN"
+
+#. ZaGGB
+#: include/sfx2/strings.hrc:331
+msgctxt "STR_CLEAR_CHAR"
+msgid "Remove"
+msgstr "Buang"
+
+#. JReRY
+#: include/sfx2/strings.hrc:332
+msgctxt "STR_CLEAR_ALL_CHAR"
+msgid "Clear All"
+msgstr "Bersihkan Semua"
+
+#. yC8Gs
+#: include/sfx2/strings.hrc:334
+msgctxt "STR_PASSWORD_LEN"
+msgid "Password length"
+msgstr "Panjang kata sandi"
+
+#. FKFmJ
+#: include/sfx2/strings.hrc:335
+msgctxt "STR_PASSWORD_WARNING"
+msgid "The password you have entered causes interoperability issues. Please enter a password that is shorter than 52 bytes, or longer than 55 bytes."
+msgstr "Kata sandi yang anda masukkan menyebabkan masalah interoperabilitas. Silakan masukkan kata sandi yang lebih pendek dari 52 byte, atau lebih panjang dari 55 byte."
+
+#. jBQFN
+#: include/sfx2/strings.hrc:337
+msgctxt "STR_CTRLCLICKHYPERLINK"
+msgid "%{key}-click to open hyperlink: %{link}"
+msgstr "%{key}-klik untuk membuka pranala: %{link}"
+
+#. jC3AK
+#: include/sfx2/strings.hrc:338
+msgctxt "STR_CLICKHYPERLINK"
+msgid "Click to open hyperlink: %{link}"
+msgstr "Klik untuk membuka pranala: %{link}"
+
+#. eFJMp
+#: include/sfx2/strings.hrc:340
+msgctxt "STR_STYLEUSEDBY"
+msgid "(used by: %STYLELIST)"
+msgstr "(dipakai oleh: %STYLELIST)"
+
+#. 6UgqW
+#: include/sfx2/strings.hrc:342
+msgctxt "STR_DOCUMENT"
+msgid "Document"
+msgstr "Dokumen"
+
+#. XDGTb
+#: include/sfx2/strings.hrc:343
+msgctxt "STR_SPREADSHEET"
+msgid "Spreadsheet"
+msgstr "Lembar Sebar"
+
+#. 3UZXB
+#: include/sfx2/strings.hrc:344
+msgctxt "STR_PRESENTATION"
+msgid "Presentation"
+msgstr "Presentasi"
+
+#. noN5s
+#: include/sfx2/strings.hrc:345
+msgctxt "STR_DRAWING"
+msgid "Drawing"
+msgstr "Gambar"
+
+#. QpuFo
+#: include/sfx2/strings.hrc:346
+msgctxt "STR_RECENT"
+msgid "Recently used"
+msgstr "Digunakan baru-baru Ini"
+
+#. EcAjb
+#: include/sfx2/strings.hrc:347
+msgctxt "STR_NORECENT"
+msgid "No recent characters"
+msgstr "Tidak ada karakter baru-baru ini"
+
+#. tfjbD
+#: include/sfx2/strings.hrc:349
+msgctxt "STR_ACTION_RESET_ALL_DEFAULT_TEMPLATES"
+msgid "Reset All De~fault Templates"
+msgstr "Atur Ulang Semua T~emplat Baku"
+
+#. GWuDE
+#: include/sfx2/strings.hrc:350
+msgctxt "STR_ACTION_RESET_WRITER_TEMPLATE"
+msgid "Reset De~fault Text Document"
+msgstr "Atur Ulang Dokumen Teks Ba~ku"
+
+#. j5eV8
+#: include/sfx2/strings.hrc:351
+msgctxt "STR_ACTION_RESET_CALC_TEMPLATE"
+msgid "Reset De~fault Spreadsheet"
+msgstr "Atur Ulang Lembar Sebar Ba~ku"
+
+#. mWp3t
+#: include/sfx2/strings.hrc:352
+msgctxt "STR_ACTION_RESET_IMPRESS_TEMPLATE"
+msgid "Reset De~fault Presentation"
+msgstr "Atur Ulang Presentasi Ba~ku"
+
+#. wfExB
+#: include/sfx2/strings.hrc:353
+msgctxt "STR_ACTION_RESET_DRAW_TEMPLATE"
+msgid "Reset De~fault Drawing"
+msgstr "Atur Ulang Gambar Ba~ku"
+
+#. BFaGA
+#: include/sfx2/strings.hrc:354
+msgctxt "STR_ACTION_IMPORT"
+msgid "~Import"
+msgstr "~Impor"
+
+#. 8Cwfk
+#: include/sfx2/strings.hrc:355
+msgctxt "STR_ACTION_EXTENSIONS"
+msgid "E~xtensions"
+msgstr "E~kstensi"
+
+#. idGvM
+#: include/sfx2/strings.hrc:356
+msgctxt "STR_WINDOW_TITLE_RENAME_TEMPLATE"
+msgid "Rename"
+msgstr "Ganti Nama"
+
+#. EyjE3
+#: include/sfx2/strings.hrc:357
+msgctxt "STR_WINDOW_TITLE_RENAME_CATEGORY"
+msgid "Rename Category"
+msgstr "Ganti Nama Kategori"
+
+#. T79Eb
+#: include/sfx2/strings.hrc:358
+msgctxt "STR_WINDOW_TITLE_RENAME_NEW_CATEGORY"
+msgid "New Category"
+msgstr "Kategori Baru"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "T_ambah"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "Ter_apkan"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_Batal"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_Tutup"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_Hapus"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "S_unting"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_Bantuan"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_Baru"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_Tidak"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_OK"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_Hapus"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "Atu_r Ulang"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Ya"
+
+#. F5rSU
+#: sfx2/inc/dinfdlg.hrc:29
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Checked by"
+msgstr "Diperiksa oleh"
+
+#. BCYGG
+#: sfx2/inc/dinfdlg.hrc:30
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Client"
+msgstr "Klien"
+
+#. nSrT3
+#: sfx2/inc/dinfdlg.hrc:31
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Date completed"
+msgstr "Tanggal selesai"
+
+#. HEaEC
+#: sfx2/inc/dinfdlg.hrc:32
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Department"
+msgstr "Departemen"
+
+#. TxAux
+#: sfx2/inc/dinfdlg.hrc:33
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Destinations"
+msgstr "Tujuan"
+
+#. f3nqh
+#: sfx2/inc/dinfdlg.hrc:34
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Disposition"
+msgstr "Disposisi"
+
+#. uznMD
+#: sfx2/inc/dinfdlg.hrc:35
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Division"
+msgstr "Divisi"
+
+#. 6DuFF
+#: sfx2/inc/dinfdlg.hrc:36
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Document number"
+msgstr "Nomor dokumen"
+
+#. XXKuP
+#: sfx2/inc/dinfdlg.hrc:37
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Editor"
+msgstr "Penyunting"
+
+#. hRRmF
+#: sfx2/inc/dinfdlg.hrc:38
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Email"
+msgstr "Surel"
+
+#. xNvDx
+#: sfx2/inc/dinfdlg.hrc:39
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Forward to"
+msgstr "Teruskan ke"
+
+#. xwv85
+#: sfx2/inc/dinfdlg.hrc:40
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Group"
+msgstr "Grup"
+
+#. u59Qp
+#: sfx2/inc/dinfdlg.hrc:41
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Info"
+msgstr "Info"
+
+#. Ltq9H
+#: sfx2/inc/dinfdlg.hrc:42
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Language"
+msgstr "Bahasa"
+
+#. bv3HC
+#: sfx2/inc/dinfdlg.hrc:43
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Mailstop"
+msgstr "Pemberhentian surat"
+
+#. AFGi2
+#: sfx2/inc/dinfdlg.hrc:44
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Matter"
+msgstr "Masalah"
+
+#. wGAD6
+#: sfx2/inc/dinfdlg.hrc:45
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Office"
+msgstr "Kantor"
+
+#. ZqphY
+#: sfx2/inc/dinfdlg.hrc:46
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Owner"
+msgstr "Pemilik"
+
+#. mK8Th
+#: sfx2/inc/dinfdlg.hrc:47
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Project"
+msgstr "Projek"
+
+#. zFeHt
+#: sfx2/inc/dinfdlg.hrc:48
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Publisher"
+msgstr "Penerbit"
+
+#. pF2eJ
+#: sfx2/inc/dinfdlg.hrc:49
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Purpose"
+msgstr "Tujuan"
+
+#. GTPFZ
+#: sfx2/inc/dinfdlg.hrc:50
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Received from"
+msgstr "Diterima dari"
+
+#. dvGyQ
+#: sfx2/inc/dinfdlg.hrc:51
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Recorded by"
+msgstr "Direkam oleh"
+
+#. GjVXD
+#: sfx2/inc/dinfdlg.hrc:52
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Recorded date"
+msgstr "Tanggal rekam"
+
+#. o5oXa
+#: sfx2/inc/dinfdlg.hrc:53
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Reference"
+msgstr "Rujukan"
+
+#. ex26g
+#: sfx2/inc/dinfdlg.hrc:54
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Source"
+msgstr "Sumber"
+
+#. 4HSZB
+#: sfx2/inc/dinfdlg.hrc:55
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Status"
+msgstr "Status"
+
+#. U3RdC
+#: sfx2/inc/dinfdlg.hrc:56
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Telephone number"
+msgstr "Nomor telepon"
+
+#. Geeuu
+#: sfx2/inc/dinfdlg.hrc:57
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Typist"
+msgstr "Pengetik"
+
+#. xxHtR
+#: sfx2/inc/dinfdlg.hrc:58
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "URL"
+msgstr "URL"
+
+#. CxTQY
+#: sfx2/inc/dinfdlg.hrc:73
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Text"
+msgstr "Teks"
+
+#. MMGFi
+#: sfx2/inc/dinfdlg.hrc:74
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "DateTime"
+msgstr "TanggalWaktu"
+
+#. GvJMH
+#: sfx2/inc/dinfdlg.hrc:75
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Date"
+msgstr "Tanggal"
+
+#. GyrbX
+#: sfx2/inc/dinfdlg.hrc:76
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Duration"
+msgstr "Durasi"
+
+#. CxZ4Z
+#: sfx2/inc/dinfdlg.hrc:77
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Number"
+msgstr "Nomor"
+
+#. CDgvL
+#: sfx2/inc/dinfdlg.hrc:78
+msgctxt "SFX_CB_PROPERTY_STRINGARRAY"
+msgid "Yes or no"
+msgstr "Ya atau tidak"
+
+#. WzBG6
+#. accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
+#. in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
+#: sfx2/inc/dinfdlg.hrc:83
+msgctxt "documentinfopage|extended_tip|userdatacb"
+msgid "Saves the user's full name with the file. You can edit the name by choosing Tools - Options - %PRODUCTNAME - User Data."
+msgstr "simpan nama lengkap pengguna dengan berkas tersebut. Anda dapat menyunting nama dengan memilihperkakas-pilihan- %PRODUCTNAME - Data pengguna."
+
+#. AxhLy
+#: sfx2/inc/doctempl.hrc:29
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "My Templates"
+msgstr "Templatku"
+
+#. 5aNp8
+#: sfx2/inc/doctempl.hrc:30
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Styles"
+msgstr "Gaya"
+
+#. t5QK9
+#: sfx2/inc/doctempl.hrc:31
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Business Correspondence"
+msgstr "Korespondensi Bisnis"
+
+#. Y79e8
+#: sfx2/inc/doctempl.hrc:32
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Other Business Documents"
+msgstr "Dokumen Bisnis Lainnya"
+
+#. 2RCC9
+#: sfx2/inc/doctempl.hrc:33
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Personal Correspondence and Documents"
+msgstr "Korespondensi Pribadi dan Dokumen"
+
+#. 6Dgiz
+#: sfx2/inc/doctempl.hrc:34
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Forms and Contracts"
+msgstr "Kontrak dan Formulir"
+
+#. VCKTG
+#: sfx2/inc/doctempl.hrc:35
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Finances"
+msgstr "Keuangan"
+
+#. HmqGP
+#: sfx2/inc/doctempl.hrc:36
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Education"
+msgstr "Pendidikan"
+
+#. xopM8
+#: sfx2/inc/doctempl.hrc:37
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Presentation Backgrounds"
+msgstr "Latar Belakang Presentasi"
+
+#. tSQLA
+#: sfx2/inc/doctempl.hrc:38
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Presentations"
+msgstr "Presentasi"
+
+#. KuNzz
+#: sfx2/inc/doctempl.hrc:39
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Miscellaneous"
+msgstr "Lain-lain"
+
+#. SC4E5
+#: sfx2/inc/doctempl.hrc:40
+msgctxt "TEMPLATE_LONG_NAMES_ARY"
+msgid "Labels"
+msgstr "Label"
+
+#. Wg9Je
+#: sfx2/source/devtools/DevToolsStrings.hrc:15
+msgctxt "STR_TEXT_PORTION"
+msgid "Text Portion %1"
+msgstr "Porsi Teks %1"
+
+#. 5ZXbE
+#: sfx2/source/devtools/DevToolsStrings.hrc:16
+msgctxt "STR_PARAGRAPH"
+msgid "Paragraph %1"
+msgstr "Paragraf %1"
+
+#. DJi4i
+#: sfx2/source/devtools/DevToolsStrings.hrc:17
+msgctxt "STR_SHAPE"
+msgid "Shape %1"
+msgstr "Bentuk %1"
+
+#. Ucjjh
+#: sfx2/source/devtools/DevToolsStrings.hrc:18
+msgctxt "STR_PAGE"
+msgid "Page %1"
+msgstr "Halaman %1"
+
+#. j9DL6
+#: sfx2/source/devtools/DevToolsStrings.hrc:19
+msgctxt "STR_SLIDE"
+msgid "Slide %1"
+msgstr "Salindia %1"
+
+#. YQqL8
+#: sfx2/source/devtools/DevToolsStrings.hrc:20
+msgctxt "STR_MASTER_SLIDE"
+msgid "Master Slide %1"
+msgstr "Salindia Induk %1"
+
+#. CEfNy
+#: sfx2/source/devtools/DevToolsStrings.hrc:21
+msgctxt "STR_SHEET"
+msgid "Sheet %1"
+msgstr "Lembar %1"
+
+#. BaABx
+#: sfx2/source/devtools/DevToolsStrings.hrc:23
+msgctxt "STR_SHAPES_NODE"
+msgid "Shapes"
+msgstr "Bentuk"
+
+#. n4VWE
+#: sfx2/source/devtools/DevToolsStrings.hrc:24
+msgctxt "STR_CHARTS_ENTRY"
+msgid "Charts"
+msgstr "Bagan"
+
+#. 5GWcX
+#: sfx2/source/devtools/DevToolsStrings.hrc:25
+msgctxt "STR_PIVOT_TABLES_ENTRY"
+msgid "Pivot Tables"
+msgstr "Tabel Pivot"
+
+#. BBLBQ
+#: sfx2/source/devtools/DevToolsStrings.hrc:26
+msgctxt "STR_DOCUMENT_ENTRY"
+msgid "Document"
+msgstr "Dokumen"
+
+#. 4dNGV
+#: sfx2/source/devtools/DevToolsStrings.hrc:27
+msgctxt "STR_SHEETS_ENTRY"
+msgid "Sheets"
+msgstr "Lembar"
+
+#. RLwRi
+#: sfx2/source/devtools/DevToolsStrings.hrc:28
+msgctxt "STR_STYLES_ENTRY"
+msgid "Styles"
+msgstr "Gaya"
+
+#. P4RF4
+#: sfx2/source/devtools/DevToolsStrings.hrc:29
+msgctxt "STR_SLIDES_ENTRY"
+msgid "Slides"
+msgstr "Salindia"
+
+#. 4bJSH
+#: sfx2/source/devtools/DevToolsStrings.hrc:30
+msgctxt "STR_MASTER_SLIDES_ENTRY"
+msgid "Master Slides"
+msgstr "Salindia Induk"
+
+#. LRq2A
+#: sfx2/source/devtools/DevToolsStrings.hrc:31
+msgctxt "STR_PAGES_ENTRY"
+msgid "Pages"
+msgstr "Halaman"
+
+#. 946kV
+#: sfx2/source/devtools/DevToolsStrings.hrc:32
+msgctxt "STR_PARAGRAPHS_ENTRY"
+msgid "Paragraphs"
+msgstr "Paragraf"
+
+#. JG2qz
+#: sfx2/source/devtools/DevToolsStrings.hrc:33
+msgctxt "STR_TABLES_ENTRY"
+msgid "Tables"
+msgstr "Tabel"
+
+#. HzFoW
+#: sfx2/source/devtools/DevToolsStrings.hrc:34
+msgctxt "STR_FRAMES_ENTRY"
+msgid "Frames"
+msgstr "Bingkai"
+
+#. ekGEm
+#: sfx2/source/devtools/DevToolsStrings.hrc:35
+msgctxt "STR_GRAPHIC_OBJECTS_ENTRY"
+msgid "Graphic Objects"
+msgstr "Objek Citra"
+
+#. cVWmY
+#: sfx2/source/devtools/DevToolsStrings.hrc:36
+msgctxt "STR_EMBEDDED_OBJECTS_ENTRY"
+msgid "Embedded Objects"
+msgstr "Objek Tertanam"
+
+#. xfnkV
+#: sfx2/source/devtools/DevToolsStrings.hrc:38
+msgctxt "STR_ANY_VALUE_TRUE"
+msgid "True"
+msgstr "Benar"
+
+#. 2WxdA
+#: sfx2/source/devtools/DevToolsStrings.hrc:39
+msgctxt "STR_ANY_VALUE_FALSE"
+msgid "False"
+msgstr "Salah"
+
+#. RBC8w
+#: sfx2/source/devtools/DevToolsStrings.hrc:40
+msgctxt "STR_ANY_VALUE_NULL"
+msgid "Null"
+msgstr "Nihil"
+
+#. As494
+#: sfx2/source/devtools/DevToolsStrings.hrc:41
+msgctxt "STR_CLASS_UNKNOWN"
+msgid "Unknown"
+msgstr "Tak Dikenal"
+
+#. gAY69
+#: sfx2/source/devtools/DevToolsStrings.hrc:43
+msgctxt "STR_METHOD_TYPE_OBJECT"
+msgid "object"
+msgstr "objek"
+
+#. HFgBW
+#: sfx2/source/devtools/DevToolsStrings.hrc:44
+msgctxt "STR_METHOD_TYPE_STRUCT"
+msgid "struct"
+msgstr "struct"
+
+#. 7DCri
+#: sfx2/source/devtools/DevToolsStrings.hrc:45
+msgctxt "STR_METHOD_TYPE_ENUM"
+msgid "enum"
+msgstr "enum"
+
+#. aEuJR
+#: sfx2/source/devtools/DevToolsStrings.hrc:46
+msgctxt "STR_METHOD_TYPE_SEQUENCE"
+msgid "sequence"
+msgstr "sequence"
+
+#. xXMdD
+#: sfx2/source/devtools/DevToolsStrings.hrc:48
+msgctxt "STR_PROPERTY_TYPE_IS_NAMED_CONTAINER"
+msgid "name container"
+msgstr "name container"
+
+#. QLZbz
+#: sfx2/source/devtools/DevToolsStrings.hrc:49
+msgctxt "STR_PROPERTY_TYPE_IS_INDEX_CONTAINER"
+msgid "index container"
+msgstr "index container"
+
+#. LLsJf
+#: sfx2/source/devtools/DevToolsStrings.hrc:50
+msgctxt "STR_PROPERTY_TYPE_IS_ENUMERATION"
+msgid "enumeration"
+msgstr "enumerasi"
+
+#. aNuA9
+#: sfx2/source/devtools/DevToolsStrings.hrc:52
+msgctxt "STR_PARMETER_MODE_IN"
+msgid "[in]"
+msgstr "[in]"
+
+#. W3AEx
+#: sfx2/source/devtools/DevToolsStrings.hrc:53
+msgctxt "STR_PARMETER_MODE_OUT"
+msgid "[out]"
+msgstr "[out]"
+
+#. ENF6w
+#: sfx2/source/devtools/DevToolsStrings.hrc:54
+msgctxt "STR_PARMETER_MODE_IN_AND_OUT"
+msgid "[in&out]"
+msgstr "[in&out]"
+
+#. rw6AB
+#: sfx2/source/devtools/DevToolsStrings.hrc:56
+msgctxt "STR_PROPERTY_ATTRIBUTE_IS_ATTRIBUTE"
+msgid "attribute"
+msgstr "atribut"
+
+#. BwCGg
+#: sfx2/source/devtools/DevToolsStrings.hrc:57
+msgctxt "STR_PROPERTY_ATTRIBUTE_GET"
+msgid "get"
+msgstr "get"
+
+#. MissY
+#: sfx2/source/devtools/DevToolsStrings.hrc:58
+msgctxt "STR_PROPERTY_ATTRIBUTE_SET"
+msgid "set"
+msgstr "set"
+
+#. Nhmiv
+#: sfx2/source/devtools/DevToolsStrings.hrc:59
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEVOID"
+msgid "may be void"
+msgstr "may be void"
+
+#. zECkD
+#: sfx2/source/devtools/DevToolsStrings.hrc:60
+msgctxt "STR_PROPERTY_ATTRIBUTE_READONLY"
+msgid "read-only"
+msgstr "hanya-baca"
+
+#. BtQDx
+#: sfx2/source/devtools/DevToolsStrings.hrc:61
+msgctxt "STR_PROPERTY_ATTRIBUTE_WRITEONLY"
+msgid "write-only"
+msgstr "hanya-tulis"
+
+#. dBQEu
+#: sfx2/source/devtools/DevToolsStrings.hrc:62
+msgctxt "STR_PROPERTY_ATTRIBUTE_REMOVABLE"
+msgid "removeable"
+msgstr "removeable"
+
+#. jRo8t
+#: sfx2/source/devtools/DevToolsStrings.hrc:63
+msgctxt "STR_PROPERTY_ATTRIBUTE_BOUND"
+msgid "bound"
+msgstr "bound"
+
+#. rBqTG
+#: sfx2/source/devtools/DevToolsStrings.hrc:64
+msgctxt "STR_PROPERTY_ATTRIBUTE_CONSTRAINED"
+msgid "constrained"
+msgstr "constrained"
+
+#. XLnBt
+#: sfx2/source/devtools/DevToolsStrings.hrc:65
+msgctxt "STR_PROPERTY_ATTRIBUTE_TRANSIENT"
+msgid "transient"
+msgstr "transien"
+
+#. BK7Zk
+#: sfx2/source/devtools/DevToolsStrings.hrc:66
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEAMBIGUOUS"
+msgid "may be ambiguous"
+msgstr "mungkin ambigu"
+
+#. BDEqD
+#: sfx2/source/devtools/DevToolsStrings.hrc:67
+msgctxt "STR_PROPERTY_ATTRIBUTE_MAYBEDEFAULT"
+msgid "may be default"
+msgstr "mungkin baku"
+
+#. TGQhd
+#: sfx2/source/devtools/DevToolsStrings.hrc:69
+msgctxt "STR_PROPERTY_VALUE_SEQUENCE"
+msgid "<Sequence [%1]>"
+msgstr "<Sequence [%1]>"
+
+#. KZ5M4
+#: sfx2/source/devtools/DevToolsStrings.hrc:70
+msgctxt "STR_PROPERTY_VALUE_OBJECT"
+msgid "<Object@%1>"
+msgstr "<Objek@%1>"
+
+#. xKaJy
+#: sfx2/source/devtools/DevToolsStrings.hrc:71
+msgctxt "STR_PROPERTY_VALUE_STRUCT"
+msgid "<Struct>"
+msgstr "<Struct>"
+
+#. AxfFu
+#: sfx2/uiconfig/ui/addtargetdialog.ui:8
+msgctxt "addtargetdialog|AddTargetDialog"
+msgid "Add Target"
+msgstr "Tambah Sasaran"
+
+#. JC8Vd
+#: sfx2/uiconfig/ui/addtargetdialog.ui:89
+msgctxt "addtargetdialog|label_name"
+msgid "Name:"
+msgstr "Nama:"
+
+#. LXpbz
+#: sfx2/uiconfig/ui/addtargetdialog.ui:120
+msgctxt "addtargetdialog|label_type"
+msgid "Type:"
+msgstr "Jenis:"
+
+#. Sy2A7
+#: sfx2/uiconfig/ui/addtargetdialog.ui:135
+msgctxt "addtargetdialog|label_content"
+msgid "Content:"
+msgstr "Isi:"
+
+#. e5sY6
+#: sfx2/uiconfig/ui/addtargetdialog.ui:169
+msgctxt "addtargetdialog|type"
+msgid "Text"
+msgstr "Teks"
+
+#. dGQqg
+#: sfx2/uiconfig/ui/addtargetdialog.ui:170
+msgctxt "addtargetdialog|type"
+msgid "Regular expression"
+msgstr "Ekspresi reguler"
+
+#. wgzA4
+#: sfx2/uiconfig/ui/addtargetdialog.ui:171
+msgctxt "addtargetdialog|type"
+msgid "Predefined"
+msgstr "Terpradefinisi"
+
+#. nGjTR
+#: sfx2/uiconfig/ui/addtargetdialog.ui:186
+msgctxt "addtargetdialog|label_content_predef"
+msgid "Content:"
+msgstr "Isi:"
+
+#. 7uQgC
+#: sfx2/uiconfig/ui/addtargetdialog.ui:204
+msgctxt "addtargetdialog|content_predef"
+msgid "Credit card numbers"
+msgstr "Nomor kartu kredit"
+
+#. jze4C
+#: sfx2/uiconfig/ui/addtargetdialog.ui:205
+msgctxt "addtargetdialog|content_predef"
+msgid "Email addresses"
+msgstr "Alamat surel"
+
+#. wDQAu
+#: sfx2/uiconfig/ui/addtargetdialog.ui:206
+msgctxt "addtargetdialog|content_predef"
+msgid "IP addresses"
+msgstr "Alamat IP"
+
+#. CpoEL
+#: sfx2/uiconfig/ui/addtargetdialog.ui:207
+msgctxt "addtargetdialog|content_predef"
+msgid "Dates (Numerical)"
+msgstr "Tanggal (Numerik)"
+
+#. 3Nz2x
+#: sfx2/uiconfig/ui/addtargetdialog.ui:208
+msgctxt "addtargetdialog|content_predef"
+msgid "National Insurance Number (UK)"
+msgstr "Nomor Asuransi Nasional (UK)"
+
+#. jSAay
+#: sfx2/uiconfig/ui/addtargetdialog.ui:209
+msgctxt "addtargetdialog|content_predef"
+msgid "Social Security Number (US)"
+msgstr "Nomor Jaminan Sosial (AS)"
+
+#. kdZJN
+#: sfx2/uiconfig/ui/addtargetdialog.ui:234
+msgctxt "addtargetdialog|checkboxCaseSensitive"
+msgid "Match case"
+msgstr "Cocok huruf besar kecil"
+
+#. G2u3B
+#: sfx2/uiconfig/ui/addtargetdialog.ui:249
+msgctxt "addtargetdialog|checkboxWholeWords"
+msgid "Whole words only"
+msgstr "Hanya kata lengkap"
+
+#. JV66c
+#: sfx2/uiconfig/ui/alienwarndialog.ui:7
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "Confirm File Format"
+msgstr "Konfirmasikan Format Berkas"
+
+#. kia7u
+#: sfx2/uiconfig/ui/alienwarndialog.ui:13
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "This document may contain formatting or content that cannot be saved in the currently selected file format “%FORMATNAME”."
+msgstr "Dokumen ini mungkin memuat pemformatan atau isi yang tak dapat disimpan dalam format berkas “%FORMATNAME” yang kini dipilih."
+
+#. 3YA5c
+#: sfx2/uiconfig/ui/alienwarndialog.ui:14
+msgctxt "alienwarndialog|AlienWarnDialog"
+msgid "Use the default ODF file format to be sure that the document is saved correctly."
+msgstr "Gunakan format berkas ODF baku agar yakin bahwa dokumen disimpan secara benar."
+
+#. ocqdy
+#: sfx2/uiconfig/ui/alienwarndialog.ui:25
+msgctxt "alienwarndialog|cancel"
+msgid "Use %DEFAULTEXTENSION _Format"
+msgstr "Gunakan _Format %DEFAULTEXTENSION"
+
+#. Fzgtz
+#: sfx2/uiconfig/ui/alienwarndialog.ui:40
+msgctxt "alienwarndialog|save"
+msgid "_Use %FORMATNAME Format"
+msgstr "G_unakan Format %FORMATNAME"
+
+#. Fgi6S
+#: sfx2/uiconfig/ui/alienwarndialog.ui:65
+msgctxt "alienwarndialog|ask"
+msgid "_Ask when not saving in ODF or default format"
+msgstr "T_anyakan ketika tak menyimpan dalam format baku ODF"
+
+#. GVVQ6
+#: sfx2/uiconfig/ui/autoredactdialog.ui:24
+msgctxt "autoredactdialog|AutoRedactDialog"
+msgid "Automatic Redaction"
+msgstr "Redaksi Otomatis"
+
+#. QCidi
+#: sfx2/uiconfig/ui/autoredactdialog.ui:122
+msgctxt "autoredactdialog|target"
+msgid "Target Name"
+msgstr "Nama Sasaran"
+
+#. szYkX
+#: sfx2/uiconfig/ui/autoredactdialog.ui:135
+msgctxt "autoredactdialog|description"
+msgid "Type"
+msgstr "Tipe"
+
+#. udcn4
+#: sfx2/uiconfig/ui/autoredactdialog.ui:148
+msgctxt "autoredactdialog|target"
+msgid "Content"
+msgstr "Isi"
+
+#. BBuAc
+#: sfx2/uiconfig/ui/autoredactdialog.ui:161
+msgctxt "autoredactdialog|target"
+msgid "Match case"
+msgstr "Cocok huruf besar kecil"
+
+#. obHtC
+#: sfx2/uiconfig/ui/autoredactdialog.ui:174
+msgctxt "autoredactdialog|target"
+msgid "Whole words"
+msgstr "Seluruh kata"
+
+#. 4MVdG
+#: sfx2/uiconfig/ui/autoredactdialog.ui:202
+msgctxt "menuassignpage|contentslabel"
+msgid "_Redaction Targets"
+msgstr "Sasaran _Redaksi"
+
+#. E4GWo
+#: sfx2/uiconfig/ui/autoredactdialog.ui:222
+msgctxt "autoredactdialog|btnLoadTargets"
+msgid "Load Targets"
+msgstr "Muat Sasaran"
+
+#. tpbYA
+#: sfx2/uiconfig/ui/autoredactdialog.ui:235
+msgctxt "autoredactdialog|btnSaveTargets"
+msgid "Save Targets"
+msgstr "Simpan Sasaran"
+
+#. TQg85
+#: sfx2/uiconfig/ui/autoredactdialog.ui:261
+msgctxt "autoredactdialog|add"
+msgid "Add Target"
+msgstr "Tambah Sasaran"
+
+#. 4TvHR
+#: sfx2/uiconfig/ui/autoredactdialog.ui:274
+msgctxt "autoredactdialog|edit"
+msgid "Edit Target"
+msgstr "Sunting Sasaran"
+
+#. knEqb
+#: sfx2/uiconfig/ui/autoredactdialog.ui:287
+msgctxt "autoredactdialog|delete"
+msgid "Delete Target"
+msgstr "Hapus Sasaran"
+
+#. iLkdK
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:8
+msgctxt "bookmarkdialog|BookmarkDialog"
+msgid "Add to Bookmarks"
+msgstr "Tambah ke Markah"
+
+#. U6BGv
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:83
+msgctxt "bookmarkdialog|alttitle"
+msgid "Rename Bookmark"
+msgstr "Ganti Nama Markah"
+
+#. Fq2rD
+#: sfx2/uiconfig/ui/bookmarkdialog.ui:102
+msgctxt "bookmarkdialog|label2"
+msgid "Bookmark:"
+msgstr "Markah:"
+
+#. 3A3VL
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:12
+msgctxt "bookmarkmenu|display"
+msgid "Display"
+msgstr "Tampilan"
+
+#. VDDCt
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:26
+msgctxt "bookmarkmenu|rename"
+msgid "Rename..."
+msgstr "Ganti Nama..."
+
+#. fCQ9n
+#: sfx2/uiconfig/ui/bookmarkmenu.ui:34
+msgctxt "bookmarkmenu|delete"
+msgid "Delete"
+msgstr "Hapus"
+
+#. WGFBK
+#: sfx2/uiconfig/ui/charmapcontrol.ui:20
+msgctxt "charmapcontrol|label1"
+msgid "Favorites"
+msgstr "Favorit"
+
+#. HAe2e
+#: sfx2/uiconfig/ui/charmapcontrol.ui:261
+msgctxt "charmapcontrol|label2"
+msgid "Recent"
+msgstr "Baru-baru Ini"
+
+#. BQwCQ
+#: sfx2/uiconfig/ui/charmapcontrol.ui:500
+msgctxt "charmapcontrol|specialchardlg"
+msgid "More Characters…"
+msgstr "Karakter Lain..."
+
+#. i2ZhQ
+#: sfx2/uiconfig/ui/charviewmenu.ui:12
+msgctxt "charviewmenu|clearchar"
+msgid "Remove"
+msgstr "Buang"
+
+#. bKHTP
+#: sfx2/uiconfig/ui/charviewmenu.ui:20
+msgctxt "charviewmenu|clearallchar"
+msgid "Clear All"
+msgstr "Bersihkan Semua"
+
+#. Y8jYN
+#: sfx2/uiconfig/ui/checkin.ui:8
+msgctxt "checkin|CheckinDialog"
+msgid "Check-In"
+msgstr "Cek-In"
+
+#. ABZKD
+#: sfx2/uiconfig/ui/checkin.ui:90
+msgctxt "checkin|MajorVersion"
+msgid "New major version"
+msgstr "Versi mayor baru"
+
+#. PYDWP
+#: sfx2/uiconfig/ui/checkin.ui:106
+msgctxt "checkin|label2"
+msgid "Version comment:"
+msgstr "Komentar versi:"
+
+#. CEnTA
+#: sfx2/uiconfig/ui/cmisline.ui:44
+msgctxt "cmisline|type"
+msgid "Type"
+msgstr "Jenis"
+
+#. g2yBR
+#: sfx2/uiconfig/ui/cmisline.ui:59
+msgctxt "cmisline|yes"
+msgid "Yes"
+msgstr "Ya"
+
+#. BWGuL
+#: sfx2/uiconfig/ui/cmisline.ui:73
+msgctxt "cmisline|no"
+msgid "No"
+msgstr "Tidak"
+
+#. kDKBB
+#: sfx2/uiconfig/ui/commandpopup.ui:36
+msgctxt "commandpopup|entry"
+msgid "Search command"
+msgstr "Cari Perintah"
+
+#. w2G7M
+#: sfx2/uiconfig/ui/custominfopage.ui:15
+msgctxt "custominfopage|add"
+msgid "Add _Property"
+msgstr "Tambah _Properti"
+
+#. 85KDm
+#: sfx2/uiconfig/ui/custominfopage.ui:23
+msgctxt "custominfopage|extended_tip|add"
+msgid "Click to add a new row to the Properties list."
+msgstr "Klik untuk menambahkan baris baru ke senarai Properti."
+
+#. aB3bA
+#: sfx2/uiconfig/ui/custominfopage.ui:42
+msgctxt "custominfopage|name"
+msgid "Name"
+msgstr "Nama"
+
+#. Ja2JC
+#: sfx2/uiconfig/ui/custominfopage.ui:55
+msgctxt "custominfopage|type"
+msgid "Type"
+msgstr "Jenis"
+
+#. WxjS6
+#: sfx2/uiconfig/ui/custominfopage.ui:68
+msgctxt "custominfopage|value"
+msgid "Value"
+msgstr "Nilai"
+
+#. kSFdB
+#: sfx2/uiconfig/ui/custominfopage.ui:116
+msgctxt "custominfopage|extended_tip|properties"
+msgid "Enter your custom contents. You can change the name, type, and contents of each row. You can add or remove rows. The items will be exported as metadata to other file formats."
+msgstr "Masukkan konten khusus Anda. Anda dapat mengubah nama, jenis, dan konten setiap baris. Anda dapat menambah atau menghapus baris. Item akan diekspor sebagai metadata ke format berkas lainnya."
+
+#. au5jH
+#: sfx2/uiconfig/ui/custominfopage.ui:138
+msgctxt "custominfopage|extended_tip|CustomInfoPage"
+msgid "Allows you to assign custom information fields to your document."
+msgstr "Memungkinkan Anda menetapkan ruas informasi gubahan ke dokumen Anda."
+
+#. VHwZA
+#: sfx2/uiconfig/ui/deck.ui:101 sfx2/uiconfig/ui/deck.ui:106
+msgctxt "deck|SFX_STR_SIDEBAR_CLOSE_DECK"
+msgid "Close Sidebar Deck"
+msgstr "Tutup Dek Bilah Sisi"
+
+#. pxEPn
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:18
+msgctxt "descriptioninfopage|label27"
+msgid "_Title:"
+msgstr "_Judul:"
+
+#. HqzQo
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:32
+msgctxt "descriptioninfopage|label28"
+msgid "_Subject:"
+msgstr "_Subjek:"
+
+#. gEGPn
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:46
+msgctxt "descriptioninfopage|label29"
+msgid "_Keywords:"
+msgstr "_Kata kunci:"
+
+#. Nayo4
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:61
+msgctxt "descriptioninfopage|label30"
+msgid "_Comments:"
+msgstr "K_omentar:"
+
+#. qw238
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:79
+msgctxt "descriptioninfopage|extended_tip|title"
+msgid "Enter a title for the document."
+msgstr "Masukkan judul untuk dokumen."
+
+#. rvZHi
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:96
+msgctxt "descriptioninfopage|extended_tip|subject"
+msgid "Enter a subject for the document. You can use a subject to group documents with similar contents."
+msgstr "Masukkan subjek untuk dokumen. Anda dapat menggunakan subjek untuk dokumen grup dengan konten serupa."
+
+#. FoxGh
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:113
+msgctxt "descriptioninfopage|extended_tip|keywords"
+msgid "Enter the words that you want to use to index the content of your document. Keywords must be separated by commas. A keyword can contain white space characters or semicolons."
+msgstr "Masukkan kata yang ingin anda gunakan untuk mengindeks konten dokumen Anda. Kata kunci harus dipisahkan dengan koma. Kata kunci dapat berisi karakter spasi dan atau titik koma."
+
+#. bo2q7
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:137
+msgctxt "descriptioninfopage|extended_tip|comments"
+msgid "Enter comments to help identify the document."
+msgstr "Masukkan komentar untuk membantu mengidentifikasi dokumen."
+
+#. sGW3Z
+#: sfx2/uiconfig/ui/descriptioninfopage.ui:150
+msgctxt "descriptioninfopage|extended_tip|DescriptionInfoPage"
+msgid "Contains descriptive information about the document."
+msgstr "Berisi informasi deskriptif tentang dokumen."
+
+#. tC2rt
+#: sfx2/uiconfig/ui/developmenttool.ui:116
+msgctxt "developmenttool|dom_current_selection_toggle-tooltip"
+msgid "Current Selection In Document"
+msgstr "Pemilihan Saat Ini dalam Dokumen"
+
+#. Po2S3
+#: sfx2/uiconfig/ui/developmenttool.ui:117
+msgctxt "developmenttool|dom_current_selection_toggle"
+msgid "Current Selection"
+msgstr "Pemilhan Saat Ini"
+
+#. eB6NR
+#: sfx2/uiconfig/ui/developmenttool.ui:128
+msgctxt "developmenttool|dom_refresh_button-tooltip"
+msgid "Refresh Document Model Tree View"
+msgstr "Muat Ulang Tampilan Pohon Model Dokumen"
+
+#. FD2yt
+#: sfx2/uiconfig/ui/developmenttool.ui:129
+msgctxt "developmenttool|dom_refresh_button"
+msgid "Refresh"
+msgstr "Muat Ulang"
+
+#. qVgcX
+#: sfx2/uiconfig/ui/developmenttool.ui:175
+msgctxt "developmenttool|object"
+msgid "Object"
+msgstr "Objek"
+
+#. x6GLB
+#: sfx2/uiconfig/ui/developmenttool.ui:223
+msgctxt "developmenttool|tooltip-back"
+msgid "Back"
+msgstr "Kembali"
+
+#. SinPk
+#: sfx2/uiconfig/ui/developmenttool.ui:224
+msgctxt "developmenttool|back"
+msgid "Back"
+msgstr "Kembali"
+
+#. 4CBb3
+#: sfx2/uiconfig/ui/developmenttool.ui:236
+msgctxt "developmenttool|tooltip-inspect"
+msgid "Inspect"
+msgstr "Periksa"
+
+#. vCciB
+#: sfx2/uiconfig/ui/developmenttool.ui:237
+msgctxt "developmenttool|inspect"
+msgid "Inspect"
+msgstr "Periksa"
+
+#. nFMXe
+#: sfx2/uiconfig/ui/developmenttool.ui:249
+msgctxt "developmenttool|tooltip-refresh"
+msgid "Refresh"
+msgstr "Muat Ulang"
+
+#. CFuvW
+#: sfx2/uiconfig/ui/developmenttool.ui:250
+msgctxt "developmenttool|refresh"
+msgid "Refresh"
+msgstr "Muat Ulang"
+
+#. 6gFmn
+#: sfx2/uiconfig/ui/developmenttool.ui:273
+msgctxt "developmenttool|classname"
+msgid "Class name:"
+msgstr "Nama Kelas:"
+
+#. a9j7f
+#: sfx2/uiconfig/ui/developmenttool.ui:338
+#: sfx2/uiconfig/ui/developmenttool.ui:387
+#: sfx2/uiconfig/ui/developmenttool.ui:445
+msgctxt "developmenttool|name"
+msgid "Name"
+msgstr "Nama"
+
+#. VFqAa
+#: sfx2/uiconfig/ui/developmenttool.ui:358
+msgctxt "developmenttool|interfaces"
+msgid "Interfaces"
+msgstr "Antarmuka"
+
+#. iCdWe
+#: sfx2/uiconfig/ui/developmenttool.ui:410
+msgctxt "developmenttool|services"
+msgid "Services"
+msgstr "Layanan"
+
+#. H7pYE
+#: sfx2/uiconfig/ui/developmenttool.ui:460
+msgctxt "developmenttool|value"
+msgid "Value"
+msgstr "Nilai"
+
+#. Jjkqh
+#: sfx2/uiconfig/ui/developmenttool.ui:474
+msgctxt "developmenttool|type"
+msgid "Type"
+msgstr "Jenis"
+
+#. zpXuY
+#: sfx2/uiconfig/ui/developmenttool.ui:488
+msgctxt "developmenttool|info"
+msgid "Info"
+msgstr "Informasi"
+
+#. AUktw
+#: sfx2/uiconfig/ui/developmenttool.ui:539
+msgctxt "developmenttool|properties"
+msgid "Properties"
+msgstr "Properti"
+
+#. wGJtn
+#: sfx2/uiconfig/ui/developmenttool.ui:569
+msgctxt "developmenttool|method"
+msgid "Method"
+msgstr "Metode"
+
+#. EnGfg
+#: sfx2/uiconfig/ui/developmenttool.ui:584
+msgctxt "developmenttool|returntype"
+msgid "Return Type"
+msgstr "Jenis Kembalian"
+
+#. AKnSa
+#: sfx2/uiconfig/ui/developmenttool.ui:598
+msgctxt "developmenttool|parameters"
+msgid "Parameters"
+msgstr "Parameter"
+
+#. tmttq
+#: sfx2/uiconfig/ui/developmenttool.ui:612
+msgctxt "developmenttool|implementation_class"
+msgid "Implementation Class"
+msgstr "Kelas Implementasi"
+
+#. Q2CBK
+#: sfx2/uiconfig/ui/developmenttool.ui:634
+msgctxt "developmenttool|methods"
+msgid "Methods"
+msgstr "Metode"
+
+#. 68CBk
+#: sfx2/uiconfig/ui/devtoolsmenu.ui:12
+msgctxt "devtoolsmenu|inspect"
+msgid "Inspect"
+msgstr "Periksa"
+
+#. zjFgn
+#: sfx2/uiconfig/ui/documentfontspage.ui:28
+msgctxt "documentfontspage|embedFonts"
+msgid "_Embed fonts in the document"
+msgstr "Tanamkan fonta dalam dokum_en"
+
+#. FzuRv
+#: sfx2/uiconfig/ui/documentfontspage.ui:36
+msgctxt "documentfontspage|extended_tip|embedFonts"
+msgid "Mark this box to embed document fonts into the document file, for portability between different computer systems."
+msgstr "Tandai kotak ini untuk menanamkan fonta dokumen ke dalam berkas dokumen, untuk portabilitas antara sistem komputer yang berbeda."
+
+#. 6rfon
+#: sfx2/uiconfig/ui/documentfontspage.ui:48
+msgctxt "documentfontspage|embedUsedFonts"
+msgid "_Only embed fonts that are used in documents"
+msgstr "_Hanya tanamkan fonta yang digunakan dalam dokumen"
+
+#. V8E5f
+#: sfx2/uiconfig/ui/documentfontspage.ui:67
+msgctxt "documentfontspage|fontEmbeddingLabel"
+msgid "Font Embedding"
+msgstr "Penanaman Fonta"
+
+#. Gip6V
+#: sfx2/uiconfig/ui/documentfontspage.ui:95
+msgctxt "documentfontspage|embedLatinScriptFonts"
+msgid "_Latin fonts"
+msgstr "Fonta _Latin"
+
+#. nFM92
+#: sfx2/uiconfig/ui/documentfontspage.ui:110
+msgctxt "documentfontspage|embedAsianScriptFonts"
+msgid "_Asian fonts"
+msgstr "Fonta _Asia"
+
+#. nSg9b
+#: sfx2/uiconfig/ui/documentfontspage.ui:125
+msgctxt "documentfontspage|embedComplexScriptFonts"
+msgid "_Complex fonts"
+msgstr "Fonta Kompleks"
+
+#. EFytK
+#: sfx2/uiconfig/ui/documentfontspage.ui:144
+msgctxt "documentfontspage|fontScriptFrameLabel"
+msgid "Font scripts to embed"
+msgstr "Skrip fonta yang akan ditanamkan"
+
+#. izc2Y
+#: sfx2/uiconfig/ui/documentfontspage.ui:158
+msgctxt "documentfontspage|extended_tip|DocumentFontsPage"
+msgid "Embed document fonts in the current file."
+msgstr "Tanamkan  font dokumen di berkas saat ini."
+
+#. CCxGn
+#: sfx2/uiconfig/ui/documentinfopage.ui:19
+msgctxt "documentinfopage|label13"
+msgid "_Created:"
+msgstr "_Dibuat:"
+
+#. EZKmF
+#: sfx2/uiconfig/ui/documentinfopage.ui:33
+msgctxt "documentinfopage|label14"
+msgid "_Modified:"
+msgstr "_Diubah:"
+
+#. 4GLKx
+#: sfx2/uiconfig/ui/documentinfopage.ui:47
+msgctxt "documentinfopage|label15"
+msgid "_Digitally signed:"
+msgstr "Ditandatangani _secara digital:"
+
+#. gJwUC
+#: sfx2/uiconfig/ui/documentinfopage.ui:61
+msgctxt "documentinfopage|label16"
+msgid "Last pri_nted:"
+msgstr "Terakhir di_cetak:"
+
+#. drz3P
+#: sfx2/uiconfig/ui/documentinfopage.ui:75
+msgctxt "documentinfopage|label17"
+msgid "Total _editing time:"
+msgstr "Total waktu p_enyuntingan:"
+
+#. MEzSr
+#: sfx2/uiconfig/ui/documentinfopage.ui:89
+msgctxt "documentinfopage|label18"
+msgid "Re_vision number:"
+msgstr "Nomor re_visi:"
+
+#. BgTqU
+#: sfx2/uiconfig/ui/documentinfopage.ui:131
+msgctxt "documentinfopage|showsigned"
+msgid "Multiply signed document"
+msgstr "Dokumen bertanda tangan ganda"
+
+#. sGFJQ
+#: sfx2/uiconfig/ui/documentinfopage.ui:183
+msgctxt "documentinfopage|userdatacb"
+msgid "_Apply user data"
+msgstr "Ter_apkan data pengguna"
+
+#. JFxmP
+#: sfx2/uiconfig/ui/documentinfopage.ui:197
+msgctxt "documentinfopage|reset"
+msgid "Reset Properties"
+msgstr "Atur Ulang Properti"
+
+#. HrN2U
+#: sfx2/uiconfig/ui/documentinfopage.ui:204
+msgctxt "documentinfopage|extended_tip|reset"
+msgid "Resets the editing time to zero, the creation date to the current date and time, and the version number to 1. The modification and printing dates are also deleted."
+msgstr "Atur ulang waktu penyuntingan ke nol, tanggal pembuatan ke tanggal dan waktu saat ini, dan nomor versi ke 1. Tanggal perubahan dan pencetakan juga dihapus."
+
+#. qeWvU
+#: sfx2/uiconfig/ui/documentinfopage.ui:215
+msgctxt "documentinfopage|signature"
+msgid "Di_gital Signatures..."
+msgstr "Tanda Tangan Di_gital..."
+
+#. rEEgJ
+#: sfx2/uiconfig/ui/documentinfopage.ui:234
+msgctxt "documentinfopage|label11"
+msgid "_Size:"
+msgstr "_Ukuran:"
+
+#. WNFYB
+#: sfx2/uiconfig/ui/documentinfopage.ui:247
+msgctxt "documentinfopage|showsize"
+msgid "unknown"
+msgstr "belum diketahui"
+
+#. EgtLE
+#: sfx2/uiconfig/ui/documentinfopage.ui:262
+msgctxt "documentinfopage|label8"
+msgid "_Location:"
+msgstr "_Lokasi:"
+
+#. 9xhwo
+#: sfx2/uiconfig/ui/documentinfopage.ui:276
+msgctxt "documentinfopage|label7"
+msgid "_Type:"
+msgstr "_Jenis:"
+
+#. ZLmAo
+#: sfx2/uiconfig/ui/documentinfopage.ui:299
+msgctxt "documentinfopage|changepass"
+msgid "Change _Password"
+msgstr "Ubah _Sandi"
+
+#. oqAZE
+#: sfx2/uiconfig/ui/documentinfopage.ui:317
+msgctxt "documentinfopage|templateft"
+msgid "Template:"
+msgstr "Templat:"
+
+#. 5pXPV
+#: sfx2/uiconfig/ui/documentinfopage.ui:366
+msgctxt "documentinfopage|extended_tip|nameed"
+msgid "Displays the file name."
+msgstr "Menampilkan nama berkas."
+
+#. LCDUj
+#: sfx2/uiconfig/ui/documentinfopage.ui:397
+msgctxt "documentinfopage|thumbnailsavecb"
+msgid "Save preview image with this document"
+msgstr "Simpan citra pratinjau dengan dokumen ini"
+
+#. 2GKBr
+#: sfx2/uiconfig/ui/documentinfopage.ui:415
+msgctxt "documentinfopage|image-preferred-dpi-checkbutton"
+msgid "Image preferred DPI"
+msgstr "DPI pilihan citra"
+
+#. VWjRu
+#: sfx2/uiconfig/ui/documentinfopage.ui:479
+msgctxt "documentinfopage|extended_tip|DocumentInfoPage"
+msgid "Contains basic information about the current file."
+msgstr "Berisi informasi dasar tentang berkas saat ini."
+
+#. scgsx
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:8
+msgctxt "documentpropertiesdialog|DocumentPropertiesDialog"
+msgid "Properties of “%1”"
+msgstr "Properti “%1”"
+
+#. iTECQ
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:135
+msgctxt "documentpropertiesdialog|general"
+msgid "General "
+msgstr "Umum "
+
+#. Vggig
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:182
+msgctxt "documentpropertiesdialog|description"
+msgid "Description"
+msgstr "Keterangan"
+
+#. HTaxP
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:230
+msgctxt "documentpropertiesdialog|customprops"
+msgid "Custom Properties"
+msgstr "Properti Tambahan"
+
+#. DccDw
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:278
+msgctxt "documentpropertiesdialog|cmisprops"
+msgid "CMIS Properties"
+msgstr "Properti CMIS"
+
+#. q9i7y
+#: sfx2/uiconfig/ui/documentpropertiesdialog.ui:326
+msgctxt "documentpropertiesdialog|security"
+msgid "Security"
+msgstr "Keamanan"
+
+#. 42uNG
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:7
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "Confirm editing of document"
+msgstr "Konfirmasikan penyuntingan dokumen"
+
+#. bdEZG
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:13
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "Are you sure you want to edit the document?"
+msgstr "Anda yakin ingin menyunting dokumen?"
+
+#. AMrnx
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:14
+msgctxt "editdocumentdialog|EditDocumentDialog"
+msgid "The original file can be signed without editing the document. Existing signatures on the document will be lost in case of saving an edited version."
+msgstr "Berkas asli dapat ditandatangani tanpa menyunting dokumen. Tanda tangan yang ada pada dokumen akan hilang ketika menyimpan versi yang disunting."
+
+#. wRps5
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:25
+msgctxt "editdocumentdialog|edit"
+msgid "Edit Document"
+msgstr "Sunting Dokumen"
+
+#. oWdm6
+#: sfx2/uiconfig/ui/editdocumentdialog.ui:42
+msgctxt "editdocumentdialog|cancel"
+msgid "Cancel"
+msgstr "Batal"
+
+#. hrgcD
+#: sfx2/uiconfig/ui/editdurationdialog.ui:43
+msgctxt "editdurationdialog|EditDurationDialog"
+msgid "Edit Duration"
+msgstr "Sunting Durasi"
+
+#. 66AnB
+#: sfx2/uiconfig/ui/editdurationdialog.ui:132
+msgctxt "editdurationdialog|negative"
+msgid "_Negative"
+msgstr "_Negatif"
+
+#. LeAmz
+#: sfx2/uiconfig/ui/editdurationdialog.ui:149
+msgctxt "editdurationdialog|label1"
+msgid "_Years:"
+msgstr "_Tahun:"
+
+#. kFDdM
+#: sfx2/uiconfig/ui/editdurationdialog.ui:163
+msgctxt "editdurationdialog|label"
+msgid "_Months:"
+msgstr "_Bulan:"
+
+#. CHLhB
+#: sfx2/uiconfig/ui/editdurationdialog.ui:177
+msgctxt "editdurationdialog|label3"
+msgid "_Days:"
+msgstr "_Hari:"
+
+#. 2w5Dd
+#: sfx2/uiconfig/ui/editdurationdialog.ui:191
+msgctxt "editdurationdialog|label4"
+msgid "H_ours:"
+msgstr "_Jam:"
+
+#. TtWAW
+#: sfx2/uiconfig/ui/editdurationdialog.ui:205
+msgctxt "editdurationdialog|label5"
+msgid "Min_utes:"
+msgstr "Me_nit:"
+
+#. TieWF
+#: sfx2/uiconfig/ui/editdurationdialog.ui:219
+msgctxt "editdurationdialog|label6"
+msgid "_Seconds:"
+msgstr "_Detik:"
+
+#. GxEZZ
+#: sfx2/uiconfig/ui/editdurationdialog.ui:233
+msgctxt "editdurationdialog|label7"
+msgid "Millise_conds:"
+msgstr "Milide_tik:"
+
+#. FLFW8
+#: sfx2/uiconfig/ui/editdurationdialog.ui:340
+msgctxt "editdurationdialog|label2"
+msgid "Duration"
+msgstr "Durasi"
+
+#. 9cAb5
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:7
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "No email configuration"
+msgstr "Tidak ada konfigurasi surel"
+
+#. cFct7
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:14
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "%PRODUCTNAME was unable to find a working email configuration."
+msgstr "%PRODUCTNAME tidak dapat menemukan konfigurasi surel yang berfungsi."
+
+#. xQi7X
+#: sfx2/uiconfig/ui/errorfindemaildialog.ui:15
+msgctxt "errorfindemaildialog|ErrorFindEmailDialog"
+msgid "Please save this document locally instead and attach it from within your email client."
+msgstr "Harap simpan dokumen ini secara lokai lalu lampirkan dari dalam klien surel Anda."
+
+#. DVQUS
+#: sfx2/uiconfig/ui/floatingrecord.ui:7
+msgctxt "floatingrecord|FloatingRecord"
+msgid "Record Macro"
+msgstr "Rekam Makro"
+
+#. Fa63R
+#: sfx2/uiconfig/ui/helpbookmarkpage.ui:32
+msgctxt "helpbookmarkpage|label1"
+msgid "_Bookmarks"
+msgstr "_Markah"
+
+#. kZqGE
+#: sfx2/uiconfig/ui/helpbookmarkpage.ui:83
+msgctxt "helpbookmarkpage|display"
+msgid "_Display"
+msgstr "_Tampilan"
+
+#. S7ppr
+#: sfx2/uiconfig/ui/helpcontrol.ui:77
+msgctxt "helpcontrol|contents"
+msgid "Contents"
+msgstr "Isi"
+
+#. vxPLh
+#: sfx2/uiconfig/ui/helpcontrol.ui:126
+msgctxt "helpcontrol|index"
+msgid "Index"
+msgstr "Indeks"
+
+#. HdGQi
+#: sfx2/uiconfig/ui/helpcontrol.ui:176
+msgctxt "helpcontrol|find"
+msgid "Find"
+msgstr "Cari"
+
+#. 7fapN
+#: sfx2/uiconfig/ui/helpcontrol.ui:226
+msgctxt "helpcontrol|bookmarks"
+msgid "Bookmarks"
+msgstr "Markah"
+
+#. UQL8A
+#: sfx2/uiconfig/ui/helpindexpage.ui:30
+msgctxt "helpindexpage|display"
+msgid "_Display"
+msgstr "_Tampilan"
+
+#. 4MkAM
+#: sfx2/uiconfig/ui/helpindexpage.ui:116
+msgctxt "helpindexpage|label1"
+msgid "_Search Term"
+msgstr "_Cari Istilah"
+
+#. wKLbH
+#: sfx2/uiconfig/ui/helpmanual.ui:7
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "%PRODUCTNAME Help Not Installed"
+msgstr "Bantuan %PRODUCTNAME Tidak Terpasang"
+
+#. JBdnz
+#: sfx2/uiconfig/ui/helpmanual.ui:12
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "The %PRODUCTNAME built-in help for current UI language ($UILOCALE) is not installed on your computer."
+msgstr "Bantuan built-in dari %PRODUCTNAME untuk bahasa antarmuka saat ini ($UILOCALE) tidak terpasang pada komputer Anda."
+
+#. DxMPr
+#: sfx2/uiconfig/ui/helpmanual.ui:13
+msgctxt "helpmanual|onlinehelpmanual"
+msgid "You may either install it from our website or your system’s repositories, or read an online version."
+msgstr "Anda dapat memasangnya dari situs web kami atau repositori sistem Anda, atau membaca versi daring."
+
+#. AaeBL
+#: sfx2/uiconfig/ui/helpmanual.ui:23
+msgctxt "helpmanual|website"
+msgid "Read Help Online"
+msgstr "Baca Bantuan Daring"
+
+#. B2Wzh
+#: sfx2/uiconfig/ui/helpmanual.ui:60
+msgctxt "helpmanual|hidedialog"
+msgid "Do not show this dialog again"
+msgstr "Jangan tampilkan dialog ini lagi"
+
+#. 8FjCk
+#: sfx2/uiconfig/ui/helpsearchpage.ui:30
+msgctxt "helpsearchpage|display"
+msgid "_Display"
+msgstr "_Tampilkan"
+
+#. JDsn3
+#: sfx2/uiconfig/ui/helpsearchpage.ui:46
+msgctxt "helpsearchpage|label1"
+msgid "_Search term"
+msgstr "Istilah _pencarian"
+
+#. VRVyq
+#: sfx2/uiconfig/ui/helpsearchpage.ui:122
+msgctxt "helpsearchpage|find"
+msgid "_Find"
+msgstr "_Cari"
+
+#. ZiE8A
+#: sfx2/uiconfig/ui/helpsearchpage.ui:141
+msgctxt "helpsearchpage|completewords"
+msgid "_Complete words only"
+msgstr "Hanya _kata lengkap"
+
+#. vzqdb
+#: sfx2/uiconfig/ui/helpsearchpage.ui:155
+msgctxt "helpsearchpage|headings"
+msgid "Find in _headings only"
+msgstr "Cari _hanya di tajuk"
+
+#. JDZho
+#: sfx2/uiconfig/ui/helpwindow.ui:69
+msgctxt "helpwindow|backward|tooltip_text"
+msgid "Previous Page"
+msgstr "Halaman Sebelumnya"
+
+#. Gv3uP
+#: sfx2/uiconfig/ui/helpwindow.ui:80
+msgctxt "helpwindow|forward|tooltip_text"
+msgid "Next Page"
+msgstr "Halaman Selanjutnya"
+
+#. uaBtK
+#: sfx2/uiconfig/ui/helpwindow.ui:91
+msgctxt "helpwindow|start|tooltip_text"
+msgid "First Page"
+msgstr "Halaman Pertama"
+
+#. TizVY
+#: sfx2/uiconfig/ui/helpwindow.ui:112
+msgctxt "helpwindow|print|tooltip_text"
+msgid "Print"
+msgstr "Cetak"
+
+#. 7wgqt
+#: sfx2/uiconfig/ui/helpwindow.ui:123
+msgctxt "helpwindow|bookmarks|tooltip_text"
+msgid "Add to Bookmarks"
+msgstr "Tambah ke Markah"
+
+#. qPF9A
+#: sfx2/uiconfig/ui/helpwindow.ui:134
+msgctxt "helpwindow|searchdialog|tooltip_text"
+msgid "Find on this Page"
+msgstr "Cari pada Halaman ini"
+
+#. VnXxR
+#: sfx2/uiconfig/ui/infobar.ui:65
+msgctxt "infobar|close|tooltip_text"
+msgid "Close Infobar"
+msgstr "Tutup Bilah Info"
+
+#. DpXCY
+#: sfx2/uiconfig/ui/inputdialog.ui:87
+msgctxt "inputdialog|label"
+msgid "Height:"
+msgstr "Tinggi:"
+
+#. HwHjx
+#: sfx2/uiconfig/ui/licensedialog.ui:8
+msgctxt "licensedialog|LicenseDialog"
+msgid "Licensing and Legal information"
+msgstr "Informasi Lisensi dan Legal"
+
+#. yLwba
+#: sfx2/uiconfig/ui/licensedialog.ui:25
+msgctxt "licensedialog|show"
+msgid "_Show License"
+msgstr "Tampilkan Li_sensi"
+
+#. 3unZa
+#: sfx2/uiconfig/ui/licensedialog.ui:68
+msgctxt "licensedialog|label"
+msgid ""
+"%PRODUCTNAME is made available subject to the terms of the Mozilla Public License, v. 2.0. A copy of the MPL can be obtained at http://mozilla.org/MPL/2.0/.\n"
+"\n"
+"Third Party Code Additional copyright notices and license terms applicable to portions of the Software are set forth in the LICENSE.html file; choose Show License to see exact details in English.\n"
+"\n"
+"All trademarks and registered trademarks mentioned herein are the property of their respective owners.\n"
+"\n"
+"Copyright © 2000–2022 LibreOffice contributors. All rights reserved.\n"
+"\n"
+"This product was created by %OOOVENDOR, based on OpenOffice.org, which is Copyright 2000, 2011 Oracle and/or its affiliates. %OOOVENDOR acknowledges all community members, please see http://www.libreoffice.org/ for more details."
+msgstr ""
+"%PRODUCTNAME tersedia dengan mengikuti ketentuan Mozilla Public License, v. 2.0. Salinan MPL dapat diperoleh di http://mozilla.org/MPL/2.0/.\n"
+"\n"
+"Pemberitahuan hak cipta dan ketentuan lisensi Kode Pihak Ketiga Tambahan yang berlaku untuk bagian-bagian dari Perangkat Lunak ini dituangkan dalam berkas LICENSE.html; pilih Tampilkan Lisensi untuk melihat detail dalam bahasa Inggris.\n"
+"\n"
+"Semua merek dagang dan merek dagang terdaftar yang disebutkan di sini adalah milik dari pemiliknya masing-masing.\n"
+"\n"
+"Hak Cipta © 2000–2022 kontributor LibreOffice. Seluruh hak cipta dilindungi.\n"
+"\n"
+"Produk ini dibuat oleh%OOOVENDOR, berdasarkan OpenOffice.org, yang merupakan Hak Cipta 2000, 2011 Oracle dan/atau afiliasinya. %OOOVENDOR mengakui semua anggota komunitas, silakan lihat http://www.libreoffice.org/ untuk detail lebih lanjut."
+
+#. QuVoN
+#: sfx2/uiconfig/ui/linefragment.ui:57
+msgctxt "linefragment|STR_SFX_REMOVE_PROPERTY"
+msgid "Remove Property"
+msgstr "Buang Properti"
+
+#. 8gPai
+#: sfx2/uiconfig/ui/linefragment.ui:149
+msgctxt "linefragment|SFX_ST_EDIT"
+msgid "..."
+msgstr "..."
+
+#. x4Fjd
+#: sfx2/uiconfig/ui/linefragment.ui:185
+msgctxt "linefragment|yes"
+msgid "Yes"
+msgstr "Ya"
+
+#. mJFyB
+#: sfx2/uiconfig/ui/linefragment.ui:200
+msgctxt "linefragment|no"
+msgid "No"
+msgstr "Tidak"
+
+#. muk9B
+#: sfx2/uiconfig/ui/linkeditdialog.ui:8
+msgctxt "linkeditdialog|title"
+msgid "Modify DDE Link"
+msgstr "Ubah Taut DDE"
+
+#. CZn3G
+#: sfx2/uiconfig/ui/linkeditdialog.ui:102
+msgctxt "linkeditdialog|label2"
+msgid "_Application:"
+msgstr "_Aplikasi:"
+
+#. GZsEX
+#: sfx2/uiconfig/ui/linkeditdialog.ui:116
+msgctxt "linkeditdialog|label3"
+msgid "_File:"
+msgstr "_Berkas:"
+
+#. 6Fx6h
+#: sfx2/uiconfig/ui/linkeditdialog.ui:130
+msgctxt "linkeditdialog|label4"
+msgid "_Category:"
+msgstr "_Kategori:"
+
+#. AzB2M
+#: sfx2/uiconfig/ui/linkeditdialog.ui:148
+msgctxt "linkeditdialog|extended_tip|app"
+msgid "Lists the application that last saved the source file. The office suite applications have the server name soffice."
+msgstr "Menyenaraikan aplikasi yang terakhir menyimpan berkas sumber. Aplikasi paket perkantoran memiliki nama peladen soffice."
+
+#. cj9do
+#: sfx2/uiconfig/ui/linkeditdialog.ui:166
+msgctxt "linkeditdialog|extended_tip|file"
+msgid "Path to the source file. Relative paths must be expressed by full URI, for example, with file://."
+msgstr "Jalur ke berkas sumber. Jalur relatif harus diekspresikan oleh URI lengkap, sebagai contoh, dengan file://."
+
+#. cMPNq
+#: sfx2/uiconfig/ui/linkeditdialog.ui:184
+msgctxt "linkeditdialog|extended_tip|category"
+msgid "Lists the section or object that the link refers to in the source file. If you want, you can enter a new section or object here."
+msgstr "Menampilkan senarai bagian atau objek yang merujuk ke tautan sumber berkas. Jika Anda mau, Anda bisa memasukan seksi atau objek baru disini."
+
+#. hiapi
+#: sfx2/uiconfig/ui/linkeditdialog.ui:199
+msgctxt "linkeditdialog|label1"
+msgid "Modify Link"
+msgstr "Ubah Taut"
+
+#. ba2Tn
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:24
+msgctxt "loadtemplatedialog|LoadTemplateDialog"
+msgid "New"
+msgstr "Baru"
+
+#. MkW3E
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:40
+msgctxt "loadtemplatedialog|fromfile"
+msgid "From File..."
+msgstr "Dari Berkas..."
+
+#. jSrBT
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:45
+msgctxt "loadtemplatedialog|fromfile|tooltip_text"
+msgid "Copy styles from selected external document to current document."
+msgstr "Salin gaya dari dokumen eksternal yang dipilih ke dokumen saat ini."
+
+#. GE236
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:48
+msgctxt "loadtemplatedialog|extended_tip|fromfile"
+msgid "Locate the file containing the styles that you want to load, and then click Open."
+msgstr "Mencari berkas yang mengandung gaya yang Anda ingin muat, dan kemudian klik Buka."
+
+#. YCguC
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:165
+msgctxt "loadtemplatedialog|extended_tip|categories"
+msgid "Lists the available template categories. Click a category to view its contents in the Templates list."
+msgstr "Menampilkan senarai kategori templat yang tersedia. Klik Kategori untuk melihat isinya dalam senarai Templat."
+
+#. PZS7L
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:176
+msgctxt "loadtemplatedialog|label1"
+msgid "Categories"
+msgstr "Kategori"
+
+#. hkGaT
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:230
+msgctxt "loadtemplatedialog|extended_tip|templates"
+msgid "Lists the available templates for the selected category."
+msgstr "Menampilkan senarai templat yang tersedia untuk kategori yang dipilih."
+
+#. hryGV
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:241
+msgctxt "loadtemplatedialog|label2"
+msgid "Templates"
+msgstr "Templat"
+
+#. LAAM3
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:245
+msgctxt "loadtemplatedialog|label2|tooltip_text"
+msgid "Templates in the selected category"
+msgstr "Templat-templat pada kategori yang dipilih"
+
+#. rFENe
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:264
+msgctxt "loadtemplatedialog|text"
+msgid "_Paragraph and Character"
+msgstr "_Paragraf dan Karakter"
+
+#. jCAuA
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:269
+msgctxt "loadtemplatedialog|text|tooltip_text"
+msgid "Copy paragraph and character styles to current document."
+msgstr "Salin gaya paragraf dan karakter ke dokumen saat ini."
+
+#. VLWfZ
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:273
+msgctxt "loadtemplatedialog|extended_tip|text"
+msgid "Loads the paragraph and the character styles from the selected document into the current document."
+msgstr "Banyaknya paragraf dan gaya karakter dari dokumen dipilih ke dalam dokumen saat ini."
+
+#. d2q55
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:284
+msgctxt "loadtemplatedialog|frame"
+msgid "_Frame"
+msgstr "_Bingkai"
+
+#. HSCZj
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:289
+msgctxt "loadtemplatedialog|frame|tooltip_text"
+msgid "Copy frame styles to current document."
+msgstr "Salin gaya bingkai ke dokumen saat ini."
+
+#. 4ZF6u
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:293
+msgctxt "loadtemplatedialog|extended_tip|frame"
+msgid "Loads the frame styles from the selected document into the current document."
+msgstr "Memuat gaya bingkai dari dokumen yang dipilih ke dalam dokumen saat ini."
+
+#. vFZLz
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:304
+msgctxt "loadtemplatedialog|pages"
+msgid "Pa_ge"
+msgstr "Hala_man"
+
+#. hdRo6
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:309
+msgctxt "loadtemplatedialog|pages|tooltip_text"
+msgid "Copy page styles to current document."
+msgstr "Salin gaya halaman ke dokumen saat ini."
+
+#. o2C8c
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:313
+msgctxt "loadtemplatedialog|extended_tip|pages"
+msgid "Loads the page styles from the selected document into the current document."
+msgstr "Banyak gaya halaman dari dokumen dipilih ke dalam dokumen saat ini."
+
+#. 2xgCH
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:324
+msgctxt "loadtemplatedialog|numbering"
+msgid "_List"
+msgstr "_Senarai"
+
+#. VZxbf
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:329
+msgctxt "loadtemplatedialog|numbering|tooltip_text"
+msgid "Copy list styles to current document."
+msgstr "Salin gaya senarai ke dokumen saat ini."
+
+#. PAsEB
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:333
+msgctxt "loadtemplatedialog|extended_tip|numbering"
+msgid "Loads the list styles from the selected document into the current document."
+msgstr "Memuat gaya senarai dari dokumen yang dipilih ke dokumen saat ini."
+
+#. VWzsG
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:344
+msgctxt "loadtemplatedialog|overwrite"
+msgid "_Overwrite"
+msgstr "_Timpa"
+
+#. cr86W
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:350
+msgctxt "loadtemplatedialog|overwrite|tooltip_text"
+msgid "Overwrite styles with same name"
+msgstr "Timpa gaya dengan nama yang sama"
+
+#. A9ogA
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:353
+msgctxt "loadtemplatedialog|extended_tip|overwrite"
+msgid "Replaces styles in the current document that have the same name as the styles you are loading."
+msgstr "Menggantikan gaya dalam dokumen saat ini yang memiliki nama yang sama seperti gaya Anda sedang memuat."
+
+#. 7ru2R
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:376
+msgctxt "loadtemplatedialog|alttitle"
+msgid "Load Styles from Template"
+msgstr "Muat Gaya dari Templat"
+
+#. X5Pi5
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:413
+msgctxt "loadtemplatedialog|label3"
+msgid "Pre_view"
+msgstr "Pra_tinjau"
+
+#. hR7cK
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:419
+msgctxt "loadtemplatedialog|extended_tip|expander"
+msgid "Shows or hides a preview of a selected template."
+msgstr "Menampilkan atau menyembunyikan pratinjau dari suatu templat yang dipilih."
+
+#. CRcca
+#: sfx2/uiconfig/ui/loadtemplatedialog.ui:449
+msgctxt "loadtemplatedialog|extended_tip|LoadTemplateDialog"
+msgid "Imports formatting styles from another document or template into the current document."
+msgstr "Mengimpor pemformatan gaya dari dokumen lain atau templat ke dalam dokumen saat ini."
+
+#. EAhup
+#: sfx2/uiconfig/ui/managestylepage.ui:33
+msgctxt "managestylepage|nameft"
+msgid "_Name:"
+msgstr "_Nama:"
+
+#. VroAG
+#: sfx2/uiconfig/ui/managestylepage.ui:47
+msgctxt "managestylepage|nextstyleft"
+msgid "Ne_xt style:"
+msgstr "Ga_ya selanjutnya:"
+
+#. mJYgm
+#: sfx2/uiconfig/ui/managestylepage.ui:61
+msgctxt "managestylepage|linkedwithft"
+msgid "Inherit from:"
+msgstr "Warisi dari:"
+
+#. 9pGL9
+#: sfx2/uiconfig/ui/managestylepage.ui:75
+msgctxt "managestylepage|categoryft"
+msgid "_Category:"
+msgstr "_Kategori:"
+
+#. MMhJQ
+#: sfx2/uiconfig/ui/managestylepage.ui:99
+msgctxt "managestylepage|editstyle"
+msgid "Edit Style"
+msgstr "Sunting Gaya"
+
+#. 7XGEs
+#: sfx2/uiconfig/ui/managestylepage.ui:123
+msgctxt "managestylepage|editlinkstyle"
+msgid "Edit Style"
+msgstr "Sunting Gaya"
+
+#. cKjrA
+#: sfx2/uiconfig/ui/managestylepage.ui:147
+msgctxt "managestylepage|autoupdate"
+msgid "_AutoUpdate"
+msgstr "Pemb_aharuan Otomatis"
+
+#. oTXJz
+#: sfx2/uiconfig/ui/managestylepage.ui:192
+msgctxt "managestylepage|label1"
+msgid "Style"
+msgstr "Gaya"
+
+#. NXG9o
+#: sfx2/uiconfig/ui/managestylepage.ui:227
+msgctxt "managestylepage|label2"
+msgid "Contains"
+msgstr "Mengandung"
+
+#. WJunC
+#: sfx2/uiconfig/ui/newstyle.ui:16
+msgctxt "newstyle|CreateStyleDialog"
+msgid "New Style from Selection"
+msgstr "Gaya Baru dari Pemilihan"
+
+#. 2XkTt
+#: sfx2/uiconfig/ui/newstyle.ui:140
+msgctxt "newstyle|styles-atkobject"
+msgid "Custom styles for selected category"
+msgstr "Gaya gubahan untuk kategori yang dipilih"
+
+#. UEGSg
+#: sfx2/uiconfig/ui/newstyle.ui:160
+msgctxt "newstyle|stylename-atkobject"
+msgid "Style name"
+msgstr "Nama gaya"
+
+#. bjN3T
+#: sfx2/uiconfig/ui/newstyle.ui:175
+msgctxt "newstyle|categorylabel"
+msgid "Custom styles for current document"
+msgstr "Gaya gubahan untuk dokumen saat ini"
+
+#. 6mnDS
+#: sfx2/uiconfig/ui/newstyle.ui:191
+msgctxt "newstyle|label1"
+msgid "Enter new style name:"
+msgstr "Ketikkan nama gaya baru:"
+
+#. R6zJz
+#: sfx2/uiconfig/ui/notebookbar.ui:74
+msgctxt "notebookbar|label9"
+msgid "File"
+msgstr "Berkas"
+
+#. QAUXF
+#: sfx2/uiconfig/ui/optprintpage.ui:35
+msgctxt "optprintpage|printer"
+msgid "_Printer"
+msgstr "_Pencetak"
+
+#. PUG9y
+#: sfx2/uiconfig/ui/optprintpage.ui:44
+msgctxt "extended_tip|printer"
+msgid "Specifies whether the print settings apply to direct printing or to printing to a file."
+msgstr "Menentukan apakah pengaturan cetak berlaku untuk pencetakan langsung atau mencetak ke file."
+
+#. Eyv8g
+#: sfx2/uiconfig/ui/optprintpage.ui:55
+msgctxt "optprintpage|file"
+msgid "Print to _file"
+msgstr "Cetak ke _berkas"
+
+#. TMHvE
+#: sfx2/uiconfig/ui/optprintpage.ui:64
+msgctxt "extended_tip|file"
+msgid "Specifies whether the print settings apply to direct printing or to printing to a file."
+msgstr "Menentukan apakah pengaturan cetak berlaku untuk pencetakan langsung atau mencetak ke file."
+
+#. C8jvp
+#: sfx2/uiconfig/ui/optprintpage.ui:79
+msgctxt "optprintpage|label4"
+msgid "Settings for"
+msgstr "Pengaturan untuk"
+
+#. 2T5Af
+#: sfx2/uiconfig/ui/optprintpage.ui:109
+msgctxt "optprintpage|papersize"
+msgid "P_aper size"
+msgstr "Ukur_an kertas"
+
+#. yj4DA
+#: sfx2/uiconfig/ui/optprintpage.ui:117
+msgctxt "extended_tip|papersize"
+msgid "Mark this check box if a certain paper size is needed for printing the current document."
+msgstr "Tandai kotak centang ini jika ukuran kertas tertentu diperlukan untuk mencetak dokumen saat ini."
+
+#. stDFq
+#: sfx2/uiconfig/ui/optprintpage.ui:128
+msgctxt "optprintpage|paperorient"
+msgid "Pap_er orientation"
+msgstr "Orientasi k_ertas"
+
+#. FdFNk
+#: sfx2/uiconfig/ui/optprintpage.ui:136
+msgctxt "extended_tip|paperorient"
+msgid "Mark this check box if you need a certain paper orientation for printing the current document."
+msgstr "Tandai kotak centang ini jika Anda memerlukan orientasi kertas tertentu untuk mencetak dokumen saat ini."
+
+#. L6rtF
+#: sfx2/uiconfig/ui/optprintpage.ui:147
+msgctxt "optprintpage|trans"
+msgid "_Transparency"
+msgstr "_Transparansi"
+
+#. F6nF9
+#: sfx2/uiconfig/ui/optprintpage.ui:155
+msgctxt "extended_tip|trans"
+msgid "Mark this check box if you always want to be warned if transparent objects are contained in the document."
+msgstr "Tandai kotak centang ini jika Anda selalu ingin diperingatkan jika objek transparan terdapat dalam dokumen."
+
+#. C5jZN
+#: sfx2/uiconfig/ui/optprintpage.ui:170
+msgctxt "optprintpage|label2"
+msgid "Warnings"
+msgstr "Peringatan"
+
+#. PJFLE
+#: sfx2/uiconfig/ui/optprintpage.ui:198
+msgctxt "optprintpage|reducegrad"
+msgid "Reduce _gradient"
+msgstr "Kurangi _gradien"
+
+#. GC8dk
+#: sfx2/uiconfig/ui/optprintpage.ui:206
+msgctxt "extended_tip|reducegrad"
+msgid "If this field is marked, gradients are printed with reduced quality."
+msgstr "Jika ruas ini ditandai, gradien dicetak dengan penurunan kualitas."
+
+#. skDME
+#: sfx2/uiconfig/ui/optprintpage.ui:230
+msgctxt "optprintpage|reducegradstripes"
+msgid "Gradient _stripes:"
+msgstr "Gari_s-garis gradien:"
+
+#. k8zh7
+#: sfx2/uiconfig/ui/optprintpage.ui:239
+msgctxt "extended_tip|reducegradstripes"
+msgid "Specifies the maximum number of gradient stripes for printing."
+msgstr "Menentukan jumlah maksimum gradien garis untuk mencetak."
+
+#. 5HCxT
+#: sfx2/uiconfig/ui/optprintpage.ui:257
+msgctxt "extended_tip|reducegradstep"
+msgid "Specifies the maximum number of gradient stripes for printing."
+msgstr "Menentukan jumlah maksimum gradien garis untuk mencetak."
+
+#. W8LE7
+#: sfx2/uiconfig/ui/optprintpage.ui:274
+msgctxt "optprintpage|reducegradcolor"
+msgid "Intermediate _color"
+msgstr "Warna in_termediet"
+
+#. TUbxx
+#: sfx2/uiconfig/ui/optprintpage.ui:283
+msgctxt "extended_tip|reducegradcolor"
+msgid "Specifies that gradients are only printed in a single intermediate color."
+msgstr "Menentukan bahwa gradien hanya dicetak dalam satu warna menengah."
+
+#. myMLR
+#: sfx2/uiconfig/ui/optprintpage.ui:304
+msgctxt "optprintpage|label1"
+msgid "Reduce Gradient"
+msgstr "Kurangi Gradien"
+
+#. abbre
+#: sfx2/uiconfig/ui/optprintpage.ui:312
+msgctxt "extended_tip|frame2"
+msgid "Defines which warnings appear before printing begins."
+msgstr "Tetapkan peringatan mana yang muncul sebelum pencetakan dimulai."
+
+#. ySmQe
+#: sfx2/uiconfig/ui/optprintpage.ui:337
+msgctxt "optprintpage|reducebitmap"
+msgid "Reduce _bitmaps"
+msgstr "Kurangi _bitmap"
+
+#. nNjfk
+#: sfx2/uiconfig/ui/optprintpage.ui:345
+msgctxt "extended_tip|reducebitmap"
+msgid "Specifies that bitmaps are printed with reduced quality. The resolution can only be reduced and not increased."
+msgstr "Menentukan bahwa bitmaps dicetak dengan penurunan kualitas. Resolusi hanya dapat dikurangi dan tidak dapat meningkat."
+
+#. qF2KM
+#: sfx2/uiconfig/ui/optprintpage.ui:363
+msgctxt "optprintpage|reducebitmapnormal"
+msgid "N_ormal print quality"
+msgstr "Kualitas cetak n_ormal"
+
+#. i5T3j
+#: sfx2/uiconfig/ui/optprintpage.ui:372
+msgctxt "extended_tip|reducebitmapnormal"
+msgid "High print quality corresponds to a resolution of 300dpi. Normal print quality corresponds to a resolution of 200dpi. "
+msgstr "Kualitas cetak tinggi sesuai dengan resolusi 300dpi. Kualitas cetak yang normal sesuai dengan resolusi 200dpi. "
+
+#. EZGK5
+#: sfx2/uiconfig/ui/optprintpage.ui:389
+msgctxt "optprintpage|reducebitmapresol"
+msgid "Reso_lution:"
+msgstr "Reso_lusi:"
+
+#. q3aJL
+#: sfx2/uiconfig/ui/optprintpage.ui:398
+msgctxt "extended_tip|reducebitmapresol"
+msgid "Specifies the maximum print quality in dpi. The resolution can only be reduced and not increased."
+msgstr "Menentukan kualitas cetak maksimum di dpi. Resolusi hanya dapat dikurangi dan tidak meningkat."
+
+#. 6ALtE
+#: sfx2/uiconfig/ui/optprintpage.ui:412
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "72 DPI"
+msgstr "72 DPI"
+
+#. FgpJ3
+#: sfx2/uiconfig/ui/optprintpage.ui:413
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "96 DPI"
+msgstr "96 DPI"
+
+#. d7BqR
+#: sfx2/uiconfig/ui/optprintpage.ui:414
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "150 DPI (Fax)"
+msgstr "150 DPI (Faks)"
+
+#. 46imh
+#: sfx2/uiconfig/ui/optprintpage.ui:415
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "200 DPI (default)"
+msgstr "200 DPI (standar)"
+
+#. AsLSp
+#: sfx2/uiconfig/ui/optprintpage.ui:416
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "300 DPI"
+msgstr "300 DPI"
+
+#. qZJg5
+#: sfx2/uiconfig/ui/optprintpage.ui:417
+msgctxt "optprintpage|reducebitmapdpi"
+msgid "600 DPI"
+msgstr "600 DPI"
+
+#. 8KFUc
+#: sfx2/uiconfig/ui/optprintpage.ui:421
+msgctxt "extended_tip|reducebitmapdpi"
+msgid "Specifies the maximum print quality in dpi. The resolution can only be reduced and not increased."
+msgstr "Menentukan kualitas cetak maksimum di dpi. Resolusi hanya dapat dikurangi dan tidak meningkat."
+
+#. YXTXc
+#: sfx2/uiconfig/ui/optprintpage.ui:438
+msgctxt "optprintpage|reducebitmapoptimal"
+msgid "_High print quality"
+msgstr "Kua_litas cetak tinggi"
+
+#. BdCpv
+#: sfx2/uiconfig/ui/optprintpage.ui:447
+msgctxt "extended_tip|reducebitmapoptimal"
+msgid "High print quality corresponds to a resolution of 300dpi. Normal print quality corresponds to a resolution of 200dpi. "
+msgstr "Kualitas cetak tinggi sesuai dengan resolusi 300dpi. Kualitas cetak yang normal sesuai dengan resolusi 200dpi. "
+
+#. YxX2s
+#: sfx2/uiconfig/ui/optprintpage.ui:468
+msgctxt "optprintpage|label1"
+msgid "Reduce Bitmaps"
+msgstr "Kurangi Bitmap"
+
+#. 5qQBR
+#: sfx2/uiconfig/ui/optprintpage.ui:496
+msgctxt "optprintpage|reducetrans"
+msgid "_Reduce transparency"
+msgstr "Ku_rangi transparansi"
+
+#. yDstT
+#: sfx2/uiconfig/ui/optprintpage.ui:504
+msgctxt "extended_tip|reducetrans"
+msgid "If you mark this field the transparent objects will be printed like normal, non-transparent objects, depending on your selection in the following two option buttons."
+msgstr "Jika Anda menandai ruas ini, objek transparan akan dicetak seperti biasa, yaitu sepertti objek tidak transparan, tergantung pada pilihan Anda dalam dua tombol pilihan berikut."
+
+#. B4C76
+#: sfx2/uiconfig/ui/optprintpage.ui:522
+msgctxt "optprintpage|reducetransauto"
+msgid "Auto_matically"
+msgstr "Secara oto_matis"
+
+#. ehRjn
+#: sfx2/uiconfig/ui/optprintpage.ui:531
+msgctxt "extended_tip|reducetransauto"
+msgid "Specifies that the transparency is only printed if the transparent area covers less than a quarter of the entire page."
+msgstr "Menentukan bahwa transparansi hanya dicetak jika wilayah transparan mencakup kurang dari seperempat dari seluruh halaman."
+
+#. K7P4C
+#: sfx2/uiconfig/ui/optprintpage.ui:542
+msgctxt "optprintpage|reducetransnone"
+msgid "_No transparency"
+msgstr "Ta_npa transparansi"
+
+#. ZuLVY
+#: sfx2/uiconfig/ui/optprintpage.ui:551
+msgctxt "extended_tip|reducetransnone"
+msgid "With this option transparency is never printed."
+msgstr "Dengan transparansi pilihan ini tidak pernah dicetak."
+
+#. B5Cpd
+#: sfx2/uiconfig/ui/optprintpage.ui:572
+msgctxt "optprintpage|label1"
+msgid "Reduce Transparency"
+msgstr "Kurangi Transparansi"
+
+#. GAFzh
+#: sfx2/uiconfig/ui/optprintpage.ui:600
+msgctxt "optprintpage|pdf"
+msgid "_PDF as standard print job format"
+msgstr "_PDF sebagai format tugas cetak standar"
+
+#. wm7C7
+#: sfx2/uiconfig/ui/optprintpage.ui:614
+msgctxt "optprintpage|converttogray"
+msgid "Con_vert colors to grayscale"
+msgstr "Kon_versi warna ke skala abu-abu"
+
+#. UNSqH
+#: sfx2/uiconfig/ui/optprintpage.ui:622
+msgctxt "extended_tip|converttogray"
+msgid "Specifies that all colors are printed only as grayscale."
+msgstr "Menentukan bahwa semua warna dicetak hanya sebagai skala abu-abu."
+
+#. CrFLq
+#: sfx2/uiconfig/ui/optprintpage.ui:633
+msgctxt "optprintpage|reducebitmaptrans"
+msgid "Include transparent objects"
+msgstr "Sertakan objek transparan"
+
+#. FFAFJ
+#: sfx2/uiconfig/ui/optprintpage.ui:641
+msgctxt "extended_tip|reducebitmaptrans"
+msgid "If this field is marked, the reduction in print quality for bitmaps also applies to the transparent areas of objects."
+msgstr "Jika ruas ini ditandai, pengurangan kualitas cetak untuk bitmap juga berlaku untuk wilayah objek transparan."
+
+#. bWPko
+#: sfx2/uiconfig/ui/optprintpage.ui:656
+msgctxt "optprintpage|label4"
+msgid "Defaults"
+msgstr "Baku"
+
+#. mMKbc
+#: sfx2/uiconfig/ui/optprintpage.ui:678
+msgctxt "extended_tip|OptPrintPage"
+msgid "Specifies the print setting options."
+msgstr "Menentukan pilihan pengaturan cetak."
+
+#. NEo7g
+#: sfx2/uiconfig/ui/panel.ui:73 sfx2/uiconfig/ui/panel.ui:78
+msgctxt "panel|SFX_STR_SIDEBAR_MORE_OPTIONS"
+msgid "More Options"
+msgstr "Lebih Banyak Pilihan"
+
+#. QrtGb
+#: sfx2/uiconfig/ui/password.ui:8
+msgctxt "password|PasswordDialog"
+msgid "Enter Password"
+msgstr "Masukkan Sandi"
+
+#. gATKy
+#: sfx2/uiconfig/ui/password.ui:102
+msgctxt "password|userft"
+msgid "User:"
+msgstr "Pengguna:"
+
+#. FRqiZ
+#: sfx2/uiconfig/ui/password.ui:116
+msgctxt "password|pass1ft"
+msgid "Password:"
+msgstr "Sandi:"
+
+#. HE8mc
+#: sfx2/uiconfig/ui/password.ui:130
+msgctxt "password|confirm1ft"
+msgid "Confirm:"
+msgstr "Konfirmasi:"
+
+#. EFJRk
+#: sfx2/uiconfig/ui/password.ui:164
+msgctxt "password|pass1ed-atkobject"
+msgid "Password"
+msgstr "Sandi"
+
+#. yVorz
+#: sfx2/uiconfig/ui/password.ui:165
+msgctxt "password|extended_tip|pass1ed"
+msgid "Type a password. A password is case sensitive."
+msgstr "Ketik sandi. Sandi sangat sensitif dalam hal besar/kecilnya karakter."
+
+#. kEcVk
+#: sfx2/uiconfig/ui/password.ui:185
+msgctxt "password|extended_tip|confirm1ed"
+msgid "Re-enter the password."
+msgstr "Masukkan kembali kata sandi."
+
+#. JBCUB
+#: sfx2/uiconfig/ui/password.ui:200
+msgctxt "password|label1"
+msgid "Password"
+msgstr "Sandi"
+
+#. zDBUt
+#: sfx2/uiconfig/ui/password.ui:232
+msgctxt "password|pass2ft"
+msgid "Password:"
+msgstr "Sandi:"
+
+#. 8RcEw
+#: sfx2/uiconfig/ui/password.ui:246
+msgctxt "password|confirm2ft"
+msgid "Confirm:"
+msgstr "Konfirmasi:"
+
+#. EkHiq
+#: sfx2/uiconfig/ui/password.ui:267
+msgctxt "password|extended_tip|pass2ed"
+msgid "Type a password. A password is case sensitive."
+msgstr "Ketik sandi. Sandi sangat sensitif dalam hal besar/kecilnya karakter."
+
+#. c4nGS
+#: sfx2/uiconfig/ui/password.ui:287
+msgctxt "password|extended_tip|confirm2ed"
+msgid "Re-enter the password."
+msgstr "Masukkan kembali kata sandi."
+
+#. mCxpj
+#: sfx2/uiconfig/ui/password.ui:302
+msgctxt "password|label2"
+msgid "Second Password"
+msgstr "Sandi Kedua"
+
+#. JZhHV
+#: sfx2/uiconfig/ui/password.ui:338
+msgctxt "password|onlyascii"
+msgid "Only Basic Latin characters can be entered"
+msgstr "Hanya karakter Latin Dasar yang dapat dimasukkan"
+
+#. AFsUP
+#: sfx2/uiconfig/ui/printeroptionsdialog.ui:8
+msgctxt "printeroptionsdialog|PrinterOptionsDialog"
+msgid "Printer Options"
+msgstr "Pilihan Pencetak"
+
+#. oAzTR
+#: sfx2/uiconfig/ui/querysavedialog.ui:7
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Save Document?"
+msgstr "Simpan Dokumen?"
+
+#. wFiA8
+#: sfx2/uiconfig/ui/querysavedialog.ui:13
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Save changes to document “$(DOC)” before closing?"
+msgstr "Simpan perubahan ke dokumen “$(DOC)” sebelum menutup?"
+
+#. 7mtVz
+#: sfx2/uiconfig/ui/querysavedialog.ui:14
+msgctxt "querysavedialog|QuerySaveDialog"
+msgid "Your changes will be lost if you don’t save them."
+msgstr "Perubahan yang Anda buat akan hilang bila tidak Anda simpan."
+
+#. sQCdE
+#: sfx2/uiconfig/ui/querysavedialog.ui:25
+msgctxt "querysavedialog|discard"
+msgid "Do_n’t Save"
+msgstr "Ja_ngan Simpan"
+
+#. dzVqL
+#: sfx2/uiconfig/ui/querysavedialog.ui:56
+msgctxt "querysavedialog|save"
+msgid "_Save"
+msgstr "_Simpan"
+
+#. 6WbvE
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:7
+msgctxt "safemodequerydialog|SafeModeQueryDialog"
+msgid "Enter Safe Mode"
+msgstr "Masuk Modus Aman"
+
+#. esgus
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:12
+msgctxt "safemodequerydialog|label"
+msgid "Are you sure you want to restart %PRODUCTNAME and enter safe mode?"
+msgstr "Apakah Anda yakin hendak memulai ulang %PRODUCTNAME dan masuk ke modus aman?"
+
+#. DpN8R
+#: sfx2/uiconfig/ui/safemodequerydialog.ui:40
+msgctxt "safemodequerydialog|restart"
+msgid "_Restart"
+msgstr "_Mulai Ulang"
+
+#. ejCo9
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:14
+msgctxt "saveastemplatedlg|SaveAsTemplateDialog"
+msgid "Save As Template"
+msgstr "Simpan Sebagai Templat"
+
+#. Gjb3A
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:102
+msgctxt "saveastemplatedlg|create_label"
+msgid "Enter Template _Name:"
+msgstr "Masukkan _Nama Templat:"
+
+#. NyFdH
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:103
+msgctxt "saveastemplatedlg|create_label"
+msgid "Enter a name for the template."
+msgstr "Masukkan nama untuk templat ini."
+
+#. Xo6BH
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:126
+msgctxt "saveastemplatedlg|extended_tip|name_entry"
+msgid "Enter a name for the template."
+msgstr "Masukkan nama untuk templat ini."
+
+#. GLDum
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:154
+msgctxt "saveastemplatedlg|select_label"
+msgid "Select Template _Category:"
+msgstr "Pilih _Kategori Templat:"
+
+#. 4ANkg
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:155
+msgctxt "saveastemplatedlg|select_label"
+msgid "Save template in selected category."
+msgstr "Simpan templat di dalam kategori terpilih"
+
+#. JBPKb
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:203
+msgctxt "saveastemplatedlg|extended_tip|categorylb"
+msgid "Select a category in which to save the new template."
+msgstr "Pilih kategori untuk menyimpan templat baru."
+
+#. wpZGc
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:223
+msgctxt "saveastemplatedlg|defaultcb"
+msgid "_Set as default template"
+msgstr "Ja_dikan sebagai templat baku"
+
+#. syB4y
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:231
+msgctxt "saveastemplatedlg|extended_tip|defaultcb"
+msgid "The new template will be used as the default template."
+msgstr "Templat baru akan digunakan sebagai templat baku."
+
+#. gH8PB
+#: sfx2/uiconfig/ui/saveastemplatedlg.ui:259
+msgctxt "saveastemplatedlg|extended_tip|SaveAsTemplateDialog"
+msgid "Saves the current document as a template."
+msgstr "Simpan dokumen saat ini sebagai templat."
+
+#. 9tSnA
+#: sfx2/uiconfig/ui/searchdialog.ui:8
+msgctxt "searchdialog|SearchDialog"
+msgid "Find on this Page"
+msgstr "Cari pada Halaman ini"
+
+#. LAKYg
+#: sfx2/uiconfig/ui/searchdialog.ui:26
+msgctxt "searchdialog|search"
+msgid "_Find"
+msgstr "_Cari"
+
+#. G5Qc9
+#: sfx2/uiconfig/ui/searchdialog.ui:99
+msgctxt "searchdialog|label1"
+msgid "_Search for:"
+msgstr "_Cari tentang:"
+
+#. TY5bL
+#: sfx2/uiconfig/ui/searchdialog.ui:125
+msgctxt "searchdialog|matchcase"
+msgid "Ma_tch case"
+msgstr "_Cocok besar kecil huruf"
+
+#. B2ksn
+#: sfx2/uiconfig/ui/searchdialog.ui:139
+msgctxt "searchdialog|wholewords"
+msgid "Whole wor_ds only"
+msgstr "_Hanya kata yang lengkap"
+
+#. ycWSx
+#: sfx2/uiconfig/ui/searchdialog.ui:153
+msgctxt "searchdialog|backwards"
+msgid "Bac_kwards"
+msgstr "Mundu_r"
+
+#. C7fSt
+#: sfx2/uiconfig/ui/searchdialog.ui:167
+msgctxt "searchdialog|wrap"
+msgid "Wrap _around"
+msgstr "Putar dari _awal"
+
+#. onEmh
+#: sfx2/uiconfig/ui/securityinfopage.ui:22
+msgctxt "securityinfopage|readonly"
+msgid "_Open file read-only"
+msgstr "_Buka berkas hanya untuk dibaca"
+
+#. HCEUE
+#: sfx2/uiconfig/ui/securityinfopage.ui:31
+msgctxt "securityinfopage|extended_tip|readonly"
+msgid "Select to allow this document to be opened in read-only mode only."
+msgstr "Pilih untuk mengizinkan dokumen ini dibuka hanya dalam modus baca-saja."
+
+#. GvCw9
+#: sfx2/uiconfig/ui/securityinfopage.ui:42
+msgctxt "securityinfopage|recordchanges"
+msgid "Record _changes"
+msgstr "_Rekam perubahan"
+
+#. pNhop
+#: sfx2/uiconfig/ui/securityinfopage.ui:50
+msgctxt "securityinfopage|extended_tip|recordchanges"
+msgid "Select to enable recording changes. This is the same as Edit - Track Changes - Record."
+msgstr "Pilih untuk mengaktifkan perekaman perubahan. Hal ini sama dengan Sunting - Lacak Perubahan - Rekam."
+
+#. Nv8rA
+#: sfx2/uiconfig/ui/securityinfopage.ui:66
+msgctxt "securityinfopage|protect"
+msgid "Protect..."
+msgstr "Lindungi..."
+
+#. 6T6ZP
+#: sfx2/uiconfig/ui/securityinfopage.ui:72
+msgctxt "securityinfopage|extended_tip|protect"
+msgid "Protects the change recording state with a password. If change recording is protected for the current document, the button is named Unprotect. Click Unprotect and type the correct password to disable the protection."
+msgstr "Melindungi status perubahan rekaman dengan kata sandi. Jika perubahan rekaman dilindungi untuk dokumen saat ini, tombol tersebut dinamai Tidak Terlindungi .klik Hapus Perlindungan dan ketik kata sandi yang benar untuk menonaktifkan perlindungan."
+
+#. jgWP4
+#: sfx2/uiconfig/ui/securityinfopage.ui:84
+msgctxt "securityinfopage|unprotect"
+msgid "_Unprotect..."
+msgstr "Hap_us Perlindungan..."
+
+#. UEdGx
+#: sfx2/uiconfig/ui/securityinfopage.ui:91
+msgctxt "securityinfopage|extended_tip|unprotect"
+msgid "Protects the change recording state with a password. If change recording is protected for the current document, the button is named Unprotect. Click Unprotect and type the correct password to disable the protection."
+msgstr "Melindungi status perubahan rekaman dengan kata sandi. Jika perubahan rekaman dilindungi untuk dokumen saat ini, tombol tersebut dinamai Klik Lepas Lindungan dan ketik kata sandi yang benar untuk mematikan perlindungan."
+
+#. JNezG
+#: sfx2/uiconfig/ui/securityinfopage.ui:113
+msgctxt "securityinfopage|label47"
+msgid "File Sharing Options"
+msgstr "Pilihan Berbagi Berkas"
+
+#. VXrJ5
+#: sfx2/uiconfig/ui/securityinfopage.ui:121
+msgctxt "securityinfopage|extended_tip|SecurityInfoPage"
+msgid "Sets password options for the current document."
+msgstr "Menetapkan pilihan kata sandi untuk dokumen saat ini."
+
+#. EDC9x
+#: sfx2/uiconfig/ui/startcenter.ui:17
+msgctxt "startcenter|clear_all"
+msgid "Clear Recent Documents"
+msgstr "Bersihkan Dokumen Terkini"
+
+#. gCfQ9
+#: sfx2/uiconfig/ui/startcenter.ui:38
+msgctxt "startcenter|filter_writer"
+msgid "Writer Templates"
+msgstr "Templat Writer"
+
+#. kj5ts
+#: sfx2/uiconfig/ui/startcenter.ui:45
+msgctxt "startcenter|filter_calc"
+msgid "Calc Templates"
+msgstr "Templat Calc"
+
+#. HEYvU
+#: sfx2/uiconfig/ui/startcenter.ui:52
+msgctxt "startcenter|filter_impress"
+msgid "Impress Templates"
+msgstr "Templat Impress"
+
+#. uWEpu
+#: sfx2/uiconfig/ui/startcenter.ui:59
+msgctxt "startcenter|filter_draw"
+msgid "Draw Templates"
+msgstr "Templat Draw"
+
+#. e3TH8
+#: sfx2/uiconfig/ui/startcenter.ui:72
+msgctxt "startcenter|manage"
+msgid "Manage Templates"
+msgstr "Kelola Templat"
+
+#. isnw8
+#: sfx2/uiconfig/ui/startcenter.ui:151
+msgctxt "startcenter|open_all"
+msgid "_Open File"
+msgstr "B_uka Berkas"
+
+#. 6zjop
+#: sfx2/uiconfig/ui/startcenter.ui:172
+msgctxt "startcenter|open_remote"
+msgid "Remote File_s"
+msgstr "Berka_s Jauh"
+
+#. ZUnZ9
+#: sfx2/uiconfig/ui/startcenter.ui:205
+msgctxt "startcenter|open_recent"
+msgid "_Recent Documents"
+msgstr "_Dokumen Terkini"
+
+#. BnkvG
+#: sfx2/uiconfig/ui/startcenter.ui:229
+msgctxt "startcenter|templates_all"
+msgid "T_emplates"
+msgstr "T_emplat"
+
+#. JEkqY
+#: sfx2/uiconfig/ui/startcenter.ui:270
+msgctxt "startcenter|create_label"
+msgid "Create:"
+msgstr "Buat:"
+
+#. SY4iY
+#: sfx2/uiconfig/ui/startcenter.ui:281
+msgctxt "startcenter|writer_all"
+msgid "_Writer Document"
+msgstr "Dokumen _Writer"
+
+#. Bvz5c
+#: sfx2/uiconfig/ui/startcenter.ui:301
+msgctxt "startcenter|calc_all"
+msgid "_Calc Spreadsheet"
+msgstr "Lembar Sebar _Calc"
+
+#. RxGP6
+#: sfx2/uiconfig/ui/startcenter.ui:321
+msgctxt "startcenter|impress_all"
+msgid "_Impress Presentation"
+msgstr "Presentasi _Impress"
+
+#. 7fE2M
+#: sfx2/uiconfig/ui/startcenter.ui:341
+msgctxt "startcenter|draw_all"
+msgid "_Draw Drawing"
+msgstr "Gambar _Draw"
+
+#. 7wn8r
+#: sfx2/uiconfig/ui/startcenter.ui:361
+msgctxt "startcenter|math_all"
+msgid "_Math Formula"
+msgstr "Rumus _Math"
+
+#. nnwDC
+#: sfx2/uiconfig/ui/startcenter.ui:381
+msgctxt "startcenter|database_all"
+msgid "_Base Database"
+msgstr "_Basis Data Base"
+
+#. ZEDmn
+#: sfx2/uiconfig/ui/startcenter.ui:403
+msgctxt "startcenter|althelplabel"
+msgid "He_lp"
+msgstr "Bantu_an"
+
+#. oqVes
+#: sfx2/uiconfig/ui/startcenter.ui:473
+msgctxt "startcenter|extensions"
+msgid "E_xtensions"
+msgstr "Ek_stensi"
+
+#. rDw4E
+#: sfx2/uiconfig/ui/startcenter.ui:498
+msgctxt "startcenter|label1"
+msgid "Application"
+msgstr "Aplikasi"
+
+#. UiDMp
+#: sfx2/uiconfig/ui/startcenter.ui:518
+msgctxt "startcenter|all_recent_label"
+msgid "Recent Files List"
+msgstr "Senarai Berkas Terkini"
+
+#. kho2B
+#: sfx2/uiconfig/ui/startcenter.ui:531
+msgctxt "startcenter|local_view_label"
+msgid "Templates List"
+msgstr "Senarai Templat"
+
+#. UHrAZ
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:12
+msgctxt "stylecontextmenu|new"
+msgid "New..."
+msgstr "Baru..."
+
+#. hnLax
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:20
+msgctxt "stylecontextmenu|edit"
+msgid "Modify..."
+msgstr "Ubah..."
+
+#. TPTqm
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:28
+msgctxt "stylecontextmenu|hide"
+msgid "Hide"
+msgstr "Sembunyikan"
+
+#. mrCMd
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:36
+msgctxt "stylecontextmenu|show"
+msgid "Show"
+msgstr "Tampilkan"
+
+#. 7bAyD
+#: sfx2/uiconfig/ui/stylecontextmenu.ui:44
+msgctxt "stylecontextmenu|delete"
+msgid "Delete..."
+msgstr "Hapus…"
+
+#. N4BGe
+#: sfx2/uiconfig/ui/tabbarcontents.ui:24
+msgctxt "tabbar|locktaskpanel"
+msgid "Dock"
+msgstr "Tambatkan"
+
+#. GNBR3
+#: sfx2/uiconfig/ui/tabbarcontents.ui:33
+msgctxt "tabbar|unlocktaskpanel"
+msgid "Undock"
+msgstr "Lepaskan kaitan"
+
+#. jXux4
+#: sfx2/uiconfig/ui/tabbarcontents.ui:42
+msgctxt "tabbar|hidesidebar"
+msgid "Close Sidebar"
+msgstr "Tutup Bilah Sisi"
+
+#. hEmHk
+#: sfx2/uiconfig/ui/tabbarcontents.ui:50
+msgctxt "tabbar|customization"
+msgid "Customization"
+msgstr "Penyesuaian"
+
+#. 9Hfx6
+#: sfx2/uiconfig/ui/tabbarcontents.ui:66
+msgctxt "tabbar|restoredefault"
+msgid "Restore Default"
+msgstr "Kembalikan ke Semula"
+
+#. DBWZf
+#: sfx2/uiconfig/ui/tabbarcontents.ui:98
+msgctxt "tabbar|menubutton|tool_tip"
+msgid "Sidebar Settings"
+msgstr "Pengaturan Bilah Sisi"
+
+#. XBaqU
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:16
+msgctxt "templatecategorydlg|TemplatesCategoryDialog"
+msgid "Select Category"
+msgstr "Pilih Kategori"
+
+#. HXfot
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:108
+msgctxt "templatecategorydlg|select_label"
+msgid "Select from Existing Category"
+msgstr "Pilih dari Kategori yang Ada"
+
+#. 7eShP
+#: sfx2/uiconfig/ui/templatecategorydlg.ui:178
+msgctxt "templatecategorydlg|create_label"
+msgid "or Create a New Category"
+msgstr "atau Buat sebuah Kategori Baru"
+
+#. eUWTy
+#: sfx2/uiconfig/ui/templatedlg.ui:46
+msgctxt "templatedlg|TemplateDialog"
+msgid "Templates"
+msgstr "Templat"
+
+#. rhuYP
+#: sfx2/uiconfig/ui/templatedlg.ui:77
+msgctxt "templatedlg|hidedialogcb"
+msgid "Show this dialog at startup"
+msgstr "Tampilkan dialog ini saat awal mula"
+
+#. 32zsB
+#: sfx2/uiconfig/ui/templatedlg.ui:144
+msgctxt "templatedlg|search_filter|tooltip_text"
+msgid "Search"
+msgstr "Cari"
+
+#. sGZMC
+#: sfx2/uiconfig/ui/templatedlg.ui:148
+msgctxt "templatedlg|search_filter"
+msgid "Search..."
+msgstr "Cari..."
+
+#. DF5YC
+#: sfx2/uiconfig/ui/templatedlg.ui:167
+msgctxt "templatedlg|action_menu|label"
+msgid "_Manage"
+msgstr "_Atur"
+
+#. LUs2m
+#: sfx2/uiconfig/ui/templatedlg.ui:181
+msgctxt "templatedlg|extended_tip|action_menu"
+msgid "Provides commands to create, rename and delete categories, reset default templates, and refresh the template manager."
+msgstr "Menyediakan perintah untuk membuat, mengganti nama dan menghapus kategori, mengatur ulang templat baku, dan memuat ulang pengelola templat."
+
+#. fXVNY
+#: sfx2/uiconfig/ui/templatedlg.ui:208
+msgctxt "templatedlg|filter_application|tooltip_text"
+msgid "Filter by Application"
+msgstr "Saring menurut Aplikasi"
+
+#. tqVhJ
+#: sfx2/uiconfig/ui/templatedlg.ui:210
+msgctxt "templatedlg|applist"
+msgid "All Applications"
+msgstr "Semua Aplikasi"
+
+#. pD6pU
+#: sfx2/uiconfig/ui/templatedlg.ui:211
+msgctxt "templatedlg|applist"
+msgid "Text Documents"
+msgstr "Dokumen Teks"
+
+#. eECt7
+#: sfx2/uiconfig/ui/templatedlg.ui:212
+msgctxt "templatedlg|applist"
+msgid "Spreadsheets"
+msgstr "Lembar Sebar"
+
+#. ajLbV
+#: sfx2/uiconfig/ui/templatedlg.ui:213
+msgctxt "templatedlg|applist"
+msgid "Presentations"
+msgstr "Presentasi"
+
+#. LfUzB
+#: sfx2/uiconfig/ui/templatedlg.ui:214
+msgctxt "templatedlg|applist"
+msgid "Drawings"
+msgstr "Gambar"
+
+#. t7zE7
+#: sfx2/uiconfig/ui/templatedlg.ui:228
+msgctxt "templatedlg|filter_folder|tooltip_text"
+msgid "Filter by Category"
+msgstr "Saring menurut Kategori"
+
+#. 93CGw
+#: sfx2/uiconfig/ui/templatedlg.ui:230
+msgctxt "templatedlg|folderlist"
+msgid "All Categories"
+msgstr "Semua Kategori"
+
+#. NF9wE
+#: sfx2/uiconfig/ui/templatedlg.ui:251
+msgctxt "templatedlg|label1"
+msgid "Filter"
+msgstr "Penyaring"
+
+#. ewTL3
+#: sfx2/uiconfig/ui/templatedlg.ui:357
+msgctxt "templatedlg|treeviewcolumn1"
+msgid "Name"
+msgstr "Nama"
+
+#. 7EJRA
+#: sfx2/uiconfig/ui/templatedlg.ui:374
+msgctxt "templatedlg|treeviewcolumn2"
+msgid "Category"
+msgstr "Kategori"
+
+#. AC27i
+#: sfx2/uiconfig/ui/templatedlg.ui:389
+msgctxt "templatedlg|treeviewcolumn3"
+msgid "Application"
+msgstr "Aplikasi"
+
+#. eSaBw
+#: sfx2/uiconfig/ui/templatedlg.ui:404
+msgctxt "templatedlg|treeviewcolumn4"
+msgid "Modified"
+msgstr "Diubah"
+
+#. pNzYA
+#: sfx2/uiconfig/ui/templatedlg.ui:419
+msgctxt "templatedlg|treeviewcolumn5"
+msgid "Size"
+msgstr "Ukuran"
+
+#. j39jM
+#: sfx2/uiconfig/ui/templatedlg.ui:445
+msgctxt "templatedlg|thumbnailviewlabel"
+msgid "Template List"
+msgstr "Senarai Templat"
+
+#. yEhgP
+#: sfx2/uiconfig/ui/templatedlg.ui:464
+msgctxt "templatedlg|thumbnail_view_btn|tooltip_text"
+msgid "Thumbnail View"
+msgstr "Tampilan Keluku"
+
+#. j76ke
+#: sfx2/uiconfig/ui/templatedlg.ui:481
+msgctxt "templatedlg|list_view_btn|tooltip_text"
+msgid "List View"
+msgstr "Tampilan Senarai"
+
+#. pm89q
+#: sfx2/uiconfig/ui/templatepanel.ui:127
+msgctxt "templatepanel|STR_STYLE_FILL_FORMAT_MODE"
+msgid "Fill Format Mode"
+msgstr "Modus Mengisi Format"
+
+#. GLRFT
+#: sfx2/uiconfig/ui/templatepanel.ui:139
+msgctxt "templatepanel|STR_STYLE_NEW_STYLE_FROM_SELECTION"
+msgid "New Style from Selection"
+msgstr "Gaya Baru dari Pemilihan"
+
+#. tAdD9
+#: sfx2/uiconfig/ui/templatepanel.ui:151
+msgctxt "templatepanel|STR_STYLE_NEW_STYLE_ACTION"
+msgid "Styles actions"
+msgstr "Aksi gaya"
+
+#. Xk5tD
+#: sfx2/uiconfig/ui/templatepanel.ui:163
+msgctxt "templatepanel|STR_STYLE_UPDATE_STYLE"
+msgid "Update Style"
+msgstr "Perbarui Gaya"
+
+#. irBvi
+#: sfx2/uiconfig/ui/templatepanel.ui:220 sfx2/uiconfig/ui/templatepanel.ui:266
+msgctxt "templatepanel|STR_STYLE_ELEMTLIST"
+msgid "Style List"
+msgstr "Senarai Gaya"
+
+#. FHud7
+#: sfx2/uiconfig/ui/templatepanel.ui:280
+msgctxt "commontemplate|STR_PREVIEW_CHECKBOX"
+msgid "Show previews"
+msgstr "Tampilkan pratinjau"
+
+#. p9AWW
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:8
+msgctxt "versioncommentdialog|VersionCommentDialog"
+msgid "Insert Version Comment"
+msgstr "Sisipkan Komentar Versi"
+
+#. CPwta
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:103
+msgctxt "versioncommentdialog|timestamp"
+msgid "Date and time: "
+msgstr "Tanggal dan jam: "
+
+#. 2mDfC
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:115
+msgctxt "versioncommentdialog|author"
+msgid "Saved by: "
+msgstr "Disimpan oleh: "
+
+#. T5AY5
+#: sfx2/uiconfig/ui/versioncommentdialog.ui:164
+msgctxt "versioncommentdialog|extended_tip|VersionCommentDialog"
+msgid "Enter a comment here when you are saving a new version. If you clicked Show to open this dialog, you cannot edit the comment."
+msgstr "Masukkan komentar di sini saat Anda menyimpan versi baru. Jika Anda mengklikTampilkanuntuk membuka dialog ini, Anda tidak dapat menyunting komentar."
+
+#. oBSSb
+#: sfx2/uiconfig/ui/versionscmis.ui:50
+msgctxt "versionscmis|compare"
+msgid "_Compare"
+msgstr "Ban_dingkan"
+
+#. WyDoB
+#: sfx2/uiconfig/ui/versionscmis.ui:64
+msgctxt "versionscmis|show"
+msgid "_Show..."
+msgstr "_Tampilkan..."
+
+#. A8Eqt
+#: sfx2/uiconfig/ui/versionscmis.ui:92
+msgctxt "versionscmis|open"
+msgid "_Open"
+msgstr "_Buka"
+
+#. gRBJa
+#: sfx2/uiconfig/ui/versionscmis.ui:177
+msgctxt "versionscmis|datetime"
+msgid "Date and time"
+msgstr "Tanggal dan jam"
+
+#. 3VLw3
+#: sfx2/uiconfig/ui/versionscmis.ui:190
+msgctxt "versionscmis|savedby"
+msgid "Saved by"
+msgstr "Disimpan oleh"
+
+#. FzBeT
+#: sfx2/uiconfig/ui/versionscmis.ui:203
+msgctxt "versionscmis|comments"
+msgid "Comments"
+msgstr "Komentar"
+
+#. c2cVg
+#: sfx2/uiconfig/ui/versionscmis.ui:226
+msgctxt "versionscmis|label2"
+msgid "Existing Versions"
+msgstr "Versi Yang Ada"
+
+#. A4BT2
+#: sfx2/uiconfig/ui/versionsofdialog.ui:33
+msgctxt "versionsofdialog|cmis"
+msgid "CMIS"
+msgstr "CMIS"
+
+#. EqmYX
+#: sfx2/uiconfig/ui/versionsofdialog.ui:53
+msgctxt "versionsofdialog|extended_tip|delete"
+msgid "Deletes the selected version."
+msgstr "Menghapus versi yang dipilih."
+
+#. erGHD
+#: sfx2/uiconfig/ui/versionsofdialog.ui:65
+msgctxt "versionsofdialog|compare"
+msgid "_Compare"
+msgstr "Ban_dingkan"
+
+#. TKEzJ
+#: sfx2/uiconfig/ui/versionsofdialog.ui:72
+msgctxt "versionsofdialog|extended_tip|compare"
+msgid "Compare the changes that were made in each version."
+msgstr "Bandingkan perubahan yang dibuat di setiap versi."
+
+#. UkbhC
+#: sfx2/uiconfig/ui/versionsofdialog.ui:84
+msgctxt "versionsofdialog|show"
+msgid "_Show..."
+msgstr "_Tampilkan..."
+
+#. 4SD7F
+#: sfx2/uiconfig/ui/versionsofdialog.ui:91
+msgctxt "versionsofdialog|extended_tip|show"
+msgid "Displays the entire comment for the selected version."
+msgstr "Menampilkan seluruh komentar untuk versi yang dipilih."
+
+#. E8yNH
+#: sfx2/uiconfig/ui/versionsofdialog.ui:119
+msgctxt "versionsofdialog|open"
+msgid "_Open"
+msgstr "_Buka"
+
+#. ASJac
+#: sfx2/uiconfig/ui/versionsofdialog.ui:126
+msgctxt "versionsofdialog|extended_tip|open"
+msgid "Opens the selected version in a read-only window."
+msgstr "Buka versi yang dipilih di jendela hanya baca."
+
+#. qKnKv
+#: sfx2/uiconfig/ui/versionsofdialog.ui:184
+msgctxt "versionsofdialog|save"
+msgid "Save _New Version"
+msgstr "Simpa_n Versi Baru"
+
+#. gTR6x
+#: sfx2/uiconfig/ui/versionsofdialog.ui:191
+msgctxt "versionsofdialog|extended_tip|save"
+msgid "Saves the current state of the document as a new version. If you want, you can also enter comments in the Insert Version Comment dialog before you save the new version."
+msgstr "Menyimpan status dokumen saat ini sebagai versi baru. Jika anda menginginkan, Anda juga dapat memasukkan komentar di dialog  Sisipkan Versi Komentar  sebelum Anda menyimpan versi yang baru."
+
+#. aCeEr
+#: sfx2/uiconfig/ui/versionsofdialog.ui:202
+msgctxt "versionsofdialog|always"
+msgid "_Always save a new version on closing"
+msgstr "Sel_alu simpan suatu versi baru saat menutup"
+
+#. JxFDN
+#: sfx2/uiconfig/ui/versionsofdialog.ui:210
+msgctxt "versionsofdialog|extended_tip|always"
+msgid "If you have made changes to your document then a new version is automatically saved when you close the document."
+msgstr "Jika Anda telah membuat perubahan pada dokumen Anda, maka versi baru akan disimpan secara otomatis saat Anda menutup dokumen."
+
+#. vuHjH
+#: sfx2/uiconfig/ui/versionsofdialog.ui:225
+msgctxt "versionsofdialog|label1"
+msgid "New Versions"
+msgstr "Versi Baru"
+
+#. nDGNv
+#: sfx2/uiconfig/ui/versionsofdialog.ui:278
+msgctxt "versionsofdialog|datetime"
+msgid "Date and time"
+msgstr "Tanggal dan jam"
+
+#. MBoBZ
+#: sfx2/uiconfig/ui/versionsofdialog.ui:291
+msgctxt "versionsofdialog|savedby"
+msgid "Saved by"
+msgstr "Disimpan oleh"
+
+#. kqEcm
+#: sfx2/uiconfig/ui/versionsofdialog.ui:304
+msgctxt "versionsofdialog|comments"
+msgid "Comments"
+msgstr "Komentar"
+
+#. GLD85
+#: sfx2/uiconfig/ui/versionsofdialog.ui:315
+msgctxt "versionsofdialog|extended_tip|versions"
+msgid "Lists the existing versions of the current document, the date and the time they were created, the author and the associated comments."
+msgstr "Menampilkan senarai versi yang ada dari dokumen saat ini, tanggal dan waktu saat dibuat, penulis dan komentar terkait."
+
+#. EbijK
+#: sfx2/uiconfig/ui/versionsofdialog.ui:332
+msgctxt "versionsofdialog|label2"
+msgid "Existing Versions"
+msgstr "Versi Yang Ada"
+
+#. 5BdCA
+#: sfx2/uiconfig/ui/versionsofdialog.ui:367
+msgctxt "versionsofdialog|extended_tip|VersionsOfDialog"
+msgid "Saves and organizes multiple versions of the current document in the same file. You can also open, delete and compare previous versions."
+msgstr "Menyimpan dan mengatur beberapa versi dokumen saat ini di berkas yang sama. Anda juga dapat membuka, menghapus, dan membandingkan dengan versi sebelumnya."

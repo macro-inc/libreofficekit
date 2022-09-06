@@ -1,0 +1,613 @@
+#. extracted from sysui/desktop/share
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2016-05-08 08:36+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: as_IN <kde-i18n-doc@kde.org>\n"
+"Language: as\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1462696583.000000\n"
+
+#. a9uCy
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document"
+msgstr "OpenOffice.org 1.0 লিখনী দস্তাবেজ"
+
+#. 9mfCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document Template"
+msgstr "OpenOffice.org 1.0 লিখনী দস্তাবেজ টেমপ্লেইট"
+
+#. hj5SQ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"master-document\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Master Document"
+msgstr "OpenOffice.org 1.0 মূখ্য দস্তাবেজ"
+
+#. 8tGE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"formula\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Formula"
+msgstr "OpenOffice.org 1.0 সূত্ৰ"
+
+#. iJFTG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation"
+msgstr "OpenOffice.org 1.0 উপস্থাপন"
+
+#. CA7gZ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation Template"
+msgstr "OpenOffice.org 1.0 উপস্থাপন টেমপ্লেইট"
+
+#. AuLrq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing"
+msgstr "OpenOffice.org 1.0 অঁকা"
+
+#. sHiv9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing Template"
+msgstr "OpenOffice.org 1.0 অঁকা টেমপ্লেইট"
+
+#. rSDA2
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet"
+msgstr "OpenOffice.org 1.0 স্প্ৰেডশ্বিট"
+
+#. iUGdT
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet Template"
+msgstr "OpenOffice.org 1.0 স্প্ৰেডশ্বিট টেমপ্লেইট"
+
+#. dup8a
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text\n"
+"LngText.text"
+msgid "OpenDocument Text"
+msgstr "OpenDocument লিখনী"
+
+#. Tvbts
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Text (Flat XML)"
+msgstr "OpenDocument লিখনী (Flat XML)"
+
+#. 7rxHH
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-template\n"
+"LngText.text"
+msgid "OpenDocument Text Template"
+msgstr "OpenDocument লিখনী টেমপ্লেইট"
+
+#. qGKKU
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document\n"
+"LngText.text"
+msgid "OpenDocument Master Document"
+msgstr "OpenDocument মাস্টাৰ দস্তাবেজ"
+
+#. LDcMd
+#: documents.ulf
+#, fuzzy
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document-template\n"
+"LngText.text"
+msgid "OpenDocument Master Document Template"
+msgstr "OpenDocument মাস্টাৰ দস্তাবেজ"
+
+#. xUvzk
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-formula\n"
+"LngText.text"
+msgid "OpenDocument Formula"
+msgstr "OpenDocument সূত্ৰ"
+
+#. QaoV9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation\n"
+"LngText.text"
+msgid "OpenDocument Presentation"
+msgstr "OpenDocument পৰিৱেশন"
+
+#. 7KXDa
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Presentation (Flat XML)"
+msgstr "OpenDocument পৰিৱেশন (Flat XML)"
+
+#. r5mkr
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-template\n"
+"LngText.text"
+msgid "OpenDocument Presentation Template"
+msgstr "OpenDocument পৰিৱেশন টেমপ্লেইট"
+
+#. ABKBq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing\n"
+"LngText.text"
+msgid "OpenDocument Drawing"
+msgstr "OpenDocument ড্ৰয়িং"
+
+#. uAguG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Drawing (Flat XML)"
+msgstr "OpenDocument অঙ্কণ (Flat XML)"
+
+#. nbGeB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-template\n"
+"LngText.text"
+msgid "OpenDocument Drawing Template"
+msgstr "OpenDocument ড্ৰয়িং টেমপ্লেইট"
+
+#. ww4GY
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet"
+msgstr "OpenDocument স্প্ৰেডশ্বীট"
+
+#. U6S6A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet (Flat XML)"
+msgstr "OpenDocument স্প্ৰেডশ্বীট (Flat XML)"
+
+#. GRcE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-template\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet Template"
+msgstr "OpenDocument স্প্ৰেডশ্বীট টেমপ্লেইট"
+
+#. FBzW7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-database\n"
+"LngText.text"
+msgid "OpenDocument Database"
+msgstr "OpenDocument ডাটাবেইচ"
+
+#. PHjCX
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-web-template\n"
+"LngText.text"
+msgid "HTML Document Template"
+msgstr "HTML দস্তাবেজ টেমপ্লেইট"
+
+#. z5v7A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"extension\n"
+"LngText.text"
+msgid "%PRODUCTNAME Extension"
+msgstr "%PRODUCTNAME Extension"
+
+#. yfXFW
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel ৱৰ্কশ্বীট"
+
+#. GFWsF
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint পৰিৱেশন"
+
+#. sXwCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word দস্তাবেজ"
+
+#. N9WPd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document2\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word দস্তাবেজ"
+
+#. jtBEd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel ৱৰ্কশ্বীট"
+
+#. YMdW5
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-template-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "Microsoft Excel ৱৰ্কশ্বীট টেমপ্লেইট"
+
+#. kg6D4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint পৰিৱেশন"
+
+#. 7TjD7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-template-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "Microsoft PowerPoint পৰিৱেশন"
+
+#. 9YtZo
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document-12\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word দস্তাবেজ"
+
+#. PXrJC
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-template-12\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "Microsoft Word টেমপ্লেইট"
+
+#. EENV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint পৰিৱেশন"
+
+#. aBQW3
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-template\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "Microsoft PowerPoint পৰিৱেশন"
+
+#. CTtV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel ৱৰ্কশ্বীট"
+
+#. Dk7Bj
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-template\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "Microsoft Excel ৱৰ্কশ্বীট টেমপ্লেইট"
+
+#. So2PB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word দস্তাবেজ"
+
+#. gHPAp
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-template\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "Microsoft Word টেমপ্লেইট"
+
+#. rJW59
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-binary-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel ৱৰ্কশ্বীট"
+
+#. Bpj3J
+#: launcher_comment.ulf
+#, fuzzy
+msgctxt ""
+"launcher_comment.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "Create and edit text and images in letters, reports, documents and Web pages by using Writer."
+msgstr "Writer ব্যৱহাৰ কৰি চিঠি, সংবাদ, দস্তাবেজ আৰু পৃষ্ঠাবোৰত থকা লিখনী আৰু গ্ৰাফিক্স সৃষ্টি আৰু সম্পাদনা কৰক।"
+
+#. hnW8F
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "Create and edit presentations for slideshows, meeting and Web pages by using Impress."
+msgstr "Impress ব্যৱহাৰ কৰি শ্লাইডশ্ব', মিটিং আৰু ৱেব পৃষ্ঠা সৃষ্টি আৰু সম্পাদনা কৰক।"
+
+#. YkHme
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "Create and edit drawings, flow charts, and logos by using Draw."
+msgstr "Draw ব্যৱহাৰ কৰি ড্ৰয়িং, ফ্ল' ছাৰ্ট আৰু ল'গ'বোৰ সৃষ্টি আৰু সম্পাদনা কৰক।"
+
+#. US56A
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "Perform calculations, analyze information and manage lists in spreadsheets by using Calc."
+msgstr "Calc ব্যৱহাৰ কৰি স্প্ৰেডশ্বিটসমূহত গণনাসমূহ কৰক, তথ্য বিশ্লেষণ কৰক আৰু তালিকাসমূহ ব্যৱস্থাপনা কৰক।"
+
+#. xb7SC
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"math\n"
+"LngText.text"
+msgid "Create and edit scientific formulas and equations by using Math."
+msgstr "Math ব্যৱহাৰ কৰি বৈজ্ঞানিক সূত্ৰ আৰু সমীকৰণবোৰ সৃষ্টি আৰু সম্পাদনা কৰক।"
+
+#. mbYRJ
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"base\n"
+"LngText.text"
+msgid "Manage databases, create queries and reports to track and manage your information by using Base."
+msgstr "Base ব্যৱহাৰ কৰি ডাটাবেইচবোৰ পৰিচালনা কৰক, ট্ৰেক আৰু পৰিচালনা কৰিবলৈ প্ৰশ্ন আৰু সংবাদবোৰ সৃষ্টি কৰক।"
+
+#. 8R6uw
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"startcenter\n"
+"LngText.text"
+msgid "The office productivity suite compatible to the open and standardized ODF document format. Supported by The Document Foundation."
+msgstr "মুক্ত আৰু প্ৰামাণিত ODF দস্তাবেজ বিন্যাসৰ লগত সংগত অফিচ উৎপাদনা চুইট। Document Foundation -ৰ দ্বাৰা সমৰ্থিত।"
+
+#. BhNQQ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "Word Processor"
+msgstr "Word প্ৰচেছৰ"
+
+#. zknFm
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "Presentation"
+msgstr "পৰিৱেশন"
+
+#. czB83
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "Spreadsheet"
+msgstr "স্প্ৰেডশ্বীট"
+
+#. AXNAJ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"base\n"
+"LngText.text"
+msgid "Database Development"
+msgstr "ডাটাবেইচ বিকাশ"
+
+#. EkVbD
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"math\n"
+"LngText.text"
+msgid "Formula Editor"
+msgstr "সূত্র সম্পাদক"
+
+#. oDGKs
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "Drawing Program"
+msgstr "ড্রয়িং কাৰ্যক্ৰম"
+
+#. DdFuQ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"startcenter\n"
+"LngText.text"
+msgid "Office"
+msgstr "অফিচ"
+
+#. N3RXU
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"xsltfilter\n"
+"LngText.text"
+msgid "XSLT based filters"
+msgstr "XSLT ভিত্তিয় ফিল্টাৰসমূহ"
+
+#. DE2Gk
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "New Document"
+msgstr "নতুন দস্তাবেজ"
+
+#. Wz7Fu
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "New Presentation"
+msgstr "নতুন পৰিৱেশন"
+
+#. 7VLq2
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "New Spreadsheet"
+msgstr "নতুন স্প্ৰেডশ্বিট"
+
+#. UXCET
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"base\n"
+"LngText.text"
+msgid "New Database"
+msgstr "নতুন ডাটাবেইচ"
+
+#. FDPZi
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"math\n"
+"LngText.text"
+msgid "New Formula"
+msgstr "নতুন সুত্ৰ"
+
+#. UQjBd
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "New Drawing"
+msgstr "নতুন অঙ্কণ"

@@ -1,0 +1,206 @@
+#. extracted from scp2/source/impress
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2016-07-26 12:55+0000\n"
+"Last-Translator: Federigo Canpanjoło <federicolovec@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: vec\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1469537741.000000\n"
+
+#. USjxN
+#: folderitem_impress.ulf
+msgctxt ""
+"folderitem_impress.ulf\n"
+"STR_FI_NAME_PRAESENTATION\n"
+"LngText.text"
+msgid "Presentation"
+msgstr "Prezentasion"
+
+#. MaeYG
+#: folderitem_impress.ulf
+msgctxt ""
+"folderitem_impress.ulf\n"
+"STR_FI_TOOLTIP_IMPRESS\n"
+"LngText.text"
+msgid "Create and edit presentations for slideshows, meeting and Web pages by using Impress."
+msgstr "Co Impress te połi crear e modifegar prezentasion, reunion e pàjine web."
+
+#. 4XJxj
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_NAME_MODULE_PRG_IMPRESS\n"
+"LngText.text"
+msgid "%PRODUCTNAME Impress"
+msgstr "%PRODUCTNAME Impress"
+
+#. 44gb8
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_DESC_MODULE_PRG_IMPRESS\n"
+"LngText.text"
+msgid "Create and edit presentations for slideshows, meeting and Web pages by using %PRODUCTNAME Impress."
+msgstr "Co %PRODUCTNAME Impress te połi crear e modifegar prezentasion, reunion e pàjine web."
+
+#. 33n88
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_NAME_MODULE_PRG_IMPRESS_BIN\n"
+"LngText.text"
+msgid "Program Module"
+msgstr "Mòduło programa"
+
+#. gfK75
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_DESC_MODULE_PRG_IMPRESS_BIN\n"
+"LngText.text"
+msgid "The application %PRODUCTNAME Impress"
+msgstr "L'aplegasion %PRODUCTNAME Impress"
+
+#. CsaFh
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_NAME_MODULE_PRG_IMPRESS_HELP\n"
+"LngText.text"
+msgid "%PRODUCTNAME Impress Help"
+msgstr "Guida de %PRODUCTNAME Impress"
+
+#. vAPBy
+#: module_impress.ulf
+msgctxt ""
+"module_impress.ulf\n"
+"STR_DESC_MODULE_PRG_IMPRESS_HELP\n"
+"LngText.text"
+msgid "Help about %PRODUCTNAME Impress"
+msgstr "Informasion so %PRODUCTNAME Impress"
+
+#. Bg4eB
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_NEW\n"
+"LngText.text"
+msgid "&New"
+msgstr "&Novo"
+
+#. A64Em
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_SO60_SHOW\n"
+"LngText.text"
+msgid "Show"
+msgstr "Mostra"
+
+#. oR4ox
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_SO60_PRESENT\n"
+"LngText.text"
+msgid "%SXWFORMATNAME %SXWFORMATVERSION Presentation"
+msgstr "%SXWFORMATNAME %SXWFORMATVERSION - Prezentasion"
+
+#. AFWjY
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_SO60_IMPRESS_TEMPLATE\n"
+"LngText.text"
+msgid "%SXWFORMATNAME %SXWFORMATVERSION Presentation Template"
+msgstr "%SXWFORMATNAME %SXWFORMATVERSION - Modeło de prezentasion"
+
+#. GbPTM
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_OO_PRESENT\n"
+"LngText.text"
+msgid "OpenDocument Presentation"
+msgstr "OpenDocument - Prezentasion"
+
+#. 6KPeW
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_OO_PRESENT_TEMPLATE\n"
+"LngText.text"
+msgid "OpenDocument Presentation Template"
+msgstr "OpenDocument - Modeło de prezentasion"
+
+#. FPmTX
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_MS_POWERPOINT_PRESENTATION_OLD\n"
+"LngText.text"
+msgid "Microsoft PowerPoint 97-2003 Presentation"
+msgstr "Prezentasion de Microsoft PowerPoint 97-2003"
+
+#. XVGBP
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_MS_POWERPOINT_SHOW\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Show"
+msgstr "Projesion Microsoft PowerPoint"
+
+#. c8FUE
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_MS_POWERPOINT_PRESENTATION\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Prezentasion de Microsoft PowerPoint"
+
+#. krens
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_MS_POWERPOINT_TEMPLATE_OLD\n"
+"LngText.text"
+msgid "Microsoft PowerPoint 97-2003 Template"
+msgstr "Modeło de Microsoft PowerPoint 97-2003"
+
+#. DkZrz
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_MS_POWERPOINT_TEMPLATE\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Template"
+msgstr "Modeło de Microsoft PowerPoint"
+
+#. n8qaR
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_UNIFORM_OFFICE_FORMAT_PRESENTATION\n"
+"LngText.text"
+msgid "Uniform Office Format Presentation"
+msgstr "Prezentasion Uniform Office Format"
+
+#. v6y5o
+#: registryitem_impress.ulf
+msgctxt ""
+"registryitem_impress.ulf\n"
+"STR_REG_VAL_COMPUTER_GRAPHICS_METAFILE\n"
+"LngText.text"
+msgid "Computer Graphics Metafile"
+msgstr "Metafile Computer Graphics"

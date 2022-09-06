@@ -1,0 +1,350 @@
+#. extracted from shell/source/win32/shlxthandler/res
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2018-01-15 15:27+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1516030060.000000\n"
+
+#. nMHZG
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TITLE%\n"
+"LngText.text"
+msgid "Title"
+msgstr "शीर्षक"
+
+#. 7QBxh
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TITLE_COLON%\n"
+"LngText.text"
+msgid "Title:"
+msgstr "शीर्षक:"
+
+#. UGL46
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUBJECT%\n"
+"LngText.text"
+msgid "Subject"
+msgstr "विषय"
+
+#. Rqom8
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUBJECT_COLON%\n"
+"LngText.text"
+msgid "Subject:"
+msgstr "विषय:"
+
+#. BbVSy
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%AUTHOR%\n"
+"LngText.text"
+msgid "Author"
+msgstr "लेखक"
+
+#. 6eSDz
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%AUTHOR_COLON%\n"
+"LngText.text"
+msgid "Author:"
+msgstr "लेखकः"
+
+#. nA6Zp
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%KEYWORDS%\n"
+"LngText.text"
+msgid "Keywords"
+msgstr "बीजशब्द"
+
+#. hJatc
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%KEYWORDS_COLON%\n"
+"LngText.text"
+msgid "Keywords:"
+msgstr "बीजशब्द:"
+
+#. NyeBb
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%COMMENTS%\n"
+"LngText.text"
+msgid "Comments"
+msgstr "टिप्पणी"
+
+#. tN79v
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%COMMENTS_COLON%\n"
+"LngText.text"
+msgid "Comments:"
+msgstr "टिप्पणी:"
+
+#. C7AUH
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PAGES%\n"
+"LngText.text"
+msgid "Pages"
+msgstr "पृष्ठ"
+
+#. vhAWA
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TABLES%\n"
+"LngText.text"
+msgid "Tables"
+msgstr "सारणी"
+
+#. VNMuj
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%GRAPHICS%\n"
+"LngText.text"
+msgid "Images"
+msgstr "चित्र"
+
+#. WePDJ
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%OBJECTS%\n"
+"LngText.text"
+msgid "Objects"
+msgstr "वस्तु"
+
+#. CXU2C
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%OLE_OBJECTS%\n"
+"LngText.text"
+msgid "OLE Objects"
+msgstr "OLE वस्तुएँ"
+
+#. zATfj
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PARAGRAPHS%\n"
+"LngText.text"
+msgid "Paragraphs"
+msgstr "अनुच्छेद"
+
+#. S4c4V
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%WORDS%\n"
+"LngText.text"
+msgid "Words"
+msgstr "शब्द"
+
+#. D4Ywc
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%CHARACTERS%\n"
+"LngText.text"
+msgid "Characters"
+msgstr "वर्ण"
+
+#. 8LRV5
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%ROWS%\n"
+"LngText.text"
+msgid "Lines"
+msgstr "पंक्तियां"
+
+#. UhaXY
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%ORIGIN%\n"
+"LngText.text"
+msgid "Origin"
+msgstr "मूल"
+
+#. eEVzH
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%VERSION%\n"
+"LngText.text"
+msgid "Version"
+msgstr "संस्करण"
+
+#. CGpUh
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SHEETS%\n"
+"LngText.text"
+msgid "Sheets"
+msgstr "शीट"
+
+#. 2okgs
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%CELLS%\n"
+"LngText.text"
+msgid "Cells"
+msgstr "सेल"
+
+#. rgN97
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%STATISTICS_TITLE%\n"
+"LngText.text"
+msgid "Document Statistics"
+msgstr "दस्तावेज़ सांख्यिकी"
+
+#. VsBfC
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUMMARY_TITLE%\n"
+"LngText.text"
+msgid "Summary"
+msgstr "सारांश"
+
+#. MiuQD
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PROPERTY%\n"
+"LngText.text"
+msgid "Property"
+msgstr "गुण"
+
+#. mGZKg
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PROPERTY_VALUE%\n"
+"LngText.text"
+msgid "Value"
+msgstr "मान"
+
+#. TCEEW
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%MODIFIED%\n"
+"LngText.text"
+msgid "Modified"
+msgstr "रूपांतरित"
+
+#. YYD9t
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%MODIFIED_COLON%\n"
+"LngText.text"
+msgid "Modified:"
+msgstr "रूपांतरितः"
+
+#. vBE2F
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DOCUMENT_NUMBER%\n"
+"LngText.text"
+msgid "Revision number"
+msgstr "संशोधन संख्या"
+
+#. FXXNk
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DOCUMENT_NUMBER_COLON%\n"
+"LngText.text"
+msgid "Revision number:"
+msgstr "संशोधन संख्या:"
+
+#. HdSaz
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%EDITING_TIME%\n"
+"LngText.text"
+msgid "Total editing time"
+msgstr "कुल संपादन समय"
+
+#. snZkq
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%EDITING_TIME_COLON%\n"
+"LngText.text"
+msgid "Total editing time:"
+msgstr "कुल संपादन समय:"
+
+#. AuQLP
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DESCRIPTION%\n"
+"LngText.text"
+msgid "Description"
+msgstr "विवरण"
+
+#. WESrR
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DESCRIPTION_COLON%\n"
+"LngText.text"
+msgid "Description:"
+msgstr "विवरण:"
+
+#. RWroq
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SIZE_COLON%\n"
+"LngText.text"
+msgid "Size:"
+msgstr "आकारः"
+
+#. 3GFSY
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TYPE_COLON%\n"
+"LngText.text"
+msgid "Type:"
+msgstr "प्रकार:"

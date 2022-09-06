@@ -1,0 +1,5042 @@
+#. extracted from wizards/source/resources
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2020-10-27 12:31+0100\n"
+"PO-Revision-Date: 2018-01-15 20:41+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ug\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1516048875.000000\n"
+
+#. 8UKfi
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_0\n"
+"property.text"
+msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
+msgstr "'%1' مۇندەرىجە قۇرالمىدى. <BR> دىسكىڭىزدا يېتەرلىك بوشلۇق بولماسلىقى مۇمكىن."
+
+#. zDuJi
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_1\n"
+"property.text"
+msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
+msgstr "تېكست پۈتۈك قۇرالمىدى.<BR>  'PRODUCTNAME Writer'بۆلەكنىڭ قاچىلانغان قاچىلانمىغانلىقىنى تەكشۈرۈڭ."
+
+#. BydGz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_2\n"
+"property.text"
+msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
+msgstr "ئېلېكترونلۇق جەدۋەل ھۆججىتى قۇرالمىدى.<BR>  'PRODUCTNAME Calc' بۆلەكنىڭ قاچىلانغان قاچىلانمىغانلىقىنى تەكشۈرۈڭ."
+
+#. jAyjL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_3\n"
+"property.text"
+msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
+msgstr "كۆرسەتمە قۇرالمىدى.<BR>  'PRODUCTNAME Impress' بۆلەكنىڭ قاچىلانغان قاچىلانمىغانلىقىنى تەكشۈرۈڭ."
+
+#. 3mrBG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_4\n"
+"property.text"
+msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
+msgstr "سىزمىچىلىق قۇرالمىدى.<BR> بۆلەك 'PRODUCTNAME Draw' نىڭ قاچىلانغان قاچىلانمىغانلىقىنى تەكشۈرۈڭ."
+
+#. rMsgf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_5\n"
+"property.text"
+msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
+msgstr "فورمۇلا قۇرالمىدى.<BR> بۆلەك 'PRODUCTNAME Math' نىڭ قاچىلانغان قاچىلانمىغانلىقىنى تەكشۈرۈڭ."
+
+#. j5GzW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_6\n"
+"property.text"
+msgid "The files required could not be found.<BR>Please start the %PRODUCTNAME Setup and choose 'Repair'."
+msgstr "لازىملىق ھۆججەت تېپىلمىدى. <BR> سىز %PRODUCTNAME قاچىلاش پروگراممىسىنى قوزغىتىپ، «ئوڭشا»نى تاللاڭ."
+
+#. BFtze
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_7\n"
+"property.text"
+msgid "The file '<PATH>' already exists.<BR><BR>Would you like to overwrite the existing file?"
+msgstr "ھۆججەت '<PATH>' مەۋجۇد. <BR><BR> بۇ ھۆججەتنى قاپلىۋېتەمسىز؟"
+
+#. 7AvGR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_8\n"
+"property.text"
+msgid "Yes"
+msgstr "ھەئە"
+
+#. GPG93
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_9\n"
+"property.text"
+msgid "Yes to All"
+msgstr "ھەممىسى ھەئە"
+
+#. oBhQ5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_10\n"
+"property.text"
+msgid "No"
+msgstr "ياق"
+
+#. wMBK7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_11\n"
+"property.text"
+msgid "Cancel"
+msgstr "ۋاز كەچ"
+
+#. boSx2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_12\n"
+"property.text"
+msgid "~Finish"
+msgstr "تامام(~F)"
+
+#. apFF8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_13\n"
+"property.text"
+msgid "< ~Back"
+msgstr "ئالدى(~B) ›"
+
+#. q8epA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_14\n"
+"property.text"
+msgid "~Next >"
+msgstr "كېيىنكى (~N) >"
+
+#. rSt56
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_15\n"
+"property.text"
+msgid "~Help"
+msgstr "ياردەم(~H)"
+
+#. 9GUa6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_16\n"
+"property.text"
+msgid "Steps"
+msgstr "قەدەم"
+
+#. 9wWVR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_17\n"
+"property.text"
+msgid "Close"
+msgstr "ياپ"
+
+#. zUv9u
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_18\n"
+"property.text"
+msgid "OK"
+msgstr "جەزملە"
+
+#. 6kGc4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_19\n"
+"property.text"
+msgid "The file already exists. Do you want to overwrite it?"
+msgstr "بۇ ھۆججەت مەۋجۇد. ئۇنى قاپلىۋېتەمسىز؟"
+
+#. BGj7a
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_20\n"
+"property.text"
+msgid "Template created via <wizard_name> on <current_date>."
+msgstr "<wizard_name> ئارقىلىق <current_date> قۇرۇلغان قېلىپ."
+
+#. zRGEs
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_21\n"
+"property.text"
+msgid "The wizard could not be run, because important files were not found.\\nUnder 'Tools - Options - %PRODUCTNAME - Paths' click the 'Default' button to reset the paths to the original default settings.\\nThen run the wizard again."
+msgstr ""
+"مۇھىم ھۆججەتنى تاپالمىغانلىقتىن يېتەكچىنى ئىجرا قىلالمىدى.\n"
+"«قورال - تاللانما - %PRODUCTNAME - يول»دىكى «كۆڭۈلدىكى» كۇنۇپكىنى چېكىپ، يولنى ئەسلىدىكى تەڭشەككە قايتۇرۇڭ. \n"
+"ئاندىن يېتەكچىنى ئىجرا قىلىڭ."
+
+#. GohbP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_0\n"
+"property.text"
+msgid "Report Wizard"
+msgstr "دوكلات يېتەكچىسى"
+
+#. BZtXG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_3\n"
+"property.text"
+msgid "~Table"
+msgstr "جەدۋەل(~T)"
+
+#. BhUoK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_4\n"
+"property.text"
+msgid "Colu~mns"
+msgstr "رەت(~M)"
+
+#. KgzkD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_7\n"
+"property.text"
+msgid "Report_"
+msgstr "دوكلات_"
+
+#. uKDkU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_8\n"
+"property.text"
+msgid "- undefined -"
+msgstr "- ئېنىقلىمىسىز -"
+
+#. ZZqKE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_9\n"
+"property.text"
+msgid "~Fields in report"
+msgstr "دوكلاتتىكى سۆز بۆلىكى(~F)"
+
+#. hMbDC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_11\n"
+"property.text"
+msgid "Grouping"
+msgstr "گۇرۇپپىلاش"
+
+#. wVXwx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_12\n"
+"property.text"
+msgid "Sort options"
+msgstr "تەرتىپلەش تاللانما"
+
+#. 7EUD3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_13\n"
+"property.text"
+msgid "Choose layout"
+msgstr "ئۇسلۇب تاللا"
+
+#. 45SFZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_14\n"
+"property.text"
+msgid "Create report"
+msgstr "دوكلات قۇر"
+
+#. cKDcw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_15\n"
+"property.text"
+msgid "Layout of data"
+msgstr "سانلىق مەلۇمات ئۇسلۇبى"
+
+#. HhPzF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_16\n"
+"property.text"
+msgid "Layout of headers and footers"
+msgstr "بەت قاشى بەت ئاستى ئۇسلۇبى"
+
+#. bN2Fw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_19\n"
+"property.text"
+msgid "Fields"
+msgstr "سۆز بۆلىكى"
+
+#. qHq62
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_20\n"
+"property.text"
+msgid "~Sort by"
+msgstr "تەرتىپلەش ئاساسى(~S)"
+
+#. 8CX4A
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_21\n"
+"property.text"
+msgid "T~hen by"
+msgstr "ئەمما ئاساسى(~H)"
+
+#. kvzxk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_22\n"
+"property.text"
+msgid "Orientation"
+msgstr "يۆنىلىشى"
+
+#. b3YDa
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_23\n"
+"property.text"
+msgid "Portrait"
+msgstr "بوي يۆنىلىش"
+
+#. DT8hG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_24\n"
+"property.text"
+msgid "Landscape"
+msgstr "توغرا يۆنىلىش"
+
+#. TErmd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_28\n"
+"property.text"
+msgid "Which fields do you want to have in your report?"
+msgstr "سىزنىڭچە دوكلات قايسى سۆز بۆلەكلىرىنى ئۆز ئىچىگە ئالىدۇ؟"
+
+#. HZgJU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_29\n"
+"property.text"
+msgid "Do you want to add grouping levels?"
+msgstr "دەرىجىگە ئايرىپ گۇرۇپپىلاش قوشسۇنمۇ؟"
+
+#. xPoaP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_30\n"
+"property.text"
+msgid "According to which fields do you want to sort the data?"
+msgstr "قايسى سۆز بۆلەكلىرىگە ئاساسەن سانلىق مەلۇماتلارنى تەرتىپلەيسىز؟"
+
+#. kAjMy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_31\n"
+"property.text"
+msgid "How do you want your report to look?"
+msgstr "دوكلاتىڭىزدا قانداق ئۇسلۇپ ئىشلىتىسىز؟"
+
+#. QvM65
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_32\n"
+"property.text"
+msgid "Decide how you want to proceed"
+msgstr "قانداق داۋاملاشتۇرۇشنى قارار قىلىڭ"
+
+#. GqD3n
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_33\n"
+"property.text"
+msgid "Title of report"
+msgstr "دوكلات ماۋزۇسى"
+
+#. Nm8v3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_34\n"
+"property.text"
+msgid "Display report"
+msgstr "دوكلات كۆرسەت"
+
+#. crCtw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_35\n"
+"property.text"
+msgid "Create report"
+msgstr "دوكلات قۇر"
+
+#. EiKBA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_36\n"
+"property.text"
+msgid "Ascending"
+msgstr "ئۆسكۈچى"
+
+#. BboXx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_37\n"
+"property.text"
+msgid "Descending"
+msgstr "كېمەيگۈچى"
+
+#. sHcrv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_40\n"
+"property.text"
+msgid "~Dynamic report"
+msgstr "ھەرىكەتچان دوكلات(~D)"
+
+#. CxGG7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_41\n"
+"property.text"
+msgid "~Create report now"
+msgstr "ھازىرلا دوكلات قۇر(~C)"
+
+#. FVhkR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_42\n"
+"property.text"
+msgid "~Modify report layout"
+msgstr "دوكلات ئۇسلۇبىنى ئۆزگەرت(~M)"
+
+#. BBFba
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_43\n"
+"property.text"
+msgid "Static report"
+msgstr "مۇقىم دوكلات"
+
+#. gSyfQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_44\n"
+"property.text"
+msgid "Save as"
+msgstr "باشقا ئاتتا ساقلا"
+
+#. hdCaM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_50\n"
+"property.text"
+msgid "Groupings"
+msgstr "گۇرۇپپىلاش"
+
+#. XrhAA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_51\n"
+"property.text"
+msgid "Then b~y"
+msgstr "كېيىن ئاساسى(~Y)"
+
+#. dnjA2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_52\n"
+"property.text"
+msgid "~Then by"
+msgstr "كېيىن ئاساسى(~T)"
+
+#. ZuRZA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_53\n"
+"property.text"
+msgid "Asc~ending"
+msgstr "ئۈستىگە(~E)"
+
+#. 2aQcz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_54\n"
+"property.text"
+msgid "Ascend~ing"
+msgstr "ئۈستىگە(~I)"
+
+#. d7S3o
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_55\n"
+"property.text"
+msgid "Ascendin~g"
+msgstr "ئۈستىگە(~G)"
+
+#. 8YKTL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_56\n"
+"property.text"
+msgid "De~scending"
+msgstr "ئاستىغا(~S)"
+
+#. 82XcF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_57\n"
+"property.text"
+msgid "Des~cending"
+msgstr "ئاستىغا(~C)"
+
+#. SCPyV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_58\n"
+"property.text"
+msgid "De~scending"
+msgstr "ئاستىغا(~S)"
+
+#. s4E5A
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_60\n"
+"property.text"
+msgid "Binary fields cannot be displayed in the report."
+msgstr "دوكلاتتا ئىككىلىك سىستېمىدىكى سۆز بۆلىكىنى كۆرسىتەلمەيدۇ."
+
+#. zhqsu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_61\n"
+"property.text"
+msgid "The table '<TABLENAME>' does not exist."
+msgstr "'<TABLENAME>' جەدۋەل مەۋجۇد ئەمەس."
+
+#. JdC5d
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_62\n"
+"property.text"
+msgid "Creating Report..."
+msgstr "دوكلات قۇرۇۋاتىدۇ…"
+
+#. PQ4E9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_63\n"
+"property.text"
+msgid "Number of records inserted: <COUNT>"
+msgstr "قىستۇرغان سانلىق مەلۇماتنىڭ سانى: <COUNT>"
+
+#. BUWNB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_64\n"
+"property.text"
+msgid "The form '<REPORTFORM>' does not exist."
+msgstr "'<REPORTFORM>' كۆزنەك مەۋجۇد ئەمەس."
+
+#. AyMsD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_65\n"
+"property.text"
+msgid "The query with the statement <BR>'<STATEMENT>' <BR> could not be run. <BR> Check your data source."
+msgstr "<BR>'<STATEMENT>' <BR> چۈشەندۈرۈشى بار سۈرۈشتۈرۈش بۇيرۇقىنى ئىجرا قىلالمىدى.<BR> ئىشلەتكەن سانلىم مەلۇمات مەنبەسىنى تەڭشۈرۈڭ."
+
+#. LW9DZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_66\n"
+"property.text"
+msgid "The following hidden control in the form '<REPORTFORM>' could not be read: '<CONTROLNAME>'."
+msgstr "تۆۋەندىكى كۆزنەك '<REPORTFORM>' غا يوشۇرۇنغان كونترول تۈرىنى ئوقۇيالمىدى: '<CONTROLNAME>'"
+
+#. GvE8h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_67\n"
+"property.text"
+msgid "Importing data..."
+msgstr "سانلىق مەلۇمات كىرگۈزۈۋاتىدۇ…"
+
+#. LujCA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_68\n"
+"property.text"
+msgid "Labeling fields"
+msgstr "سۆز بۆلەككە بەلگە قويۇۋاتىدۇ"
+
+#. HPxDv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_69\n"
+"property.text"
+msgid "How do you want to label the fields?"
+msgstr "سۆز بۆلەك ئاتىغا قانداق بەلگە قويىسىز؟"
+
+#. C2Caz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_70\n"
+"property.text"
+msgid "Label"
+msgstr "ئەن"
+
+#. EknR9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_71\n"
+"property.text"
+msgid "Field"
+msgstr "سۆز بۆلىكى"
+
+#. agw3x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_72\n"
+"property.text"
+msgid "An error occurred in the wizard.<BR>The template '%PATH' could be erroneous.<BR>Either the required sections or tables do not exist or exist under the wrong name.<BR>See the Help for more detailed information.<BR>Please select another template."
+msgstr "يېتەكچىدە خاتالىق كۆرۈلدى. <BR> قېلىپ '%PATH' دا خاتالىق بولۇشى مۇمكىن.<BR> لازىملىق دائىرە ياكى جەدۋەل مەۋجۇد ئەمەس ياكى خاتا ئات ئاستىدا. <BR> مۇناسىۋەتلىك تەپسىلىي ئۇچۇرنى «ياردەم» دىن كۆرۈڭ. <BR> باشقا قېلىپ تاللاڭ."
+
+#. Za86f
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_73\n"
+"property.text"
+msgid "There is an invalid user field in a table."
+msgstr "جەدۋەلدە ئىشلەتكۈچى بەلگىلىگەن ئىناۋەتسىز سۆز بۆلىكى بار."
+
+#. rXZZH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_74\n"
+"property.text"
+msgid "The sort criterion '<FIELDNAME>' was chosen twice. Each criterion can only be chosen once."
+msgstr "تەرتىپلەش شەرتى '<FIELDNAME>' ئىككى قېتىم تاللاندى. ھەر بىر شەرتنى بىرلا قېتىم تاللاشقا بولىدۇ."
+
+#. ZNk6M
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_75\n"
+"property.text"
+msgid "Note: The dummy text will be replaced by data from the database when the report is created."
+msgstr "دىققەت: دوكلات قۇرغاندا ئۈلگە تېكست سانداندىكى تېكست مەزمۇنى تەرىپىدىن ئالماشتۇرۇلىدۇ."
+
+#. 5VdG4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_76\n"
+"property.text"
+msgid "A report '%REPORTNAME' already exists in the database. Please assign another name."
+msgstr "سانداندا '%REPORTNAME' دوكلات مەۋجۇد. باشقا ئات بەلگىلەڭ."
+
+#. TD56g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_78\n"
+"property.text"
+msgid "How do you want to proceed after creating the report?"
+msgstr "دوكلات قۇرغاندىن كېيىن قانداق داۋاملاشتۇرىدۇ؟"
+
+#. fpEwz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_79\n"
+"property.text"
+msgid "What kind of report do you want to create?"
+msgstr "سىز قايسى خىل دوكلات قۇرىسىز؟"
+
+#. s3vBB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_80\n"
+"property.text"
+msgid "Tabular"
+msgstr "جەدۋەلسىمان"
+
+#. dDWAD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_81\n"
+"property.text"
+msgid "Columnar, single-column"
+msgstr "كۆپ رەت، يەككە رەت"
+
+#. MwR8x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_82\n"
+"property.text"
+msgid "Columnar, two columns"
+msgstr "كۆپ رەت، ئىككى رەت"
+
+#. UsKmm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_83\n"
+"property.text"
+msgid "Columnar, three columns"
+msgstr "كۆپ رەت، ئۈچ رەت"
+
+#. RG9ds
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_84\n"
+"property.text"
+msgid "In blocks, labels left"
+msgstr "پارچىدا، بەلگە سولدا"
+
+#. dspnP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_85\n"
+"property.text"
+msgid "In blocks, labels above"
+msgstr "پارچىدا، بەلگە ئۈستىدە"
+
+#. FXJtW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_86\n"
+"property.text"
+msgid "Title:"
+msgstr "ماۋزۇ:"
+
+#. 2z2JH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_87\n"
+"property.text"
+msgid "Author:"
+msgstr "يازغۇچى:"
+
+#. uESaE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_88\n"
+"property.text"
+msgid "Date:"
+msgstr "چېسلا:"
+
+#. GzkD4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_89\n"
+"property.text"
+msgid "Page #page# of #count#"
+msgstr "#page#-بەت جەمئى #count# بەت"
+
+#. 3FXVE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_90\n"
+"property.text"
+msgid "Page number:"
+msgstr "بەت نومۇرى:"
+
+#. 9HCyq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_91\n"
+"property.text"
+msgid "Page count:"
+msgstr "بەت سانى:"
+
+#. FAa63
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_92\n"
+"property.text"
+msgid "No valid report template was found."
+msgstr "ئىناۋەتلىك دوكلات قېلىپى تېپىلمىدى."
+
+#. F6vrA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_93\n"
+"property.text"
+msgid "Page:"
+msgstr "بەت:"
+
+#. v8gUF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_94\n"
+"property.text"
+msgid "Align Left - Border"
+msgstr "سولغا توغرىلا - گىرۋەك"
+
+#. TV3AA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_95\n"
+"property.text"
+msgid "Align Left - Compact"
+msgstr "سولغا توغرىلا - ئىخچام"
+
+#. DL6ZJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_96\n"
+"property.text"
+msgid "Align Left - Elegant"
+msgstr "سولغا توغرىلا - نەپىس"
+
+#. wRNAq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_97\n"
+"property.text"
+msgid "Align Left - Highlighted"
+msgstr "سولغا توغرىلا - يورۇتۇلغان"
+
+#. JnhXj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_98\n"
+"property.text"
+msgid "Align Left - Modern"
+msgstr "سولغا توغرىلا - زامانىۋى"
+
+#. 4Djyg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_99\n"
+"property.text"
+msgid "Align Left - Red & Blue"
+msgstr "سولغا توغرىلا - قىزىل ۋە كۆك"
+
+#. BvcfB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_100\n"
+"property.text"
+msgid "Default"
+msgstr "كۆڭۈلدىكى"
+
+#. Bca59
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_101\n"
+"property.text"
+msgid "Outline - Borders"
+msgstr "ئىزنا - گىرۋەك"
+
+#. C9umd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_102\n"
+"property.text"
+msgid "Outline - Compact"
+msgstr "ئىزنا - ئىخچام"
+
+#. uYz2T
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_103\n"
+"property.text"
+msgid "Outline - Elegant"
+msgstr "ئىزنا - نەپىس"
+
+#. iFk6x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_104\n"
+"property.text"
+msgid "Outline - Highlighted"
+msgstr "ئىزنا - يورۇتۇلغان"
+
+#. jhJnN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_105\n"
+"property.text"
+msgid "Outline - Modern"
+msgstr "ئىزنا - زامانىۋى"
+
+#. mXnKN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_106\n"
+"property.text"
+msgid "Outline - Red & Blue"
+msgstr "ئىزنا - قىزىل ۋە كۆك"
+
+#. zKFcj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_107\n"
+"property.text"
+msgid "Outline, indented - Borders"
+msgstr "ئىزنا، تارايغان - گىرۋەك"
+
+#. 8XBee
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_108\n"
+"property.text"
+msgid "Outline, indented - Compact"
+msgstr "ئىزنا، تارايغان - ئىخچام"
+
+#. e47Xn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_109\n"
+"property.text"
+msgid "Outline, indented - Elegant"
+msgstr "ئىزنا، تارايغان - نەپىس"
+
+#. CGQuu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_110\n"
+"property.text"
+msgid "Outline, indented - Highlighted"
+msgstr "ئىزنا، تارايغان - يورۇتۇلغان"
+
+#. ABC5q
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_111\n"
+"property.text"
+msgid "Outline, indented - Modern"
+msgstr "ئىزنا، تارايغان - زامانىۋى"
+
+#. urT2J
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_112\n"
+"property.text"
+msgid "Outline, indented - Red & Blue"
+msgstr "ئىزنا، تارايغان - قىزىل ۋە كۆك"
+
+#. TzXg5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_113\n"
+"property.text"
+msgid "Bubbles"
+msgstr "كۆپۈكلەر"
+
+#. RGiTm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_114\n"
+"property.text"
+msgid "Cinema"
+msgstr "كىنوخانا"
+
+#. Eo2jG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_115\n"
+"property.text"
+msgid "Controlling"
+msgstr "تىزگىنلەۋاتىدۇ"
+
+#. fpiSX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_116\n"
+"property.text"
+msgid "Default"
+msgstr "كۆڭۈلدىكى"
+
+#. 927HM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_117\n"
+"property.text"
+msgid "Drafting"
+msgstr "سىزمىچىلىق"
+
+#. BGvCk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_118\n"
+"property.text"
+msgid "Finances"
+msgstr "مالىيە"
+
+#. mhJr6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_119\n"
+"property.text"
+msgid "Flipchart"
+msgstr "تەرتىپ دىئاگراممىسى"
+
+#. t5VdL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_120\n"
+"property.text"
+msgid "Formal with Company Logo"
+msgstr "شىركەت تۇغى بىلەن رەسمىي"
+
+#. iwANQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_121\n"
+"property.text"
+msgid "Generic"
+msgstr "ئادەتتىكى"
+
+#. RkArE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_122\n"
+"property.text"
+msgid "Worldmap"
+msgstr "دۇنيا خەرىتىسى"
+
+#. wpr5T
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_0\n"
+"property.text"
+msgid "C~reate"
+msgstr "قۇر(~R)"
+
+#. W6xLZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_1\n"
+"property.text"
+msgid "~Cancel"
+msgstr "ۋاز كەچ(~C)"
+
+#. ecMFi
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_2\n"
+"property.text"
+msgid "< ~Back"
+msgstr "ئالدى(~B) ›"
+
+#. HvEAE
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_3\n"
+"property.text"
+msgid "~Next >"
+msgstr "كېيىنكى (~N) >"
+
+#. u5rzd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_4\n"
+"property.text"
+msgid "~Database"
+msgstr "ساندان(~D)"
+
+#. sCeDP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_5\n"
+"property.text"
+msgid "~Table name"
+msgstr "جەدۋەل ئىسمى(~T)"
+
+#. KC4Dw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_6\n"
+"property.text"
+msgid "An error occurred while running the wizard. The wizard will be terminated."
+msgstr "يېتەكچى قوزغاتقاندا خاتالىق كۆرۈلدى. يېتەكچى ئاخىرلاشتۇرۇلدى."
+
+#. ZG95j
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_8\n"
+"property.text"
+msgid "No database has been installed. At least one database is required before the wizard for forms can be started."
+msgstr ""
+
+#. GCAgB
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_9\n"
+"property.text"
+msgid "The database does not contain any tables."
+msgstr "سانداندا \"#\" ئاتلىق جەدۋەل يوق."
+
+#. ikZ7F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_10\n"
+"property.text"
+msgid "This title already exists in the database. Please enter another name."
+msgstr ""
+
+#. Dposv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_11\n"
+"property.text"
+msgid "The title must not contain any spaces or special characters."
+msgstr ""
+
+#. FUgQA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_12\n"
+"property.text"
+msgid "The database service (com.sun.data.DatabaseEngine) could not be instantiated."
+msgstr ""
+
+#. HRAeA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_13\n"
+"property.text"
+msgid "The selected table or query could not be opened."
+msgstr ""
+
+#. VAphN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_14\n"
+"property.text"
+msgid "No connection to the database could be established."
+msgstr "ساندان بىلەن ئۇلىنىش قۇرالمىدى."
+
+#. z9FhA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_20\n"
+"property.text"
+msgid "~Help"
+msgstr "ياردەم(~H)"
+
+#. eXWrX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_21\n"
+"property.text"
+msgid "~Stop"
+msgstr "توختا(~S)"
+
+#. GiCi2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_30\n"
+"property.text"
+msgid "The document could not be saved."
+msgstr "بۇ پۈتۈكنى ساقلىيالمىدى."
+
+#. UkQEx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_33\n"
+"property.text"
+msgid "Exiting the wizard"
+msgstr "يېتەكچىدىن چېكىن"
+
+#. HrveE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_34\n"
+"property.text"
+msgid "Connecting to data source..."
+msgstr "سانلىق مەلۇمات مەنبەسىگە ئۇلىنىۋاتىدۇ…"
+
+#. se64P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_35\n"
+"property.text"
+msgid "The connection to the data source could not be established."
+msgstr "سانلىق مەلۇمات مەنبەسى بىلەن ئۇلىنالمىدى."
+
+#. Ch5MD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_36\n"
+"property.text"
+msgid "The file path entered is not valid."
+msgstr "كىرگۈزگەن ھۆججەت يولى ئىناۋەتسىز."
+
+#. kPABE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_37\n"
+"property.text"
+msgid "Please select a data source"
+msgstr "سانلىق مەلۇمات مەنبەسىدىن بىرنى تاللاڭ."
+
+#. XDBBC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_38\n"
+"property.text"
+msgid "Please select a table or query"
+msgstr "جەدۋەل ياكى سۈرۈشتۈرۈش تاللاڭ"
+
+#. AgeWk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_39\n"
+"property.text"
+msgid "Add field"
+msgstr "سۆز بۆلىكى قوش"
+
+#. FoExR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_40\n"
+"property.text"
+msgid "Remove field"
+msgstr "سۆز بۆلىكى چىقىرىۋەت"
+
+#. BuUZ5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_41\n"
+"property.text"
+msgid "Add all fields"
+msgstr "ھەممە سۆز بۆلىكىنى قوش"
+
+#. PVELV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_42\n"
+"property.text"
+msgid "Remove all fields"
+msgstr "ھەممە سۆز بۆلىكىنى چىقىرىۋەت"
+
+#. jAXRw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_43\n"
+"property.text"
+msgid "Move field up"
+msgstr "سۆز بۆلەكنى ئۈستىگە يۆتكە"
+
+#. Ao2Z6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_44\n"
+"property.text"
+msgid "Move field down"
+msgstr "سۆز بۆلەكنى تۆۋەنگە يۆتكە"
+
+#. B4mWx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_45\n"
+"property.text"
+msgid "The field names from '%NAME' could not be retrieved."
+msgstr "'%NAME' دىن سۆز بۆلەك ئاتىنى ئىزدىيەلمىدى."
+
+#. SNhe5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_0\n"
+"property.text"
+msgid "Query Wizard"
+msgstr "سۈرۈشتۈرۈش يېتەكچىسى"
+
+#. RySqB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_1\n"
+"property.text"
+msgid "Query"
+msgstr "سۈرۈشتۈر"
+
+#. wKhwS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_2\n"
+"property.text"
+msgid "Query Wizard"
+msgstr "سۈرۈشتۈرۈش يېتەكچىسى"
+
+#. QEtRG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_3\n"
+"property.text"
+msgid "~Tables"
+msgstr "جەدۋەل(~T)"
+
+#. s2KnF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_4\n"
+"property.text"
+msgid "A~vailable fields"
+msgstr "ئىشلىتىلىشچان سۆز بۆلىكى(~V)"
+
+#. Wsx8x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_5\n"
+"property.text"
+msgid "Name ~of the query"
+msgstr "سۈرۈشتۈرۈش ئاتى(~O)"
+
+#. t9MEU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_6\n"
+"property.text"
+msgid "Display ~Query"
+msgstr "سۈرۈشتۈرۈش كۆرسەت(~Q)"
+
+#. UBWUX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_7\n"
+"property.text"
+msgid "~Modify Query"
+msgstr "سۈرۈشتۈرۈش ئۆزگەرت(~M)"
+
+#. AoeET
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_8\n"
+"property.text"
+msgid "~How do you want to proceed after creating the query?"
+msgstr "سۈرۈشتۈرۈش قۇرغاندىن كېيىن قانداق داۋاملاشتۇرىدۇ(~H)؟"
+
+#. kofEg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_9\n"
+"property.text"
+msgid "Match ~all of the following"
+msgstr "تۆۋەندىكى تۈرلەرنىڭ ھەممىسىگە ماس كېلىدۇ(~A)"
+
+#. 4xM3Z
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_10\n"
+"property.text"
+msgid "~Match any of the following"
+msgstr "تۆۋەندىكىلەردىن خالىغان بىرسىگە ماسلاشتۇر(~M)"
+
+#. WLFFc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_11\n"
+"property.text"
+msgid "~Detailed query (Shows all records of the query.)"
+msgstr "تەپسىلىي سۈرۈشتۈرۈش (سۈرۈشتۈرۈشنىڭ ھەممە خاتىرىسىنى كۆرسەت)(~D)"
+
+#. fnzhE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_12\n"
+"property.text"
+msgid "~Summary query (Shows only results of aggregate functions.)"
+msgstr "قىسقىچە سۈرۈشتۈرۈش (توپلانما فونكسىيىنىڭ نەتىجىسىنىلا كۆرسەت)(~S)"
+
+#. SdQBk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_16\n"
+"property.text"
+msgid "Aggregate functions"
+msgstr "توپلانما فونكسىيە"
+
+#. tFNb2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_17\n"
+"property.text"
+msgid "Fields"
+msgstr "سۆز بۆلىكى"
+
+#. D9sGR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_18\n"
+"property.text"
+msgid "~Group by"
+msgstr "گۇرۇپپا ئاساسى(~G)"
+
+#. E5N85
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_19\n"
+"property.text"
+msgid "Field"
+msgstr "سۆز بۆلىكى"
+
+#. 2dqd2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_20\n"
+"property.text"
+msgid "Alias"
+msgstr "تەخەللۇس"
+
+#. 8eMER
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_21\n"
+"property.text"
+msgid "Table:"
+msgstr "جەدۋەل:"
+
+#. jaKR7
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_22\n"
+"property.text"
+msgid "Query:"
+msgstr "سۈرۈشتۈر: "
+
+#. TpbSv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_24\n"
+"property.text"
+msgid "Condition"
+msgstr "شەرت"
+
+#. Dvk6K
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_25\n"
+"property.text"
+msgid "Value"
+msgstr "قىممەت"
+
+#. oP8P9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_26\n"
+"property.text"
+msgid "is equal to"
+msgstr "تەڭ"
+
+#. D7K36
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_27\n"
+"property.text"
+msgid "is not equal to"
+msgstr "تەڭ ئەمەس"
+
+#. n9gFB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_28\n"
+"property.text"
+msgid "is smaller than"
+msgstr "كىچىك"
+
+#. FAiPg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_29\n"
+"property.text"
+msgid "is greater than"
+msgstr "چوڭ"
+
+#. pFsPY
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_30\n"
+"property.text"
+msgid "is equal or less than"
+msgstr "تەڭ ياكى كىچىك "
+
+#. yT9cM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_31\n"
+"property.text"
+msgid "is equal or greater than"
+msgstr "تەڭ ياكى چوڭ"
+
+#. GFnAN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_32\n"
+"property.text"
+msgid "like"
+msgstr "ئوخشاش"
+
+#. JZCLd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_33\n"
+"property.text"
+msgid "not like"
+msgstr "ئوخشىمايدۇ"
+
+#. TiHHv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_34\n"
+"property.text"
+msgid "is null"
+msgstr "بوش"
+
+#. dpAdZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_35\n"
+"property.text"
+msgid "is not null"
+msgstr "بوش ئەمەس"
+
+#. ZnCKf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_36\n"
+"property.text"
+msgid "true"
+msgstr "راست"
+
+#. AwCQp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_37\n"
+"property.text"
+msgid "false"
+msgstr "يالغان"
+
+#. GEGKb
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_38\n"
+"property.text"
+msgid "and"
+msgstr "ۋە"
+
+#. GDvQV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_39\n"
+"property.text"
+msgid "or"
+msgstr "ياكى"
+
+#. BaA5J
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_40\n"
+"property.text"
+msgid "get the sum of"
+msgstr "يىغىندا"
+
+#. uCRgg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_41\n"
+"property.text"
+msgid "get the average of"
+msgstr "ئوتتۇرىچە قىممەت"
+
+#. UjEVW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_42\n"
+"property.text"
+msgid "get the minimum of"
+msgstr "ئەڭ كىچىك قىممەت"
+
+#. qpN4C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_43\n"
+"property.text"
+msgid "get the maximum of"
+msgstr "ئەڭ چوڭ قىممەت"
+
+#. DAZUE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_44\n"
+"property.text"
+msgid "get the count of"
+msgstr "يىغىندا:"
+
+#. BBEEj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_48\n"
+"property.text"
+msgid "(none)"
+msgstr "(يوق)"
+
+#. agTUo
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_50\n"
+"property.text"
+msgid "Fie~lds in the Query:"
+msgstr "سۈرۈشتۈرۈشتىكى سۆز بۆلىكى(~L): "
+
+#. CScUQ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_51\n"
+"property.text"
+msgid "Sorting order:"
+msgstr "تەرتىپلەش تەرتىپى: "
+
+#. JDHFH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_52\n"
+"property.text"
+msgid "No sorting fields were assigned."
+msgstr "تەرتىپلەش سۆز بۆلىكى بەلگىلەنمىگەن."
+
+#. GLtfA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_53\n"
+"property.text"
+msgid "Search conditions:"
+msgstr "ئىزدەش شەرتى: "
+
+#. DocWB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_54\n"
+"property.text"
+msgid "No conditions were assigned."
+msgstr "شەرت بەلگىلەنمىگەن."
+
+#. BfAEG
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_55\n"
+"property.text"
+msgid "Aggregate functions:"
+msgstr "توپلانما فونكسىيە: "
+
+#. mArUE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_56\n"
+"property.text"
+msgid "No aggregate functions were assigned."
+msgstr "توپلانما فونكسىيە بەلگىلەنمىگەن."
+
+#. uDTRV
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_57\n"
+"property.text"
+msgid "Grouped by:"
+msgstr "گۇرۇپپا ئاساسى: "
+
+#. WXLSS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_58\n"
+"property.text"
+msgid "No Groups were assigned."
+msgstr "گۇرۇپپا بەلگىلەنمىگەن."
+
+#. jhPaR
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_59\n"
+"property.text"
+msgid "Grouping conditions:"
+msgstr "گۇرۇپپا شەرتى: "
+
+#. EoMHV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_60\n"
+"property.text"
+msgid "No grouping conditions were assigned."
+msgstr "گۇرۇپپا شەرتى بەلگىلەنمىگەن."
+
+#. NNF8b
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_70\n"
+"property.text"
+msgid "Select the fields (columns) for your query"
+msgstr "سۈرۈشتۈرىدىغان سۆز بۆلىكى (رەت) تاللا"
+
+#. kX9cK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_71\n"
+"property.text"
+msgid "Select the sorting order"
+msgstr "تەرتىپلەش تەرتىپىنى تاللا"
+
+#. 7jmnS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_72\n"
+"property.text"
+msgid "Select the search conditions"
+msgstr "ئىزدەش شەرتىنى تاللا"
+
+#. UHCrm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_73\n"
+"property.text"
+msgid "Select the type of query"
+msgstr "ئىزدەش تىپىنى تاللا"
+
+#. ZY6MS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_74\n"
+"property.text"
+msgid "Select the groups"
+msgstr "گۇرۇپپا تاللا"
+
+#. N8n8X
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_75\n"
+"property.text"
+msgid "Select the grouping conditions"
+msgstr "گۇرۇپپا شەرتىنى تاللا"
+
+#. sy7Lt
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_76\n"
+"property.text"
+msgid "Assign aliases if desired"
+msgstr "لازىم بولسا تەخەللۇس بەلگىلە"
+
+#. exiZ6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_77\n"
+"property.text"
+msgid "Check the overview and decide how to proceed"
+msgstr "قىسقىچە باياننى تەكشۈرۇپ قانداق داۋاملاشتۇرۇشنى جەزملە"
+
+#. 2uhKR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_80\n"
+"property.text"
+msgid "Field selection"
+msgstr "سۆز بۆلىكى تاللا"
+
+#. LzPyD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_81\n"
+"property.text"
+msgid "Sorting order"
+msgstr "تەرتىپلەش تەرتىپى"
+
+#. pVVLS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_82\n"
+"property.text"
+msgid "Search conditions"
+msgstr "ئىزدەش شەرتى"
+
+#. Z22GZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_83\n"
+"property.text"
+msgid "Detail or summary"
+msgstr "تەپسىلىي ياكى قىسقىچە"
+
+#. 4EYC7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_84\n"
+"property.text"
+msgid "Grouping"
+msgstr "گۇرۇپپىلاش"
+
+#. MziCd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_85\n"
+"property.text"
+msgid "Grouping conditions"
+msgstr "گۇرۇپپا شەرتى"
+
+#. EB7JF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_86\n"
+"property.text"
+msgid "Aliases"
+msgstr "تەخەللۇس"
+
+#. WzptL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_87\n"
+"property.text"
+msgid "Overview"
+msgstr "قىسقىچە بايان"
+
+#. f4xrP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_88\n"
+"property.text"
+msgid "A field that has not been assigned an aggregate function must be used in a group."
+msgstr "گۇرۇپپىدا  توپلانما فونكسىيىنىڭ بەلگىلەنمىگەن سۆز بۆلىكىدىن بىرى ئىشلىتىلىشى لازىم."
+
+#. 2C2nu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_89\n"
+"property.text"
+msgid "The condition '<FIELDNAME> <LOGICOPERATOR> <VALUE>' was chosen twice. Each condition can only be chosen once"
+msgstr "'<FIELDNAME> <LOGICOPERATOR> <VALUE>' شەرتى ئىككى قېتىم تاللاندى. ھەر بىر شەرت بىرلا قېتىم تاللىنىدۇ."
+
+#. ZAHzB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_90\n"
+"property.text"
+msgid "The aggregate function <FUNCTION> has been assigned twice to the fieldname '<NUMERICFIELD>'."
+msgstr "<FUNCTION> توپلانما فونكسىيە'<NUMERICFIELD>' سۆز بۆلەك ئاتىغا ئىككى قېتىم بەلگىلەپ بېرىلدى."
+
+#. s2MGE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_91\n"
+"property.text"
+msgid ","
+msgstr ""
+
+#. D8bmB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_92\n"
+"property.text"
+msgid "<FIELDTITLE> (<FIELDNAME>)"
+msgstr "<FIELDTITLE> (<FIELDNAME>)"
+
+#. dGCJv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_93\n"
+"property.text"
+msgid "<FIELDNAME> (<SORTMODE>)"
+msgstr "<FIELDNAME> (<SORTMODE>)"
+
+#. RAt2h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_94\n"
+"property.text"
+msgid "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+msgstr "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+
+#. pbBGo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_95\n"
+"property.text"
+msgid "<CALCULATEDFUNCTION> <FIELDNAME>"
+msgstr "<CALCULATEDFUNCTION> <FIELDNAME>"
+
+#. MBwoM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_96\n"
+"property.text"
+msgid "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+msgstr "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+
+#. yheet
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_0\n"
+"property.text"
+msgid "Form Wizard"
+msgstr "كۆزنەك يېتەكچىسى"
+
+#. H4MXV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_1\n"
+"property.text"
+msgid "Fields in ~the form"
+msgstr "كۆزنەكتىكى سۆز بۆلىكى(~T)"
+
+#. 6J6EJ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_2\n"
+"property.text"
+msgid "Binary fields are always listed and selectable from the left list.\\nIf possible, they are interpreted as images."
+msgstr ""
+"ئىككىلىك سىستېمىدىكى سۆز بۆلىكى ئىزچىل سول تەرەپتىكى تىزىملىكتە كۆرسىتىلىپ تاللاشقا تەمىنلىنىدۇ.\n"
+"ئەگەر مۇمكىن بولسا بۇ سۆز بۆلەكلىرى سۈرەت سۈپىتىدە كۆرسىتىلىدۇ."
+
+#. BCBCd
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_3\n"
+"property.text"
+msgid "A subform is a form that is inserted in another form.\\nUse subforms to show data from tables or queries with a one-to-many relationship."
+msgstr ""
+"تارماق كۆزنەك باشقا كۆزنەككە قىستۇرىدىغان كۆزنەكتۇر.\n"
+"تارماق كۆزنەك ئىشلىتىپ بىرسى كۆپكە باغلىنىش مۇناسىۋىتىدىكى جەدۋەل ياكى سۈرۈشتۈرۈشتىكى سانلىق مەلۇماتلارنى كۆرسىتەلەيدۇ.relationship."
+
+#. h4XzG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_4\n"
+"property.text"
+msgid "~Add Subform"
+msgstr "تارماق كۆزنەك قوش(~A)"
+
+#. GSiwE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_5\n"
+"property.text"
+msgid "~Subform based on existing relation"
+msgstr "نۆۋەتتىكى مۇناسىۋەت ئاساسىدىكى تارماق كۆزنەك(~S)"
+
+#. oFM6V
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_6\n"
+"property.text"
+msgid "Tables or queries"
+msgstr "جەدۋەل ياكى سۈرۈشتۈرۈش"
+
+#. 2BEab
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_7\n"
+"property.text"
+msgid "Subform based on ~manual selection of fields"
+msgstr "قولدا تاللايدىغان سۆز بۆلەك ئاساسىدىكى كۆزنەك(~M)"
+
+#. PShA6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_8\n"
+"property.text"
+msgid "~Which relation do you want to add?"
+msgstr "قانداق مۇناسىۋەت قوشىسىز(~W)؟"
+
+#. yGGuc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_9\n"
+"property.text"
+msgid "Fields in the ~subform"
+msgstr "تارماق كۆزنەكتىكى سۆز بۆلىكى(~S)"
+
+#. KG4Hj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_12\n"
+"property.text"
+msgid "~Available fields"
+msgstr "ئىشلىتىلىشچان سۆز بۆلىكى(~A)"
+
+#. pB2Mv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_13\n"
+"property.text"
+msgid "Fields in form"
+msgstr "جەدۋەلدىكى سۆز بۆلىكى"
+
+#. fFuDk
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_19\n"
+"property.text"
+msgid "The join '<FIELDNAME1>' and '<FIELDNAME2>' has been selected twice.\\nBut joins may only be used once."
+msgstr ""
+"'<FIELDNAME1>' ۋە '<FIELDNAME2>' نىڭ بېرىكمىسى ئىككى قېتىم تاللاندى.\n"
+"ئەمما بېرىكمىنى بىرلا قېتىم ئىشلەتكىلى بولىدۇ."
+
+#. 9uFd2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_20\n"
+"property.text"
+msgid "~First joined subform field"
+msgstr "بىرىنچى قېتىم بېرىكتۈرگەن تارماق كۆزنەك سۆز بۆلىكى(~F)"
+
+#. NfpyC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_21\n"
+"property.text"
+msgid "~Second joined subform field"
+msgstr "ئىككىنچى قېتىم بېرىكتۈرگەن تارماق كۆزنەك سۆز بۆلىكى(~S)"
+
+#. 5F4nf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_22\n"
+"property.text"
+msgid "~Third joined subform field"
+msgstr "ئۈچىنچى قېتىم بېرىكتۈرگەن تارماق كۆزنەك سۆز بۆلىكى(~T)"
+
+#. BJBzR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_23\n"
+"property.text"
+msgid "~Fourth joined subform field"
+msgstr "تۆتىنچى قېتىم بېرىكتۈرگەن تارماق كۆزنەك سۆز بۆلىكى(~F)"
+
+#. EAJxx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_24\n"
+"property.text"
+msgid "F~irst joined main form field"
+msgstr "بىرىنچى قېتىم بېرىكتۈرگەن ئاساسىي كۆزنەك سۆز بۆلىكى(~I)"
+
+#. S72RL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_25\n"
+"property.text"
+msgid "S~econd joined main form field"
+msgstr "ئىككىنچى قېتىم بېرىكتۈرگەن ئاساسىي كۆزنەك سۆز بۆلىكى(~E)"
+
+#. C73ZZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_26\n"
+"property.text"
+msgid "T~hird joined main form field"
+msgstr "ئۈچىنچى قېتىم بېرىكتۈرگەن ئاساسىي كۆزنەك سۆز بۆلىكى(~H)"
+
+#. AwNUu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_27\n"
+"property.text"
+msgid "F~ourth joined main form field"
+msgstr "تۆتىنچى قېتىم بېرىكتۈرگەن ئاساسىي كۆزنەك سۆز بۆلىكى(~O)"
+
+#. KCNEY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_28\n"
+"property.text"
+msgid "Field border"
+msgstr "سۆز بۆلەك يان رامكىسى"
+
+#. oQq6u
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_29\n"
+"property.text"
+msgid "No border"
+msgstr "يان رامكا يوق"
+
+#. hk9Xa
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_30\n"
+"property.text"
+msgid "3D look"
+msgstr "3D كۆرۈنۈش"
+
+#. noMiL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_31\n"
+"property.text"
+msgid "Flat"
+msgstr "تەكشىلىك"
+
+#. kCBjw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_32\n"
+"property.text"
+msgid "Label placement"
+msgstr "بەلگە سۆز بۆلىكىگە توغرىلا"
+
+#. Vrww6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_33\n"
+"property.text"
+msgid "Align left"
+msgstr "سولغا توغرىلا"
+
+#. Qrt6U
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_34\n"
+"property.text"
+msgid "Align right"
+msgstr "ئوڭغا توغرىلا"
+
+#. KNG6r
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_35\n"
+"property.text"
+msgid "Arrangement of DB fields"
+msgstr "ساندان سۆز بۆلىكىگە توغرىلا"
+
+#. nRTak
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_36\n"
+"property.text"
+msgid "Columnar - Labels Left"
+msgstr "رەت ئىچىدە - بەلگە سولدا"
+
+#. HcbRM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_37\n"
+"property.text"
+msgid "Columnar - Labels on Top"
+msgstr "رەت ئىچىدە - بەلگە ئۈستىدە"
+
+#. dRw3C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_38\n"
+"property.text"
+msgid "In Blocks - Labels Left"
+msgstr "پارچىدا - بەلگە سولدا"
+
+#. m99kS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_39\n"
+"property.text"
+msgid "In Blocks - Labels Above"
+msgstr "پارچىدا - بەلگە ئۈستىدە"
+
+#. ZNTvC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_40\n"
+"property.text"
+msgid "As Data Sheet"
+msgstr "سانلىق مەلۇمات ۋارىقى سۈپىتىدە"
+
+#. F5dN5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_41\n"
+"property.text"
+msgid "Arrangement of the main form"
+msgstr "ئاساسىي كۆزنەكنىڭ تىزىلىشى"
+
+#. BEN4F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_42\n"
+"property.text"
+msgid "Arrangement of the subform"
+msgstr "تارماق كۆزنەكنىڭ تىزىلىشى"
+
+#. ZAxZE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_44\n"
+"property.text"
+msgid "The form is to be ~used for entering new data only."
+msgstr "كۆزنەك يېڭى سانلىق مەلۇمات كىرگۈزۈش ئۈچۈنلا ئىشلىتىلىدۇ(~U)."
+
+#. epRse
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_45\n"
+"property.text"
+msgid "Existing data will not be displayed"
+msgstr "نۆۋەتتىكى سانلىق مەلۇمات كۆرسىتىلمەيدۇ "
+
+#. hrpiG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_46\n"
+"property.text"
+msgid "T~he form is to display all data"
+msgstr "بۇ كۆزنەك ھەممە سانلىق مەلۇماتلارنى كۆرسىتىدۇ(~H)"
+
+#. jqEHe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_47\n"
+"property.text"
+msgid "Do not allow ~modification of existing data"
+msgstr "نۆۋەتتىكى سانلىق مەلۇماتنى ئۆزگەرتىشكە يول قويمايدۇ(~M)"
+
+#. FE9no
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_48\n"
+"property.text"
+msgid "Do not allow ~deletion of existing data"
+msgstr "نۆۋەتتىكى سانلىق مەلۇماتنى ئۆچۈرۈشكە يول قويمايدۇ(~D)"
+
+#. KwdDp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_49\n"
+"property.text"
+msgid "Do not allow ~addition of new data"
+msgstr "يېڭى سانلىق مەلۇمات قوشۇشقا يول قويمايدۇ(~A)"
+
+#. Z7Wzp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_50\n"
+"property.text"
+msgid "Name of ~the form"
+msgstr "كۆزنەك ئاتى(~T)"
+
+#. AdLhz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_51\n"
+"property.text"
+msgid "How do you want to proceed after creating the form?"
+msgstr "كۆزنەك قۇرغاندىن كېيىن قانداق داۋاملاشتۇرىدۇ؟"
+
+#. G7CYq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_52\n"
+"property.text"
+msgid "~Work with the form"
+msgstr "كۆزنەك ئىشلەت(~W)"
+
+#. iCnFm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_53\n"
+"property.text"
+msgid "~Modify the form"
+msgstr "كۆزنەك ئۆزگەرت(~M)"
+
+#. 5EgBu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_55\n"
+"property.text"
+msgid "~Page Styles"
+msgstr "بەت ئۇسلۇبى(~P)"
+
+#. D99cE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_80\n"
+"property.text"
+msgid "Field selection"
+msgstr "سۆز بۆلىكى تاللا"
+
+#. AspWz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_81\n"
+"property.text"
+msgid "Set up a subform"
+msgstr "تارماق كۆزنەك تەڭشىكى"
+
+#. YayFB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_82\n"
+"property.text"
+msgid "Add subform fields"
+msgstr "تارماق كۆزنەك سۆز بۆلىكى قوش"
+
+#. V2Q6R
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_83\n"
+"property.text"
+msgid "Get joined fields"
+msgstr "بېرىكمە سۆز بۆلىكىگە ئېرىش"
+
+#. orBm4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_84\n"
+"property.text"
+msgid "Arrange controls"
+msgstr "تىزىش كونترولى"
+
+#. QGCau
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_85\n"
+"property.text"
+msgid "Set data entry"
+msgstr "سانلىق مەلۇمات تۈر تەڭشىكى"
+
+#. vFeqn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_86\n"
+"property.text"
+msgid "Apply styles"
+msgstr "ئۇسلۇب قوللان"
+
+#. 24keF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_87\n"
+"property.text"
+msgid "Set name"
+msgstr "ئات تەڭشىكى"
+
+#. H25LH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_88\n"
+"property.text"
+msgid "(Date)"
+msgstr "(چېسلا)"
+
+#. EACeJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_89\n"
+"property.text"
+msgid "(Time)"
+msgstr "(ۋاقىت)"
+
+#. scXkg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_90\n"
+"property.text"
+msgid "Select the fields of your form"
+msgstr "كۆزنەكتىكى سۆز بۆلەكنى تاللاڭ"
+
+#. s6xRo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_91\n"
+"property.text"
+msgid "Decide if you want to set up a subform"
+msgstr "تارماق كۆزنەك تەڭشەش ياكى تەڭشىمەسلىكنى جەزملە"
+
+#. 4pHsF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_92\n"
+"property.text"
+msgid "Select the fields of your subform"
+msgstr "تارماق كۆزنەكنىڭ سۆز بۆلىكىنى تاللا"
+
+#. WT3Gn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_93\n"
+"property.text"
+msgid "Select the joins between your forms"
+msgstr "كۆزنەكلەر ئارىسىدىكى بېرىكمىنى تاللا"
+
+#. DWvza
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_94\n"
+"property.text"
+msgid "Arrange the controls on your form"
+msgstr "كۆزنەكتە كونتروللارنى تەرتىپلە"
+
+#. j6uv4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_95\n"
+"property.text"
+msgid "Select the data entry mode"
+msgstr "سانلىق مەلۇمات تۈر تىپىنى تاللا"
+
+#. TWztZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_96\n"
+"property.text"
+msgid "Apply the style of your form"
+msgstr "كۆزنەك ئۇسلۇبىنى قوللان"
+
+#. zZiae
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_97\n"
+"property.text"
+msgid "Set the name of the form"
+msgstr "كۆزنەك ئاتىنى تەڭشە"
+
+#. JTRXV
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_98\n"
+"property.text"
+msgid "A form with the name '%FORMNAME' already exists.\\nChoose another name."
+msgstr ""
+"'%FORMNAME' ئاتلىق كۆزنەك مەۋجۇد.\n"
+"باشقا ئاتىنى تاللاڭ."
+
+#. KJkgf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_1\n"
+"property.text"
+msgid "Table Wizard"
+msgstr "جەدۋەل يېتەكچىسى"
+
+#. hGMoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_2\n"
+"property.text"
+msgid "Select fields"
+msgstr "سۆز بۆلىكى تاللا"
+
+#. XEQgp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_3\n"
+"property.text"
+msgid "Set types and formats"
+msgstr "تىپ ۋە پىچىم تەڭشىكى"
+
+#. Lww9c
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_4\n"
+"property.text"
+msgid "Set primary key"
+msgstr "ئاساسىي ھالقىلىق سۆز تەڭشىكى"
+
+#. LkTBf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_5\n"
+"property.text"
+msgid "Create table"
+msgstr "جەدۋەل قۇر"
+
+#. hei5Y
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_8\n"
+"property.text"
+msgid "Select fields for your table"
+msgstr "جەدۋەلگە سۆز بۆلىكى تاللاڭ"
+
+#. 5DXT6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_9\n"
+"property.text"
+msgid "Set field types and formats"
+msgstr "سۆز بۆلەك تىپى ۋە پىچىم تەڭشىكى"
+
+#. bAfiP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_10\n"
+"property.text"
+msgid "Set primary key"
+msgstr "ئاساسىي ھالقىلىق سۆز تەڭشىكى"
+
+#. UHTbE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_11\n"
+"property.text"
+msgid "Create table"
+msgstr "جەدۋەل قۇر"
+
+#. XyCFc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_14\n"
+"property.text"
+msgid "This wizard helps you to create a table for your database. After selecting a table category and a sample table, choose the fields you want to include in your table. You can include fields from more than one sample table."
+msgstr "بۇ يېتەكچى سىزگە ياردەملىشىپ ساندان ئۈچۈن جەدۋەلدىن بىرنى قۇرىدۇ. جەدۋەل تۈرى ۋە جەدۋەل ئۈلگىسىنى تاللىغاندىن كېيىن، جەدۋەلگە قوشىدىغان سۆز بۆلىكىنى تاللاڭ. بىر قانچە جەدۋەل ئۈلگىسىدىكى سۆز بۆلەكلىرىنى قوشقىلى بولىدۇ."
+
+#. FEU9Q
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_15\n"
+"property.text"
+msgid "Ca~tegory"
+msgstr "كاتېگورىيە(~T)"
+
+#. aBFKF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_16\n"
+"property.text"
+msgid "B~usiness"
+msgstr "كارخانا(~U)"
+
+#. nfCjy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_17\n"
+"property.text"
+msgid "P~ersonal"
+msgstr "شەخسىي(~E)"
+
+#. NrVBB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_18\n"
+"property.text"
+msgid "~Sample tables"
+msgstr "ئۈلگە جەدۋەل(~S)"
+
+#. itXJ9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_19\n"
+"property.text"
+msgid "A~vailable fields"
+msgstr "ئىشلىتىلىشچان سۆز بۆلىكى(~V)"
+
+#. JteH7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_20\n"
+"property.text"
+msgid "Field information"
+msgstr "سۆز بۆلەك ئۇچۇرى"
+
+#. NqEog
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_21\n"
+"property.text"
+msgid "+"
+msgstr ""
+
+#. BhFze
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_22\n"
+"property.text"
+msgid "-"
+msgstr ""
+
+#. B8Qeu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_23\n"
+"property.text"
+msgid "Field name"
+msgstr "سۆز بۆلەك ئاتى"
+
+#. gF5v4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_24\n"
+"property.text"
+msgid "Field type"
+msgstr "سۆز بۆلەك تىپى"
+
+#. S82Up
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_25\n"
+"property.text"
+msgid "~Selected fields"
+msgstr "تاللانغان سۆز بۆلىكى(~S)"
+
+#. iWG72
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_26\n"
+"property.text"
+msgid "A primary key uniquely identifies each record in a database table. Primary keys ease the linking of information in separate tables, and it is recommended that you have a primary key in every table. Without a primary key, it will not be possible to enter data into this table."
+msgstr "ئاساسىي ھالقىلىق سۆز ساندان جەدۋىلىدىكى ھەر بىر خاتىرىنى بىردىنبىر بەلگە بىلەن ئىپادىلەشكە ئىشلىتىلىدۇ. ئاساسىي ھالقىلىق سۆز ئارقىلىق ھەر بىر جەدۋالدىكى ئۇچۇرلارغا ناھايىتى قولاي ھالدا ئۇلىنالايدۇ؛ ھەر بىر جەدۋەلگە بىردىن ھالقىلىق سۆز تەڭشىشىڭىزنى تەۋسىيە قىلىمىز.  ئەگەر ئاساسىي ھالقىلىق سۆز بولمىسا، بۇ جەدۋەلنى ساندانغا كىرگۈزگىلى بولمايدۇ."
+
+#. 3kaaw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_27\n"
+"property.text"
+msgid "~Create a primary key"
+msgstr "ئاساسىي ھالقىلىق سۆز قۇر(~C)"
+
+#. xGC6Z
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_28\n"
+"property.text"
+msgid "~Automatically add a primary key"
+msgstr "ئۆزلۈكىدىن ئاساسىي ھالقىلىق سۆز قۇر(~A)"
+
+#. aP3ai
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_29\n"
+"property.text"
+msgid "~Use an existing field as a primary key"
+msgstr "نۆۋەتتىكى سۆز بۆلىكىنى ئاساسىي ھالقىلىق سۆز قىلىپ ئىشلەت(~U)"
+
+#. KBVAL
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_30\n"
+"property.text"
+msgid "Define p~rimary key as a combination of several fields"
+msgstr "ئاساسىي ھالقىلىق سۆزنى بىر قانچە سۆز بۆلىكىنىڭ بېرىكمىسى قىلىپ بەلگىلە(~R) "
+
+#. PQfF2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_31\n"
+"property.text"
+msgid "F~ieldname"
+msgstr "سۆز بۆلەك ئاتى(~I)"
+
+#. AK4Vf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_32\n"
+"property.text"
+msgid "~Primary key fields"
+msgstr "ئاساسىي ھالقىلىق سۆز سۆز بۆلىكى(~P)"
+
+#. ZykVT
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_33\n"
+"property.text"
+msgid "Auto ~value"
+msgstr "ئاپتوماتىك قىممەت(~V)"
+
+#. AnaDG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_34\n"
+"property.text"
+msgid "What do you want to name your table?"
+msgstr "جەدۋەلگە قانداق ئات قويىسىز؟"
+
+#. vVHAs
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_35\n"
+"property.text"
+msgid "Congratulations. You have entered all the information needed to create your table."
+msgstr "مۇبارەك بولسۇن. جەدۋەل قۇرۇشقا لازىملىق ھەممە ئۇچۇرلارنى كىرگۈزۈپ بولدىڭىز."
+
+#. 9wGua
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_36\n"
+"property.text"
+msgid "What do you want to do next?"
+msgstr "كېيىن سىز نېمە ئىش قىلماقچى؟"
+
+#. satRX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_37\n"
+"property.text"
+msgid "Modify the table design"
+msgstr "جەدۋەل لايىھىسى ئۆزگەرت"
+
+#. GEjDE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_38\n"
+"property.text"
+msgid "Insert data immediately"
+msgstr "دەرھال سانلىق مەلۇمات قىستۇر"
+
+#. E8SB9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_39\n"
+"property.text"
+msgid "C~reate a form based on this table"
+msgstr "بۇ جەدۋەل ئاساسىدا كۆزنەك قۇر(~R)"
+
+#. FkbmE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_40\n"
+"property.text"
+msgid "The table you have created could not be opened."
+msgstr "سىز قۇرغان جەدۋەلنى ئاچالمىدى."
+
+#. mZMcY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_41\n"
+"property.text"
+msgid "The table name '%TABLENAME' contains a character ('%SPECIALCHAR') that might not be supported by the database."
+msgstr "'%TABLENAME' جەدۋەل ئاتىدا ساندان قوللىمايدىغان ئالاھىدە ھەرپ ('%SPECIALCHAR') بولۇشى مۇمكىن."
+
+#. GGfLR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_42\n"
+"property.text"
+msgid "The field name '%FIELDNAME' contains a special character ('%SPECIALCHAR') that might not be supported by the database."
+msgstr "'%FIELDNAME' سۆز بۆلەك ئاتىدا ساندان قوللىمايدىغان ئالاھىدە ھەرپ ('%SPECIALCHAR') بولۇشى مۇمكىن."
+
+#. CtXqK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_43\n"
+"property.text"
+msgid "Field"
+msgstr "سۆز بۆلىكى"
+
+#. LCMUy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_44\n"
+"property.text"
+msgid "MyTable"
+msgstr "MyTable"
+
+#. g7GJC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_45\n"
+"property.text"
+msgid "Add a Field"
+msgstr "سۆز بۆلىكى قوش"
+
+#. EC4Xn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_46\n"
+"property.text"
+msgid "Remove the selected Field"
+msgstr "تاللانغان سۆز بۆلىكىنى تاللا"
+
+#. rhV9g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_47\n"
+"property.text"
+msgid "The field cannot be inserted because this would exceed the maximum number of %COUNT possible fields in the database table"
+msgstr "سۆز بۆلەكنى قىستۇرالمىدى، چۈنكى ساندان جەدۋىلىدە يول قويىدىغان ئەڭ كۆپ سۆز بۆلەك سانى %COUNT دىن ئېشىپ كەتتى."
+
+#. jbZRo
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_48\n"
+"property.text"
+msgid "The name '%TABLENAME' already exists.\\nPlease enter another name."
+msgstr ""
+"'%TABLENAME' ئات مەۋجۇد.\n"
+"باشقا ئات كىرگۈزۈڭ."
+
+#. CSsZM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_49\n"
+"property.text"
+msgid "Catalog of the table"
+msgstr "جەدۋەل مۇندەرىجىسى"
+
+#. vYCp3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_50\n"
+"property.text"
+msgid "Schema of the table"
+msgstr "جەدۋەل ھالىتى"
+
+#. UnUxG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_51\n"
+"property.text"
+msgid "The field '%FIELDNAME' already exists."
+msgstr "'%FIELDNAME' سۆز بۆلىكى مەۋجۇد."
+
+#. Jqd4i
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_0\n"
+"property.text"
+msgid "~Cancel"
+msgstr "ۋاز كەچ(~C)"
+
+#. t9bGA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_1\n"
+"property.text"
+msgid "~Help"
+msgstr "ياردەم(~H)"
+
+#. TQ8fA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_2\n"
+"property.text"
+msgid "< ~Back"
+msgstr "ئالدى(~B) ›"
+
+#. XD8JL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_3\n"
+"property.text"
+msgid "~Convert"
+msgstr "ئالماشتۇر(~C)"
+
+#. tGJBz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_4\n"
+"property.text"
+msgid "Note: Currency amounts from external links and currency conversion factors in formulas cannot be converted."
+msgstr "ئەسكەرتىش: سىرتتىن نەقىل ئېلىپ ئەكىرگەن سانلىق مەلۇماتنىڭ پۇل سوممىسى ۋە فورمۇلاسىدىكى پۇل ئايلاندۇرۇش كوئېففىتسېنتىنى ئايلاندۇرالمىدى."
+
+#. GdxoQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_5\n"
+"property.text"
+msgid "First, unprotect all sheets."
+msgstr "ئالدى بىلەن ھەممە جەدۋەل قوغداشنى بوشات."
+
+#. fUudC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_6\n"
+"property.text"
+msgid "Currencies:"
+msgstr "پۇل:"
+
+#. 5Uug9
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_7\n"
+"property.text"
+msgid "C~ontinue >"
+msgstr "داۋاملاشتۇر(~O)>>"
+
+#. 9JLmA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_8\n"
+"property.text"
+msgid "C~lose"
+msgstr "ياپ(~L)"
+
+#. pkLZp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_0\n"
+"property.text"
+msgid "~Entire document"
+msgstr "پۈتكۈل پۈتۈك(~E)"
+
+#. KTycA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_1\n"
+"property.text"
+msgid "Selection"
+msgstr "تاللا"
+
+#. NCtfG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_2\n"
+"property.text"
+msgid "Cell S~tyles"
+msgstr "كاتەكچە ئۇسلۇبى(~T)"
+
+#. W4CcY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_3\n"
+"property.text"
+msgid "Currency cells in the current ~sheet"
+msgstr "نۆۋەتتىكى جەدۋەلدىكى پۇل بىرلىك كاتەكچىسى(~S)"
+
+#. XBbAm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_4\n"
+"property.text"
+msgid "Currency cells in the entire ~document"
+msgstr "پۈتكۈل پۈتۈكتىكى پۇل بىرلىك كاتەكچىسى(~D)"
+
+#. dRGpU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_5\n"
+"property.text"
+msgid "~Selected range"
+msgstr "تاللانغان دائىرە(~S)"
+
+#. KGDmq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_6\n"
+"property.text"
+msgid "Select Cell Styles"
+msgstr "كاتەكچە ئۇسلۇبى تاللا"
+
+#. rEiCE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_7\n"
+"property.text"
+msgid "Select currency cells"
+msgstr "پۇل بىرلىكى كاتەكچە تاللا"
+
+#. yXtpS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_8\n"
+"property.text"
+msgid "Currency ranges:"
+msgstr "پۇل دائىرىسى:"
+
+#. d2faA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_9\n"
+"property.text"
+msgid "Templates:"
+msgstr "قېلىپلار:"
+
+#. 63WRQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_0\n"
+"property.text"
+msgid "Extent"
+msgstr "دائىرە"
+
+#. CDmMh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_1\n"
+"property.text"
+msgid "~Single %PRODUCTNAME Calc document"
+msgstr "يەككە %PRODUCTNAME Calc پۈتۈكى(~S)"
+
+#. nUcAR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_2\n"
+"property.text"
+msgid "Complete ~directory"
+msgstr "تولۇق مۇندەرىجە(~D)"
+
+#. eUtmF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_3\n"
+"property.text"
+msgid "Source Document:"
+msgstr "مەنبە پۈتۈك:"
+
+#. iQj6g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_4\n"
+"property.text"
+msgid "Source directory:"
+msgstr "مەنبە مۇندەرىجە:"
+
+#. JM8cN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_5\n"
+"property.text"
+msgid "~Including subfolders"
+msgstr "تارماق مۇندەرىجىمۇ ئىچىدە(~I)"
+
+#. BFR2F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_6\n"
+"property.text"
+msgid "Target directory:"
+msgstr "نىشان مۇندەرىجە:"
+
+#. 2q8vo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_7\n"
+"property.text"
+msgid "Temporarily unprotect sheet without query"
+msgstr "جەدۋەل قوغداشنى ۋاقىتلىق بوشات جەزملەش ھاجەتسىز"
+
+#. BVhae
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_10\n"
+"property.text"
+msgid "Also convert fields and tables in text documents"
+msgstr "تېكست پۈتۈكىدىكى سۆز بۆلىكى ۋە جەدۋەلنى بىرلا ۋاقىتتا ئايلاندۇرىدۇ"
+
+#. sFtH8
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_0\n"
+"property.text"
+msgid "Conversion status:"
+msgstr "ئايلاندۇرۇش ھالىتى: "
+
+#. 8EcKA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_1\n"
+"property.text"
+msgid "Conversion status of the cell templates:"
+msgstr "كاتەكچە قېلىپىنىڭ ئايلاندۇرۇش ھالىتى"
+
+#. BAX9w
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_2\n"
+"property.text"
+msgid "Registration of the relevant ranges: Sheet %1Number%1 of %2TotPageCount%2"
+msgstr "خەتلەنگەن ئالماشتۇرۇش دائىرىسى: جەدۋەل %1Number%1 / %2TotPageCount%2"
+
+#. EbBJf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_3\n"
+"property.text"
+msgid "Entry of the ranges to be converted..."
+msgstr "ئايلاندۇرىدىغان دائىرە…"
+
+#. f3Erf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_4\n"
+"property.text"
+msgid "Sheet protection for each sheet will be restored..."
+msgstr "ھەر بىر جەدۋەلنىڭ قوغدىشىنى ئەسلىگە كەلتۈر…"
+
+#. 5sPuS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_5\n"
+"property.text"
+msgid "Conversion of the currency units in the cell templates..."
+msgstr "كاتەكچە قېلىپىدىكى پۇل بىرلىكىنىڭ ئايلاندۇرۇلۇشى…"
+
+#. JuVQA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_0\n"
+"property.text"
+msgid "~Finish"
+msgstr "تامام(~F)"
+
+#. xsatA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_1\n"
+"property.text"
+msgid "Select directory"
+msgstr "مۇندەرىجە تاللا"
+
+#. o4Myk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_2\n"
+"property.text"
+msgid "Select file"
+msgstr "ھۆججەت تاللا"
+
+#. 5khdm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_3\n"
+"property.text"
+msgid "Select target directory"
+msgstr "نىشان مۇندەرىجە تاللا"
+
+#. Ldc4o
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_4\n"
+"property.text"
+msgid "non-existent"
+msgstr "مەۋجۇد ئەمەس"
+
+#. bh9MB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_5\n"
+"property.text"
+msgid "Euro Converter"
+msgstr "ياۋرۇ ئالماشتۇرغۇچ"
+
+#. tb9sF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_6\n"
+"property.text"
+msgid "Should protected spreadsheets be temporarily unprotected?"
+msgstr "قوغدالغان ئېلېكترونلۇق جەدۋەل قوغداشنى ۋاقىتلىق بوشىتامسىز؟"
+
+#. zFqxc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_7\n"
+"property.text"
+msgid "Enter the password to unprotect the table %1TableName%1"
+msgstr "ئىم كىرگۈزۈڭ، %1TableName%1 جەدۋەل قوغداش قۇلۇپى بوشىتىلىدۇ."
+
+#. t2n9c
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_8\n"
+"property.text"
+msgid "Wrong Password!"
+msgstr "ئىم خاتا!"
+
+#. YPd7L
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_9\n"
+"property.text"
+msgid "Protected Sheet"
+msgstr "قوغدالغان ۋاراق"
+
+#. JbEyK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_10\n"
+"property.text"
+msgid "Warning!"
+msgstr "ئاگاھلاندۇرۇش!"
+
+#. tYfDo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_11\n"
+"property.text"
+msgid "Protection for the sheets will not be removed."
+msgstr "جەدۋەل قوغداشنى بىكار قىلالمىدى."
+
+#. YfPkn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_12\n"
+"property.text"
+msgid "Sheet cannot be unprotected"
+msgstr "جەدۋەل قوغداشنى بىكار قىلالمىدى"
+
+#. PisTE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_13\n"
+"property.text"
+msgid "The Wizard cannot edit this document as cell formats cannot be modified in documents containing protected spreadsheets."
+msgstr "يېتەكچى بۇ پۈتۈكنى تەھرىرلىيەلمىدى، چۈنكى ھۆججەتتە قوغدىلىدىغان ئېلېكترونلۇق جەدۋەل بولسا كاتەكچە ئۇسلۇبىنى ئۆزگەرتەلمەيدۇ."
+
+#. t5jgU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_14\n"
+"property.text"
+msgid "Please note that the Euro Converter will, otherwise, not be able to edit this document!"
+msgstr "دىققەت، مۇشۇنداق بولمىسا ياۋرۇ ئالماشتۇرغۇچ بۇ پۈتۈكنى تەھرىرلىيەلمەيدۇ!"
+
+#. MwoXF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_15\n"
+"property.text"
+msgid "Please choose a currency to be converted first!"
+msgstr "ئالدى بىلەن ئالماشتۇرىدىغان پۇلنى تاللاڭ!"
+
+#. CzTMy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_16\n"
+"property.text"
+msgid "Password:"
+msgstr "ئىم:"
+
+#. QBznu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_17\n"
+"property.text"
+msgid "OK"
+msgstr "جەزملە"
+
+#. ALxZG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_18\n"
+"property.text"
+msgid "Cancel"
+msgstr "ۋاز كەچ"
+
+#. bTNoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_19\n"
+"property.text"
+msgid "Please select a %PRODUCTNAME Calc document for editing!"
+msgstr "تەھرىرلەيدىغان %PRODUCTNAME Calc پۈتۈكىنى تاللاڭ!"
+
+#. 8QobR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_20\n"
+"property.text"
+msgid "'<1>' is not a directory!"
+msgstr "'<1>' مۇندەرىجە ئەمەس!"
+
+#. saw7C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_21\n"
+"property.text"
+msgid "Document is read-only!"
+msgstr "پۈتۈك يېزىشتىن قوغدالغان!"
+
+#. GZECF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_22\n"
+"property.text"
+msgid "The '<1>' file already exists.<CR>Do you want to overwrite it?"
+msgstr "'<1>' ھۆججەت مەۋجۇد. <CR> بۇ ھۆججەتنى قاپلىۋېتەمسىز؟"
+
+#. 9dJcF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_23\n"
+"property.text"
+msgid "Do you really want to terminate conversion at this point?"
+msgstr "سىز راستىنلا ئالماشتۇرۇشنى بىكار قىلامسىز؟"
+
+#. ufpoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_24\n"
+"property.text"
+msgid "Cancel Wizard"
+msgstr "يېتەكچىدىن ۋاز كەچ"
+
+#. HCfhF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_0\n"
+"property.text"
+msgid "Portuguese Escudo"
+msgstr "پورتۇگالىيە ئېسكۇدو"
+
+#. 4PAvX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_1\n"
+"property.text"
+msgid "Dutch Guilder"
+msgstr "گوللاندىيە گۇلدىنى"
+
+#. VzRz9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_2\n"
+"property.text"
+msgid "French Franc"
+msgstr "فرانسىيە فرانك"
+
+#. rQFWP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_3\n"
+"property.text"
+msgid "Spanish Peseta"
+msgstr "ئىسپانىيە پېسېتا"
+
+#. tc8KC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_4\n"
+"property.text"
+msgid "Italian Lira"
+msgstr "ئىتالىيە لىرا"
+
+#. XgEB3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_5\n"
+"property.text"
+msgid "German Mark"
+msgstr "گېرمانىيە مارك"
+
+#. 7sBxK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_6\n"
+"property.text"
+msgid "Belgian Franc"
+msgstr "بىلگىيە فرانك"
+
+#. nLYJf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_7\n"
+"property.text"
+msgid "Irish Punt"
+msgstr "ئېرلاندىيە پۇنت"
+
+#. rujpn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_8\n"
+"property.text"
+msgid "Luxembourg Franc"
+msgstr "ليۇكسېمبورگ فرانك"
+
+#. jR3cM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_9\n"
+"property.text"
+msgid "Austrian Schilling"
+msgstr "ئاۋسترىيە شىللىڭ"
+
+#. 8x4oF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_10\n"
+"property.text"
+msgid "Finnish Mark"
+msgstr "فىنلاندىيە مارك"
+
+#. LsUXE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_11\n"
+"property.text"
+msgid "Greek Drachma"
+msgstr "گرېتسىيە دراخما"
+
+#. cks9C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_12\n"
+"property.text"
+msgid "Slovenian Tolar"
+msgstr "سلوۋېنىيە تولار"
+
+#. CMbyy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_13\n"
+"property.text"
+msgid "Cypriot Pound"
+msgstr "سىپرۇس فوند"
+
+#. HyCde
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_14\n"
+"property.text"
+msgid "Maltese Lira"
+msgstr "مالتا لىرا"
+
+#. GAtT3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_15\n"
+"property.text"
+msgid "Slovak Koruna"
+msgstr "سلوۋاكىيە كورۇنا"
+
+#. iXDND
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_16\n"
+"property.text"
+msgid "Estonian Kroon"
+msgstr "ئىستونىيە كىرۇنى"
+
+#. NRqiA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_17\n"
+"property.text"
+msgid "Latvian Lats"
+msgstr "لاتۋىيە لاتى"
+
+#. N9Psc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_18\n"
+"property.text"
+msgid "Lithuanian Litas"
+msgstr "لىتۋا لىتاسى"
+
+#. eDjBr
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_0\n"
+"property.text"
+msgid "Progress"
+msgstr "سۈرئەت"
+
+#. JhTCq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_1\n"
+"property.text"
+msgid "Retrieving the relevant documents..."
+msgstr "مۇناسىۋەتلىك پۈتۈك ئىزدە…"
+
+#. CLY8k
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_2\n"
+"property.text"
+msgid "Converting the documents..."
+msgstr "پۈتۈك ئالماشتۇر…"
+
+#. Fh3Fg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_3\n"
+"property.text"
+msgid "Settings:"
+msgstr "تەڭشەك:"
+
+#. C3AGk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_4\n"
+"property.text"
+msgid "Sheet is always unprotected"
+msgstr "جەدۋەل قوغداشنى ئۆزلۈكىدىن بوشات"
+
+#. BBZaA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_0\n"
+"property.text"
+msgid "Theme Selection"
+msgstr "باش تېما تاللا"
+
+#. DbGhN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_1\n"
+"property.text"
+msgid "Error while saving the document to the clipboard! The following action cannot be undone."
+msgstr "پۈتۈكنى چاپلاش تاختىسىغا ساقلىغاندا خاتالىق كۆرۈلدى! تۆۋەندىكى مەشغۇلاتتىن يېنىۋالغىلى بولمايدۇ."
+
+#. LTS44
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_2\n"
+"property.text"
+msgid "~Cancel"
+msgstr "ۋاز كەچ(~C)"
+
+#. qXu5G
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_3\n"
+"property.text"
+msgid "~OK"
+msgstr "جەزملە(~O)"
+
+#. VkFhm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_0\n"
+"property.text"
+msgid "(Standard)"
+msgstr "(ئۆلچەملىك)"
+
+#. YUTxB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_1\n"
+"property.text"
+msgid "Autumn Leaves"
+msgstr "كۈز ياپرىقى"
+
+#. Bmx9P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_2\n"
+"property.text"
+msgid "Be"
+msgstr "Be"
+
+#. AYcUq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_3\n"
+"property.text"
+msgid "Black and White"
+msgstr "رەڭسىز"
+
+#. kNA76
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_4\n"
+"property.text"
+msgid "Blackberry Bush"
+msgstr "Blackberry Bush"
+
+#. AsnuA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_5\n"
+"property.text"
+msgid "Blue Jeans"
+msgstr "كۆك پادىچى شىمى"
+
+#. VgzDD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_6\n"
+"property.text"
+msgid "Fifties Diner"
+msgstr "ئەللىكىنچى يىللاردىكى كەچلىك تاماق"
+
+#. YDRhE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_7\n"
+"property.text"
+msgid "Glacier"
+msgstr "مۇز ئېقىمى"
+
+#. 769K8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_8\n"
+"property.text"
+msgid "Green Grapes"
+msgstr "يېشىل ئۈزۈملەر"
+
+#. bNeCA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_9\n"
+"property.text"
+msgid "Marine"
+msgstr "دېڭىز كۆك"
+
+#. LYvgg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_10\n"
+"property.text"
+msgid "Millennium"
+msgstr "مىڭ يىل"
+
+#. 2dsey
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_11\n"
+"property.text"
+msgid "Nature"
+msgstr "تەبىئەت"
+
+#. sobFj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_12\n"
+"property.text"
+msgid "Neon"
+msgstr "نېئون"
+
+#. E9VPF
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_13\n"
+"property.text"
+msgid "Night"
+msgstr "كېچە"
+
+#. VFByN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_14\n"
+"property.text"
+msgid "PC Nostalgia"
+msgstr "PC سىغىنىشى"
+
+#. FCRpD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_15\n"
+"property.text"
+msgid "Pastel"
+msgstr "رەڭلىك فارفۇر"
+
+#. uAsPp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_16\n"
+"property.text"
+msgid "Pool Party"
+msgstr "كۆلچەك يىغىلىشى"
+
+#. GDi2u
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_17\n"
+"property.text"
+msgid "Pumpkin"
+msgstr "كاۋا"
+
+#. piSqr
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_0\n"
+"property.text"
+msgid "Addressee"
+msgstr "ئادرېس"
+
+#. Cy8W9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_1\n"
+"property.text"
+msgid "One recipient"
+msgstr "يەككە قوبۇللىغۇچى"
+
+#. rH3a3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_2\n"
+"property.text"
+msgid "Several recipients (address database)"
+msgstr "كۆپ تاپشۇرۇۋالغۇچى (ئادرېس ساندانى)"
+
+#. G8T6x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_3\n"
+"property.text"
+msgid "Use of This Template"
+msgstr "قېلىپ ئىشلەت"
+
+#. wTrM9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceMsgError\n"
+"property.text"
+msgid "An error has occurred."
+msgstr "خاتالىق يۈز بەردى."
+
+#. K77VB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_0\n"
+"property.text"
+msgid "Click placeholder and overwrite"
+msgstr "بۇ يەرنى چېكىپ، خەت يېزىشنى باشلاڭ"
+
+#. hRJRf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_1\n"
+"property.text"
+msgid "Company"
+msgstr "شىركەت"
+
+#. c6Zjp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_2\n"
+"property.text"
+msgid "Department"
+msgstr "تارماق"
+
+#. cYzGQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_3\n"
+"property.text"
+msgid "First Name"
+msgstr "ئاتى"
+
+#. BEmdM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_4\n"
+"property.text"
+msgid "Last Name"
+msgstr "تەگئات"
+
+#. fxfq5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_5\n"
+"property.text"
+msgid "Street"
+msgstr "كوچا"
+
+#. DxdCD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_6\n"
+"property.text"
+msgid "Country"
+msgstr "دۆلەت"
+
+#. uNexF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_7\n"
+"property.text"
+msgid "ZIP/Postal Code"
+msgstr "پوچتا نومۇرى"
+
+#. qHMFm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_8\n"
+"property.text"
+msgid "City"
+msgstr "شەھەر"
+
+#. AqdCs
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_9\n"
+"property.text"
+msgid "Title"
+msgstr "ماۋزۇ"
+
+#. s8G9A
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_10\n"
+"property.text"
+msgid "Position"
+msgstr "ئورنى"
+
+#. Wa8WF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_11\n"
+"property.text"
+msgid "Form of Address"
+msgstr "تاپشۇرۇۋالغۇچى ئاتىلىشى"
+
+#. 5FwLR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_12\n"
+"property.text"
+msgid "Initials"
+msgstr "قىسقارتىلمىسى"
+
+#. zH6b3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_13\n"
+"property.text"
+msgid "Salutation"
+msgstr "ھۆرمەت بىلەن"
+
+#. wDEfh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_14\n"
+"property.text"
+msgid "Home Phone"
+msgstr "ئۆي تېلېفون"
+
+#. LJ5ou
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_15\n"
+"property.text"
+msgid "Work Phone"
+msgstr "خىزمەت تېلېفون"
+
+#. hJQtY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_16\n"
+"property.text"
+msgid "Fax"
+msgstr "فاكس"
+
+#. jmiN2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_17\n"
+"property.text"
+msgid "Email"
+msgstr ""
+
+#. w7uK5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_18\n"
+"property.text"
+msgid "URL"
+msgstr "URL"
+
+#. bgJJe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_19\n"
+"property.text"
+msgid "Notes"
+msgstr "ئىزاھ"
+
+#. EhQEg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_20\n"
+"property.text"
+msgid "Alt. Field 1"
+msgstr "زاپاس سۆز بۆلەك 1"
+
+#. bZ4za
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_21\n"
+"property.text"
+msgid "Alt. Field 2"
+msgstr "زاپاس سۆز بۆلەك 2"
+
+#. vgr7W
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_22\n"
+"property.text"
+msgid "Alt. Field 3"
+msgstr "زاپاس سۆز بۆلەك 3"
+
+#. TGKbX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_23\n"
+"property.text"
+msgid "Alt. Field 4"
+msgstr "زاپاس سۆز بۆلەك 4"
+
+#. HTUTU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_24\n"
+"property.text"
+msgid "ID"
+msgstr "ID"
+
+#. BkAJF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_25\n"
+"property.text"
+msgid "State"
+msgstr "ھالەت"
+
+#. 8NXAm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_26\n"
+"property.text"
+msgid "Office Phone"
+msgstr "ئىشخانا تېلېفون"
+
+#. RvvuS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_27\n"
+"property.text"
+msgid "Pager"
+msgstr "چاقىرغۇ"
+
+#. M65e8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_28\n"
+"property.text"
+msgid "Mobile Phone"
+msgstr "يانفون"
+
+#. hNCCT
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_29\n"
+"property.text"
+msgid "Other Phone"
+msgstr "باشقا تېلېفون"
+
+#. jNWYd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_30\n"
+"property.text"
+msgid "Calendar URL"
+msgstr "يىلنامە URL"
+
+#. Ad3kk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_31\n"
+"property.text"
+msgid "Invite"
+msgstr "تەكلىپ"
+
+#. gpGUV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceNoTextmark_0\n"
+"property.text"
+msgid "The bookmark 'Recipient' is missing."
+msgstr "خەتكۈچ 'Recipient' يوقالغان."
+
+#. G6KuE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceNoTextmark_1\n"
+"property.text"
+msgid "Form letter fields can not be included."
+msgstr "ئېلخەت بىرلەشتۈرۈش سۆز بۆلىكى قىستۇرالمىدى."
+
+#. WM8Eu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgName\n"
+"property.text"
+msgid "Minutes Template"
+msgstr "خاتىرە قېلىپى"
+
+#. 3Yeqe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgNoCancel\n"
+"property.text"
+msgid "An option must be confirmed."
+msgstr "چوقۇم تاللانمىدىن بىرنى تاللاڭ."
+
+#. BEWBh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgFrame\n"
+"property.text"
+msgid "Minutes Type"
+msgstr "خاتىرە تىپى"
+
+#. hyGRE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgButton1\n"
+"property.text"
+msgid "Results Minutes"
+msgstr "كۈنتەرتىپ نەتىجە خاتىرىسى"
+
+#. DMfQn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgButton2\n"
+"property.text"
+msgid "Evaluation Minutes"
+msgstr "كۈنتەرتىپ جەريان خاتىرىسى"
+
+#. 9zy6P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextField\n"
+"property.text"
+msgid "User data field is not defined!"
+msgstr "ئىشلەتكۈچى سانلىق مەلۇمات سۆز بۆلىكىگە ئېنىقلىما بېرىلمىگەن!"
+
+#. DzUkS
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"NoDirCreation\n"
+"property.text"
+msgid "The '%1' directory cannot be created:"
+msgstr "'%1' مۇندەرىجە قۇرالمىدى: "
+
+#. JDcBR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MsgDirNotThere\n"
+"property.text"
+msgid "The '%1' directory does not exist."
+msgstr "'%1' مۇندەرىجە مەۋجۇد ئەمەس."
+
+#. WcmGg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"QueryfornewCreation\n"
+"property.text"
+msgid "Do you want to create it now?"
+msgstr "بۇ مۇندەرىجىنى قۇرامسىز؟"
+
+#. 6rvR2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"HelpButton\n"
+"property.text"
+msgid "~Help"
+msgstr "ياردەم(~H)"
+
+#. qeDY7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CancelButton\n"
+"property.text"
+msgid "~Cancel"
+msgstr "ۋاز كەچ(~C)"
+
+#. yZGTC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"BackButton\n"
+"property.text"
+msgid "< ~Back"
+msgstr "ئالدى(~B) ›"
+
+#. Wc2Fp
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"NextButton\n"
+"property.text"
+msgid "Ne~xt >"
+msgstr "‹‹ كەينى(~X)"
+
+#. tntS5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"BeginButton\n"
+"property.text"
+msgid "~Convert"
+msgstr "ئالماشتۇر(~C)"
+
+#. CL4tm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CloseButton\n"
+"property.text"
+msgid "~Close"
+msgstr "ياپ(~C)"
+
+#. 3FYU3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"WelcometextLabel1\n"
+"property.text"
+msgid "This wizard convert legacy format documents to Open Document Format for Office Applications."
+msgstr "بۇ يېتەكچى ئەنئەنىۋى پىچىمدىكى پۈتۈكلەرنى ئىشخانا يۈرۈشلۈك دېالى ئىشلىتەلەيدىغان ئوچۇق پۈتۈك پىچىمىغا ئايلاندۇرىدۇ."
+
+#. ZQwGS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"WelcometextLabel3\n"
+"property.text"
+msgid "Select the document type for conversion:"
+msgstr "ئايلاندۇرىدىغان پۈتۈك تىپىنى تاللاڭ:"
+
+#. 8QmDc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_1_\n"
+"property.text"
+msgid "Word templates"
+msgstr "Word قېلىپ"
+
+#. AujXQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_2_\n"
+"property.text"
+msgid "Excel templates"
+msgstr "Excel قېلىپ"
+
+#. hPB75
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_3_\n"
+"property.text"
+msgid "PowerPoint templates"
+msgstr "PowerPoint قېلىپ"
+
+#. QUiMA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_1_\n"
+"property.text"
+msgid "Word documents"
+msgstr "Word پۈتۈك"
+
+#. BDr26
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_2_\n"
+"property.text"
+msgid "Excel documents"
+msgstr "Excel پۈتۈك"
+
+#. 9RwAv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_3_\n"
+"property.text"
+msgid "PowerPoint/Publisher documents"
+msgstr "PowerPoint/Publisher پۈتۈكلەر"
+
+#. uCxvB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSContainerName\n"
+"property.text"
+msgid "Microsoft Office"
+msgstr "Microsoft Office"
+
+#. s4vuw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SummaryHeader\n"
+"property.text"
+msgid "Summary:"
+msgstr "مۇھىم مەزمۇن:"
+
+#. uAmbh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"GroupnameDefault\n"
+"property.text"
+msgid "Imported_Templates"
+msgstr "ئەكىرگەن قېلىپ"
+
+#. As7iy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressMoreDocs\n"
+"property.text"
+msgid "Documents"
+msgstr "پۈتۈكلەر"
+
+#. tbXgc
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressMoreTemplates\n"
+"property.text"
+msgid "Templates"
+msgstr "قېلىپلار"
+
+#. foG9h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"FileExists\n"
+"property.text"
+msgid "The '<1>' file already exists.<CR>Do you want to overwrite it?"
+msgstr "'<1>' ھۆججەت مەۋجۇد. <CR> بۇ ھۆججەتنى قاپلىۋېتەمسىز؟"
+
+#. bvMuH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MorePathsError3\n"
+"property.text"
+msgid "Directories do not exist"
+msgstr "مۇندەرىجە مەۋجۇد ئەمەس"
+
+#. Jh3WF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ConvertError1\n"
+"property.text"
+msgid "Do you really want to terminate conversion at this point?"
+msgstr "سىز راستىنلا ئالماشتۇرۇشنى بىكار قىلامسىز؟"
+
+#. zuFo9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ConvertError2\n"
+"property.text"
+msgid "Cancel Wizard"
+msgstr "يېتەكچىدىن ۋاز كەچ"
+
+#. MNVFe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RTErrorDesc\n"
+"property.text"
+msgid "An error has occurred in the wizard."
+msgstr ""
+
+#. VzQoq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RTErrorHeader\n"
+"property.text"
+msgid "Error"
+msgstr "خاتالىق"
+
+#. mFTyW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"OverwriteallFiles\n"
+"property.text"
+msgid "Do you want to overwrite documents without being asked?"
+msgstr "ئەسكەرتمەيلا بىۋاسىتە پۈتۈكنى قاپلىۋېتەمسىز؟"
+
+#. rWgBN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ReeditMacro\n"
+"property.text"
+msgid "Document macro has to be revised."
+msgstr "پۈتۈك ماكروسىنى قايتىدىن تۈزىتىش لازىم."
+
+#. GDbH6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CouldNotsaveDocument\n"
+"property.text"
+msgid "Document '<1>' could not be saved."
+msgstr "پۈتۈك'<1>'نى ساقلىيالمىدى."
+
+#. GcGjC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CouldNotopenDocument\n"
+"property.text"
+msgid "Document '<1>' could not be opened."
+msgstr "پۈتۈك'<1>'نى ئاچالمىدى."
+
+#. XG3Dg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"PathDialogMessage\n"
+"property.text"
+msgid "Select a directory"
+msgstr "مۇندەرىجىدىن بىرنى تاللا"
+
+#. 8DV2D
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"DialogTitle\n"
+"property.text"
+msgid "Document Converter"
+msgstr "پۈتۈك ئايلاندۇرغۇچ"
+
+#. 6hySA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SearchInSubDir\n"
+"property.text"
+msgid "Including subdirectories"
+msgstr "تارماق قىسقۇچ ئىچىدە"
+
+#. Juv8i
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage1\n"
+"property.text"
+msgid "Progress"
+msgstr "سۈرئەت"
+
+#. EWECA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage2\n"
+"property.text"
+msgid "Retrieving the relevant documents:"
+msgstr "مۇناسىۋەتلىك پۈتۈك ئىزدە:"
+
+#. zTpAx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage3\n"
+"property.text"
+msgid "Converting the documents"
+msgstr "پۈتۈك ئالماشتۇر"
+
+#. B6PuJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressFound\n"
+"property.text"
+msgid "Found:"
+msgstr "تېپىلدى:"
+
+#. 9G86q
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage5\n"
+"property.text"
+msgid "\"%1 found"
+msgstr "%1 تېپىلدى"
+
+#. GmveL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"Ready\n"
+"property.text"
+msgid "Finished"
+msgstr "تاماملاندى"
+
+#. yZCLk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SourceDocuments\n"
+"property.text"
+msgid "Source documents"
+msgstr "مەنبە پۈتۈك"
+
+#. vDd4X
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TargetDocuments\n"
+"property.text"
+msgid "Target documents"
+msgstr "نىشان پۈتۈك"
+
+#. VyLKU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"LogfileSummary\n"
+"property.text"
+msgid "<COUNT> documents converted"
+msgstr "<COUNT> ھۆججىتى ئايلاندۇرۇلدى"
+
+#. D8KY3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumInclusiveSubDir\n"
+"property.text"
+msgid "All subdirectories will be taken into account"
+msgstr "ھەممە تارماق مۇندەرىجىنى ئۆز ئىچىگە ئالىدۇ"
+
+#. 8Bmz9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumSaveDokumente\n"
+"property.text"
+msgid "These will be exported to the following directory:"
+msgstr "تۆۋەندىكى مۇندەرىجىگە چىقىرىدۇ:"
+
+#. 8atHD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextImportLabel\n"
+"property.text"
+msgid "Import from:"
+msgstr "ئەكىرىش ئورنى:"
+
+#. zpCFk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextExportLabel\n"
+"property.text"
+msgid "Save to:"
+msgstr "ساقلاش ئورنى:"
+
+#. C7a2B
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CreateLogfile\n"
+"property.text"
+msgid "Create log file"
+msgstr "كاتىپ ھۆججەت قۇر"
+
+#. pzBG4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"LogfileHelpText\n"
+"property.text"
+msgid "A log file will be created in your work directory"
+msgstr "خىزمەت مۇندەرىجىڭىزدە كاتىپ ھۆججەتتىن بىرى قۇرۇلدى"
+
+#. mDG8Y
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ShowLogfile\n"
+"property.text"
+msgid "Show log file"
+msgstr "كاتىپ ھۆججەت كۆرسەت"
+
+#. 7S3Ct
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTextDocuments\n"
+"property.text"
+msgid "All Word documents contained in the following directory will be imported:"
+msgstr "تۆۋەندىكى مۇندەرىجىدىكى ھەممە Word پۈتۈكىنى ئەكىرىدۇ:"
+
+#. iBJo8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTableDocuments\n"
+"property.text"
+msgid "All Excel documents contained in the following directory will be imported:"
+msgstr "تۆۋەندىكى مۇندەرىجىدىكى ھەممە Excel پۈتۈكىنى ئەكىرىدۇ:"
+
+#. kZfUh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSDrawDocuments\n"
+"property.text"
+msgid "All PowerPoint/Publisher documents contained in the following directory will be imported:"
+msgstr "تۆۋەندىكى مۇندەرىجىدىكى PowerPoint/Publisher پۈتۈكلىرىنىڭ ھەممىسىنى ئەكىرىدۇ:"
+
+#. AEPyE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTextTemplates\n"
+"property.text"
+msgid "All Word templates contained in the following directory will be imported:"
+msgstr "تۆۋەندىكى مۇندەرىجىدىكى ھەممە Word قېلىپىنى ئەكىرىدۇ:"
+
+#. G2vMa
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTableTemplates\n"
+"property.text"
+msgid "All Excel templates contained in the following directory will be imported:"
+msgstr "تۆۋەندىكى مۇندەرىجىدىكى ھەممە Excel قېلىپىنى ئەكىرىدۇ:"
+
+#. AEEwA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSDrawTemplates\n"
+"property.text"
+msgid "All PowerPoint templates contained in the following directory will be imported:"
+msgstr "تۆۋەندىكى مۇندەرىجىدىكى ھەممە PowerPoint قېلىپىنى ئەكىرىدۇ:"

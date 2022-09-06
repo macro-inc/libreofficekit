@@ -1,0 +1,1106 @@
+#. extracted from helpcontent2/source/auxiliary
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2021-11-25 19:33+0100\n"
+"PO-Revision-Date: 2020-12-20 15:57+0000\n"
+"Last-Translator: Modestas Rimkus <modestas.rimkus@gmail.com>\n"
+"Language-Team: Lithuanian <https://translations.documentfoundation.org/projects/libo_help-master/auxiliary/lt/>\n"
+"Language: lt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n % 10 == 1 && (n % 100 < 11 || n % 100 > 19)) ? 0 : ((n % 10 >= 2 && n % 10 <= 9 && (n % 100 < 11 || n % 100 > 19)) ? 1 : 2);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1556913032.000000\n"
+
+#. fEEXD
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07\n"
+"help_section.text"
+msgid "Macros and Scripting"
+msgstr "Makrokomandos ir scenarijai"
+
+#. pDA36
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0701\n"
+"node.text"
+msgid "%PRODUCTNAME BASIC"
+msgstr "%PRODUCTNAME Basic"
+
+#. Ua99d
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070101\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Bendroji informacija ir darbas su naudotojo sąsaja"
+
+#. ooCCn
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070102\n"
+"node.text"
+msgid "Command Reference"
+msgstr "Komandų rodyklė"
+
+#. ZhxZF
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010202\n"
+"node.text"
+msgid "Functions, Statements and Operators"
+msgstr ""
+
+#. 3SEZD
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010201\n"
+"node.text"
+msgid "Alphabetic List of Functions, Statements and Operators"
+msgstr ""
+
+#. jhVCB
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010205\n"
+"node.text"
+msgid "Advanced Basic Libraries"
+msgstr "Papildomos „Basic“ bibliotekos"
+
+#. cFRyM
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010305\n"
+"node.text"
+msgid "ScriptForge Library"
+msgstr ""
+
+#. Vkt9E
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070103\n"
+"node.text"
+msgid "Guides"
+msgstr "Instrukcijos"
+
+#. f7k4A
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0702\n"
+"node.text"
+msgid "Python Scripts Help"
+msgstr "„Python“ scenarijų žinynas"
+
+#. pVb5g
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070201\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Bendroji informacija ir darbas su naudotojo sąsaja"
+
+#. D6bPQ
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070202\n"
+"node.text"
+msgid "Programming with Python"
+msgstr "Programavimas „Python“ kalba"
+
+#. JCHAg
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0703\n"
+"node.text"
+msgid "Script Development Tools"
+msgstr ""
+
+#. KsAjT
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08\n"
+"help_section.text"
+msgid "Spreadsheets (Calc)"
+msgstr "Skaičiuoklės dokumentai (Calc)"
+
+#. DnZNf
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0801\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Bendroji informacija ir darbas su naudotojo sąsaja"
+
+#. DdtJy
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0802\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Komandų ir meniu rodyklė"
+
+#. 8g9EE
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"080201\n"
+"node.text"
+msgid "Menus"
+msgstr "Meniu"
+
+#. jwFgp
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"080202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Mygtukų juostos"
+
+#. sHFhh
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0803\n"
+"node.text"
+msgid "Functions Types and Operators"
+msgstr "Funkcijų tipai ir operatoriai"
+
+#. DSUE2
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0804\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Įkėlimas, įrašymas, importas, eksportas ir redakcija"
+
+#. yRwiN
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0805\n"
+"node.text"
+msgid "Formatting"
+msgstr "Formatavimas"
+
+#. 5wLkU
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0806\n"
+"node.text"
+msgid "Filtering and Sorting"
+msgstr "Filtravimas ir rikiavimas"
+
+#. yCyBs
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0807\n"
+"node.text"
+msgid "Printing"
+msgstr "Spausdinimas"
+
+#. GTRoC
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0808\n"
+"node.text"
+msgid "Data Ranges"
+msgstr "Duomenų rėžiai"
+
+#. cM3fi
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0809\n"
+"node.text"
+msgid "Pivot Table"
+msgstr "Suvestinė lentelė"
+
+#. ZBuq9
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08091\n"
+"node.text"
+msgid "Pivot Chart"
+msgstr "Suvestinė diagrama"
+
+#. RowUw
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0810\n"
+"node.text"
+msgid "Scenarios"
+msgstr "Scenarijai"
+
+#. NHiVG
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08101\n"
+"node.text"
+msgid "Subtotals"
+msgstr "Daliniai rezultatai"
+
+#. CzARM
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0811\n"
+"node.text"
+msgid "References"
+msgstr "Nuorodos"
+
+#. ELC6F
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0812\n"
+"node.text"
+msgid "Viewing, Selecting, Copying"
+msgstr "Peržiūra, atranka, kopijavimas"
+
+#. VFHig
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0813\n"
+"node.text"
+msgid "Formulas and Calculations"
+msgstr "Formulės ir skaičiavimai"
+
+#. bCMSS
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0814\n"
+"node.text"
+msgid "Protection"
+msgstr "Apsauga"
+
+#. m2Dpj
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0815\n"
+"node.text"
+msgid "Writing Calc Macros"
+msgstr ""
+
+#. Q59GN
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0815\n"
+"node.text"
+msgid "Miscellaneous"
+msgstr "Įvairios temos"
+
+#. 6Saoi
+#: schart.tree
+msgctxt ""
+"schart.tree\n"
+"05\n"
+"help_section.text"
+msgid "Charts and Diagrams"
+msgstr "Grafikai ir diagramos"
+
+#. gu6pZ
+#: schart.tree
+msgctxt ""
+"schart.tree\n"
+"0501\n"
+"node.text"
+msgid "General Information"
+msgstr "Bendroji informacija"
+
+#. Q5EUA
+#: sdatabase.tree
+msgctxt ""
+"sdatabase.tree\n"
+"09\n"
+"help_section.text"
+msgid "Database Functionality (Base)"
+msgstr "Duomenų bazės (Base)"
+
+#. tLWiE
+#: sdatabase.tree
+msgctxt ""
+"sdatabase.tree\n"
+"0901\n"
+"node.text"
+msgid "General Information"
+msgstr "Bendroji informacija"
+
+#. xU49Q
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11\n"
+"help_section.text"
+msgid "Drawings (Draw)"
+msgstr "Grafikos dokumentai (Draw)"
+
+#. UcMAA
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1101\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Bendroji informacija ir darbas su naudotojo sąsaja"
+
+#. ZDeBD
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1102\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Komandų ir meniu rodyklė"
+
+#. kq7Az
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11020201\n"
+"node.text"
+msgid "Menus"
+msgstr "Meniu"
+
+#. SFgJ7
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11020202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Mygtukų juostos"
+
+#. 9ojH7
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1103\n"
+"node.text"
+msgid "Loading, Saving, Importing, and Exporting"
+msgstr "Įkėlimas, įrašymas, importas ir eksportas"
+
+#. fJYHX
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1104\n"
+"node.text"
+msgid "Formatting"
+msgstr "Formatavimas"
+
+#. HkVUY
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1105\n"
+"node.text"
+msgid "Printing"
+msgstr "Spausdinimas"
+
+#. G8GoF
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1106\n"
+"node.text"
+msgid "Effects"
+msgstr "Efektai"
+
+#. fd9tS
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1107\n"
+"node.text"
+msgid "Objects, Graphics, and Bitmaps"
+msgstr "Objektai, paveikslai ir taškinė grafika"
+
+#. crdMY
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1108\n"
+"node.text"
+msgid "Groups and Layers"
+msgstr "Grupės ir sluoksniai"
+
+#. G3s8n
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1109\n"
+"node.text"
+msgid "Text in Drawings"
+msgstr "Tekstas grafikos objektuose"
+
+#. rxRmL
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1110\n"
+"node.text"
+msgid "Viewing"
+msgstr "Peržiūra"
+
+#. 4zaCG
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"01\n"
+"help_section.text"
+msgid "%PRODUCTNAME Installation"
+msgstr "„%PRODUCTNAME“ diegimas"
+
+#. 3EUAC
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"10\n"
+"help_section.text"
+msgid "Common Help Topics"
+msgstr "Bendros žinyno temos"
+
+#. 3GoWS
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1001\n"
+"node.text"
+msgid "General Information"
+msgstr "Bendroji informacija"
+
+#. vFfKE
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1002\n"
+"node.text"
+msgid "%PRODUCTNAME and Microsoft Office"
+msgstr "„%PRODUCTNAME“ ir „Microsoft Office“"
+
+#. GBR3F
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1004\n"
+"node.text"
+msgid "%PRODUCTNAME Options"
+msgstr "„%PRODUCTNAME“ parinktys"
+
+#. d4gAD
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1005\n"
+"node.text"
+msgid "Wizards"
+msgstr "Vedikliai"
+
+#. aXMeh
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100501\n"
+"node.text"
+msgid "Letter Wizard"
+msgstr "Laiško vediklis"
+
+#. 6qzVL
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100502\n"
+"node.text"
+msgid "Fax Wizard"
+msgstr "Faksimilės vediklis"
+
+#. GMiKt
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100504\n"
+"node.text"
+msgid "Agenda Wizard"
+msgstr "Darbotvarkės vediklis"
+
+#. gvsML
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100506\n"
+"node.text"
+msgid "HTML Export Wizard"
+msgstr "HTML eksporto vediklis"
+
+#. 8tHJK
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100510\n"
+"node.text"
+msgid "Document Converter Wizard"
+msgstr "Dokumentų konvertavimo vediklis"
+
+#. zhnAF
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1006\n"
+"node.text"
+msgid "Configuring %PRODUCTNAME"
+msgstr "„%PRODUCTNAME“ sąranka"
+
+#. 2rp8T
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1007\n"
+"node.text"
+msgid "Working with the User Interface"
+msgstr "Darbas su naudotojo sąsaja"
+
+#. mFuDH
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"10071\n"
+"node.text"
+msgid "Digital Signatures"
+msgstr "Skaitmeniniai parašai"
+
+#. drtXn
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1008\n"
+"node.text"
+msgid "Printing, Faxing, Sending"
+msgstr "Dokumentų spausdinimas, siuntimas faksu ar el. paštu"
+
+#. ZJbym
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1009\n"
+"node.text"
+msgid "Drag & Drop"
+msgstr "Tempimas"
+
+#. DFzj6
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1010\n"
+"node.text"
+msgid "Copy and Paste"
+msgstr "Kopijavimas ir įdėjimas"
+
+#. hQXmX
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1012\n"
+"node.text"
+msgid "Charts and Diagrams"
+msgstr "Grafikai ir diagramos"
+
+#. GVohQ
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1013\n"
+"node.text"
+msgid "Load, Save, Import, Export, PDF"
+msgstr "Įkėlimas, įrašymas, importas, eksportas, PDF formatas"
+
+#. Ty8Du
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1014\n"
+"node.text"
+msgid "Links and References"
+msgstr "Saitai ir nuorodos"
+
+#. nDFsH
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1015\n"
+"node.text"
+msgid "Document Version Tracking"
+msgstr "Dokumentų versijos"
+
+#. AnvYc
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1016\n"
+"node.text"
+msgid "Labels and Business Cards"
+msgstr "Etiketės ir vizitinės kortelės"
+
+#. tEYBw
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1018\n"
+"node.text"
+msgid "Inserting External Data"
+msgstr "Išorinių duomenų įterpimas"
+
+#. X2KH4
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1019\n"
+"node.text"
+msgid "Automatic Functions"
+msgstr "Automatinės funkcijos"
+
+#. EGqAp
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1020\n"
+"node.text"
+msgid "Searching and Replacing"
+msgstr "Paieška ir keitimas"
+
+#. 4GGhC
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1021\n"
+"node.text"
+msgid "Guides"
+msgstr "Instrukcijos"
+
+#. BjDNf
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04\n"
+"help_section.text"
+msgid "Presentations (Impress)"
+msgstr "Pateiktys (Impress)"
+
+#. hBFX8
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0401\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Bendroji informacija ir darbas su naudotojo sąsaja"
+
+#. XaGTA
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0402\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Komandų ir meniu rodyklė"
+
+#. ADAgH
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04020101\n"
+"node.text"
+msgid "Menus"
+msgstr "Meniu"
+
+#. fqLWR
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04020102\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Mygtukų juostos"
+
+#. fiLDS
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0403\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Įkėlimas, įrašymas, importas, eksportas ir redakcija"
+
+#. jMBsp
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0404\n"
+"node.text"
+msgid "Formatting"
+msgstr "Formatavimas"
+
+#. HtUGZ
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0405\n"
+"node.text"
+msgid "Printing"
+msgstr "Spausdinimas"
+
+#. FxREt
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0406\n"
+"node.text"
+msgid "Effects"
+msgstr "Efektai"
+
+#. RX5V8
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0407\n"
+"node.text"
+msgid "Objects, Graphics, and Bitmaps"
+msgstr "Objektai, paveikslai ir taškinė grafika"
+
+#. aDbFG
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0409\n"
+"node.text"
+msgid "Text in Presentations"
+msgstr "Tekstas pateiktyse"
+
+#. s8GCo
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0410\n"
+"node.text"
+msgid "Viewing"
+msgstr "Peržiūra"
+
+#. Lo4YZ
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0411\n"
+"node.text"
+msgid "Slide Shows"
+msgstr "Skaidrių demonstravimas"
+
+#. m5CkC
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"03\n"
+"help_section.text"
+msgid "Formulas (Math)"
+msgstr "Formulių dokumentai (Math)"
+
+#. kAkAL
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0301\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Bendroji informacija ir darbas su naudotojo sąsaja"
+
+#. 3BZ8j
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"030101\n"
+"node.text"
+msgid "%PRODUCTNAME Formula Elements"
+msgstr "„%PRODUCTNAME“ formulių elementai"
+
+#. V99im
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0302\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Komandų ir meniu rodyklė"
+
+#. CGoih
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0303\n"
+"node.text"
+msgid "Working with Formulas"
+msgstr "Darbas su formulėmis"
+
+#. FxCSV
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"02\n"
+"help_section.text"
+msgid "Text Documents (Writer)"
+msgstr "Teksto dokumentai (Writer)"
+
+#. jWyEV
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0201\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Bendroji informacija ir darbas su naudotojo sąsaja"
+
+#. mT2iu
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0202\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Komandų ir meniu rodyklė"
+
+#. 4RREa
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"020201\n"
+"node.text"
+msgid "Menus"
+msgstr "Meniu"
+
+#. SQkvD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"020202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Mygtukų juostos"
+
+#. AExWW
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0210\n"
+"node.text"
+msgid "Navigating Text Documents"
+msgstr "Teksto dokumentų žvalgymas"
+
+#. hjKKD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0212\n"
+"node.text"
+msgid "Formatting Text Documents"
+msgstr "Teksto dokumentų formatavimas"
+
+#. 6gFto
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"021201\n"
+"node.text"
+msgid "Templates and Styles"
+msgstr "Šablonai ir stiliai"
+
+#. 7BQES
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0204\n"
+"node.text"
+msgid "Graphics in Text Documents"
+msgstr "Paveikslai teksto dokumentuose"
+
+#. QsiTB
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0205\n"
+"node.text"
+msgid "Tables in Text Documents"
+msgstr "Lentelės teksto dokumentuose"
+
+#. Xx5Fp
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0206\n"
+"node.text"
+msgid "Objects in Text Documents"
+msgstr "Objektai teksto dokumentuose"
+
+#. 47SjN
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0207\n"
+"node.text"
+msgid "Sections and Frames in Text Documents"
+msgstr "Sekcijos ir kadrai teksto dokumentuose"
+
+#. E2N9E
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0208\n"
+"node.text"
+msgid "Tables of Contents and Indexes"
+msgstr "Turiniai ir rodyklės"
+
+#. yi6ro
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0209\n"
+"node.text"
+msgid "Fields in Text Documents"
+msgstr "Laukai teksto dokumentuose"
+
+#. ZgfjA
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0211\n"
+"node.text"
+msgid "Calculating in Text Documents"
+msgstr "Skaičiavimai teksto dokumentuose"
+
+#. wVGdF
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0213\n"
+"node.text"
+msgid "Special Text Elements"
+msgstr "Specialieji teksto elementai"
+
+#. FxdVR
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0214\n"
+"node.text"
+msgid "Automatic Functions"
+msgstr "Automatinės funkcijos"
+
+#. hi36Q
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0215\n"
+"node.text"
+msgid "Numbering and Lists"
+msgstr "Numeravimas ir sąrašai"
+
+#. 2FPcB
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0216\n"
+"node.text"
+msgid "Spellchecking, Thesaurus, and Languages"
+msgstr "Rašybos tikrinimas, tezauras ir kalbos"
+
+#. vDffD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0218\n"
+"node.text"
+msgid "Troubleshooting Tips"
+msgstr "Nesklandumų šalinimas"
+
+#. qLMLk
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0219\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Įkėlimas, įrašymas, importas, eksportas ir redakcija"
+
+#. 8GC4J
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0220\n"
+"node.text"
+msgid "Master Documents"
+msgstr "Pagrindiniai dokumentai"
+
+#. wbJh4
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0221\n"
+"node.text"
+msgid "Links and References"
+msgstr "Saitai ir nuorodos"
+
+#. vHzyn
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0222\n"
+"node.text"
+msgid "Printing"
+msgstr "Spausdinimas"
+
+#. F4LCk
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0223\n"
+"node.text"
+msgid "Searching and Replacing"
+msgstr "Paieška ir keitimas"
+
+#. CYQr2
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"06\n"
+"help_section.text"
+msgid "HTML Documents (Writer Web)"
+msgstr "Tinklalapiai (Writer Web)"
