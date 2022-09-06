@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriter0000000403xml" indexer="exclude" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">View Menu</title>
+    <filename>/text/swriter/00/00000403.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+<h1 id="hd_id3154656" xml-lang="en-US">View Menu</h1>
+<paragraph id="par_id3149502" role="paragraph" xml-lang="en-US"><variable id="lineal">Choose <menuitem>View - Rulers - Rulers</menuitem> </variable></paragraph>
+<paragraph id="par_id3148871" role="paragraph" xml-lang="en-US"><variable id="textbegrenzungen">Choose <menuitem>View - Text Boundaries</menuitem> </variable></paragraph>
+
+<section id="field_shadings">
+<paragraph id="par_id3153248" role="paragraph" xml-lang="en-US">Choose <menuitem>View - Field Shadings</menuitem> </paragraph>
+<paragraph id="par_id3154763" role="paragraph" xml-lang="en-US"><switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode>
+</caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+F8</keycode></paragraph>
+</section>
+
+<section id="field_names">
+<paragraph id="par_id3149052" role="paragraph" xml-lang="en-US">Choose <menuitem>View - Field Names</menuitem> </paragraph>
+<paragraph id="par_id3151387" role="paragraph" xml-lang="en-US"><switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode>
+</caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+F9</keycode></paragraph>
+</section>
+
+<section id="formatting_marks">
+<paragraph id="par_id3155625" role="paragraph" xml-lang="en-US">Choose <menuitem>View - Formatting Marks</menuitem> </paragraph>
+<paragraph id="par_id3145823" role="paragraph" xml-lang="en-US"><switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode>
+</caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+F10</keycode></paragraph>
+<paragraph id="par_id3154508" role="paragraph" xml-lang="en-US">On Standard bar, click</paragraph>
+
+<section id="syformatting_marks">
+
+<table id="tbl_id3153732">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3150932" role="paragraph" xml-lang="en-US"> <image id="img_id3150502" src="cmd/sc_controlcodes.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3150502">Formatting Marks Icon</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3153716" role="paragraph" xml-lang="en-US">Formatting Marks</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+</section>
+</section>
+<section id="show_whitespace">
+    <paragraph role="paragraph" id="par_id401629894593714">Choose <menuitem>View - Show Whitespace</menuitem>.</paragraph>
+   <table id="tab_id131629893774664">
+    <tablerow>
+        <tablecell>
+            <paragraph id="par_id291629893774665" role="paragraph">
+                <image src="cmd/lc_showwhitespace.svg" id="img_id221629893774666" width="1cm"  height="1cm"><alt xml-lang="en-US" id="alt_id141629893774667">Icon Show Whitespace </alt></image>
+            </paragraph>
+        </tablecell>
+        <tablecell>
+            <paragraph id="par_id311629893774668" role="paragraph" xml-lang="en-US">Show Whitespace</paragraph>
+        </tablecell>
+    </tablerow>
+</table>
+</section>
+
+<section id="webbrowser">
+<paragraph id="par_id3149712" role="paragraph" xml-lang="en-US">Choose <menuitem>View - Web</menuitem></paragraph>
+<paragraph id="par_id3154640" role="paragraph" xml-lang="en-US">On <emph>Tools</emph> bar, enable</paragraph>
+<section id="sybrowser">
+<table id="tbl_id3151264">
+  <tablerow>
+    <tablecell>
+        <paragraph id="par_id3150765" role="paragraph" xml-lang="en-US"> <image id="img_id3147572" src="cmd/lc_browseview.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3147572">Web Icon</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3149291" role="paragraph" xml-lang="en-US">Web</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+</section>
+</section>
+
+<section id="normal_layout">
+<paragraph id="par_id3151176" role="paragraph" xml-lang="en-US">Choose <menuitem>View - Normal</menuitem><comment>removed table with icon (was copy/paste error)</comment></paragraph>
+</section>
+<paragraph id="par_id3149808" role="paragraph" xml-lang="en-US"><variable id="hidden_para">Choose <menuitem>View - Hidden Paragraphs</menuitem> </variable></paragraph>
+</body>
+</helpdocument>

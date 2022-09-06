@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+<topic id="textsharedexplorerdatabasemenufilesavexhp" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Save</title>
+<filename>/text/sdatabase/menufilesave.xhp</filename>
+</topic>
+<history>
+<created date="2005-02-07T15:50:39">save dialog in Base</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/collectionviewdialog/CollectionView" id="bm_id2862637" localize="false"/>
+<h1 id="par_idN10547">Save</h1>
+<paragraph role="paragraph" id="par_idN1054B" xml-lang="en-US">In this dialog, you can specify the position and name of a form <comment>UFI: spec says also for report, but reports can be created only by Wizard and are autosaved there</comment><comment>UFI: spec says also for query, cannot verify</comment>that you save within a <link href="text/sdatabase/dabadoc.xhp">database file</link>. The dialog opens automatically when you save a form the first time.<comment>UFI: no chance to open the dialog a second time</comment></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/collectionviewdialog/newFolderButton" id="bm_id2862636" localize="false"/>
+<h2 id="par_idN10564">Create New Directory</h2>
+<paragraph role="paragraph" id="par_idN10568" xml-lang="en-US"><ahelp hid=".">Click to create a new folder within the database file.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/collectionviewdialog/upButton" id="bm_id2447279" localize="false"/>
+<h2 id="par_idN1057F">Up One Level</h2>
+<paragraph role="paragraph" id="par_idN10583" xml-lang="en-US"><ahelp hid=".">Click to go up one level in the folder hierarchy.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/collectionviewdialog/fileNameEntry" id="bm_id1669362" localize="false"/>
+<h2 id="par_idN1059A">File name</h2>
+<paragraph role="paragraph" id="par_idN1059E" xml-lang="en-US"><ahelp hid=".">Enter the file name for the saved form.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/collectionviewdialog/ok" id="bm_id1720023" localize="false"/>
+<h2 id="par_idN105B5">Save</h2>
+<paragraph role="paragraph" id="par_idN105B9" xml-lang="en-US"><ahelp hid=".">Click to save the form to the database file.</ahelp></paragraph>
+</body>
+</helpdocument>

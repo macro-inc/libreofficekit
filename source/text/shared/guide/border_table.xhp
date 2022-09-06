@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+<topic id="textsharedguideborder_tablexml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Defining Borders for Tables and Table Cells</title>
+<filename>/text/shared/guide/border_table.xhp</filename>
+</topic>
+</meta>
+<body>
+
+<bookmark xml-lang="en-US" branch="index" id="bm_id3155805"><bookmark_value>tables in text; defining borders</bookmark_value>
+<bookmark_value>tables in spreadsheets;defining borders</bookmark_value>
+<bookmark_value>borders; for tables</bookmark_value>
+<bookmark_value>frames; around tables</bookmark_value>
+<bookmark_value>defining;table borders</bookmark_value>
+</bookmark>
+  <comment>mw deleted "adding;"</comment>
+  <h1 xml-lang="en-US" id="hd_id3155805"><variable id="border_table"><link href="text/shared/guide/border_table.xhp" name="Defining Borders for Tables and Table Cells">Defining Borders for Tables and Table Cells</link>
+</variable></h1>
+  <h2 xml-lang="en-US" id="hd_id3147008">Setting a Predefined Border Style</h2>
+  <list type="ordered">
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3146957" role="listitem">Select the table cells that you want to modify.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3156346" role="listitem">Click the <emph>Borders</emph> icon on the <emph>Table </emph>toolbar (Writer) or on the <emph>Line and Filling</emph> bar to open the <emph>Borders</emph> window.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3143270" role="listitem">Click one of the predefined border styles.</paragraph>
+    <paragraph xml-lang="en-US" id="par_id3156156" role="listitem">This <emph>adds</emph> the selected style to the current border style of the table cells. Select the blank border style at the top left of the <emph>Borders</emph> window to clear all border styles.</paragraph>
+   </listitem>
+  </list>
+  <h2 xml-lang="en-US" id="hd_id3153666">Setting a Customized Border Style</h2>
+  <list type="ordered">
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3152472" role="listitem">Select the table cells that you want to modify.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3147265" role="listitem">Choose <emph>Table - Properties - Borders</emph> (Writer) or <emph>Format - Cells - Borders</emph> (Calc).</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3159413" role="listitem">In the <emph>User-defined</emph> area select the edge(s) that you want to appear in a common layout. Click on an edge in the preview to toggle the selection of an edge.</paragraph>
+   </listitem>
+      <listitem>
+    <paragraph xml-lang="en-US" id="par_id31594132" role="listitem">If you select more than one row or column, you can change the middle lines between rows or columns. Select the middle markers in the <emph>User-defined</emph> area.</paragraph>
+   </listitem>
+
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3153526" role="listitem">Select a line style and color for the selected border style in the <emph>Line</emph> area. These settings apply to all border lines that are included in the selected border style.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3145606" role="listitem">Repeat the last two steps for every border edge.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3156422" role="listitem">Select the distance between the border lines and the page contents in the <emph>Padding</emph> area.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3149807" role="listitem">Click <emph>OK</emph> to apply the changes.</paragraph>
+   </listitem>
+  </list>
+  <section id="relatedtopics">
+    <switch select="appl">
+      <case select="WRITER">
+        <embed href="text/swriter/guide/border_object.xhp#border_object"/>
+        <embed href="text/swriter/guide/border_page.xhp#border_page"/>
+        <embed href="text/swriter/guide/borders.xhp#borders"/>
+      </case>
+    </switch>
+  <embed href="text/shared/guide/border_paragraph.xhp#border_paragraph"/>
+  </section>
+ </body>
+</helpdocument>

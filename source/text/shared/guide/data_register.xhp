@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedguidedata_registerxhp" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Registering and Deleting a Database </title>
+<filename>/text/shared/guide/data_register.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id4724570"><bookmark_value>databases;registering (Base)</bookmark_value>
+<bookmark_value>registering;databases (Base)</bookmark_value>
+<bookmark_value>deleting;databases (Base)</bookmark_value>
+<bookmark_value>databases;deleting (Base)</bookmark_value>
+<bookmark_value>lists;registered databases (Base)</bookmark_value>
+</bookmark><comment>mw deleted "removing;...". New entry "lists;" from shared/optionen/01160200.xhp</comment><paragraph role="heading" id="par_idN105A3" xml-lang="en-US" level="1"><variable id="data_register"><link href="text/shared/guide/data_register.xhp">Registering and Deleting a Database</link>
+</variable></paragraph>
+<paragraph role="paragraph" id="par_idN105C1" xml-lang="en-US">Data from any <link href="text/sdatabase/dabadoc.xhp">database file</link> can be registered to the installed instance of %PRODUCTNAME. To register means to tell %PRODUCTNAME where the data is located, how it is organized, how to get that data, and more. Once the database is registered, you can use the menu command <emph>View - Data source</emph> to access the data records from your text documents and spreadsheets.</paragraph>
+<paragraph role="heading" id="par_idN105C8" xml-lang="en-US" level="3">To register an existing database file:</paragraph>
+<list type="ordered">
+<listitem>
+<paragraph role="paragraph" id="par_idN105CF" xml-lang="en-US">Choose <switchinline select="sys"><caseinline select="MAC">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - <link href="text/shared/optionen/01160200.xhp">%PRODUCTNAME Base - Databases</link>.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_idN105E1" xml-lang="en-US">Click <emph>New</emph> and select the database file.<comment>i60224</comment></paragraph>
+</listitem>
+</list>
+<paragraph role="heading" id="par_idN10700" xml-lang="en-US" level="3">To remove a registered database from %PRODUCTNAME</paragraph>
+<list type="ordered">
+<listitem>
+<paragraph role="paragraph" id="par_idN10707" xml-lang="en-US">Choose <switchinline select="sys"><caseinline select="MAC">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - <link href="text/shared/optionen/01160200.xhp">%PRODUCTNAME Base - Databases</link>.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_idN10719" xml-lang="en-US">Select the database file and click <emph>Delete</emph>. </paragraph>
+</listitem>
+</list>
+<section id="relatedtopics">
+<paragraph role="paragraph" id="par_idN105F3" xml-lang="en-US" localize="false">
+	<embedvar href="text/sdatabase/main.xhp#base"/>
+</paragraph>
+<paragraph role="paragraph" id="par_idN105FB" xml-lang="en-US" localize="false">
+	<embedvar href="text/shared/guide/database_main.xhp#database_main"/>
+</paragraph>
+</section>
+</body>
+</helpdocument>

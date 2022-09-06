@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0201170004xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Special Tips for Table Controls</title>
+    <filename>/text/shared/02/01170004.xhp</filename>
+  </topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3109850"><bookmark_value>table controls; properties</bookmark_value>
+<bookmark_value>controls; properties of table controls</bookmark_value>
+<bookmark_value>table controls;keyboard-only edit mode</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3109850" xml-lang="en-US" level="1">Special Tips for Table Controls</paragraph>
+<paragraph role="paragraph" id="par_id3153539" xml-lang="en-US">You can define a table control to display the records as you like. In other words you can define data fields for displaying or editing data like in a database form.</paragraph>
+<paragraph role="paragraph" id="par_id3152372" xml-lang="en-US">The following fields are possible in a table control: text, date, time and currency field, numeric field, pattern field, check box and combo box. In the case of combined date/time fields, two columns are created automatically.</paragraph>
+<paragraph role="paragraph" id="par_id3159194" xml-lang="en-US">The number of selected lines, if any are selected, is in parentheses after the total number of records.</paragraph>
+<paragraph role="paragraph" id="par_id3155616" xml-lang="en-US">To insert columns into the table control, click in the column heads and bring up the context menu. The following commands are available:</paragraph>
+<bookmark xml-lang="en-US" branch="hid/SVX_HID_FM_INSERTCOL" id="bm_id3147571" localize="false"/><paragraph role="heading" id="hd_id3150789" xml-lang="en-US" level="2">Insert Column</paragraph>
+<paragraph role="paragraph" id="par_id3153750" xml-lang="en-US"><ahelp hid="SID_FM_INSERTCOL">Calls a submenu to select a data field to adopt it in the table control.</ahelp></paragraph>
+<paragraph role="paragraph" id="par_id3155552" xml-lang="en-US">Configure the table control using drag and drop: Open the data source browser and drag the desired fields out of the data source browser and on to the column heads of the table control. A pre-configured column is created.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/SVX_HID_FM_CHANGECOL" id="bm_id3145211" localize="false"/><paragraph role="heading" id="hd_id3149827" xml-lang="en-US" level="2">Replace with</paragraph>
+<paragraph role="paragraph" id="par_id3153345" xml-lang="en-US"><ahelp hid="SID_FM_CHANGECOL">Opens a submenu to select a data field to replace the data field selected in the table control.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/SVX_HID_FM_DELETECOL" id="bm_id3149095" localize="false"/><paragraph role="heading" id="hd_id3143267" xml-lang="en-US" level="2">Delete Column</paragraph>
+<paragraph role="paragraph" id="par_id3157958" xml-lang="en-US"><ahelp hid="SID_FM_DELETECOL">Deletes the currently selected column.</ahelp></paragraph>
+<paragraph role="heading" id="hd_id3147275" xml-lang="en-US" level="2">Column</paragraph>
+<paragraph role="paragraph" id="par_id3152996" xml-lang="en-US">Opens the properties dialog of the selected column.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/SVX_HID_FM_HIDECOL" id="bm_id3163802" localize="false"/><paragraph role="heading" id="hd_id3148539" xml-lang="en-US" level="2">Hide Columns</paragraph>
+<paragraph role="paragraph" id="par_id3159157" xml-lang="en-US"><ahelp hid="SID_FM_HIDECOL">Hides the selected column.</ahelp> Its properties are not changed.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/SVX_HID_FM_SHOWCOLS" id="bm_id3155135" localize="false"/><paragraph role="heading" id="hd_id3150771" xml-lang="en-US" level="2">Show columns</paragraph>
+<paragraph role="paragraph" id="par_id3159400" xml-lang="en-US"><ahelp hid="SID_FM_SHOWCOLS">Calls a submenu where you can select the columns to show again.</ahelp> To show only one column, click the column name. You see only the first <emph>16</emph> hidden columns. If there are more hidden columns, choose the <emph>More</emph> command to call the <emph>Show Columns</emph> dialog.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/SVX_HID_FM_SHOWCOLS_MORE" id="bm_id3150669" localize="false"/><paragraph role="heading" id="hd_id3156193" xml-lang="en-US" level="3">More</paragraph>
+<paragraph role="paragraph" id="par_id3159269" xml-lang="en-US"><ahelp hid="SID_FM_SHOWCOLS_MORE">Calls the <emph>Show Columns</emph> dialog.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/showcoldialog/ShowColDialog" id="bm_id3159148" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/showcoldialog/@@nowidget@@" id="bm_id3159148" localize="false"/>
+<paragraph role="paragraph" id="par_id3149763" xml-lang="en-US"><ahelp hid="cui/ui/showcoldialog/ShowColDialog">In the <emph>Show Columns</emph> dialog you can select the columns to be shown. Hold down the <emph>Shift</emph> or <switchinline select="sys"><caseinline select="MAC"><emph>Command</emph></caseinline><defaultinline><emph>Ctrl</emph></defaultinline></switchinline> key to select multiple entries.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/SVX_HID_FM_SHOWALLCOLS" id="bm_id3145119" localize="false"/><paragraph role="heading" id="hd_id3153561" xml-lang="en-US" level="3">All</paragraph>
+<paragraph role="paragraph" id="par_id3150504" xml-lang="en-US"><ahelp hid="SID_FM_SHOWALLCOLS">Click <emph>All</emph> if you want to show all columns.</ahelp></paragraph>
+<paragraph role="heading" id="hd_id3153349" xml-lang="en-US" level="2">Keyboard-only control of <emph>Table Controls</emph></paragraph>
+<paragraph role="paragraph" id="par_id3149416" xml-lang="en-US">If you use the keyboard only to travel through controls in your document, you will find one difference to the other types of controls: the <emph>Tab</emph> key does not move the cursor to the next control, but moves to the next column inside the table control. Press <switchinline select="sys"><caseinline select="MAC"><emph>Command</emph></caseinline><defaultinline><emph>Ctrl</emph></defaultinline></switchinline>+<emph>Tab</emph> to move to the next control, or press <emph>Shift</emph>+<switchinline select="sys"><caseinline select="MAC"><emph>Command</emph></caseinline><defaultinline><emph>Ctrl</emph></defaultinline></switchinline>+<emph>Tab</emph> to move to the previous control.</paragraph>
+<paragraph role="heading" id="hd_id3153062" xml-lang="en-US" level="3">To enter the special keyboard-only edit mode for <emph>Table Controls</emph>:</paragraph>
+<paragraph role="paragraph" id="par_id3144510" xml-lang="en-US">The form document must be in <link href="text/shared/02/01170500.xhp" name="design mode"><emph>Design mode</emph></link>.</paragraph>
+<list type="ordered">
+  <listitem>
+    <paragraph role="listitem" id="par_id3154758" xml-lang="en-US">Press <switchinline select="sys"><caseinline select="MAC"><emph>Command</emph></caseinline><defaultinline><emph>Ctrl</emph></defaultinline></switchinline>+<emph>F6</emph> to select the document.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph role="listitem" id="par_id3161657" xml-lang="en-US">Press <emph>Shift</emph>+<emph>F4</emph> to select the first control. If the <emph>Table Control</emph> is not the first control, press <emph>Tab</emph> until it is selected.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph role="listitem" id="par_id3151056" xml-lang="en-US">Press <emph>Enter</emph> to enter the edit mode. The handles are shown farther out from the control border.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph role="listitem" id="par_id3154938" xml-lang="en-US">In the edit mode, you can open the edit mode context menu by pressing <emph>Shift</emph>+<emph>F10</emph>.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph role="listitem" id="par_id3154365" xml-lang="en-US">If you want to edit columns, press <emph>Shift</emph>+<emph>Space</emph> to enter column edit mode. Now you can rearrange the order of columns with <switchinline select="sys"><caseinline select="MAC"><emph>Command</emph></caseinline><defaultinline><emph>Ctrl</emph></defaultinline></switchinline>+<emph>Arrow</emph> keys. The <emph>Delete</emph> key deletes the current column.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph role="listitem" id="par_id3145419" xml-lang="en-US">Press the <emph>Esc</emph> key to exit the edit mode.</paragraph>
+  </listitem>
+</list>
+</body>
+</helpdocument>

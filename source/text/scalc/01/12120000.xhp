@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalc0112120000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Validity</title>
+<filename>/text/scalc/01/12120000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="hid/.uno:Validation" id="bm_id3153880" localize="false"/>
+<section id="validityheader">
+<h1 id="hd_id3156347"><link href="text/scalc/01/12120000.xhp" name="validity">Validity</link></h1>
+<paragraph role="paragraph" id="par_id3153252" xml-lang="en-US"><variable id="gueltigkeit"><ahelp hid=".uno:Validation">Defines what data is valid for a selected cell or cell range.</ahelp>
+</variable></paragraph>
+</section>
+<section id="howtoget">
+  <embed href="text/scalc/00/00000412.xhp#datengueltig"/>
+</section>
+<tip id="par_idN105D1">You can also insert a list box from the Controls toolbar and link the list box to a cell. This way you can specify the valid values on the <link href="text/shared/02/01170102.xhp">Data</link> page of the list box properties window.</tip>
+<embed href="text/scalc/01/12120100.xhp#criteria"/>
+<embed href="text/scalc/01/12120200.xhp#input_help"/>
+<embed href="text/scalc/01/12120300.xhp#error_alert"/>
+<embed href="text/shared/00/00000001.xhp#reset"/>
+</body>
+</helpdocument>

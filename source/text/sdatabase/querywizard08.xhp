@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedexplorerdatabasequerywizard08xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Query Wizard - Overview</title>
+<filename>/text/sdatabase/querywizard08.xhp</filename>
+</topic>
+<history>
+<created date="2004-07-06T10:23:58">UFI: new Query Wizard page 8</created>
+</history>
+</meta>
+<body>
+<section id="overview">
+<h1 id="par_idN10543"><link href="text/sdatabase/querywizard08.xhp">Query Wizard - Overview</link></h1>
+<paragraph role="paragraph" id="par_idN10553" xml-lang="en-US">Enter a name of the query, and specify whether you want to display or to modify the query after the Wizard is finished.</paragraph>
+</section>
+<bookmark xml-lang="en-US" branch="hid/WIZARDS_HID_QUERYWIZARD_TXTQUERYTITLE" id="bm_id3238319" localize="false"/>
+<h2 id="par_idN10556">Name of the query</h2>
+<paragraph role="paragraph" id="par_idN1055A" xml-lang="en-US"><ahelp hid=".">Enter the name of the query.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/WIZARDS_HID_QUERYWIZARD_OPTDISPLAYQUERY" id="bm_id1403241" localize="false"/>
+<h2 id="par_idN1055D">Display query</h2>
+<paragraph role="paragraph" id="par_idN10561" xml-lang="en-US"><ahelp hid=".">Select to save and display the query.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/WIZARDS_HID_QUERYWIZARD_OPTMODIFYQUERY" id="bm_id2776268" localize="false"/>
+<h2 id="par_idN10564">Modify query</h2>
+<paragraph role="paragraph" id="par_idN10568" xml-lang="en-US"><ahelp hid=".">Select to save the query and open it for editing.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/WIZARDS_HID_QUERYWIZARD_TXTSUMMARY" id="bm_id4912869" localize="false"/>
+<h2 id="par_idN1056B">Overview</h2>
+<paragraph role="paragraph" id="par_idN1056F" xml-lang="en-US"><ahelp hid=".">Displays a summary of the query.</ahelp></paragraph>
+<paragraph role="paragraph" id="par_idN10572" xml-lang="en-US"><link href="text/sdatabase/querywizard00.xhp" name="Query Wizard">Query Wizard</link></paragraph>
+</body>
+</helpdocument>

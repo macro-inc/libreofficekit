@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0206050000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Demote Outline Level</title>
+    <filename>/text/shared/02/06050000.xhp</filename>
+  </topic>
+  <history>
+    <created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+  </history>
+</meta>
+<body>
+<section id="demote_one_level">
+<bookmark xml-lang="en-US" branch="hid/.uno:OutlineRight" id="bm_id7638577" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:DecrementLevel" id="bm_id6945277" localize="false"/>
+  <h1 id="hd_id3148983"><link href="text/shared/02/06050000.xhp" name="Demote One Level">Demote<switchinline select="appl"><caseinline select="WRITER"> Outline Level</caseinline></switchinline></link></h1>
+<paragraph role="paragraph" id="par_id3147285" xml-lang="en-US"><ahelp hid="."><switchinline select="appl"><caseinline  select="WRITER">Moves a chapter heading where the cursor is located, or selected chapter headings, down one outline level. </caseinline></switchinline>Moves a list paragraph where the cursor is located, or selected list paragraphs, down one list level.</ahelp><comment>UFI: need two files for numbering and outline, also for 06060000.xhp</comment></paragraph>
+</section>
+<paragraph role="paragraph" id="par_id3149549" xml-lang="en-US"><switchinline select="appl"><caseinline select="WRITER">The <menuitem>Demote Outline Level</menuitem> icon is on the <link href="text/swriter/main0206.xhp" name="BulletNumberingBar"><menuitem>Bullets and Numbering</menuitem></link> bar, which appears when the cursor is positioned on a numbered chapter heading or a list paragraph.</caseinline>
+<caseinline select="IMPRESS">The <menuitem>Demote</menuitem> icon is on the <menuitem>Outline</menuitem> bar, which appears when working in the outline view. This function can also be called by pressing <keycode>Alt+Shift+Right Arrow</keycode>.</caseinline></switchinline></paragraph>
+<section id="sydemote_one_level">
+<table id="tbl_id3153394">
+  <tablerow>
+    <tablecell>
+      <paragraph role="paragraph" id="par_id3146957" xml-lang="en-US"><image id="img_id3143267" src="cmd/lc_decrementlevel.svg" width="1cm" height="1cm"><alt id="alt_id3143267" xml-lang="en-US">Icon Demote</alt></image></paragraph>
+    </tablecell>
+     <tablecell>
+        <paragraph role="paragraph" id="par_id3149096" xml-lang="en-US"><switchinline select="appl"><caseinline select="WRITER">Demote Outline Level</caseinline><defaultinline>Demote</defaultinline></switchinline></paragraph>
+     </tablecell>
+  </tablerow>
+</table>
+</section>
+</body>
+</helpdocument>

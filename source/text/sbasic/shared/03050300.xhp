@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03050300xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Error Function</title>
+<filename>/text/sbasic/shared/03050300.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="errorf">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3159413"><bookmark_value>Error function</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3159413" xml-lang="en-US" level="1"><link href="text/sbasic/shared/03050300.xhp" name="Error Function">Error Function</link></paragraph>
+<paragraph role="paragraph" id="par_id3148663" xml-lang="en-US">Returns the error message that corresponds to a value or raises a given error context.</paragraph>
+</section>
+<paragraph role="heading" id="hd_id3153379" xml-lang="en-US" level="2">Syntax:</paragraph>
+<bascode>
+<paragraph role="bascode" id="par_id631576404838377">Error</paragraph>
+<paragraph role="bascode" id="par_id3154366" xml-lang="en-US">Error(expression)</paragraph>
+<paragraph role="bascode" id="par_id231576404629080">Error err_code</paragraph>
+</bascode>
+<paragraph role="heading" id="hd_id3145173" xml-lang="en-US" level="2">Return value:</paragraph>
+<paragraph role="paragraph" id="par_id3154125" xml-lang="en-US">String or raised error context</paragraph>
+<paragraph role="heading" id="hd_id3150869" xml-lang="en-US" level="2">Parameters:</paragraph>
+<paragraph role="paragraph" id="par_id3159254" xml-lang="en-US">If no argument is provided, the Error function returns the error message of the most recent error that occurred during program execution.</paragraph>
+<paragraph role="paragraph" id="par_id3153193" xml-lang="en-US">
+<emph>expression:</emph> Any numeric expression whose error code can be mapped to an existing error message. An empty string is returned if the error code does not exist.</paragraph>
+<paragraph role="paragraph" id="par_id351576405235602" xml-lang="en-US"><emph>err_code:</emph> Any value that corresponds to an existing error code.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#allerrors"/><comment>fixed i60953</comment>
+<section id="relatedtopics">
+  <embed href="text/sbasic/shared/03050000.xhp#ErrHandlingh1"/>
+</section>
+</body>
+</helpdocument>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedoptionen01050300xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Background</title>
+<filename>/text/shared/optionen/01050300.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+  <section id="background">
+  <h1 id="hd_id3147653"><link href="text/shared/optionen/01050300.xhp" name="Background">Background</link></h1>
+  <paragraph role="paragraph" id="par_id3150443" xml-lang="en-US">Specifies the background for HTML documents. The background is valid for both new HTML documents and for those that you load, as long as these have not defined their own background.</paragraph>
+  </section>
+  <section id="howtoget">
+  <embed href="text/shared/00/00000406.xhp#hinter"/>
+</section>
+<paragraph xml-lang="en-US" id="par_id3151114" role="paragraph"><ahelp hid=".">Click a color. Click the <emph>None</emph> button to remove a background color.</ahelp></paragraph>
+ </body>
+</helpdocument>

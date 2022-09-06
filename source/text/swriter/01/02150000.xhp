@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriter0102150000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Edit Footnote or Endnote</title>
+    <filename>/text/swriter/01/02150000.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="footnote_endnote">
+<bookmark xml-lang="en-US" branch="hid/.uno:EditFootnote" id="bm_id8871205" localize="false"/>
+
+<h1 id="hd_id3143276"><link href="text/swriter/01/02150000.xhp" name="Edit Footnotes">Edit Footnote or Endnote</link></h1>
+<paragraph id="par_id3149097" role="paragraph" xml-lang="en-US"><variable id="footnote_endnote_text"><variable id="fusstext"><ahelp hid=".uno:EditFootnote">Edits the selected footnote or endnote anchor. Click in front of the footnote or endnote, and then choose this command.</ahelp> </variable></variable></paragraph>
+</section>
+
+<section id="howtoget">
+<embed href="text/swriter/00/00000402.xhp#fussnote"/>
+</section>
+<paragraph id="par_id3149035" role="paragraph" xml-lang="en-US">To edit the text of a footnote or endnote, click in the footnote area at the bottom of the page, or at the end of the document.</paragraph>
+<note id="par_id3145776">To quickly jump to the footnote or endnote text, click the anchor for note in the document. You can also position the cursor in front of or behind the marker, and then press <switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Shift+PgDn</keycode>. To jump back to the anchor for the note, press <keycode>PgUp</keycode>.</note>
+
+<h2 id="hd_id3155916">Numbering</h2>
+<paragraph id="par_id3151373" role="paragraph" xml-lang="en-US">Select the numbering type for the footnote or endnote.</paragraph>
+
+<h3 id="hd_id3150685">Auto</h3>
+<embed href="text/swriter/01/04030000.xhp#bearbeitenautomatisch"/>
+
+<h3 id="hd_id3155858">Character</h3>
+<embed href="text/swriter/01/04030000.xhp#bearbeitenzeichen"/>
+
+<h3 id="hd_id3150113">Choose</h3>
+<embed href="text/swriter/01/04030000.xhp#bearbeitensonderzeichen"/>
+<tip id="par_id3149849">To change the format of a footnote or endnote anchor or text, select it, and then choose <item type="menuitem">Format - Character</item>. You can press <switchinline select="sys"><caseinline select="MAC">Command+T
+</caseinline><defaultinline>F11</defaultinline></switchinline> to open the <emph>Styles</emph> window and modify the footnote or endnote paragraph style.</tip>
+
+<h2 id="hd_id3153296">Type</h2>
+<paragraph id="par_id3153308" role="paragraph" xml-lang="en-US">Select the type of note to insert, that is, footnote or endnote. A footnote is placed at the bottom of the current page, whereas an endnote is placed at the end of the document.</paragraph>
+
+<h3 id="hd_id3156130">Footnote</h3>
+<paragraph id="par_id3156098" role="paragraph" xml-lang="en-US">Converts an endnote to a footnote.</paragraph>
+
+<h3 id="hd_id3156111">Endnote</h3>
+<paragraph id="par_id3155079" role="paragraph" xml-lang="en-US">Converts a footnote to an endnote.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/insertfootnote/prev" id="bm_id3154335" localize="false"/>
+
+<h2 id="hd_id3154323">Arrow left</h2>
+<paragraph id="par_id3154341" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/insertfootnote/prev">Moves to the previous footnote or endnote anchor in the document.</ahelp></paragraph>
+
+<table id="tbl_id3148791">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3150023" role="paragraph" xml-lang="en-US"> <image id="img_id3150030" src="res/lc06301.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3150030">Icon Previous footnote</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3154614" role="paragraph" xml-lang="en-US">Previous footnote</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/insertfootnote/next" id="bm_id3149631" localize="false"/>
+
+<h2 id="hd_id3154630">Arrow right</h2>
+<paragraph id="par_id3149638" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/insertfootnote/next">Moves to the next footnote or endnote anchor in the document.</ahelp></paragraph>
+
+<table id="tbl_id3150662">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3154029" role="paragraph" xml-lang="en-US"> <image id="img_id3154044" src="res/lc06300.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3154044">Icon Next footnote</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3149606" role="paragraph" xml-lang="en-US">Next footnote</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<embed href="text/shared/00/00000004.xhp#related"/>
+<paragraph id="par_id3150772" role="paragraph" xml-lang="en-US"><link href="text/swriter/01/04030000.xhp" name="Insert Footnote">Insert Footnote/Endnote</link> dialog.</paragraph>
+</body>
+
+</helpdocument>

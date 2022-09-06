@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03090102xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Select...Case Statement</title>
+    <filename>/text/sbasic/shared/03090102.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="selectcase">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149416">
+  <bookmark_value>Select Case statement</bookmark_value>
+  <bookmark_value>Case keyword; in Select Case statement</bookmark_value>
+</bookmark>
+
+
+<h1 id="hd_id3149416" xml-lang="en-US"><variable id="Select_h1"><link href="text/sbasic/shared/03090102.xhp" name="Select...Case Statement">Select...Case Statement</link></variable></h1>
+<paragraph id="par_id3153896" role="paragraph" xml-lang="en-US">Defines one or more statement blocks depending on the value of an expression.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<paragraph role="image" id="par_id841588605629842"><image src="media/helpimg/sbasic/Select-Case_statement.svg" id="img_id931588605629842"><alt id="alt_id931588605629842">Select Case syntax</alt></image></paragraph>
+<bascode>
+  <paragraph role="bascode" id="bas_id251592381900645">Select Case expression</paragraph>
+  <paragraph role="bascode" id="bas_id321592381903509">   Case values</paragraph>
+  <paragraph role="bascode" id="bas_id231592381903973">     Statement Block</paragraph>
+  <paragraph role="bascode" id="bas_id361592381904372">[  Case values2</paragraph>
+  <paragraph role="bascode" id="bas_id421592382002520">     Statement Block]</paragraph>
+  <paragraph role="bascode" id="bas_id161592382004496">[  Case Else</paragraph>
+  <paragraph role="bascode" id="bas_id681592382005351">     Statement Block]</paragraph>
+  <paragraph role="bascode" id="bas_id831592381905293">End Select</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph id="par_id3156281" role="paragraph" xml-lang="en-US"> <emph>expression:</emph> Any expression that controls if the statement block that follows the respective <literal>Case</literal> clause is executed.</paragraph>
+  <paragraph id="par_id3150448" role="paragraph" xml-lang="en-US"> <emph>values:</emph> Any value list that is compatible with the expression. The statement block that follows the <literal>Case</literal> clause is executed if <emph>expression</emph> matches <emph>values</emph>.</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341173760" role="bascode" localize="false" xml-lang="en-US">Sub ExampleRandomSelect</paragraph>
+<paragraph id="par_idm1341172528" role="bascode" localize="false" xml-lang="en-US">Dim iVar As Integer</paragraph>
+<paragraph id="par_idm1341171296" role="bascode" localize="false" xml-lang="en-US">    iVar = Int((15 * Rnd) -2)</paragraph>
+<paragraph id="par_idm1341170048" role="bascode" localize="false" xml-lang="en-US">    Select Case iVar</paragraph>
+<paragraph id="par_idm1341168816" role="bascode" localize="false" xml-lang="en-US">        Case 1 To 5</paragraph>
+<paragraph id="par_id3152597" role="bascode" xml-lang="en-US">            Print "Number from 1 to 5"</paragraph>
+<paragraph id="par_idm1341165856" role="bascode" localize="false" xml-lang="en-US">        Case 6, 7, 8</paragraph>
+<paragraph id="par_id3147349" role="bascode" xml-lang="en-US">            Print "Number from 6 to 8"</paragraph>
+<paragraph id="par_idm1341162896" role="bascode" localize="false" xml-lang="en-US">        Case 8 To 10</paragraph>
+<paragraph id="par_id3152886" role="bascode" xml-lang="en-US">            Print "Greater than 8"</paragraph>
+<paragraph id="par_idm1340795200" role="bascode" localize="false" xml-lang="en-US">        Case Else</paragraph>
+<paragraph id="par_id3146975" role="bascode" xml-lang="en-US">            Print "Out of range 1 to 10"</paragraph>
+<paragraph id="par_idm1340792224" role="bascode" localize="false" xml-lang="en-US">    End Select</paragraph>
+<paragraph id="par_idm1340790992" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+
+<section id="relatedtopics">
+   <embed href="text/sbasic/shared/03090402.xhp#Choose_h1"/>
+   <embed href="text/sbasic/shared/03090410.xhp#Switch_h1"/>
+  <paragraph role="paragraph" id="par_id161588865796615"><link href="text/sbasic/shared/03090101.xhp" name="If...Then...Else statement">If</link> statement</paragraph>
+  <paragraph role="paragraph" id="par_id281588865818334"><link href="text/sbasic/shared/03090103.xhp" name="Iif function">Iif</link> or <link href="text/sbasic/shared/03090410.xhp" name="Switch function">Switch</link> functions</paragraph>
+</section>
+
+</body>
+</helpdocument>

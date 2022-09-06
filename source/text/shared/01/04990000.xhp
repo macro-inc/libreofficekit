@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textshared0104990000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Media</title>
+    <filename>/text/shared/01/04990000.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+<section id="media_submenu">
+<bookmark xml-lang="en-US" branch="hid/.uno:GraphicMenu" id="bm_id1919919" localize="false"/>
+<h1 id="hd_id3156045"><link href="text/shared/01/04990000.xhp" name="media">Media</link></h1>
+<paragraph id="par_id3154613" role="paragraph" xml-lang="en-US"><ahelp hid=".">The submenu presents various sources that an image, audio or video can be insert from.</ahelp></paragraph>
+</section>
+<embed href="text/shared/01/gallery.xhp#stargallery"/>
+<switch select="appl">
+    <case select="IMPRESS">
+        <embed href="text/simpress/guide/photo_album.xhp#impress_photo_album"/>
+    </case>
+</switch>
+<embed href="text/shared/01/04060000.xhp#scan"/>
+<switch select="appl">
+    <case select="IMPRESS">
+        <embed href="text/simpress/01/06050000.xhp#animation"/>
+    </case>
+    <default>
+        <embed href="text/shared/01/moviesound.xhp#moviesound"/>
+    </default>
+</switch>
+</body>
+</helpdocument>

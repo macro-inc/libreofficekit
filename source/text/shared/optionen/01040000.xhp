@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedoptionen01040000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Text Document Options</title>
+<filename>/text/shared/optionen/01040000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="hid/.uno:SwEditOptions" id="bm_id3148491" localize="false"/>
+<h1 id="hd_id3155628" xml-lang="en-US">%PRODUCTNAME Writer Options</h1>
+<paragraph role="paragraph" id="par_id3145315" xml-lang="en-US"><variable id="optionentextdokument"><ahelp hid=".uno:SwEditOptions">These settings determine the way text documents that are created in $[officename] are handled. It is also possible to define settings for the current text document.</ahelp>
+</variable> The global settings are automatically saved.</paragraph>
+<section id="howtoget">
+  <embed href="text/shared/00/00000406.xhp#optionentextdokument"/>
+</section>
+<embed href="text/shared/optionen/01040900.xhp#general"/>
+<embed href="text/shared/optionen/01040200.xhp#layout"/>
+<embed href="text/shared/optionen/01040600.xhp#formatting_aids"/>
+<embed href="text/shared/optionen/01050100.xhp#grid"/>
+<h2 id="hd_id3159399" xml-lang="en-US"><link href="text/shared/optionen/01040300.xhp" name="Basic Fonts (Western)">Basic Fonts (Western)</link></h2>
+<paragraph role="paragraph" id="par_id3151385" xml-lang="en-US">Specifies the settings for the basic fonts.</paragraph>
+<h2 id="hd_id3148563" xml-lang="en-US"><link href="text/shared/optionen/01040300.xhp" name="Basic Fonts (Asian)">Basic Fonts (Asian)</link></h2>
+<paragraph role="paragraph" id="par_id3147304" xml-lang="en-US">Specifies the settings for the basic Asian fonts if Asian language support has been activated under <switchinline select="sys"><caseinline select="MAC"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Language Settings - Languages.</emph>
+</paragraph>
+<h2 id="hd_id3149294" xml-lang="en-US"><link href="text/shared/optionen/01040300.xhp" name="Basic Fonts (CTL)">Basic Fonts (CTL)</link></h2>
+<paragraph role="paragraph" id="par_id3150792" xml-lang="en-US">Specifies the settings for basic fonts for complex text layout languages if their support has been activated under <switchinline select="sys"><caseinline select="MAC"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Language Settings - Languages</emph>.</paragraph>
+<embed href="text/shared/optionen/01040400.xhp#print"/>
+<embed href="text/shared/optionen/01040500.xhp#table"/>
+<embed href="text/shared/optionen/01040700.xhp#changes"/>
+<embed href="text/shared/optionen/01041000.xhp#compatibility"/>
+<embed href="text/shared/optionen/01041100.xhp#autocaption"/>
+<embed href="text/shared/optionen/mailmerge.xhp#mailmerge"/>
+</body>
+</helpdocument>

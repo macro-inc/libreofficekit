@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+      <topic id="textswriter0106040000xml" indexer="include" status="PUBLISH">
+         <title xml-lang="en-US" id="tit">Word Count</title>
+         <filename>/text/swriter/01/06040000.xhp</filename>
+      </topic>
+   </meta>
+   <body>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/wordcount/WordCountDialog" id="bm_id6469313" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/wordcount/@@nowidget@@" id="bm_@@nowidget@@" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/wordcount/help" id="bm_id6469314" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/wordcount/close" id="bm_id6469315" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:WordCountDialog" id="bm_id1483504" localize="false"/>
+<section id="wordcount">
+         <h1 xml-lang="en-US" id="par_idN10542"><link href="text/swriter/01/06040000.xhp">Word Count</link></h1>
+         <paragraph xml-lang="en-US" id="par_idN10552" role="paragraph"><ahelp hid="modules/swriter/ui/wordcount/WordCountDialog">Counts the words and characters, with or without spaces, in the current selection and in the whole document. The count is kept up to date as you type or change the selection.</ahelp></paragraph>
+      </section>
+      <section id="howtoget">
+         <embed href="text/swriter/00/00000406.xhp#wordcount"/>
+      </section>
+      <embed href="text/swriter/guide/words_count.xhp#how"/>
+      <section id="relatedtopics">
+         <paragraph xml-lang="en-US" id="par_idN1062D" role="paragraph"><link href="text/shared/01/01100400.xhp" name="File - Properties - Statistics"><menuitem>File - Properties - Statistics</menuitem> </link></paragraph>
+      </section>
+   </body>
+</helpdocument>

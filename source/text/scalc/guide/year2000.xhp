@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalcguideyear2000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">19xx/20xx Years</title>
+<filename>/text/scalc/guide/year2000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150439"><bookmark_value>years; 2-digits</bookmark_value>
+<bookmark_value>dates; 19xx/20xx</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3150439" xml-lang="en-US" level="1"><variable id="year2000"><link href="text/scalc/guide/year2000.xhp" name="19xx/20xx Years">19xx/20xx Years</link>
+</variable></paragraph>
+<section id="text">
+<paragraph role="paragraph" id="par_id3151116" xml-lang="en-US">The year in a date entry is often entered as two digits. Internally, the year is managed by $[officename] as four digits, so that in the calculation of the difference from 1/1/99 to 1/1/01, the result will correctly be two years.</paragraph>
+<list type="unordered">
+<listitem>
+<paragraph role="listitem" id="par_id3154011" xml-lang="en-US">Under <switchinline select="sys"><caseinline select="MAC"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - $[officename] - General</emph> you can define the century that is used when you enter a year with only two digits. The default is 1930 to 2029.</paragraph>
+</listitem>
+</list>
+<paragraph role="paragraph" id="par_id3150010" xml-lang="en-US">This means that if you enter a date of 1/1/30 or higher, it will be treated internally as 1/1/1930 or higher. All lower two-digit years apply to the 20xx century. So, for example, 1/1/20 is converted into 1/1/2020.</paragraph>
+</section>
+<section id="relatedtopics">
+<embed href="text/scalc/guide/calc_date.xhp#calc_date"/>
+</section>
+</body>
+</helpdocument>

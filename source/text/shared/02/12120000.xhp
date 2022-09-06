@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0212120000xml" indexer="include" status="PUBLISH">
+    <title xml-lang="en-US" id="tit">Apply Filter</title>
+    <filename>/text/shared/02/12120000.xhp</filename>
+  </topic>
+  <history>
+    <created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+  </history>
+</meta>
+<body>
+<section id="apply_filter">
+<bookmark branch="hid/.uno:FormFiltered" xml-lang="en-US" id="bm_id3151097" localize="false"/>
+<h1 id="hd_id3149748"><link href="text/shared/02/12120000.xhp" name="Apply Filter">Apply Filter</link></h1>
+<paragraph role="paragraph" id="par_id3149495" xml-lang="en-US"><ahelp hid=".uno:FormFiltered" visibility="visible">Switches between the filtered and unfiltered view of the table.</ahelp></paragraph>
+</section>
+<section id="syapply_filter">
+<table id="tbl_id3143281">
+  <tablerow>
+    <tablecell>
+      <paragraph role="paragraph" id="par_id3149999" xml-lang="en-US"><image src="cmd/sc_formfiltered.png" id="img_id3146130" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3146130">Icon Form Filter</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph role="paragraph" id="par_id3145090" xml-lang="en-US">Apply Filter</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+</section>
+<paragraph xml-lang="en-US" role="paragraph" id="par_id3147226">The <emph>Apply Filter</emph> function retains <link href="text/shared/02/12110000.xhp" name="form-based filters"><emph>form-based filters</emph></link> that have been set. You do not need to redefine them.</paragraph>
+</body>
+</helpdocument>

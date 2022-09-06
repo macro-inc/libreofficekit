@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03100500xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">CInt Function</title>
+    <filename>/text/sbasic/shared/03100500.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="cint">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149346">
+  <bookmark_value>CInt function</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3149346"><link href="text/sbasic/shared/03100500.xhp" name="CInt Function">CInt Function</link></h1>
+<paragraph id="par_id3155419" role="paragraph" xml-lang="en-US">Converts any string or numeric expression to an integer.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3154142" role="bascode" xml-lang="en-US">CInt (Expression As Variant) As Integer</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3147560" localize="false" role="paragraph">Integer</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<embed href="text/sbasic/shared/03100900.xhp#ExpressionArgument"/>
+<paragraph id="par_id3159416" role="paragraph" xml-lang="en-US">If the argument is string, the function trims the leading white space; then it tries to recognize a number in following characters. The syntax below are recognized:</paragraph>
+<list type="unordered">
+    <listitem>
+        <paragraph id="par_id811638383475418" role="listitem">Decimal numbers (with optional leading sign) using decimal and group separators of locale configured in $[officename] (group separators are accepted in any position), with optional exponential notation like "-12e+1" (where an optionally signed whole decimal number after e or E or d or D defines power of 10);</paragraph>
+    </listitem>
+    <listitem>
+        <paragraph id="par_id361638383494362" role="listitem">Octal numbers like "&amp;Onnn...", where "nnn..." after "&amp;O" or "&amp;o" is sequence no longer than 11 digits, from 0 to 7, up to the next non-alphanumeric character;</paragraph>
+    </listitem>
+    <listitem>
+        <paragraph id="par_id91638383518862" role="listitem">Hexadecimal numbers like "&amp;Hnnn...", where "nnn..." after "&amp;H" or "&amp;h" is sequence of characters up to the next non-alphanumeric character, and must be no longer than 8 digits, from 0 to 9, A to F, or a to f. </paragraph>
+    </listitem>
+</list>
+<paragraph role="paragraph" id="par_id61638383582794">The rest of the string is ignored. If the string is not recognized, e.g. when after trimming leading whitespace it doesn't start with plus, minus, a decimal digit, or "&amp;", or when the sequence after "&amp;O" is longer than 11 characters or contains an alphabetic character, the numeric value of expression is 0.</paragraph>
+<paragraph id="par_id3159417" role="paragraph" xml-lang="en-US">If the argument is an error, the error number is used as numeric value of the expression.</paragraph>
+<paragraph id="par_id3159418" role="paragraph" xml-lang="en-US">If the argument is a date, number of days since 1899-12-30 (serial date) is used as numeric value of the expression. Time is represented as fraction of a day.</paragraph>
+<paragraph id="par_id3150358" role="paragraph" xml-lang="en-US">After calculating the numeric value of the expression, it is rounded to the nearest integer (if needed), and if the result is not between -32768 and 32767, $[officename] Basic reports an overflow error. Otherwise, the result is returned.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<embed href="text/sbasic/shared/03100900.xhp#ExampleCountryConvert"/>
+</body>
+</helpdocument>

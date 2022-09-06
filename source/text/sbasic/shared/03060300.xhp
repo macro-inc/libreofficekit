@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03060300xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Imp Operator</title>
+    <filename>/text/sbasic/shared/03060300.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="imp">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3156024">
+  <bookmark_value>Imp operator (logical)</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3156024" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03060300.xhp" name="Imp Operator">Imp Operator</link></paragraph>
+<paragraph id="par_id3148947" role="paragraph" xml-lang="en-US">Performs a logical implication on two expressions.</paragraph>
+</section>
+
+<paragraph id="hd_id3148664" role="heading" level="2" xml-lang="en-US">Syntax:</paragraph>
+<bascode>
+<paragraph id="par_id3149656" role="bascode" xml-lang="en-US">Result = Expression1 Imp Expression2</paragraph>
+</bascode>
+
+<paragraph id="hd_id3151212" role="heading" level="2" xml-lang="en-US">Parameters:</paragraph>
+<paragraph id="par_id3154910" role="paragraph" xml-lang="en-US"> <emph>Result:</emph> Any numeric variable that contains the result of the implication.</paragraph>
+<paragraph id="par_id3156281" role="paragraph" xml-lang="en-US"> <emph>Expression1, Expression2:</emph> Any expressions that you want to evaluate with the Imp operator.</paragraph>
+<paragraph id="par_id3150440" role="paragraph" xml-lang="en-US">If you use the Imp operator in Boolean expressions, False is only returned if the first expression evaluates to True and the second expression to False.</paragraph>
+<paragraph id="par_id3163710" role="paragraph" xml-lang="en-US">If you use the Imp operator in bit expressions, a bit is deleted from the result if the corresponding bit is set in the first expression and the corresponding bit is deleted in the second expression.</paragraph>
+
+<paragraph id="hd_id3147318" role="heading" level="2" xml-lang="en-US">Example:</paragraph>
+<bascode>
+<paragraph id="par_idm1341575552" role="bascode" localize="false" xml-lang="en-US">Sub ExampleImp</paragraph>
+<paragraph id="par_idm1341574320" role="bascode" localize="false" xml-lang="en-US">Dim A As Variant, B As Variant, C As Variant, D As Variant</paragraph>
+<paragraph id="par_idm1341573040" role="bascode" localize="false" xml-lang="en-US">Dim vOut As Variant</paragraph>
+<paragraph id="par_idm1341571808" role="bascode" localize="false" xml-lang="en-US">    A = 10: B = 8: C = 6: D = Null</paragraph>
+<paragraph id="par_id3145750" role="bascode" xml-lang="en-US">    vOut = A &gt; B Imp B &gt; C ' returns -1</paragraph>
+<paragraph id="par_id3156441" role="bascode" xml-lang="en-US">    vOut = B &gt; A Imp B &gt; C ' returns -1</paragraph>
+<paragraph id="par_id3152596" role="bascode" xml-lang="en-US">    vOut = A &gt; B Imp B &gt; D ' returns 0</paragraph>
+<paragraph id="par_id3154942" role="bascode" xml-lang="en-US">    vOut = (B &gt; D Imp B &gt; A) ' returns -1</paragraph>
+<paragraph id="par_id3154492" role="bascode" xml-lang="en-US">    vOut = B Imp A ' returns -1</paragraph>
+<paragraph id="par_idm1341561584" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

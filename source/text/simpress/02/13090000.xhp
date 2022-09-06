@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+	
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+ 
+	
+<meta>
+      <topic id="textsimpress0213090000xml" indexer="include" status="PUBLISH">
+         <title xml-lang="en-US" id="tit">Modify Object with Attributes</title>
+         <filename>/text/simpress/02/13090000.xhp</filename>
+      </topic>
+   </meta>
+   <body>
+      <section id="object_with_attributes">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3152596"><bookmark_value>attributes; objects with</bookmark_value>
+         <bookmark_value>objects; with attributes</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/.uno:SolidCreate" id="bm_id8691281" localize="false"/>
+<paragraph xml-lang="en-US" id="hd_id3152596" role="heading" level="1"><link href="text/simpress/02/13090000.xhp" name="Create Object with Attributes">Modify Object with Attributes</link></paragraph>
+         <paragraph xml-lang="en-US" id="par_id3151074" role="paragraph"><ahelp hid=".uno:SolidCreate">If this icon on the <emph>Options</emph> bar is activated, objects are shown with their attributes, but with 50% transparency, while you move or draw them.</ahelp> If this icon is not activated, only a contour is shown while drawing, and the object is shown with all attributes when you release the mouse button.</paragraph>
+      </section>
+      <section id="syobject_with_attributes">
+         <table id="tbl_id3153711">
+            <tablerow>
+               <tablecell>
+                  <paragraph xml-lang="en-US" id="par_id3154702" role="paragraph">
+<image id="img_id3155962" src="cmd/sc_solidcreate.png" width="0.1665in" height="0.1665in"><alt xml-lang="en-US" id="alt_id3155962">Icon</alt>
+	</image></paragraph>
+               </tablecell>
+               <tablecell>
+                  <paragraph xml-lang="en-US" id="par_id3154021" role="paragraph">Modify Object with Attributes</paragraph>
+               </tablecell>
+            </tablerow>
+         </table>
+
+      </section>
+   </body>
+</helpdocument>

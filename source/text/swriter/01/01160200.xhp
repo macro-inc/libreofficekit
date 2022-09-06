@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textswriter0101160200xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Outline to Clipboard</title>
+<filename>/text/swriter/01/01160200.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="outline_to_clipboard">
+<bookmark xml-lang="en-US" branch="hid/.uno:SendOutlineToClipboard" id="bm_id3148770" localize="false"/>
+<bookmark xml-lang="en-US" branch="index" id="bm_id481537444644102">
+<bookmark_value>send;outline to clipboard</bookmark_value>
+<bookmark_value>outline;outline to clipboard</bookmark_value>
+<bookmark_value>clipboard;outline to clipboard</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3145241" xml-lang="en-US" level="1"><link href="text/swriter/01/01160200.xhp" name="Outline to Clipboard">Outline to Clipboard</link></paragraph>
+<paragraph role="paragraph" id="par_id3150758" xml-lang="en-US"><ahelp hid=".uno:SendOutlineToClipboard">Sends the outline of a document to the clipboard in Rich Text Format (RTF).</ahelp></paragraph>
+</section>
+<section id="howtoget">
+  <embed href="text/swriter/00/00000401.xhp#sendenclipboard"/>
+</section>
+</body>
+</helpdocument>

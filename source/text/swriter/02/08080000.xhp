@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textswriter0208080000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Combined Display</title>
+<filename>/text/swriter/02/08080000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+  
+  
+  <section id="combined_display">
+<bookmark branch="hid/.uno:StatusBarFunc" xml-lang="en-US" id="bm_id3149292" localize="false"/>
+<paragraph id="hd_id3151186" role="heading" level="1" xml-lang="en-US"><link href="text/swriter/02/08080000.xhp" name="Combined Display">Combined Display</link></paragraph>
+  <paragraph role="paragraph" id="par_id3151172" xml-lang="en-US"><ahelp hid=".uno:StatusBarFunc" visibility="visible">Displays current information about the active document.</ahelp></paragraph>
+  </section>
+  <paragraph role="paragraph" id="par_id3156375" xml-lang="en-US">When the cursor is in a named section, the section name appears. When the cursor is in a table, the name of the table cell appears. The size of the object is shown when you edit frames or drawing objects.</paragraph>
+  <paragraph xml-lang="en-US" role="paragraph" id="par_id3145416">When the cursor is positioned within text, you can double-click this field to open the <link href="text/swriter/01/04090000.xhp" name="Fields"><emph>Fields</emph></link> dialog. In this dialog, you can define a field to be inserted in your document at the current cursor position. When the cursor is positioned in a table, a double-click in this field will call the <emph>Table Format</emph> dialog. Depending on the object selected, you can call up a dialog to edit a section, a graphic object, a floating frame, an OLE object, direct numbering or the position and size of a drawing object.</paragraph>
+ </body>
+</helpdocument>

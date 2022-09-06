@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0212130000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Data source as table</title>
+    <filename>/text/shared/02/12130000.xhp</filename>
+  </topic>
+  <history>
+    <created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+  </history>
+</meta>
+<body>
+<section id="data_source_as_table">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3152895"><bookmark_value>data sources; as tables</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/.uno:ViewFormAsGrid" id="bm_id1551702" localize="false"/>
+<h1 id="hd_id3152895"><link href="text/shared/02/12130000.xhp" name="Data source as table">Data source as table</link></h1>
+<paragraph role="paragraph" id="par_id3163829" xml-lang="en-US"><ahelp hid=".uno:ViewFormAsGrid">Activates an additional table view when in the form view.</ahelp> When the <emph>Data source as table</emph> function is activated, you see the table in an area above the form.</paragraph>
+</section>
+<section id="sydata_source_as_table">
+<table id="tbl_id3150616">
+  <tablerow>
+    <tablecell>
+      <paragraph role="paragraph" id="par_id3093440" xml-lang="en-US"><image id="img_id3156414" src="cmd/lc_viewformasgrid.svg" width="1cm" height="1cm"><alt id="alt_id3156414" xml-lang="en-US">Icon</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph role="paragraph" id="par_id3152801" xml-lang="en-US">Data source as table</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+</section>
+<paragraph role="paragraph" id="par_id3147576" xml-lang="en-US">The <emph>Table view</emph> and <emph>Form view</emph> reflect the same data. Changes made in the table are also visible in the form, and changes to the form are visible in the table.</paragraph>
+<paragraph role="paragraph" id="par_id3153748" xml-lang="en-US">If there are several logical forms in a document, the table is only able to show one at a time.<comment>UFI removed two paras, see #60894</comment></paragraph>
+</body>
+</helpdocument>

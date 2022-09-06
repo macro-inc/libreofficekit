@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textswriter0101160500xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Name and Path of HTML Documents</title>
+<filename>/text/swriter/01/01160500.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="hid/SW_HID_SEND_HTML_CTRL_PUSHBUTTON_CANCEL" id="bm_id3150499" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/SW_HID_SEND_HTML_CTRL_CHECKBOX_AUTOEXTENSION" id="bm_id3151262" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:NewHtmlDoc" id="bm_id8703681" localize="false"/>
+<h1 id="hd_id3147171">Name and Path of HTML Documents</h1>
+<paragraph role="paragraph" id="par_id3151175" xml-lang="en-US"><variable id="htmltext"><ahelp hid=".">Saves the file as an HTML document, so that you can view it in a web browser. You can choose to create a separate page when a heading style that you specify is encountered in the document.</ahelp> If you choose this option, a separate page of links to all of the pages that are generated is also created.
+</variable></paragraph>
+<section id="howtoget">
+  <embed href="text/swriter/00/00000401.xhp#html"/>
+</section>
+<paragraph role="paragraph" id="par_id3149801" xml-lang="en-US">Consecutive numbers are added to the file name if more than one HTML document is created. The titles of the HTML pages are created from the topmost chapter heading.</paragraph>
+<h2 id="hd_id3153668">File name</h2>
+<embed href="text/shared/01/01070000.xhp#filename"/>
+<bookmark xml-lang="en-US" branch="hid/SW_HID_SEND_HTML_CTRL_LISTBOX_TEMPLATE" id="bm_id3155903" localize="false"/><h2 id="hd_id3155892">separated by</h2>
+<paragraph role="paragraph" id="par_id3149688" xml-lang="en-US"><ahelp hid=".">Select the heading paragraph style that you want to use to indicate a new HTML page.</ahelp> To use this option, apply one of the heading paragraph styles to the paragraphs where you want to start a new page in the document.</paragraph>
+<h2 id="hd_id3155187">File type</h2>
+<embed href="text/shared/01/01070000.xhp#filetype"/>
+<h2 id="hd_id3143277">Save</h2>
+<embed href="text/shared/01/01070000.xhp#save"/>
+</body>
+</helpdocument>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpress0213060000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Double-Click to add Text</title>
+<filename>/text/simpress/02/13060000.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="doubleclick_textedit">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150010"><bookmark_value>text; double-clicking to edit</bookmark_value>
+</bookmark>
+
+<bookmark xml-lang="en-US" branch="hid/.uno:DoubleClickTextEdit" id="bm_id3147434" localize="false"/>
+<paragraph role="heading" id="hd_id3150010" xml-lang="en-US" level="1"><link href="text/simpress/02/13060000.xhp" name="Double-Click to add Text">Double-Click to add Text</link></paragraph>
+<paragraph role="paragraph" id="par_id3149378" xml-lang="en-US"><ahelp hid=".uno:DoubleClickTextEdit">Changes the mouse-click behavior, so that you can double-click an object to add or edit text.</ahelp></paragraph>
+</section>
+<section id="sydoubleclick_textedit">
+<table id="tbl_id3153416">
+<tablerow>
+<tablecell colspan="" rowspan="">
+<paragraph role="paragraph" id="par_id3154756" xml-lang="en-US">
+<image id="img_id3147341" src="cmd/sc_doubleclicktextedit.png" width="5.64mm" height="5.64mm"><alt id="alt_id3147341" xml-lang="en-US">Icon</alt>
+	</image></paragraph>
+</tablecell>
+<tablecell colspan="" rowspan="">
+<paragraph role="paragraph" id="par_id3155445" xml-lang="en-US">Double-click to add Text</paragraph>
+</tablecell>
+</tablerow>
+</table>
+</section>
+</body>
+</helpdocument>

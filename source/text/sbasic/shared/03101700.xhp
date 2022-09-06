@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03101700xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">DefObj Statement</title>
+<filename>/text/sbasic/shared/03101700.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="defobj">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149811"><bookmark_value>DefObj statement</bookmark_value>
+</bookmark>
+<h1 id="hd_id3149811"><link href="text/sbasic/shared/03101700.xhp" name="DefObj Statement">DefObj Statement</link></h1>
+<paragraph role="paragraph" id="par_id3147573" xml-lang="en-US">Sets the default variable type, according to a letter range, if no type-declaration character or keyword is specified.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/03101100.xhp#PrefixDefCommon"/>
+
+<embed href="text/sbasic/shared/03101100.xhp#ExamplePrefixDefCommon"/>
+<bascode>
+  <paragraph id="par_idm871792224" role="bascode" localize="false">Sub DefObj_example</paragraph>
+  <paragraph id="par_id3255273" role="bascode" xml-lang="en-US">    Print Typename(properties), VarType(ordinal), IsNull(unique), IsObject(org)' Result is: Object 9 True False</paragraph>
+  <paragraph id="par_idm871789232" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+
+</body>
+</helpdocument>

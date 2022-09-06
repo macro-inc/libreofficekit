@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+<helpdocument version="1.0">
+  <meta>
+    <topic id="textsdraw00pagemenuxml" indexer="exclude" status="PUBLISH">
+      <title id="tit" xml-lang="en-US">Page Menu</title>
+      <filename>/text/sdraw/00/page_menu.xhp</filename>
+    </topic>
+  </meta>
+  <body>
+    <paragraph role="paragraph" id="par_id341556823034391" xml-lang="en-US"><variable id="frtite">Choose <menuitem>Page - Page Properties</menuitem>
+    </variable></paragraph>
+    <paragraph role="paragraph" id="par_id561556823042778" xml-lang="en-US"><variable id="frtites">Choose <menuitem>Page - Page Properties</menuitem> and then click the <emph>Page</emph> tab
+    </variable></paragraph>
+    <paragraph role="paragraph" id="par_id321556823043909" xml-lang="en-US"><variable id="frtiteh">Choose <menuitem>Page - Page Properties</menuitem> and then click the <emph>Background</emph> tab
+    </variable></paragraph>
+    <paragraph role="paragraph" id="par_id941556823044342" xml-lang="en-US"><variable id="seitenvorlage">Choose <menuitem>Page - Master Page</menuitem>
+    </variable></paragraph>
+    <paragraph role="paragraph" id="par_id911634055593609"><variable id="loadpagedesign">Choose <menuitem>Page - Master Page - Load</menuitem></variable></paragraph>
+    <section id="new_page">
+      <paragraph id="par_id191556823044529" role="paragraph" xml-lang="en-US">Choose <menuitem>Page - New Page</menuitem></paragraph>
+      <paragraph id="par_id1001556823044677" role="paragraph" xml-lang="en-US">On the <emph>Insert</emph> bar, click</paragraph>
+      <section id="insertpage">
+        <table id="tab_id501556823072396">
+          <tablerow>
+            <tablecell>
+              <paragraph id="par_id351556823072396" role="paragraph" xml-lang="en-US"> <image id="img_id381556823072396" src="cmd/sc_insertpage.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id381556823072396">Icon New Page</alt></image></paragraph>
+            </tablecell>
+            <tablecell>
+              <paragraph id="par_id831556823072396" role="paragraph" xml-lang="en-US">New Page</paragraph>
+            </tablecell>
+          </tablerow>
+        </table>
+      </section>
+    </section>
+    <paragraph role="paragraph" id="par_id231566134395223"><variable id="menupagerename">Choose <menuitem>Page - Rename Page</menuitem></variable></paragraph>
+    <paragraph role="paragraph" id="par_id311566135070776"><variable id="contextmenurename">Right-click on the page thumbnail and choose <menuitem>Rename Page</menuitem></variable></paragraph>
+    <paragraph role="paragraph" id="par_id141566138212217"><variable id="menupagedelete">Choose <menuitem>Page - Delete Page</menuitem></variable></paragraph>
+    <paragraph role="paragraph" id="par_id261566138218294"><variable id="contextmenudelete">Right-click on the page thumbnail and choose <menuitem>Delete Page</menuitem></variable></paragraph>
+    <paragraph role="paragraph" id="par_id491566139741356"><variable id="menupageduplicate">Choose <menuitem>Page - Duplicate Page</menuitem></variable></paragraph>
+    <paragraph role="paragraph" id="par_id301566157911675"><variable id="pagenavigation">Choose <menuitem>Page - Navigate</menuitem>.</variable></paragraph>
+
+  </body>
+</helpdocument>

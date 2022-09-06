@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedautopi01000000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Wizard</title>
+<filename>/text/shared/autopi/01000000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="wizards">
+<section id="autopilot">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3152551"><bookmark_value>wizards; overview</bookmark_value>
+<bookmark_value>AutoPilots, see wizards</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/.uno:AutoPilotMenu" id="bm_id3149827" localize="false"/>
+<paragraph role="heading" id="hd_id3152551" xml-lang="en-US" level="1"><link href="text/shared/autopi/01000000.xhp" name="Wizards">Wizards</link></paragraph>
+<paragraph role="paragraph" id="par_id3153527" xml-lang="en-US"><ahelp hid=".uno:AutoPilotMenu">Guides you through creating business and personal letters, faxes, agendas, presentations, and more.</ahelp></paragraph>
+</section>
+</section>
+<section id="howtoget">
+  <embed href="text/shared/00/00000401.xhp#autobrief"/>
+</section>
+<paragraph role="heading" id="hd_id3154750" xml-lang="en-US" level="2"><link href="text/shared/autopi/01010000.xhp" name="Letter">Letter</link></paragraph>
+<embed href="text/shared/autopi/01010000.xhp#brief"/>
+<paragraph role="heading" id="hd_id3153662" xml-lang="en-US" level="2"><link href="text/shared/autopi/01020000.xhp" name="Fax">Fax</link></paragraph>
+<embed href="text/shared/autopi/01020000.xhp#fax"/>
+<paragraph role="heading" id="hd_id3153561" xml-lang="en-US" level="2"><link href="text/shared/autopi/01040000.xhp" name="Agenda">Agenda</link></paragraph>
+<embed href="text/shared/autopi/01040000.xhp#agenda"/>
+<paragraph role="heading" id="hd_id3147530" xml-lang="en-US" level="2"><link href="text/shared/autopi/01130000.xhp" name="Document Converter">Document Converter</link></paragraph>
+<embed href="text/shared/autopi/01130000.xhp#ms"/>
+<paragraph role="heading" id="hd_id3147303" xml-lang="en-US" level="2"><link href="text/shared/autopi/01150000.xhp" name="Euro Converter">Euro Converter</link></paragraph>
+<embed href="text/shared/autopi/01150000.xhp#eurokonv"/>
+<embed href="text/shared/autopi/01170000.xhp#address_data_source"/>
+</body>
+</helpdocument>

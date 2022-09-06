@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriter0218120000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Images and Charts</title>
+    <filename>/text/swriter/02/18120000.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<bookmark xml-lang="en-US" branch="hid/.uno:Graphic" id="bm_id1021216" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:ShowGraphics" id="bm_id691655488102795" localize="false"/>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3147167">
+  <bookmark_value>graphics;do not show</bookmark_value>
+  <bookmark_value>images;do not show</bookmark_value>
+  <bookmark_value>pictures;do not show</bookmark_value>
+</bookmark>
+<section id="ShowGraphicsHead">
+<h1 id="hd_id3148568"><link href="text/swriter/02/18120000.xhp" name="Images and Charts">Images and Charts</link></h1>
+<paragraph id="par_id3147167" role="paragraph" xml-lang="en-US"><ahelp hid=".uno:Graphic">If the <emph>Images and Charts</emph> icon on the <emph>Tools</emph> bar is activated, no graphics are displayed - only empty frames as placeholders.</ahelp></paragraph>
+</section>
+
+<table id="tbl_id3151180">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3151177" role="paragraph" xml-lang="en-US"> <image id="img_id3156379" src="cmd/sc_graphic.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3156379">Icon Images and Charts</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3154107" role="paragraph" xml-lang="en-US">Images and Charts</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+</body>
+</helpdocument>

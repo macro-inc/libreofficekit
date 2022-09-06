@@ -1,0 +1,16 @@
+# backup and temporary files
+*~
+.*.sw[op]
+.gitattributes
+
+# Wiki
+/wikisetup.txt
+
+# Python
+/to-wiki/*.pyc
+
+# the build directories
+/callcatcher
+
+# libxslt debug memdump
+.memdump

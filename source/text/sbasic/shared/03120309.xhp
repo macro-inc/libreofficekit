@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03120309xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">RTrim Function</title>
+    <filename>/text/sbasic/shared/03120309.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="rtrim">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154286">
+  <bookmark_value>RTrim function</bookmark_value>
+</bookmark>
+
+
+<h1 id="hd_id3154286"><link href="text/sbasic/shared/03120309.xhp" name="RTrim Function">RTrim Function</link></h1>
+<paragraph id="par_id3153127" role="paragraph" xml-lang="en-US">Deletes the spaces at the end of a string expression.</paragraph>
+</section>
+<paragraph id="par_id3153062" role="paragraph" xml-lang="en-US">See also: <link href="text/sbasic/shared/03120305.xhp" name="LTrim Function">LTrim Function</link></paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3154347" role="bascode" xml-lang="en-US">RTrim (Text As String)</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3153381" localize="false" role="paragraph">String</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3151380" role="paragraph" xml-lang="en-US"> <emph>Text: </emph>Any string expression.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341574144" role="bascode" localize="false" xml-lang="en-US">Sub ExampleSpaces</paragraph>
+<paragraph id="par_idm1341572912" role="bascode" localize="false" xml-lang="en-US">Dim sText2 As String,sText As String,sOut As String</paragraph>
+<paragraph id="par_idm1341571648" role="bascode" localize="false" xml-lang="en-US">    sText2 = " &lt;*Las Vegas*&gt; "</paragraph>
+<paragraph id="par_idm1341570400" role="bascode" localize="false" xml-lang="en-US">    sOut = "'"+sText2 +"'"+ Chr(13)</paragraph>
+<paragraph id="par_idm1341569152" role="bascode" localize="false" xml-lang="en-US">    sText = Ltrim(sText2) ' sText = "&lt;*Las Vegas*&gt; "</paragraph>
+<paragraph id="par_idm1341567856" role="bascode" localize="false" xml-lang="en-US">    sOut = sOut + "'"+sText +"'" + Chr(13)</paragraph>
+<paragraph id="par_idm1341566592" role="bascode" localize="false" xml-lang="en-US">    sText = Rtrim(sText2) ' sText = " &lt;*Las Vegas*&gt;"</paragraph>
+<paragraph id="par_idm1341565296" role="bascode" localize="false" xml-lang="en-US">    sOut = sOut +"'"+ sText +"'" + Chr(13)</paragraph>
+<paragraph id="par_idm1341564032" role="bascode" localize="false" xml-lang="en-US">    sText = Trim(sText2) ' sText = "&lt;*Las Vegas*&gt;"</paragraph>
+<paragraph id="par_idm1341562736" role="bascode" localize="false" xml-lang="en-US">    sOut = sOut +"'"+ sText +"'"</paragraph>
+<paragraph id="par_idm1341561488" role="bascode" localize="false" xml-lang="en-US">    MsgBox sOut</paragraph>
+<paragraph id="par_idm1341560256" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+<section id="relatedtopics">
+    <paragraph role="paragraph" id="par_id161599082457466" localize="false"><embedvar href="text/sbasic/shared/00000003.xhp#stringfunctions"/></paragraph>
+</section>
+</body>
+
+</helpdocument>

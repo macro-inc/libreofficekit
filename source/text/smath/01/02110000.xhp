@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsmath0102110000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Previous Error</title>
+<filename>/text/smath/01/02110000.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="previous_error">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3147434"><bookmark_value>error search; previous error</bookmark_value></bookmark>
+<bookmark branch="hid/.uno:PrevError" xml-lang="en-US" id="bm_id3866654" localize="false"/>
+<paragraph id="hd_id3147434" role="heading" level="1" xml-lang="en-US"><link href="text/smath/01/02110000.xhp" name="Previous Error">Previous Error</link></paragraph>
+<paragraph role="paragraph" id="par_id3145799" xml-lang="en-US"><ahelp hid="SID_PREVERR" visibility="visible">Moves the cursor to the previous error (moving left).</ahelp></paragraph>
+</section>
+<section id="howtoget">
+  <embed href="text/smath/00/00000004.xhp#previous_error"/>
+</section>
+ </body>
+</helpdocument>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textscalc0107090000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Freeze Rows and Columns</title>
+    <filename>/text/scalc/01/07090000.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="freeze_rows_and_columns">
+<bookmark xml-lang="en-US" branch="hid/.uno:FreezePanes" id="bm_id6343491" localize="false"/>
+
+<h1 id="hd_id3150517"  xml-lang="en-US"><variable id="freezerowcolum"><link href="text/scalc/01/07090000.xhp" name="Freeze">Freeze Rows and Columns</link></variable></h1>
+<paragraph id="par_id3156289" role="paragraph" xml-lang="en-US"><ahelp hid=".">Divides the sheet at the top left corner of the active cell and the area to the top left is no longer scrollable.</ahelp></paragraph>
+</section>
+
+<section id="howtoget">
+<embed href="text/scalc/00/00000407.xhp#fefix"/>
+</section>
+<section id="relatedtopics">
+<embed href="text/scalc/guide/line_fix.xhp#line_fix"/>
+<embed href="text/scalc/01/07090100.xhp#freezecellsh1"/>
+</section>
+</body>
+</helpdocument>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03120307xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Right Function</title>
+    <filename>/text/sbasic/shared/03120307.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="right">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153311">
+  <bookmark_value>Right function</bookmark_value>
+</bookmark>
+
+
+<h1 id="hd_id3153311"><link href="text/sbasic/shared/03120307.xhp" name="Right Function">Right Function</link></h1>
+<paragraph id="par_id3150984" role="paragraph" xml-lang="en-US">Returns the rightmost "n" characters of a string expression.</paragraph>
+</section>
+<paragraph id="par_id3149763" role="paragraph" xml-lang="en-US">See also: <link href="text/sbasic/shared/03120303.xhp" name="Left Function">Left Function</link>.</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3153061" role="bascode" xml-lang="en-US">Right (Text As String, n As Long)</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3156344" role="paragraph" xml-lang="en-US">String</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3153526" role="paragraph" xml-lang="en-US"> <emph>Text:</emph> Any string expression that you want to return the rightmost characters of.</paragraph>
+<paragraph id="par_id3151211" role="paragraph" xml-lang="en-US"> <emph>n:</emph> Numeric expression that defines the number of characters that you want to return. If <emph>n</emph> = 0, a zero-length string is returned. The maximum allowed value is 2,147,483,648.</paragraph>
+<paragraph id="par_id3158410" role="paragraph" xml-lang="en-US">The following example converts a date in YYYY-MM-DD format to the US date format (MM/DD/YYYY).</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341027360" role="bascode" localize="false" xml-lang="en-US">Sub ExampleUSDate</paragraph>
+<paragraph id="par_idm1341026128" role="bascode" localize="false" xml-lang="en-US">Dim sInput As String</paragraph>
+<paragraph id="par_idm1341024896" role="bascode" localize="false" xml-lang="en-US">Dim sUS_date As String</paragraph>
+<paragraph id="par_id3159252" role="bascode" xml-lang="en-US">    sInput = InputBox("Please input a date in the international format 'YYYY-MM-DD'")</paragraph>
+<paragraph id="par_idm1341021888" role="bascode" localize="false" xml-lang="en-US">    sUS_date = Mid(sInput, 6, 2)</paragraph>
+<paragraph id="par_idm1341020640" role="bascode" localize="false" xml-lang="en-US">    sUS_date = sUS_date &amp; "/"</paragraph>
+<paragraph id="par_idm1341019376" role="bascode" localize="false" xml-lang="en-US">    sUS_date = sUS_date &amp; Right(sInput, 2)</paragraph>
+<paragraph id="par_idm1341018112" role="bascode" localize="false" xml-lang="en-US">    sUS_date = sUS_date &amp; "/"</paragraph>
+<paragraph id="par_idm1341016848" role="bascode" localize="false" xml-lang="en-US">    sUS_date = sUS_date &amp; Left(sInput, 4)</paragraph>
+<paragraph id="par_idm1341015584" role="bascode" localize="false" xml-lang="en-US">    MsgBox sUS_date</paragraph>
+<paragraph id="par_idm1341014352" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+<section id="relatedtopics">
+    <paragraph role="paragraph" id="par_id161599082457466" localize="false"><embedvar href="text/sbasic/shared/00000003.xhp#stringfunctions"/></paragraph>
+</section>
+</body>
+
+</helpdocument>

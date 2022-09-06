@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+
+		<helpdocument version="1.0">
+<meta>
+<topic id="textsmathguidemainxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Instructions for Using $[officename] Math</title>
+<filename>/text/smath/guide/main.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3147341"><bookmark_value>$[officename] Math;general instructions</bookmark_value>
+<bookmark_value>instructions; $[officename] Math</bookmark_value>
+<bookmark_value>Equation Editor, see $[officename] Math</bookmark_value>
+</bookmark><comment>mw added a cross-reference</comment><paragraph role="heading" id="hd_id3147341" xml-lang="en-US" level="1"><variable id="main"><link href="text/smath/guide/main.xhp" name="Instructions for Using $[officename] Math">Instructions for Using $[officename] Math</link>
+</variable></paragraph>
+<embed href="text/shared/00/00000099.xhp#table"/>
+<paragraph role="heading" id="hd_id3150199" xml-lang="en-US" level="2">Entering and Editing Formulas</paragraph>
+<embed href="text/smath/guide/text.xhp#text"/>
+<embed href="text/smath/guide/attributes.xhp#attributes"/>
+<embed href="text/smath/guide/newline.xhp#newline"/>
+<embed href="text/smath/guide/align.xhp#align"/>
+<embed href="text/smath/guide/limits.xhp#limits"/>
+<embed href="text/smath/guide/brackets.xhp#brackets"/>
+<embed href="text/smath/guide/parentheses.xhp#parentheses"/>
+<embed href="text/smath/guide/comment.xhp#comment"/>
+<embed href="text/smath/guide/keyboard.xhp#keyboard"/>
+</body>
+</helpdocument>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03020408xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">FileLen Function</title>
+    <filename>/text/sbasic/shared/03020408.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="filelen">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153126">
+  <bookmark_value>FileLen function</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3153126" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03020408.xhp" name="FileLen Function">FileLen Function</link></paragraph>
+<paragraph id="par_id3145068" role="paragraph" xml-lang="en-US">Returns the length of a file in bytes.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3149656" role="bascode" localize="false">FileLen (Text As String) As Long</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3156282" localize="false" role="paragraph" xml-lang="en-US">Long</paragraph>
+<tip id="par_id401651744449325">Use <link href="text/sbasic/shared/03/sf_filesystem.xhp" name="ScriptForge.FileSystem service">ScriptForge.FileSystem</link> service <link href="text/sbasic/shared/03/sf_filesystem.xhp#GetFileLen" name="GetFileLen method">GetFileLen()</link> method when size is expected to be over 2 gigabytes.</tip>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3153193" role="paragraph" xml-lang="en-US"> <emph>Text:</emph> Any string expression that contains an unambiguous file specification. You can also use <link href="text/sbasic/shared/00000002.xhp" name="URL notation">URL notation</link>.</paragraph>
+<paragraph id="par_id3150439" role="paragraph" xml-lang="en-US">This function determines the length of a file. If the <literal>FileLen</literal> function is called for an open file, it returns the file length before it was opened. To determine the current file length of an open file, use the <link href="text/sbasic/shared/03020303.xhp" name="Lof function"><literal>Lof</literal></link> function.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341573440" role="bascode" localize="false">Sub ExampleFileLen</paragraph>
+<paragraph id="par_idm1341572208" role="bascode" localize="false">    MsgBox FileLen("C:\autoexec.bat")</paragraph>
+<paragraph id="par_idm1341570960" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

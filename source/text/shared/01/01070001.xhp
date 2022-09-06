@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0101070001xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Export</title>
+    <filename>/text/shared/01/01070001.xhp</filename>
+  </topic>
+</meta>
+<body>
+<section id="export">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153383">
+<bookmark_value>documents; exporting</bookmark_value>
+<bookmark_value>converting; $[officename] documents</bookmark_value>
+<bookmark_value>exporting;to foreign formats</bookmark_value>
+</bookmark><comment>MW deleted "document types;..."</comment>
+<bookmark xml-lang="en-US" branch="hid/.uno:ExportTo" id="bm_id9593822" localize="false"/>
+<paragraph role="heading" id="hd_id3153383" xml-lang="en-US" level="1"><link href="text/shared/01/01070001.xhp" name="Export">Export</link></paragraph>
+<paragraph role="paragraph" id="par_id3149355" xml-lang="en-US"><variable id="exportieren"><ahelp hid=".uno:ExportTo">Saves the current document with a different name and format to a location that you specify.</ahelp></variable></paragraph>
+</section>
+<section id="howtoget">
+  <embed href="text/shared/00/00000401.xhp#export"/>
+</section>
+<tip id="par_id91561565107419">Unlike <emph>Save As</emph>, the <emph>Export</emph> command writes a copy of the current document in a new file with the chosen format, but keeps the current document and format open in your session.</tip>
+<paragraph role="paragraph" id="par_id471561565422027">The Export command opens the system file picker, where you can enter the name and format of the exported file.</paragraph>
+<h2 id="hd_id3147209">File Name</h2>
+<paragraph role="paragraph" id="par_id871561565412738">Enter a file name or a path for the file.</paragraph>
+<h2 id="hd_id3152996">File Type</h2>
+  <embed href="text/shared/01/01070000.xhp#filetype"/>
+<h2 id="hd_id3148539">Save</h2>
+  <embed href="text/shared/01/01070000.xhp#save"/>
+</body>
+</helpdocument>

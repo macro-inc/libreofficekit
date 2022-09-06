@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalc0112050100xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">1st, 2nd, 3rd Group</title>
+<filename>/text/scalc/01/12050100.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="group">
+<bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/subtotalgrppage/SubTotalGrpPage" id="bm_id3147335" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/subtotalgrppage/@@nowidget@@" id="bm_id3147335" localize="false"/>
+<h1 id="hd_id3149784"><link href="text/scalc/01/12050100.xhp" name="1st, 2nd, 3rd Group">1st, 2nd, 3rd Group</link></h1>
+<paragraph role="paragraph" id="par_id3145068" xml-lang="en-US"><ahelp hid="modules/scalc/ui/subtotalgrppage/SubTotalGrpPage">Specify the settings for up to three subtotal groups. Each tab has the same layout.</ahelp></paragraph>
+</section>
+<section id="howtoget">
+  <embed href="text/scalc/00/00000412.xhp#dntezd"/>
+</section>
+<bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/subtotalgrppage/group_by" id="bm_id3163713" localize="false"/>
+<h2 id="hd_id3156441">Group by</h2>
+<paragraph role="paragraph" id="par_id3154013" xml-lang="en-US"><ahelp hid="modules/scalc/ui/subtotalgrppage/group_by">Select the column that you want to control the subtotal calculation process. If the contents of the selected column change, the subtotals are automatically recalculated.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/subtotalgrppage/columns" id="bm_id3149379" localize="false"/>
+<h2 id="hd_id3154943">Calculate subtotals for</h2>
+<paragraph role="paragraph" id="par_id3147125" xml-lang="en-US"><ahelp hid="modules/scalc/ui/subtotalgrppage/columns">Select the column(s) containing the values that you want to subtotal.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/subtotalgrppage/functions" id="bm_id3149413" localize="false"/>
+<h2 id="hd_id3156283">Use function</h2>
+<paragraph role="paragraph" id="par_id3145647" xml-lang="en-US"><ahelp hid="modules/scalc/ui/subtotalgrppage/functions">Select the mathematical function that you want to use to calculate the subtotals.</ahelp></paragraph>
+<section id="relatedtopics">
+    <embed href="text/scalc/guide/subtotaltool.xhp#subtotaltoolh1"/>
+</section>
+</body>
+</helpdocument>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicsharedmain0211xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Macro Toolbar</title>
+<filename>/text/sbasic/shared/main0211.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+  
+  
+  <section id="macro">
+  <bookmark id="bm_id3150543" branch="index" xml-lang="en-US"><bookmark_value>toolbars; Basic IDE</bookmark_value><bookmark_value>macro toolbar</bookmark_value></bookmark><!-- removed HID HID_BASICIDE_TOOLBOX --><bookmark branch="hid/.uno:MacroBarVisible" xml-lang="en-US" id="bm_id3153539" localize="false"/><paragraph id="hd_id3150543" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/main0211.xhp" name="Macro Toolbar">Macro Toolbar</link></paragraph>
+  <paragraph role="paragraph" id="par_id3147288" xml-lang="en-US"><ahelp visibility="visible" hid=".uno:MacroBarVisible">The <emph>Macro Toolbar </emph>contains commands to create, edit, and run macros.</ahelp></paragraph>
+  </section>
+  <embed href="text/sbasic/shared/02/11010000.xhp#bibliothek"/>
+  <embed href="text/sbasic/shared/02/11010000.xhp#sybibliothek"/>
+  <embed href="text/sbasic/shared/02/11020000.xhp#compile"/>
+  <embed href="text/sbasic/shared/02/11020000.xhp#sycompile"/>
+  <embed href="text/sbasic/shared/02/11030000.xhp#run"/>
+  <embed href="text/sbasic/shared/02/11030000.xhp#syrun"/>
+  <embed href="text/sbasic/shared/02/11040000.xhp#stop"/>
+  <embed href="text/sbasic/shared/02/11040000.xhp#systop"/>
+  <embed href="text/sbasic/shared/02/11060000.xhp#procedure_step"/>
+  <embed href="text/sbasic/shared/02/11060000.xhp#syprocedure_step"/>
+  <embed href="text/sbasic/shared/02/11050000.xhp#single_step"/>
+  <embed href="text/sbasic/shared/02/11050000.xhp#sysingle_step"/>
+  <embed href="text/sbasic/shared/02/11160000.xhp#stepout"/>
+  <embed href="text/sbasic/shared/02/11160000.xhp#systepout"/>
+  <embed href="text/sbasic/shared/02/11070000.xhp#breakpoint"/>
+  <embed href="text/sbasic/shared/02/11070000.xhp#sybreakpoint"/>
+  <embed href="text/sbasic/shared/02/11170000.xhp#manage_breakpoints"/>
+  <embed href="text/sbasic/shared/02/11170000.xhp#sybreakpoints"/>
+  <embed href="text/sbasic/shared/02/11080000.xhp#watch"/>
+  <embed href="text/sbasic/shared/02/11080000.xhp#sywatch"/>
+  <embed href="text/sbasic/shared/02/11090000.xhp#ocatalog"/>
+  <embed href="text/sbasic/shared/02/11090000.xhp#syobjectcatalog"/>
+  <embed href="text/sbasic/shared/02/11100000.xhp#macros"/>
+  <embed href="text/sbasic/shared/02/11100000.xhp#symacros"/>
+  <embed href="text/sbasic/shared/02/11110000.xhp#module"/>
+  <embed href="text/sbasic/shared/02/11110000.xhp#symodule"/>
+  <embed href="text/sbasic/shared/02/11120000.xhp#parentheses"/>
+  <embed href="text/sbasic/shared/02/11120000.xhp#syparentheses"/>
+  <embed href="text/sbasic/shared/02/11140000.xhp#insertsource"/>
+  <embed href="text/sbasic/shared/02/11140000.xhp#syinsertsource"/>
+  <embed href="text/sbasic/shared/02/11150000.xhp#savesource"/>
+  <embed href="text/sbasic/shared/02/11150000.xhp#sysavesource"/>
+  <embed href="text/sbasic/shared/02/11180000.xhp#import"/>
+  <embed href="text/sbasic/shared/02/11180000.xhp#syimport"/>
+  <embed href="text/sbasic/shared/02/11190000.xhp#export"/>
+  <embed href="text/sbasic/shared/02/11190000.xhp#syexport"/>
+ </body>
+</helpdocument>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03010301xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Blue Function</title>
+    <filename>/text/sbasic/shared/03010301.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="blue">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149180">
+  <bookmark_value>Blue function</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3149180"><link href="text/sbasic/shared/03010301.xhp" name="Blue Function">Blue Function</link></h1>
+<paragraph id="par_id3156343" role="paragraph" xml-lang="en-US">Returns the blue component of the specified composite color code.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3149457" role="bascode" xml-lang="en-US">Blue (Color As Long)</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3154365" role="paragraph" xml-lang="en-US">Integer</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3150448" role="paragraph" xml-lang="en-US"> <emph>Color value</emph>: Long integer expression that specifies any composite color code for which to return the blue component.</paragraph>
+<warning id="par_id671639922129017">Under VBA compatibility mode (<link href="text/sbasic/shared/03103350.xhp" name="vbasupport"><literal>Option VBASupport 1</literal></link>), the function Blue() is incompatible with VBA colors, when color from previous call to <link href="text/sbasic/shared/03010306.xhp" name="linkrgbvba"><literal>function RGB [VBA]</literal></link> is passed.
+</warning>
+
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+<embed href="text/sbasic/shared/03010303.xhp#ColorPickerDialog"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1073171488" role="bascode" localize="false" xml-lang="en-US">Sub ExampleColor</paragraph>
+<paragraph id="par_idm1073170256" role="bascode" localize="false" xml-lang="en-US">Dim lVar As Long</paragraph>
+<paragraph id="par_idm1073169024" role="bascode" localize="false" xml-lang="en-US">    lVar = rgb(128,0,200)</paragraph>
+<paragraph id="par_id3154012" role="bascode" xml-lang="en-US">    MsgBox "The color " &amp; lVar &amp; " consists of:" &amp; Chr(13) &amp;_</paragraph>
+<paragraph id="par_id3148645" role="bascode" xml-lang="en-US">        "red= " &amp; Red(lVar) &amp; Chr(13)&amp;_</paragraph>
+<paragraph id="par_id3159155" role="bascode" xml-lang="en-US">        "green= " &amp; Green(lVar) &amp; Chr(13)&amp;_</paragraph>
+<paragraph id="par_id3147319" role="bascode" xml-lang="en-US">        "blue= " &amp; Blue(lVar) &amp; Chr(13) , 64,"colors"</paragraph>
+<paragraph id="par_idm1073160528" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

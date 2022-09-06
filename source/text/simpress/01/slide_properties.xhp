@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+  <meta>
+    <topic id="textsimpressslide_propertiesxml" indexer="include" status="PUBLISH">
+      <title xml-lang="en-US" id="tit">Slide Properties</title>
+      <filename>/text/simpress/01/slide_properties.xhp</filename>
+    </topic>
+    <history>
+      <created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+    </history>
+  </meta>
+  <body>
+    <bookmark branch="hid/.uno:SlideSetup" xml-lang="en-US" id="bm_id3154492" localize="false"/>
+    <section id="slideproperties">
+      <paragraph role="heading" level="1" id="hd_id3149379" xml-lang="en-US">Slide Properties</paragraph>
+      <paragraph role="paragraph" id="par_id3150717" xml-lang="en-US"><variable id="seiteeintext"><ahelp hid=".uno:SlideSetup" visibility="visible">Sets slide orientation, slide margins, background and other layout options.</ahelp></variable></paragraph>
+    </section>
+    <section id="howtoget">
+      <embed href="text/simpress/00/slide_menu.xhp#frtite"/>
+    </section>
+    <embed href="text/simpress/guide/background.xhp#background"/>
+    <embed href="text/simpress/01/01180001.xhp#page"/>
+    <embed href="text/simpress/01/01180002.xhp#background"/>
+    <paragraph xml-lang="en-US" role="tip" id="par_id3145587">To change the background of all of the slides in the active file, select a background, click <emph>OK</emph> and click <emph>Yes</emph> in the <emph>Page Setup</emph> dialog.</paragraph>
+  </body>
+</helpdocument>

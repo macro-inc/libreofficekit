@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedexplorerdatabasedabawiz02jdbcxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">JDBC Connection</title>
+<filename>/text/sdatabase/dabawiz02jdbc.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3726920"><bookmark_value>JDBC; databases (Base)</bookmark_value>
+<bookmark_value>databases; JDBC (Base)</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/jdbcconnectionpage/JDBCConnectionPage" id="bm_id6293219" localize="false"/>
+<h1 id="par_idN105FC"><variable id="jdbc"><link href="text/sdatabase/dabawiz02jdbc.xhp">JDBC Connection</link>
+</variable></h1>
+<paragraph role="paragraph" id="par_idN10600" xml-lang="en-US"><ahelp hid=".">Specifies the options to access a <link href="text/shared/00/00000005.xhp#jdbc" name="JDBC">JDBC</link> database.</ahelp><comment>copied text from shared\explorer\database\11110000</comment></paragraph>
+<h2 id="par_idN10623">JDBC Examples</h2>
+<paragraph role="paragraph" id="par_idN10627" xml-lang="en-US">
+<item type="productname">You can use a JDBC driver class to connect to a JDBC database from %PRODUCTNAME</item>. The driver class is provided by the database manufacturer. Two examples of JDBC databases are Oracle and MySQL.</paragraph>
+<note id="par_idN1062D">The driver classes must be added to %PRODUCTNAME in <switchinline select="sys"><caseinline select="MAC"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - %PRODUCTNAME - Advanced</menuitem>.</note>
+<h3 id="par_idN10634">Oracle database</h3>
+<paragraph role="paragraph" id="par_idN10638" xml-lang="en-US">You can use a JDBC driver to access an Oracle database from Solaris or Linux. To access the database from Windows, you need an ODBC driver.</paragraph>
+<switch select="sys">
+<case select="UNIX"><paragraph role="paragraph" id="par_idN1064B" xml-lang="en-US">On UNIX, ensure that the Oracle database client is installed with JDBC support. The JDBC driver class for the Solaris Oracle client version 8.x is located in the &lt;Oracle client&gt;/product/jdbc/lib/classes111.zip directory. You can also download the latest version from the Oracle web site.</paragraph>
+</case>
+</switch>
+<paragraph role="paragraph" id="par_idN10661" xml-lang="en-US">In the <emph>Data source URL</emph> box, enter the location of the Oracle database server. The syntax of the URL depends on the database type. See the documentation that came with the JDBC driver for more information. </paragraph>
+<paragraph role="paragraph" id="par_idN10668" xml-lang="en-US">For an Oracle database, the syntax of the URL is:</paragraph>
+<paragraph role="example" id="par_idN1066B" xml-lang="en-US">oracle:thin:@hostname:port:database_name</paragraph>
+<list type="unordered">
+<listitem>
+<paragraph role="listitem" id="par_idN10674" xml-lang="en-US">hostname is the name of the machine that runs the Oracle database. You can also replace hostname with the IP address of the server.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_idN10678" xml-lang="en-US">port is the port where the Oracle database listens. Ask your database administrator for the correct port address.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_idN1067C" xml-lang="en-US">database_name is the name of the Oracle database. Ask your database administrator for the correct name.</paragraph>
+</listitem>
+</list>
+<bookmark xml-lang="en-US" branch="hid/DBACCESS_HID_PAGE_DBWIZARD_JDBC_ET_MYSQLHOSTSERVER" id="bm_id3033539" localize="false"/><h3 id="par_idN1067F">MySQL database</h3>
+<paragraph role="paragraph" id="par_idN10683" xml-lang="en-US">The driver for the MySQL database is available on the MySQL web site.<comment>removed link, see i54077</comment></paragraph>
+<paragraph role="paragraph" id="par_idN10689" xml-lang="en-US">The syntax for a MySQL database is:</paragraph>
+<paragraph role="example" id="par_idN1068C" xml-lang="en-US">mysql://hostname:port/database_name</paragraph>
+<list type="unordered">
+<listitem>
+<paragraph role="listitem" id="par_idN10695" xml-lang="en-US"><ahelp hid=".">hostname is the name of the machine that runs the MySQL database.</ahelp> You can also replace hostname with the IP address of the server.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_idN10699" xml-lang="en-US">port is the default port for MySQL databases, namely 3306.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_idN1069D" xml-lang="en-US">database_name is the name of the database.</paragraph>
+</listitem>
+</list>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/jdbcconnectionpage/browseurl" id="bm_id6293221" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/DBACCESS_HID_PAGE_DBWIZARD_JDBC_ET_MYSQLPORT" id="bm_id3450117" localize="false"/><h2 id="par_idN106A0">Data source URL</h2>
+<paragraph role="paragraph" id="par_idN106A4" xml-lang="en-US"><ahelp hid=".">Enter the URL for the database. For example, for the MySQL JDBC driver, enter "mysql://&lt;Servername&gt;/&lt;name of the database&gt;". For more information on the JDBC driver, consult the documentation that came with the driver.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/connectionpage/javaDriverLabel" id="bm_id3153970" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/jdbcconnectionpage/jdbcEntry" id="bm_id3153969" localize="false"/>
+<h2 id="par_idN106BB">JDBC Driver Class</h2>
+<paragraph role="paragraph" id="par_idN106BF" xml-lang="en-US"><ahelp hid=".">Enter the name of the JDBC driver.</ahelp></paragraph>
+<section id="classpath">
+    <warning id="par_id7953733">Before you can use a JDBC driver, you need to add its class path. Choose <switchinline select="sys"><caseinline select="MAC"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - %PRODUCTNAME - Advanced</menuitem>, and click the <widget>Class Path</widget> button. After you add the path information, restart %PRODUCTNAME.</warning>
+</section>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/jdbcconnectionpage/jdbcButton" id="bm_id3153971" localize="false"/>
+<h2 id="par_idN106CE">Test Class</h2>
+<paragraph role="paragraph" id="par_idN106E4" xml-lang="en-US"><ahelp hid=".">Tests the connection with the current settings.</ahelp></paragraph>
+<paragraph role="paragraph" id="par_idN106E7" xml-lang="en-US"><link href="text/sdatabase/dabawiz03auth.xhp">Authentication</link></paragraph>
+<paragraph role="paragraph" localize="false" id="par_idN1061A" xml-lang="en-US"><embedvar href="text/sdatabase/dabawiz00.xhp#databasewizardh1"/></paragraph>
+</body>
+</helpdocument>

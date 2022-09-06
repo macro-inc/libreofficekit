@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03020100xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Opening and Closing Files</title>
+<filename>/text/sbasic/shared/03020100.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="opening">
+<paragraph role="heading" id="hd_id3152924" xml-lang="en-US" level="1"><link href="text/sbasic/shared/03020100.xhp" name="Opening and Closing Files">Opening and Closing Files</link></paragraph>
+</section>
+<embed href="text/sbasic/shared/03020101.xhp#close"/>
+<embed href="text/sbasic/shared/03020102.xhp#freefile"/>
+<embed href="text/sbasic/shared/03020103.xhp#open"/>
+<embed href="text/sbasic/shared/03020104.xhp#reset"/>
+</body>
+</helpdocument>

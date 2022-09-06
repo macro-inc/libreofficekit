@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+-->
+
+<meta>
+  <topic id="filterscreenshots" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Filter screenshots</title>
+    <filename>/text/shared/06/filter_screenshots.xhp</filename>
+  </topic>
+</meta>
+<body>
+<section id="pdfgeneralpage">
+    <paragraph role="paragraph" id="par_id431534783734366" xml-lang="en-US">
+            <image src="media/screenshots/filter/ui/pdfgeneralpage/PdfGeneralPage.png" id="img_id131534783734367"><alt xml-lang="en-US" id="alt_id271534783734367">PDF Export General Options Dialog Image</alt></image>
+        </paragraph>
+</section>
+<section id="pdflinkspage">
+    <paragraph role="paragraph" id="par_id434534783734366" xml-lang="en-US">
+            <image src="media/screenshots/filter/ui/pdflinkspage/PdfLinksPage.png" id="img_id131534783734367"><alt xml-lang="en-US" id="alt_id271534783734367">PDF Export Links Options Dialog Image</alt></image>
+        </paragraph>
+</section>
+<section id="pdfviewpage">
+    <paragraph role="paragraph" id="par_id434534703734366" xml-lang="en-US">
+            <image src="media/screenshots/filter/ui/pdfviewpage/PdfViewPage.png" id="img_id131534783734367"><alt xml-lang="en-US" id="alt_id271534783734367">PDF Export View Options Dialog Image</alt></image>
+        </paragraph>
+</section>
+<section id="pdfuserinterfacepage">
+    <paragraph role="paragraph" id="par_id434534703734306" xml-lang="en-US">
+            <image src="media/screenshots/filter/ui/pdfuserinterfacepage/PdfUserInterfacePage.png" id="img_id131534783734367"><alt xml-lang="en-US" id="alt_id271534783734367">PDF Export User Interface Options Dialog Image</alt></image>
+        </paragraph>
+</section>
+<section id="pdfsignpage">
+    <paragraph role="paragraph" id="par_id434534703704306" xml-lang="en-US">
+            <image src="media/screenshots/filter/ui/pdfsignpage/PdfSignPage.png" id="img_id131534783734367"><alt xml-lang="en-US" id="alt_id271534783734367">PDF Export Digital Signature Options Dialog Image</alt></image>
+        </paragraph>
+</section>
+<section id="pdfsecuritypage">
+    <paragraph role="paragraph" id="par_id434034703704306" xml-lang="en-US">
+            <image src="media/screenshots/filter/ui/pdfsecuritypage/PdfSecurityPage.png" id="img_id131534783734367"><alt xml-lang="en-US" id="alt_id271534783734367">PDF Export Security Options Dialog Image</alt></image>
+        </paragraph>
+</section>
+<section id="exportepub">
+    <paragraph id="par_id19921" role="paragraph">
+        <image id="img_id22170" src="media/screenshots/writerperfect/ui/exportepub/EpubDialog.png"><alt id="alt_id59843">EPUB dialog box</alt></image>
+    </paragraph>
+</section>
+</body>
+</helpdocument>

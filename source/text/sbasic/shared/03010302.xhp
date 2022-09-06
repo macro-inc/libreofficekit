@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03010302xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Green Function</title>
+    <filename>/text/sbasic/shared/03010302.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="green">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3148947">
+  <bookmark_value>Green function</bookmark_value>
+</bookmark>
+
+
+<h1 id="hd_id3148947"><link href="text/sbasic/shared/03010302.xhp" name="Green Function">Green Function</link></h1>
+<paragraph id="par_id3153361" role="paragraph" xml-lang="en-US">Returns the Green component of the given composite color code.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3153969" role="bascode" xml-lang="en-US">Green (Color As Long)</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3153194" role="paragraph" xml-lang="en-US">Integer</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3153770" role="paragraph" xml-lang="en-US"> <emph>Color</emph>: Long integer expression that specifies a composite color code for which to return the Green component.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+<embed href="text/sbasic/shared/03010303.xhp#ColorPickerDialog"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341170976" role="bascode" localize="false" xml-lang="en-US">Sub ExampleColor</paragraph>
+<paragraph id="par_idm1341169744" role="bascode" localize="false" xml-lang="en-US">Dim lVar As Long</paragraph>
+<paragraph id="par_idm1341168512" role="bascode" localize="false" xml-lang="en-US">    lVar = rgb(128,0,200)</paragraph>
+<paragraph id="par_id3151117" role="bascode" xml-lang="en-US">    MsgBox "The color " &amp; lVar &amp; " contains the components:" &amp; Chr(13) &amp;_</paragraph>
+<paragraph id="par_id3153951" role="bascode" xml-lang="en-US">        "red = " &amp; red(lVar) &amp; Chr(13)&amp;_</paragraph>
+<paragraph id="par_id3152462" role="bascode" xml-lang="en-US">        "green = " &amp; green(lVar) &amp; Chr(13)&amp;_</paragraph>
+<paragraph id="par_id3154730" role="bascode" xml-lang="en-US">        "blue = " &amp; blue(lVar) &amp; Chr(13) , 64,"colors"</paragraph>
+<paragraph id="par_idm1341159952" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

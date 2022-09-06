@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedguideredlining_versionsxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Version Management</title>
+<filename>/text/shared/guide/redlining_versions.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154230"><bookmark_value>versions; of a document</bookmark_value>
+<bookmark_value>documents; version management</bookmark_value>
+<bookmark_value>version management</bookmark_value>
+</bookmark>
+<h1 id="hd_id3154230"><variable id="redlining_versions"><link href="text/shared/guide/redlining_versions.xhp" name="Version Management">Version Management</link>
+</variable></h1>
+<paragraph role="paragraph" id="par_id3153394" xml-lang="en-US">The <emph>File</emph> menu contains a <link href="text/shared/01/01190000.xhp" name="Versions"><emph>Versions</emph></link> command that enables you to save multiple versions of a document in the same file.</paragraph>
+<paragraph role="paragraph" id="par_id3149399" xml-lang="en-US">You can choose to view individual versions of a document, or you can display the differences between versions with color markings.</paragraph>
+<paragraph role="paragraph" id="par_id3149811" xml-lang="en-US">In the dialog to open a document, you can select from a combo box which version of this document you want to open.</paragraph>
+<section id="relatedtopics">
+<embed href="text/shared/guide/redlining.xhp#redlining"/>
+<switch select="appl">
+<case select="WRITER"><embed href="text/shared/guide/redlining_navigation.xhp#redlining_navigation"/></case>
+</switch>
+<embed href="text/shared/guide/redlining_enter.xhp#redlining_enter"/>
+<embed href="text/shared/guide/redlining_accept.xhp#redlining_accept"/>
+<embed href="text/shared/guide/redlining_doccompare.xhp#redlining_doccompare"/>
+</section>
+</body>
+</helpdocument>

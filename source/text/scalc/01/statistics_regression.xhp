@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="regressiontopic" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Regression Analysis</title>
+    <filename>/text/scalc/01/statistics_regression.xhp</filename>
+  </topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id2764278">
+<bookmark_value>Analysis toolpack;regression analysis</bookmark_value>
+<bookmark_value>regression analysis;Analysis toolpack</bookmark_value>
+<bookmark_value>Data statistics;regression analysis</bookmark_value>
+<bookmark_value>Confidence level;regression analysis</bookmark_value>
+<bookmark_value>regression analysis;linear</bookmark_value>
+<bookmark_value>regression analysis;power</bookmark_value>
+<bookmark_value>regression analysis;logarithmic</bookmark_value>
+</bookmark>
+
+<bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/regressiondialog/RegressionDialog" id="bm_id2745673" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/regressiondialog/@@nowidget@@" id="bm_id2745673" localize="false"/>
+<section id="regression">
+<h1 id="hd_id1701201615033510"><variable id="regressionanalysish1"><link href="text/scalc/01/statistics_regression.xhp" name="regression analysis">Regression Analysis</link></variable></h1>
+<paragraph id="par_id1001240" role="paragraph" xml-lang="en-US"><ahelp hid="modules/scalc/ui/regressiondialog/RegressionDialog">Performs linear, logarithmic, or power regression analysis of a data set comprising one dependent variable and multiple independent variables.</ahelp></paragraph>
+</section>
+<paragraph role="paragraph" id="par_id431629832333206">For example, a crop yield (dependent variable) may be related to rainfall, temperature conditions, sunshine, humidity, soil quality and more, all of them independent variables.</paragraph>
+<section id="howtoget">
+<paragraph id="par_id1000040" role="paragraph" xml-lang="en-US"><variable id="sam01">Choose <menuitem>Data - Statistics - Regression</menuitem></variable></paragraph>
+</section>
+<paragraph id="par_id1001270" role="note" xml-lang="en-US">For more information on regression analysis, refer to the <link href="https://en.wikipedia.org/wiki/Regression_analysis" name="English Wikipedia: Regression analysis">corresponding Wikipedia article</link>.</paragraph>
+<h2 id="hd_id891629830986496">Data</h2>
+<h3 id="hd_id101629830993962">Independent variable(s) (X) range:</h3>
+<paragraph role="paragraph" id="par_id961629834099308">Enter a single range that contains multiple independent variable observations (along columns or rows). All X variable observations need to be entered adjacent to each other in the same table.</paragraph>
+<h3 id="hd_id871629830998653">Dependent variable (Y) range:</h3>
+<paragraph role="paragraph" id="par_id391629834089370">Enter the range that contains the dependent variable whose regression is to be calculated.</paragraph>
+<h3 id="hd_id931629831003368">Both X and Y ranges have labels</h3>
+<paragraph role="paragraph" id="par_id261629834071776">Check to use the first line (or column) of the data sets as variable names in the output range.</paragraph>
+<h3 id="hd_id11629831014811">Results to:</h3>
+<paragraph role="paragraph" id="par_id441629834000533">The reference of the top left cell of the range where the results will be displayed.</paragraph>
+<embed href="text/scalc/01/stat_data.xhp#grouped"/>
+
+<h2 id="hd_id1000070">Output Regression Types</h2>
+<paragraph id="par_id1001280" role="paragraph" xml-lang="en-US">Set the regression type. Three types are available: </paragraph>
+
+<list type="unordered">
+  <listitem>
+    <paragraph id="par_id1701201620334364" role="listitem" xml-lang="en-US"><emph>Linear Regression</emph>: finds a linear function in the form of y = b + a<sub>1</sub>.[x<sub>1</sub>] + a<sub>2</sub>.[x<sub>2</sub>] + a<sub>3</sub>.[x<sub>3</sub>] ..., where a<sub>i</sub> is the i-th slope, [x<sub>i</sub>] is the i-th independent variable, and b is the intercept that best fits the data.</paragraph>
+  </listitem>
+  <listitem>
+      <paragraph id="par_id1701201620340168" role="listitem" xml-lang="en-US"><emph>Logarithmic regression</emph>: finds a logarithmic curve in the form of y = b + a<sub>1</sub>.ln[x<sub>1</sub>] + a<sub>2</sub>.ln[x<sub>2</sub>] + a<sub>3</sub>.ln[x<sub>3</sub>] ..., where a<sub>i</sub> is the i-th coefficient, b is the intercept and ln[x<sub>i</sub>] is the natural logarithm of the i-th independent variable, that best fits the data.</paragraph>
+  </listitem>
+  <listitem>
+      <paragraph id="par_id1701201620340139" role="listitem" xml-lang="en-US"><emph>Power regression</emph>: finds a power curve in the form of y = exp( b + a<sub>1</sub>.ln[x<sub>1</sub>] + a<sub>2</sub>.ln[x<sub>2</sub>] + a<sub>3</sub>.ln[x<sub>3</sub>] ...), where a<sub>i</sub> is the i-th power, [x<sub>i</sub>] is the i-th independent variable, and b is intercept that best fits the data.</paragraph>
+  </listitem></list>
+
+  <h2 id="hd_id331629834218606">Options</h2>
+  <h3 id="hd_id481629834269509">Confidence level</h3>
+  <paragraph role="paragraph" id="par_id971629835636129">A numeric value between 0 and 1 (exclusive), default is 0.95. Calc uses this percentage to compute the corresponding confidence intervals for each of the estimates (namely the slopes and intercept).</paragraph>
+  <h3 id="hd_id751629834274709">Calculate residuals</h3>
+  <paragraph role="paragraph" id="par_id401629835408653">Select whether to opt in or out of computing the residuals, which may be beneficial in cases where you are interested only in the slopes and intercept estimates and their statistics. The residuals give information on how far the actual data points deviate from the predicted data points, based on the regression model.</paragraph>
+  <h3 id="hd_id861629834279039">Force intercept to be zero</h3>
+  <paragraph role="paragraph" id="par_id121629837424848">Calculates the regression model using zero as the intercept, thus forcing the model to pass through the origin.</paragraph>
+<section id="relatedtopics">
+<embed href="text/scalc/01/stat_data.xhp#otherstat"/>
+</section>
+</body>
+</helpdocument>

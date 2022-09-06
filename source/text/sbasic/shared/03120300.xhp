@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03120300xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Editing String Contents</title>
+<filename>/text/sbasic/shared/03120300.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="manipu">
+<paragraph role="heading" id="hd_id3153894" xml-lang="en-US" level="1"><link href="text/sbasic/shared/03120300.xhp" name="Editing String Contents">Editing String Contents</link></paragraph>
+<paragraph role="paragraph" id="par_id3149178" xml-lang="en-US">The following functions edit, format, and align the contents of strings. Use the <literal>&amp;</literal> or <literal>+</literal> operators to concatenate strings.</paragraph>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150669">
+  <bookmark_value>ampersand symbol; in string handling</bookmark_value>
+  <bookmark_value>Operators;concatenation (&amp; or +)</bookmark_value>
+  <bookmark_value>"&amp; or +" concatenation (strings)</bookmark_value>
+</bookmark>
+</section>
+<embed href="text/sbasic/shared/03120301.xhp#format"/>
+<embed href="text/sbasic/shared/03120302.xhp#lcase"/>
+<embed href="text/sbasic/shared/03120303.xhp#left"/>
+<embed href="text/sbasic/shared/03120304.xhp#lset"/>
+<embed href="text/sbasic/shared/03120305.xhp#ltrim"/>
+<embed href="text/sbasic/shared/03120306.xhp#mid"/>
+<embed href="text/sbasic/shared/replace.xhp#replace"/>
+<embed href="text/sbasic/shared/03120307.xhp#right"/>
+<embed href="text/sbasic/shared/03120308.xhp#rset"/>
+<embed href="text/sbasic/shared/03120309.xhp#rtrim"/>
+<embed href="text/sbasic/shared/03120311.xhp#trim"/>
+<embed href="text/sbasic/shared/03120310.xhp#ucase"/>
+<embed href="text/sbasic/shared/03120314.xhp#split"/>
+<embed href="text/sbasic/shared/03120315.xhp#join"/>
+<embed href="text/sbasic/shared/03120312.xhp#converttourl"/>
+<embed href="text/sbasic/shared/03120313.xhp#convertfromurl"/>
+</body>
+</helpdocument>

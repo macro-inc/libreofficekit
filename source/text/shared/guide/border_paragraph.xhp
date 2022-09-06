@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+
+		<helpdocument version="1.0">
+<meta>
+<topic id="textsharedguideborder_paragraphxml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Defining Borders for Paragraphs</title>
+<filename>/text/shared/guide/border_paragraph.xhp</filename>
+</topic>
+</meta>
+<body>
+  
+  
+  
+<bookmark xml-lang="en-US" branch="index" id="bm_id3147571"><bookmark_value>borders, see also frames</bookmark_value>
+<bookmark_value>paragraphs; defining borders</bookmark_value>
+<bookmark_value>borders; for paragraphs</bookmark_value>
+<bookmark_value>frames; around paragraphs</bookmark_value>
+<bookmark_value>inserting;paragraph borders</bookmark_value>
+<bookmark_value>defining;paragraph borders</bookmark_value>
+</bookmark>
+  <comment>mw changed "adding;" to "inserting;"</comment>
+  <paragraph xml-lang="en-US" id="hd_id3147571" role="heading" level="1"><variable id="border_paragraph"><link href="text/shared/guide/border_paragraph.xhp" name="Defining Borders for Paragraphs">Defining Borders for Paragraphs</link> 
+</variable></paragraph>
+  <paragraph xml-lang="en-US" id="hd_id3159233" role="heading" level="2">Setting a Predefined Border Style</paragraph>
+  <list type="ordered">
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3156113" role="listitem">Place the cursor in the paragraph for which you want to define a border.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3149398" role="listitem">Choose <emph>Format - Paragraph - Borders</emph>.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3156326" role="listitem">Select one of the default border styles in the <emph>Default</emph> area.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3154285" role="listitem">Select a line style, width and color for the selected border style in the <emph>Line</emph> area. These settings apply to all border lines that are included in the selected border style.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3153665" role="listitem">Select the distance between the border lines and the paragraph contents in the <emph>Padding</emph> area. You can only change distances to edges that have a border line defined.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3153543" role="listitem">Click <emph>OK</emph> to apply the changes.</paragraph>
+   </listitem>
+  </list>
+  <paragraph xml-lang="en-US" id="hd_id3149237" role="heading" level="2">Setting a Customized Border Style</paragraph>
+  <list type="ordered">
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3155388" role="listitem">Choose <emph>Format - Paragraph - Borders</emph>.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3148943" role="listitem">In the <emph>User-defined</emph> area select the edge(s) that you want to appear in a common layout. Click on an edge in the preview to toggle the selection of an edge.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3148948" role="listitem">Select a line style, width and color for the selected border style in the <emph>Line</emph> area. These settings apply to all border lines that are included in the selected border style.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3152811" role="listitem">Repeat the last two steps for every border edge.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3150793" role="listitem">Select the distance between the border lines and the paragraph contents in the <emph>Padding</emph> area. You can only change distances to edges that have a border line defined.</paragraph>
+   </listitem>
+   <listitem>
+    <paragraph xml-lang="en-US" id="par_id3151178" role="listitem">Click <emph>OK</emph> to apply the changes.</paragraph>
+   </listitem>
+  </list>
+  <section id="relatedtopics">
+   
+   
+<switch select="appl">
+   
+<case select="WRITER">
+   <embed href="text/swriter/guide/border_page.xhp#border_page"/>
+   <embed href="text/swriter/guide/border_character.xhp#border_character"/>
+   <embed href="text/swriter/guide/border_object.xhp#border_object"/>
+   
+</case>
+   
+</switch>
+   <embed href="text/shared/guide/border_table.xhp#border_table"/>
+   
+  </section>
+ </body>
+</helpdocument>

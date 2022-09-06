@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+    <!--
+    * This file is part of the LibreOffice project.
+    *
+    * This Source Code Form is subject to the terms of the Mozilla Public
+    * License, v. 2.0. If a copy of the MPL was not distributed with this
+    * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    *
+    -->
+
+    <meta>
+        <topic id="pivotchartupdate" indexer="include" status="PUBLISH">
+            <title id="tit" xml-lang="en-US">Pivot Chart Update</title>
+            <filename>/text/scalc/guide/pivotchart_update.xhp</filename>
+        </topic>
+    </meta>
+    <body>
+    <bookmark xml-lang="en-US" branch="index" id="bm_id801525146393791">
+        <bookmark_value>pivot chart;update</bookmark_value>
+    </bookmark>
+    <paragraph role="heading" id="hd_id281525146417678" level="1" xml-lang="en-US"><variable id="pivotchartupdate"><link href="text/scalc/guide/pivotchart_update.xhp" name="Pivot Chart Update">Updating Pivot Charts</link></variable></paragraph>
+    <paragraph role="paragraph" id="par_id831525146706944" xml-lang="en-US">If the data of the source sheet has been changed, you must refresh the pivot table and the pivot chart is updated accordingly. To refresh the pivot table (and thus the pivot chart):</paragraph>
+    <list type="unordered">
+        <listitem>
+            <paragraph id="par_id451525146722974"  role="listitem" xml-lang="en-US">Choose <emph>Data - Pivot Table - Refresh</emph>.</paragraph>
+        </listitem>
+        <listitem>
+            <paragraph id="par_id331525146738273"  role="listitem" xml-lang="en-US">Choose <emph>Refresh...</emph> in the context menu of any cell in the pivot table.</paragraph>
+        </listitem>
+    </list>
+    
+    <embed href="text/scalc/06/calcsamplefiles.xhp#pivot"/>
+    <section id="relatedtopics">
+        <embed href="text/scalc/guide/pivotchart.xhp#pivotchart"/>
+        <embed href="text/scalc/guide/pivotchart_create.xhp#pivotchartcreate"/>
+        <embed href="text/scalc/guide/pivotchart_edit.xhp#pivotchartedit"/>
+        <embed href="text/scalc/guide/pivotchart_filter.xhp#pivotchartfilter"/>
+        <embed href="text/scalc/guide/pivotchart_delete.xhp#pivotchartdelete"/>
+    </section>
+</body>
+</helpdocument>

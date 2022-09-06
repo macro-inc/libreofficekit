@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpressmain0202xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Line and Filling Bar</title>
+<filename>/text/simpress/main0202.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="lineandfillingbar">
+<h1 id="hd_id3149664"><link href="text/simpress/main0202.xhp" name="Line and Filling Bar">Line and Filling Bar</link></h1>
+<paragraph role="paragraph" id="par_id3153729" xml-lang="en-US"><ahelp hid=".">The Line and Filling Bar contains commands and options that you can apply in the current view.</ahelp></paragraph>
+</section>
+<embed href="text/shared/02/01230000.xhp#stylist"/>
+<embed href="text/shared/02/01230000.xhp#systylist"/>
+<embed href="text/shared/01/05200000.xhp#line"/>
+<embed href="text/shared/00/00040502.xhp#syline"/>
+<embed href="text/shared/02/05020000.xhp#arrow_style"/>
+<embed href="text/shared/02/05020000.xhp#syarrow_style"/>
+<h2 id="hd_id3156382"><link href="text/shared/01/05200100.xhp" name="Line Style">Line Style</link></h2>
+<embed href="text/shared/01/05200100.xhp#stiltext"/>
+<embed href="text/shared/00/00000004.xhp#syline_style"/>
+<h2 id="hd_id3159184"><link href="text/shared/01/05200100.xhp" name="Line Width">Line Width</link></h2>
+<embed href="text/shared/01/05200100.xhp#breitetext"/>
+<embed href="text/shared/00/00000004.xhp#syline_width"/>
+<h2 id="hd_id3150250"><link href="text/shared/01/05200100.xhp" name="Line Color">Line Color</link></h2>
+<embed href="text/shared/01/05200100.xhp#farbetext"/>
+<embed href="text/shared/00/00000004.xhp#syline_color"/>
+<embed href="text/shared/01/05210000.xhp#area"/>
+<embed href="text/shared/00/00040502.xhp#syarea"/>
+<h2 id="hd_id3148609"><link href="text/shared/01/05210100.xhp" name="Area Style / Filling">Area Style / Filling</link></h2>
+<embed href="text/shared/01/05210100.xhp#sytext"/>
+<embed href="text/shared/00/00000004.xhp#syarea_style"/>
+<embed href="text/shared/01/05210600.xhp#syshadow"/>
+</body>
+</helpdocument>

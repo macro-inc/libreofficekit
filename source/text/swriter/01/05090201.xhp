@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textswriter0105090201xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Editing Tables Using the Keyboard</title>
+<filename>/text/swriter/01/05090201.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154506"><bookmark_value>tables; editing with the keyboard</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3154506" xml-lang="en-US" level="1"><variable id="tabelle_tastatur"><link href="text/swriter/01/05090201.xhp" name="Editing Tables Using the Keyboard">Editing Tables Using the Keyboard</link>
+</variable></paragraph>
+<paragraph role="paragraph" id="par_id3145244" xml-lang="en-US">You can resize and delete table columns with the keyboard.</paragraph>
+<paragraph role="heading" id="hd_id3150564" xml-lang="en-US" level="2">Resizing Columns and Rows</paragraph>
+<list type="unordered">
+<listitem>
+<paragraph role="listitem" id="par_id3153920" xml-lang="en-US">To resize a column, place the cursor in a table cell, hold down Alt, and then press the left or the right arrow. To resize the column without changing the width of the table, hold down <switchinline select="sys"><caseinline select="MAC">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>, and then press the left or the right arrows.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3147566" xml-lang="en-US">To increase the left indent of the table, hold down <switchinline select="sys"><caseinline select="MAC">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift, and then press the right arrow.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3150759" xml-lang="en-US">To resize a row, place the cursor in the row, hold down <switchinline select="sys"><caseinline select="MAC">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>, and then press the up or the down arrows.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3149286" xml-lang="en-US">To move the table downwards on the page, hold down <switchinline select="sys"><caseinline select="MAC">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift, and then press the down arrow.</paragraph>
+</listitem>
+</list>
+<paragraph role="heading" id="hd_id3151176" xml-lang="en-US" level="2">Inserting and deleting columns or rows</paragraph>
+<list type="unordered">
+<listitem>
+<paragraph role="listitem" id="par_id3147512" xml-lang="en-US">To insert a column, place the cursor in a table cell, hold down <switchinline select="sys"><caseinline select="MAC">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> and press Insert, release, and then press the left or the right arrow.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3152940" xml-lang="en-US">To delete a column, place the cursor in the column that you want to delete, hold down <switchinline select="sys"><caseinline select="MAC">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> and press Delete, release, and then press the left or the right arrow.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3154105" xml-lang="en-US">To insert a row, place the cursor in a table cell, hold down <switchinline select="sys"><caseinline select="MAC">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> and press Insert, release, and then press the up or the down arrow.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3153531" xml-lang="en-US">To delete a row, place the cursor in the row that you want to delete, hold down <switchinline select="sys"><caseinline select="MAC">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> and press Delete, release, and then press the up or the down arrow.</paragraph>
+</listitem>
+</list>
+<paragraph role="note" id="par_id3150983" xml-lang="en-US">To change the behavior of tables in a text document, choose <switchinline select="sys"><caseinline select="MAC"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href="text/shared/optionen/01040500.xhp" name="Text Document - Table"><emph>%PRODUCTNAME Writer - Table</emph></link>.</paragraph>
+<embed href="text/shared/00/00000004.xhp#related"/>
+<paragraph role="paragraph" id="par_id3154196" xml-lang="en-US"><link href="text/swriter/main0204.xhp" name="Table Bar">Table Bar</link></paragraph>
+</body>
+</helpdocument>

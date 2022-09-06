@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03020301xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Eof Function</title>
+    <filename>/text/sbasic/shared/03020301.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="eof">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154598">
+  <bookmark_value>Eof function</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3154598" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03020301.xhp" name="Eof Function">Eof Function</link></paragraph>
+<paragraph id="par_id3147182" role="paragraph" xml-lang="en-US">Determines if the file pointer has reached the end of a file.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3147399" role="bascode" xml-lang="en-US">Eof (intexpression As Integer)</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3156027" role="paragraph" xml-lang="en-US">Bool</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3153990" role="paragraph" xml-lang="en-US"> <emph>Intexpression:</emph> Any integer expression that evaluates to the number of an open file.</paragraph>
+<paragraph id="par_id3153527" role="paragraph" xml-lang="en-US">Use EOF to avoid errors when you attempt to get input past the end of a file. When you use the Input or Get statement to read from a file, the file pointer is advanced by the number of bytes read. When the end of a file is reached, EOF returns the value "True" (-1).</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+<embed href="text/sbasic/shared/00000003.xhp#err52"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<embed href="text/sbasic/shared/03020103.xhp#FileExample"/>
+
+<section id="relatedtopics" >
+   <embed href="text/sbasic/shared/03020101.xhp#Close_h1"/>
+   <embed href="text/sbasic/shared/03010103.xhp#Print_h1"/>
+   <embed href="text/sbasic/shared/03020202.xhp#Input_h1"/>
+   <embed href="text/sbasic/shared/03020103.xhp#Open_h1"/>
+</section>
+</body>
+</helpdocument>

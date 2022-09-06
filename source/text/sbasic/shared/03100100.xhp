@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03100100xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">CBool Function</title>
+    <filename>/text/sbasic/shared/03100100.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="cbool">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150616">
+  <bookmark_value>CBool function</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3150616" ><variable id="CBool_h1"><link href="text/sbasic/shared/03100100.xhp" name="CBool Function">CBool Function</link></variable></h1>
+<paragraph id="par_id3145136" role="paragraph">Converts an expression or a set of expressions into a boolean. An expression is composed of strings, numbers and operators. Comparison, logical or mathematical operators are allowed inside expressions.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+  <paragraph id="par_id3194514" role="bascode" localize="false">CBool (expression As Variant) As Boolean</paragraph>
+</bascode>
+<paragraph role="paragraph" id="par_id681638266349216"><literal>expression</literal> can be a number or a set of combined expressions.</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3155419" role="paragraph" xml-lang="en-US">Boolean</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph role="paragraph" id="par_id791636986444058"><emph>expression</emph>: A logical expression, a mathematical formula, a numeric expression or a set of expressions combined with operators. During expression evaluation <link href="text/sbasic/shared/03060000.xhp" name="logical operators">logical operators</link> take preceedence over <link href="text/sbasic/shared/03110100.xhp" name="comparison operators">comparison operators</link>, which in turn take preceedence over <link href="text/sbasic/shared/03070000.xhp" name="mathematical operators">mathematical operators</link>.</paragraph>
+<paragraph role="paragraph" id="par_id1001638264728895">The <literal>expression</literal> can be a number or mathematical formula. When equals to 0, <literal>False</literal> is returned, otherwise <literal>True</literal> is returned.</paragraph>
+<paragraph id="par_id3149655" role="paragraph">Multiple expressions such as <input>expr1 [[{operator] expr2]..]</input> can be combined. <input>expr1</input> and <input>expr2</input> can be any string or numeric expressions that you want to evaluate. <literal>CBool</literal> combines the expressions and returns either <literal>True</literal> or <literal>False</literal>.  <input>operator</input> can be a <link href="text/sbasic/shared/03070000.xhp" name="mathematical operator">mathematical operator</link>, <link href="text/sbasic/shared/03060000.xhp" name="logical operator">logical operator</link> or <link href="text/sbasic/shared/03110100.xhp" name="comparison operator">comparison operator</link>.</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<paragraph id="par_id3145171" role="paragraph" xml-lang="en-US">In the following examples, the <literal>CBool</literal> function evaluates a logical expression, a mathematical formula and the value that is returned by the <literal>Instr</literal> function. The function checks if the character "a" is found in the sentence that was entered by the user.</paragraph>
+<bascode>
+<paragraph id="par_idm1340987280" role="bascode" localize="false">Sub ExampleCBool</paragraph>
+<paragraph role="bascode" id="bas_id961636989038747" xml-lang="en-US">    Print CBool( 1>2 Xor 44 ) ' computes to True</paragraph>
+<paragraph role="bascode" id="bas_id991636996682074" xml-lang="en-US">    Print CBool( expression := 15 /2 -7.5 ) ' displays False as expression equals 0</paragraph>
+<paragraph id="par_id3155132" role="bascode" xml-lang="en-US">    txt = InputBox("Please enter a short sentence:")</paragraph>
+<paragraph id="par_id3155855" role="bascode" xml-lang="en-US">    ' Proof if the character "a" appears in the sentence.</paragraph>
+<paragraph id="par_id3146984" role="bascode" xml-lang="en-US">    ' Instead of the command line</paragraph>
+<paragraph id="par_id3148576" localize="false" role="bascode" xml-lang="en-US">    ' If Instr(Input, "a")&lt;&gt;0 Then...</paragraph>
+<paragraph id="par_id3154014" role="bascode" xml-lang="en-US">    ' the CBool function is applied as follows:</paragraph>
+<paragraph id="par_id3155413" localize="false" role="bascode" xml-lang="en-US">    If CBool(Instr(txt, "a")) Then</paragraph>
+<paragraph id="par_id3152940" role="bascode" xml-lang="en-US">        MsgBox "The character »a« appears in the sentence you entered!"</paragraph>
+<paragraph id="par_idm1340972320" role="bascode" localize="false">    EndIf</paragraph>
+<paragraph id="par_idm1340971088" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+
+<section id="relatedtopics">
+  <embed href="text/sbasic/shared/03120105.xhp#CByte_h1"/>
+  <embed href="text/sbasic/shared/03100050.xhp#CCur_h1"/>
+<!-- WiP
+  <embed href="text/sbasic/shared/03100300.xhp#CDate_h1"/>
+  <embed href="text/sbasic/shared/03100400.xhp#CDbl_h1"/>
+  <embed href="text/sbasic/shared/03100060.xhp#CDec_h1"/>
+  <embed href="text/sbasic/shared/03100500.xhp#CInt_h1"/>
+  <embed href="text/sbasic/shared/03100600.xhp#CLng_h1"/>
+  <embed href="text/sbasic/shared/03100900.xhp#CSng_h1"/>
+  <embed href="text/sbasic/shared/03101000.xhp#CStr_h1"/>
+-->
+</section>
+
+</body>
+</helpdocument>

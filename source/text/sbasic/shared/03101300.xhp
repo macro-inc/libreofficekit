@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03101300xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">DefDate Statement</title>
+    <filename>/text/sbasic/shared/03101300.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="defdate">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150504">
+  <bookmark_value>DefDate statement</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3150504"><link href="text/sbasic/shared/03101300.xhp" name="DefDate Statement">DefDate Statement</link></h1>
+<paragraph id="par_id3145069" role="paragraph" xml-lang="en-US">If no type-declaration character or keyword is specified, the DefDate statement sets the default variable type, according to a letter range.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/03101100.xhp#PrefixDefCommon"/>
+
+<embed href="text/sbasic/shared/03101100.xhp#ExamplePrefixDefCommon"/>
+<bascode>
+  <paragraph id="par_idm1341297408" role="bascode" localize="false">Sub ExampleDefDate</paragraph>
+  <paragraph id="par_id3152462" role="bascode" xml-lang="en-US">    tDate=Date ' tDate is an implicit date variable</paragraph>
+  <paragraph id="par_id3153562" role="bascode" xml-lang="en-US">    Print VarType(tea), train, TypeName(timedate), IsDate(tick) ' Displays: 7 00:00:00 Date True</paragraph>
+  <paragraph id="par_idm1341619984" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+
+</body>
+</helpdocument>

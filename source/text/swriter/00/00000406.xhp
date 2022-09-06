@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriter0000000406xml" indexer="exclude">
+    <title id="tit" xml-lang="en-US">Tools Menu</title>
+    <filename>/text/swriter/00/00000406.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<h1 id="hd_id3154279">Tools Menu</h1>
+<paragraph id="par_id3150710" role="paragraph" xml-lang="en-US"><variable id="silbentrennung">Choose <emph>Tools - Language - Hyphenation</emph></variable></paragraph>
+<paragraph id="par_idN105A1" role="paragraph" xml-lang="en-US"><variable id="wordcount">Choose <emph>Tools - Word Count</emph></variable></paragraph>
+<paragraph id="par_id3154100" role="paragraph" xml-lang="en-US"><variable id="kapitelnumerierung">Choose <emph>Tools - Chapter Numbering</emph></variable></paragraph>
+<paragraph id="par_id3153530" role="paragraph" xml-lang="en-US"><variable id="kapitelnumerierung1">Choose <emph>Tools - Chapter Numbering - Numbering</emph> tab</variable></paragraph>
+<paragraph id="par_id3151321" role="paragraph" xml-lang="en-US"><variable id="zeilennumerierung">Choose <emph>Tools - Line Numbering</emph> (not for HTML format)</variable></paragraph>
+<paragraph id="par_id3154477" role="paragraph" xml-lang="en-US"><variable id="fussnoteneinstellung">Choose <emph>Tools - Footnotes and Endnotes</emph></variable></paragraph>
+<paragraph id="par_id3153669" role="paragraph" xml-lang="en-US"><variable id="fussnoten">Choose <emph>Tools - Footnotes and Endnotes - Footnotes</emph> tab</variable></paragraph>
+<paragraph id="par_id3150972" role="paragraph" xml-lang="en-US"><variable id="endnoten">Choose <emph>Tools - Footnotes and Endnotes - Endnotes</emph> tab</variable></paragraph>
+<paragraph id="par_id3152963" role="paragraph" xml-lang="en-US"><variable id="texttabelle">Choose <emph>Table - Convert - Text to Table</emph></variable></paragraph>
+<paragraph id="par_id3150833" role="paragraph" xml-lang="en-US"><variable id="sortieren">Choose <emph>Tools - Sort</emph></variable></paragraph>
+
+<section id="calculate">
+<paragraph id="par_id3149692" role="paragraph" xml-lang="en-US">Choose <emph>Tools - Calculate</emph> </paragraph>
+<paragraph id="par_id3159188" role="paragraph" xml-lang="en-US"><switchinline select="sys"><caseinline select="MAC">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + plus sign</paragraph>
+</section>
+<paragraph id="par_id3155174" role="paragraph" xml-lang="en-US"><variable id="aktualisieren">Choose <emph>Tools - Update</emph></variable></paragraph>
+<paragraph id="par_id3151330" role="paragraph" xml-lang="en-US"><variable id="seitenformatierung">Choose <menuitem>Tools - Update - Page Formatting</menuitem></variable></paragraph>
+<paragraph id="par_id3149482" role="paragraph" xml-lang="en-US"><variable id="aktuellesverz">Choose <emph>Tools - Update - Current Index</emph></variable></paragraph>
+<paragraph id="par_id3149821" role="paragraph" xml-lang="en-US"><variable id="alleverz">Choose <menuitem>Tools - Update - Indexes and Tables</menuitem></variable></paragraph>
+<paragraph id="par_id3151249" role="paragraph" xml-lang="en-US"><variable id="alles">Choose <emph>Tools - Update - Update All </emph></variable></paragraph>
+
+<section id="update_fields">
+<paragraph id="par_id3154839" role="paragraph" xml-lang="en-US">Choose <emph>Tools - Update - Fields </emph></paragraph>
+<paragraph id="par_id3147090" role="paragraph" xml-lang="en-US">F9 key</paragraph>
+</section>
+<paragraph id="par_id3148970" role="paragraph" xml-lang="en-US"><variable id="aktverknuepf">Choose <emph>Tools - Update - Links</emph></variable></paragraph>
+<paragraph id="par_id3147220" role="paragraph" xml-lang="en-US"><variable id="adiagr">Choose <menuitem>Tools - Update - Charts</menuitem></variable></paragraph>
+
+<section id="protecdocument">
+    <paragraph role="paragraph" id="par_id101630955770811"><variable id="protectfield">Choose <menuitem>Tools - Protect Document - Protect Fields</menuitem>.</variable></paragraph>
+    <paragraph role="paragraph" id="par_id621630955775413"><variable id="protecbookmarks">Choose <menuitem>Tools - Protect Document - Protect Bookmarks</menuitem>.</variable></paragraph>
+</section>
+
+<section id="mmwizard">
+<paragraph id="par_idN10792" role="paragraph" xml-lang="en-US">Choose <emph>Tools - Mail Merge Wizard</emph></paragraph>
+<paragraph id="par_idN107E6" role="paragraph" xml-lang="en-US">Click the <emph>Mail Merge</emph> icon on the <emph>Mail Merge</emph> bar:</paragraph>
+<paragraph id="par_idN107E7" role="paragraph" xml-lang="en-US">Click the <emph>Mail Merge</emph> icon on the <emph>Table Data</emph> bar:</paragraph>
+<table id="tbl_id3149877">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10806" role="paragraph" xml-lang="en-US"> <image id="img_id3083452" src="cmd/sc_mergedialog.png" width="0.2228in" height="0.2228in"><alt xml-lang="en-US" id="alt_id3083452">Icon</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN10823" role="paragraph" xml-lang="en-US">Mail Merge</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+</section>
+
+</body>
+</helpdocument>

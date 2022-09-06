@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+<topic id="textsmathguidelimitsxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Working with Limits</title>
+<filename>/text/smath/guide/limits.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id8404492"><bookmark_value>limits;in sums/integrals</bookmark_value>
+<bookmark_value>integral limits</bookmark_value>
+</bookmark>
+<h1 id="hd_id1892147" xml-lang="en-US"><variable id="limits"><link href="text/smath/guide/limits.xhp">Working with Limits</link></variable></h1>
+<h3 id="hd_id9881893" xml-lang="en-US">How can I define the limits in a Sum or Integral formula?<comment>i83226</comment></h3>
+<paragraph role="paragraph" id="par_id6504409" xml-lang="en-US">You want to insert a summation formula like "summation of s^k from k = 0 to n" at the cursor in a Writer text document.</paragraph>
+<list type="ordered">
+<listitem>
+<paragraph role="paragraph" id="par_id8811304" localize="false" xml-lang="en-US"><embedvar href="text/shared/00/00000404.xhp#insert_formula"/></paragraph>
+<paragraph role="paragraph" id="par_id1276589" xml-lang="en-US">You see the Math input window and the Elements pane on the left.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id3283791" xml-lang="en-US">From the list on the upper part of the Elements pane, select the <emph>Operators</emph> item.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id9734794" xml-lang="en-US">In the lower part of the Elements pane, click the <emph>Sum</emph> icon.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id9641712" xml-lang="en-US">To enable lower and upper limits, click additionally the <emph>Upper and Lower Limits</emph> icon.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id3304239" xml-lang="en-US">In the input window, the first placeholder or marker is selected, and you can start to enter the lower limit: </paragraph>
+<paragraph role="smathcode" id="par_id8679158" xml-lang="en-US" localize="false">k = 0</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id8471327" xml-lang="en-US">Press F4 to advance to the next marker, and enter the upper limit:</paragraph>
+<paragraph role="smathcode" id="par_id4731894" xml-lang="en-US" localize="false">n</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id759300" xml-lang="en-US">Press F4 to advance to the next marker, and enter the summand:</paragraph>
+<paragraph role="smathcode" id="par_id651875" xml-lang="en-US" localize="false">s^k</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id6756187" xml-lang="en-US">Now the formula is complete. Click into your text document outside the formula to leave the formula editor.</paragraph>
+</listitem>
+</list>
+<paragraph role="paragraph" id="par_id9406414" xml-lang="en-US">In the same way, you can enter an Integral formula with limits. When you click an icon from the Elements pane, the assigned text command is inserted in the input window. If you know the text commands, you can enter the commands directly in the input window.</paragraph>
+<list type="ordered">
+<listitem>
+<paragraph role="paragraph" id="par_id5866267" xml-lang="en-US" localize="false"><embedvar href="text/shared/00/00000404.xhp#insert_formula"/></paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id1965697" xml-lang="en-US">Click in the input window and enter the following line:</paragraph>
+<paragraph role="smathcode" id="par_id9004486" xml-lang="en-US" localize="false">int from{a} to{b} f(x)`dx</paragraph>
+<paragraph role="paragraph" id="par_id4651020" xml-lang="en-US">A small gap exists between f(x) and dx, which you can also enter using the Elements pane: select the <emph>Formats</emph> item from the list on the top, then the <emph>Small Gap</emph> icon.</paragraph>
+</listitem>
+</list>
+<note id="par_id3877071" xml-lang="en-US">If you don't like the font of the letters f and x, choose <item type="menuitem">Format - Fonts</item> and select other fonts. Click the <emph>Default</emph> button to use the new fonts as default from now on.</note>
+<tip id="par_id3021332" xml-lang="en-US">If you need the formula within a line of text, the limits increase the line height. You can choose <item type="menuitem">Format - Text Mode</item> to place the limits besides the Sum or Integral symbol, which reduces the line height.</tip>
+<section id="relatedtopics">
+<paragraph role="paragraph" id="par_id260322" xml-lang="en-US"><link href="text/smath/01/03090909.xhp">Example of Integral and Sum ranges</link></paragraph>
+</section>
+</body>
+</helpdocument>

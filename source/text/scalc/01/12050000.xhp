@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalc0112050000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Subtotals</title>
+<filename>/text/scalc/01/12050000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+
+<bookmark branch="hid/.uno:DataSubTotals" xml-lang="en-US" id="bm_id3154515" localize="false"/>
+<section id="subtotalheader">
+    <h1 id="hd_id3153822"><variable id="subtotalheaderh1"><link href="text/scalc/01/12050000.xhp" name="subtotals">Subtotals</link></variable></h1>
+  <paragraph role="paragraph" id="par_id3145119" xml-lang="en-US"><variable id="teilergebnisse"><ahelp hid=".uno:DataSubTotals" visibility="visible">Calculates subtotals for the columns that you select.</ahelp></variable> $[officename] uses the SUM function to automatically calculate the subtotal and grand total values in a labeled range. You can also use other functions to perform the calculation. $[officename] automatically recognizes a defined database area when you place the cursor in it.</paragraph>
+  </section>
+  <section id="howtoget">
+  <embed href="text/scalc/00/00000412.xhp#dntegs"/>
+</section>
+  <paragraph role="paragraph" id="par_id3153896" xml-lang="en-US">For example, you can generate a sales summary for a certain postal code based on data from a client database.</paragraph>
+  <embed href="text/scalc/01/12050100.xhp#group"/>
+  <embed href="text/scalc/01/12050200.xhp#options"/>
+  <embed href="text/shared/00/00000001.xhp#reset"/>
+  <h2 id="hd_id3163708">Delete</h2>
+  <paragraph role="paragraph" id="par_id3154125" xml-lang="en-US">Deletes the subtotal rows in the selected area.</paragraph>
+  <section id="relatedtopics">
+    <embed href="text/scalc/guide/subtotaltool.xhp#subtotaltoolh1"/>
+</section>
+ </body>
+</helpdocument>

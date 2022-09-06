@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03080202xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Log Function</title>
+    <filename>/text/sbasic/shared/03080202.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="log">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149416">
+  <bookmark_value>Log function</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3149416"><link href="text/sbasic/shared/03080202.xhp" name="Log Function">Log Function (BASIC)</link></h1>
+<paragraph id="par_id3145066" role="paragraph" xml-lang="en-US">Returns the natural logarithm of a number.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3154760" role="bascode" xml-lang="en-US">Log (Number)</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3150791" localize="false" role="paragraph">Double</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3151041" role="paragraph" xml-lang="en-US"> <emph>Number:</emph> Any numeric expression that you want to calculate the natural logarithm for.</paragraph>
+<paragraph id="par_id3150869" role="paragraph" xml-lang="en-US">The natural logarithm is the logarithm to the base e. Base e is a constant with an approximate value of 2.718282...</paragraph>
+<paragraph id="par_id3153968" role="paragraph" xml-lang="en-US">You can calculate logarithms to any base (n) for any number (x) by dividing the natural logarithm of x by the natural logarithm of n, as follows:</paragraph>
+<paragraph id="par_id3145420" role="paragraph" xml-lang="en-US">Log<sub>n</sub>(x) = Log(x) / Log(n)</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341571344" role="bascode" localize="false" xml-lang="en-US">Sub ExampleLogExp</paragraph>
+<paragraph id="par_idm1341570112" role="bascode" localize="false" xml-lang="en-US">Dim a As Double</paragraph>
+<paragraph id="par_idm1341568880" role="bascode" localize="false" xml-lang="en-US">Dim Const b1=12.345e12</paragraph>
+<paragraph id="par_idm1341567648" role="bascode" localize="false" xml-lang="en-US">Dim Const b2=1.345e34</paragraph>
+<paragraph id="par_idm1341566416" role="bascode" localize="false" xml-lang="en-US">    a=Exp( Log(b1)+Log(b2) )</paragraph>
+<paragraph id="par_id3149262" role="bascode" xml-lang="en-US">    MsgBox "" &amp; a &amp; chr(13) &amp; (b1*b2) ,0,"Multiplication by logarithm function"</paragraph>
+<paragraph id="par_idm1341563312" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+</helpdocument>

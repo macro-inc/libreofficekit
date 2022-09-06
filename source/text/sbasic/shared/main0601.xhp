@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicsharedmain0601xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">$[officename] Basic Help</title>
+    <filename>/text/sbasic/shared/main0601.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<bookmark xml-lang="en-US" branch="hid/HID_GLOBAL_FALLBACK" id="bm_id3143284" localize="false"/>
+
+<h1 id="hd_id3154232"><variable id="mainsbasic"><link href="text/sbasic/shared/main0601.xhp" name="$[officename] Basic Help">%PRODUCTNAME Basic Help</link></variable></h1>
+<embed href="text/shared/06/youtubevideos.xhp#whatisit"/>
+<section id="basicalt">
+<paragraph id="par_id3153894" role="paragraph" xml-lang="en-US">%PRODUCTNAME provides an Application Programming Interface (API) that allows controlling the $[officename] components with different programming languages by using the $[officename] Software Development Kit (SDK). For more information about the $[officename] API and the Software Development Kit, visit <link href="https://api.libreoffice.org/" name="api.libreoffice.org">https://api.libreoffice.org</link></paragraph>
+<paragraph id="par_id3147226" role="paragraph" xml-lang="en-US">This help section explains the most common functions of %PRODUCTNAME Basic. For more in-depth information please refer to the <link href="https://wiki.documentfoundation.org/Documentation/BASIC_Guide" name="wiki.documentfoundation.org BASIC Guide">OpenOffice.org BASIC Programming Guide</link> on the Wiki.</paragraph>
+</section>
+
+<paragraph id="hd_id3146957" role="heading" level="3" xml-lang="en-US">Working with %PRODUCTNAME Basic</paragraph>
+<embed href="text/sbasic/shared/01000000.xhp#doc_title"/>
+<embed href="text/sbasic/shared/03000000.xhp#doc_title"/>
+<embed href="text/shared/guide/macro_recording.xhp#macro_recording"/>
+<embed href="text/sbasic/guide/create_dialog.xhp#create_dialog"/>
+<embed href="text/sbasic/guide/insert_control.xhp#insert_control"/>
+<embed href="text/sbasic/guide/control_properties.xhp#control_properties"/>
+<embed href="text/sbasic/guide/show_dialog.xhp#show_dialog"/>
+<embed href="text/sbasic/guide/sample_code.xhp#sample_code"/>
+<embed href="text/sbasic/guide/basic_examples.xhp#basicexamplestit"/>
+
+<paragraph id="hd_id05182017030838384" role="heading" level="3" xml-lang="en-US">Working with VBA Macros</paragraph>
+<embed href="text/sbasic/shared/vbasupport.xhp#vbamacros"/>
+<embed href="text/sbasic/shared/special_vba_func.xhp#exclusivevba"/>
+
+<h3 id="hd_id191548155077269">Working with Macros in Python</h3>
+<embed href="text/sbasic/python/main0000.xhp#pythonscriptshelp"/>
+<embed href="text/sbasic/python/python_ide.xhp#pythonideh1"/>
+<embed href="text/sbasic/python/python_locations.xhp#pythonlocations1"/>
+<embed href="text/sbasic/python/python_shell.xhp#pythonshell1"/>
+<embed href="text/sbasic/python/python_programming.xhp#pythonprogrammingheading"/>
+<embed href="text/sbasic/python/python_examples.xhp#pythonexamples2"/>
+<embed href="text/sbasic/python/python_2_basic.xhp#py2ba_h1"/>
+
+<paragraph role="heading" id="hd_id51528998827009" level="3" xml-lang="en-US">%PRODUCTNAME internal Basic macro libraries</paragraph>
+<paragraph role="paragraph" id="par_id441528998842556" xml-lang="en-US">%PRODUCTNAME installs a set of Basic macro libraries that can be accessed from your Basic macros.</paragraph>
+<embed href="text/sbasic/shared/03/lib_tools.xhp#tools_lib"/>
+<embed href="text/sbasic/shared/03/lib_depot.xhp#depot_lib"/>
+<embed href="text/sbasic/shared/03/lib_euro.xhp#euro_lib"/>
+<embed href="text/sbasic/shared/03/lib_formwizard.xhp#formwizard_lib"/>
+<embed href="text/sbasic/shared/03/lib_gimmicks.xhp#gimmicks_lib"/>
+<embed href="text/sbasic/shared/03/lib_importwiz.xhp#importwiz_lib"/>
+<embed href="text/sbasic/shared/03/lib_schedule.xhp#schedule_lib"/>
+<embed href="text/sbasic/shared/03/lib_script.xhp#script_lib"/>
+<embed href="text/sbasic/shared/03/lib_ScriptForge.xhp#ScriptForge_lib"/>
+<embed href="text/sbasic/shared/03/lib_template.xhp#template_lib"/>
+<embed href="text/sbasic/shared/03/lib_wikieditor.xhp#wikieditor_lib"/>
+
+<embed href="text/swriter/main0000.xhp#helpabouthelp"/>
+</body>
+</helpdocument>

@@ -1,0 +1,309 @@
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+<!--
+Version 03-Feb-2006
+  added optional localize attribute to images
+
+Version 06-Jun-2017
+  Made xml-lang optional (#IMPLIED)
+
+Version Nov 2018
+  Added extensions: H1, .. H6, menuitem, keycode, literal input, widget, note, tip, warning
+  Added extensions: pycode, sqlcode, bascode
+-->
+
+<!ELEMENT ahelp (#PCDATA | embedvar | br | comment | emph | menuitem | widget | keycode | input | literal | sub | sup | item | link | switchinline | variable)*>
+<!ATTLIST ahelp
+  hid CDATA #REQUIRED
+  visibility (hidden | visible) #IMPLIED
+>
+
+<!ELEMENT alt (#PCDATA)>
+<!ATTLIST alt
+  xml-lang CDATA #IMPLIED
+  id CDATA #REQUIRED
+  localize CDATA #IMPLIED
+>
+
+<!ELEMENT bascode (paragraph+)>
+
+<!ELEMENT pycode (paragraph+)>
+
+<!ELEMENT sqlcode (paragraph+)>
+
+<!ELEMENT body (h1 | h2 | h3 | h4 | h5 | h6 | section | paragraph | table | comment | bookmark | switch | embed | list | sort | bascode | pycode | sqlcode | note | warning | tip)*>
+
+<!ELEMENT bookmark (bookmark_value)*>
+<!ATTLIST bookmark
+  branch CDATA #REQUIRED
+  xml-lang CDATA #IMPLIED
+  id CDATA #REQUIRED
+  localize CDATA #IMPLIED
+>
+
+<!ELEMENT bookmark_value (#PCDATA | embedvar)*>
+
+<!ELEMENT br EMPTY>
+
+<!ELEMENT caption (#PCDATA | embedvar | br | emph | sub | sup | item | link | switchinline | variable)*>
+<!ATTLIST caption
+  xml-lang CDATA #IMPLIED
+  id CDATA #REQUIRED
+  localize CDATA #IMPLIED
+>
+
+<!ELEMENT case (h1 | h2 | h3 | h4 | h5 | h6 | note | warning |tip | paragraph | table | comment | bookmark | embed | link | list | switch | section | sort | bascode | pycode | sqlcode )*>
+<!ATTLIST case
+  select CDATA #REQUIRED
+>
+
+<!ELEMENT caseinline (#PCDATA | image | embedvar | br | emph | sub | sup | item | link | switchinline | variable | ahelp | object | keycode | menuitem | input | literal | widget)*>
+<!ATTLIST caseinline
+  select CDATA #REQUIRED
+>
+
+<!ELEMENT comment (#PCDATA)>
+
+<!ELEMENT created (#PCDATA)>
+<!ATTLIST created
+  date CDATA #REQUIRED
+>
+
+<!ELEMENT default (h1 | h2 | h3 | h4 | h5 | h6 | note | warning |tip | paragraph | table | comment | bookmark | embed | link | list | switch | section | sort | bascode | pycode | sqlcode)*>
+
+<!ELEMENT defaultinline (#PCDATA | image | embedvar | br | emph | sub | sup | item | link | switchinline | variable | ahelp | object | keycode | menuitem | input | literal | widget)*>
+
+<!ELEMENT embed EMPTY>
+<!ATTLIST embed
+  href CDATA #REQUIRED
+  role CDATA #IMPLIED
+  level CDATA #IMPLIED
+>
+
+<!ELEMENT embedvar EMPTY>
+<!ATTLIST embedvar
+  href CDATA #REQUIRED
+  markup (keep | ignore) #IMPLIED
+>
+
+<!ELEMENT emph (#PCDATA | item | comment | help-id-missing)*>
+
+<!ELEMENT menuitem (#PCDATA)>
+
+<!ELEMENT keycode (#PCDATA)>
+
+<!ELEMENT input (#PCDATA)>
+
+<!ELEMENT literal (#PCDATA)>
+
+<!ELEMENT widget (#PCDATA)>
+
+<!ELEMENT sub (#PCDATA | item | comment | help-id-missing)*>
+
+<!ELEMENT sup (#PCDATA | item | comment | help-id-missing)*>
+
+<!ELEMENT filename (#PCDATA)>
+
+<!ELEMENT h1 (#PCDATA | comment | embedvar | br | emph | item | link | switchinline | variable | ahelp | bookmark | keycode | menuitem | input | literal | widget)*>
+<!ATTLIST h1 id CDATA #REQUIRED xml-lang CDATA #IMPLIED localize CDATA #IMPLIED
+>
+
+<!ELEMENT h2 (#PCDATA | comment | embedvar | br | emph | item | link | switchinline | variable | ahelp | bookmark | keycode | menuitem | input | literal | widget)*>
+<!ATTLIST h2 id CDATA #REQUIRED  xml-lang CDATA #IMPLIED localize CDATA #IMPLIED
+>
+
+<!ELEMENT h3 (#PCDATA | comment | embedvar | br | emph | item | link | switchinline | variable | ahelp | bookmark | keycode | menuitem | input | literal | widget)*>
+<!ATTLIST h3 id CDATA #REQUIRED  xml-lang CDATA #IMPLIED localize CDATA #IMPLIED
+>
+
+<!ELEMENT h4 (#PCDATA | comment | embedvar | br | emph | item | link | switchinline | variable | ahelp | bookmark | keycode | menuitem | input | literal | widget)*>
+<!ATTLIST h4 id CDATA #REQUIRED  xml-lang CDATA #IMPLIED localize CDATA #IMPLIED
+>
+
+<!ELEMENT h5 (#PCDATA | comment | embedvar | br | emph | item | link | switchinline | variable | ahelp | bookmark | keycode | menuitem | input | literal | widget)*>
+<!ATTLIST h5 id CDATA #REQUIRED  xml-lang CDATA #IMPLIED localize CDATA #IMPLIED
+>
+
+<!ELEMENT h6 (#PCDATA | comment | embedvar | br | emph | item | link | switchinline | variable | ahelp | bookmark | keycode | menuitem | input | literal | widget)*>
+<!ATTLIST h6 id CDATA #REQUIRED  xml-lang CDATA #IMPLIED localize CDATA #IMPLIED
+>
+
+<!ELEMENT helpdocument (meta, body)>
+<!ATTLIST helpdocument
+  version CDATA #REQUIRED
+>
+
+<!ELEMENT history (created)>
+
+<!ELEMENT image (caption* | alt+)?>
+<!ATTLIST image
+  src CDATA #REQUIRED
+  width CDATA #IMPLIED
+  height CDATA #IMPLIED
+  id CDATA #REQUIRED
+  localize CDATA #IMPLIED
+>
+
+<!ELEMENT item (#PCDATA)>
+<!ATTLIST item
+  type CDATA #REQUIRED
+>
+
+<!ELEMENT link (#PCDATA | embedvar | emph | sub | sup | item | variable | switchinline | keycode | menuitem | input | literal | widget)*>
+<!ATTLIST link
+  href CDATA #REQUIRED
+  name CDATA #IMPLIED
+  type CDATA #IMPLIED
+  target CDATA #IMPLIED
+>
+
+<!ELEMENT list (listitem | (comment)*)+>
+<!ATTLIST list
+  type CDATA #REQUIRED
+  startwith CDATA #IMPLIED
+  format (1 | i | I | a | A) #IMPLIED
+  bullet (disc | circle | square) #IMPLIED
+  sorted (asc | desc) #IMPLIED
+>
+
+<!ELEMENT listitem (comment | section | paragraph | table | switch | embed | bookmark | note | tip | warning)*>
+<!ATTLIST listitem
+  format (1 | i | I | a | A) #IMPLIED
+  bullet (disc | circle | square) #IMPLIED
+	class CDATA #IMPLIED
+>
+
+<!ELEMENT meta (topic, history?)>
+
+<!ELEMENT object EMPTY>
+<!ATTLIST object
+  type CDATA #REQUIRED
+  id CDATA #REQUIRED
+  data CDATA #REQUIRED
+  height CDATA #IMPLIED
+  width CDATA #IMPLIED
+>
+
+<!ELEMENT paragraph (#PCDATA | image | comment | embedvar | br | emph | sub | sup | item | link | switchinline | variable | ahelp | object | bookmark | menuitem | input | keycode | literal | widget | help-id-missing)*>
+<!ATTLIST paragraph
+  role CDATA #REQUIRED
+  level CDATA #IMPLIED
+  id CDATA #REQUIRED
+  l10n CDATA #IMPLIED
+  xml-lang CDATA #IMPLIED
+  oldref CDATA #IMPLIED
+  localize CDATA #IMPLIED
+>
+
+<!ELEMENT section (section | h1 | h2 | h3 | h4 | h5 | h6 | paragraph | table | list | comment | bookmark | embed | switch | sort | bascode | pycode | sqlcode | note |warning | tip)*>
+<!ATTLIST section
+  id CDATA #REQUIRED
+>
+
+<!ELEMENT sort (section+)>
+<!ATTLIST sort
+  order (asc | desc) #IMPLIED
+  descendant (paragraph | h1 | h2 | h3 | h4 | h5 | h6 ) #IMPLIED
+>
+
+<!ELEMENT switch ((case | comment)* | default?)*>
+<!ATTLIST switch
+  select (sys | appl | distrib | target | lang | ver) #REQUIRED
+>
+
+<!ELEMENT switchinline ((caseinline)+, (defaultinline?)?)>
+<!ATTLIST switchinline
+  select (sys | appl | distrib | target | ver | lang) #REQUIRED
+>
+
+<!ELEMENT table (caption*, tablehead*, tablerow+)>
+<!ATTLIST table
+  name CDATA #IMPLIED
+  width CDATA #IMPLIED
+  height CDATA #IMPLIED
+  unit CDATA #IMPLIED
+  class CDATA #IMPLIED
+  id CDATA #REQUIRED
+>
+
+<!ELEMENT tablecell (section | paragraph | comment | embed | bookmark | image | list | bascode | pycode | note | warning | tip)*>
+<!ATTLIST tablecell
+  colspan CDATA #IMPLIED
+  rowspan CDATA #IMPLIED
+  width CDATA #IMPLIED
+  class CDATA #IMPLIED
+  unit CDATA #IMPLIED
+>
+
+<!ELEMENT tablerow (tablecell+)>
+<!ATTLIST tablerow
+  height CDATA #IMPLIED
+  class CDATA #IMPLIED
+  unit CDATA #IMPLIED
+>
+
+<!ELEMENT tablehead (tablerow+)>
+<!ATTLIST tablehead
+  class CDATA #IMPLIED
+>
+
+<!ELEMENT title (#PCDATA)>
+<!ATTLIST title
+  xml-lang CDATA #IMPLIED
+  id CDATA #REQUIRED
+  localize CDATA #IMPLIED
+>
+
+<!ELEMENT topic (title+, filename, bookmark*)>
+<!ATTLIST topic
+  id CDATA #REQUIRED
+  indexer (exclude | include) #IMPLIED
+	status (DRAFT | FINAL | PUBLISH | STALLED | DEPRECATED) #IMPLIED
+>
+
+<!ELEMENT variable (#PCDATA | ahelp | embedvar | br | emph | sub | sup | item | link | variable | image | object | switchinline | keycode | menuitem | input | literal | widget)*>
+<!ATTLIST variable
+  id CDATA #REQUIRED
+  visibility (hidden | visible) #IMPLIED
+>
+
+<!ELEMENT note (#PCDATA | image | comment | embedvar | br | emph | sub | sup | item | link | switchinline | variable | ahelp | object | bookmark | menuitem | input | keycode | literal | widget | help-id-missing)*>
+<!ATTLIST note
+  id CDATA #REQUIRED
+  l10n CDATA #IMPLIED
+  xml-lang CDATA #IMPLIED
+  localize CDATA #IMPLIED
+>
+
+<!ELEMENT tip (#PCDATA | image | comment | embedvar | br | emph | sub | sup | item | link | switchinline | variable | ahelp | object | bookmark | menuitem | input | keycode | literal | widget | help-id-missing)*>
+<!ATTLIST tip
+  id CDATA #REQUIRED
+  l10n CDATA #IMPLIED
+  xml-lang CDATA #IMPLIED
+  localize CDATA #IMPLIED
+>
+
+<!ELEMENT warning (#PCDATA | image | comment | embedvar | br | emph | sub | sup | item | link | switchinline | variable | ahelp | object | bookmark | menuitem | input | keycode | literal | widget | help-id-missing)*>
+<!ATTLIST warning
+  id CDATA #REQUIRED
+  l10n CDATA #IMPLIED
+  xml-lang CDATA #IMPLIED
+  localize CDATA #IMPLIED
+>
+
+<!ELEMENT help-id-missing EMPTY>

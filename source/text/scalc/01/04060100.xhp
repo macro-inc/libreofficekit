@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+      <topic id="textscalc0104060100xml" indexer="include">
+         <title xml-lang="en-US" id="tit">Functions by Category</title>
+         <filename>/text/scalc/01/04060100.xhp</filename>
+      </topic>
+   </meta>
+   <body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3148575"><bookmark_value>functions;listed by category</bookmark_value>
+      <bookmark_value>categories of functions</bookmark_value>
+      <bookmark_value>list of functions</bookmark_value>
+</bookmark><comment>MW deleted "Calc functions"</comment>
+<h1 xml-lang="en-US" id="hd_id3154944"><variable id="drking"><link href="text/scalc/01/04060100.xhp" name="Functions by Category">Functions by Category</link></variable></h1>
+      <paragraph xml-lang="en-US" id="par_id3149378" role="paragraph">This section describes the functions of $[officename] Calc. The various functions are divided into categories in the Function Wizard.</paragraph>
+      <h2 xml-lang="en-US" id="hd_id3146972"><link href="text/scalc/01/04060101.xhp" name="Database">Database</link></h2>
+      <embed href="text/scalc/01/04060101.xhp#datenbanktext"/>
+      <paragraph xml-lang="en-US" id="hd_id3155443" role="heading" level="2"><link href="text/scalc/01/04060102.xhp" name="Date &amp; Time">Date &amp; Time</link></paragraph>
+      <embed href="text/scalc/01/04060102.xhp#datumzeittext"/>
+      <paragraph xml-lang="en-US" id="hd_id3147339" role="heading" level="2"><link href="text/scalc/01/04060103.xhp" name="Financial">Financial</link></paragraph>
+      <embed href="text/scalc/01/04060103.xhp#finanztext"/>
+      <paragraph xml-lang="en-US" id="hd_id3153963" role="heading" level="2"><link href="text/scalc/01/04060104.xhp" name="Information">Information</link></paragraph>
+      <embed href="text/scalc/01/04060104.xhp#informationtext"/>
+      <h2 xml-lang="en-US" id="hd_id3146316"><link href="text/scalc/01/04060105.xhp" name="Logical">Logical</link></h2>
+      <embed href="text/scalc/01/04060105.xhp#logicaltext"/>
+      <paragraph xml-lang="en-US" id="hd_id3148485" role="heading" level="2"><link href="text/scalc/01/04060106.xhp" name="Mathematical">Mathematical</link></paragraph>
+      <embed href="text/scalc/01/04060106.xhp#mathematiktext"/>
+      <paragraph xml-lang="en-US" id="hd_id3150363" role="heading" level="2"><link href="text/scalc/01/04060107.xhp" name="Matrix">Array</link></paragraph>
+      <embed href="text/scalc/01/04060107.xhp#matrixtext"/>
+      <paragraph xml-lang="en-US" id="hd_id3150208" role="heading" level="2"><link href="text/scalc/01/04060108.xhp" name="Statistical">Statistical</link></paragraph>
+      <embed href="text/scalc/01/04060108.xhp#statistiktext"/>
+      <paragraph xml-lang="en-US" id="hd_id3166428" role="heading" level="2"><link href="text/scalc/01/04060109.xhp" name="Spreadsheet">Spreadsheet</link></paragraph>
+      <embed href="text/scalc/01/04060109.xhp#tabelletext"/>
+      <paragraph xml-lang="en-US" id="hd_id3145585" role="heading" level="2"><link href="text/scalc/01/04060110.xhp" name="Text">Text</link></paragraph>
+      <embed href="text/scalc/01/04060110.xhp#texttext"/>
+      <paragraph xml-lang="en-US" id="hd_id3156449" role="heading" level="2"><link href="text/scalc/01/04060111.xhp" name="Add-in">Add-in</link></paragraph>
+      <embed href="text/scalc/01/04060111.xhp#addintext"/>
+      <section id="relatedtopics">
+         <paragraph xml-lang="en-US" id="par_id3150715" role="paragraph"><link href="text/scalc/01/04060199.xhp" name="Operators">Operators</link></paragraph>
+      </section>
+   </body>
+</helpdocument>

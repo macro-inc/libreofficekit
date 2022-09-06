@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpress0113050000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Convert</title>
+<filename>/text/simpress/01/13050000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+  
+  
+  <section id="convert">
+  <paragraph id="hd_id3152596" role="heading" level="1" xml-lang="en-US"><link href="text/simpress/01/13050000.xhp" name="Convert">Convert</link></paragraph>
+  <paragraph role="paragraph" id="par_id3151075" xml-lang="en-US">Options for converting the selected object.</paragraph>
+  </section>
+  <section id="howtoget">
+  <embed href="text/simpress/00/00000413.xhp#convert"/>
+</section>
+  <embed href="text/simpress/01/13050100.xhp#to_curve"/>
+  <embed href="text/simpress/01/13050200.xhp#inpolygon"/>
+  <embed href="text/simpress/01/13050700.xhp#to_contour"/>
+  <embed href="text/simpress/01/13050300.xhp#in3d"/>
+  <embed href="text/simpress/01/13050400.xhp#rotation"/>
+  <embed href="text/simpress/01/13050500.xhp#bitmap"/>
+  <embed href="text/simpress/01/13050600.xhp#metafile"/>
+ </body>
+</helpdocument>

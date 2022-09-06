@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03132500xhp" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">GetDefaultContext Function</title>
+<filename>/text/sbasic/shared/03132500.xhp</filename>
+</topic>
+<history>
+<created date="2005-02-11T11:16:25">GetDefaultContext function</created>
+</history>
+</meta>
+<body>
+<section id="getdefaultcontext">
+<bookmark xml-lang="en-US" branch="index" id="bm_id4761192"><bookmark_value>GetDefaultContext function</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="par_idN10580" xml-lang="en-US" level="1"><link href="text/sbasic/shared/03132500.xhp">GetDefaultContext Function</link></paragraph>
+<paragraph role="paragraph" id="par_idN10590" xml-lang="en-US">Returns the default context of the process service factory, if existent, else returns a null reference. </paragraph>
+</section>
+<paragraph role="paragraph" id="par_idN10593" xml-lang="en-US">This function returns the default component context to be used, if instantiating services via XmultiServiceFactory. See the <item type="literal">Professional UNO</item> chapter in the <item type="literal">Developer's Guide</item> on <link href="https://api.libreoffice.org" name="api.libreoffice.org">api.libreoffice.org</link> for more information.</paragraph>
+</body>
+</helpdocument>

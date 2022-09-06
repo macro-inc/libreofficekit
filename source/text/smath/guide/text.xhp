@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+
+		<helpdocument version="1.0">
+<meta>
+<topic id="textsmathguidetextxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Entering Text</title>
+<filename>/text/smath/guide/text.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3155962"><bookmark_value>text strings; entering in $[officename] Math</bookmark_value>
+<bookmark_value>direct text; entering in $[officename] Math</bookmark_value>
+<bookmark_value>inserting;text in $[officename] Math</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id5676442" xml-lang="en-US" level="1"><variable id="text"><link href="text/smath/guide/text.xhp" name="Entering Text">Entering Text</link>
+</variable></paragraph>
+<paragraph role="heading" id="hd_id8509170" xml-lang="en-US" level="3">How to enter direct text strings that do not get interpreted?</paragraph>
+<paragraph role="paragraph" id="par_id337229" xml-lang="en-US">Some text strings get interpreted as operators automatically. Sometimes this is not what you want. If you want to write W<emph>*</emph> (a letter with a superscripted asterisk), the asterisk will be interpreted as a multiplication operator. Enclose the direct text within double quotes or add spaceholders.</paragraph>
+<paragraph role="paragraph" id="par_idN105D0" xml-lang="en-US">Examples:<comment>collected from several issues: i78812, i9167,  i21484, i25573</comment></paragraph>
+<paragraph role="paragraph" id="par_id521866" xml-lang="en-US">An imported MathType formula contains the following string</paragraph>
+<paragraph role="smathcode" id="par_id9413739" xml-lang="en-US" localize="false">W rSup { size 8{*} }</paragraph>
+<paragraph role="paragraph" id="par_id755943" xml-lang="en-US">If you have set up Math to convert imported MathType formulas (in <switchinline select="sys"><caseinline select="MAC">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - Load/Save - Microsoft Office), you see the formula with a placeholder instead of the asterisk.</paragraph>
+<paragraph role="paragraph" id="par_id5988952" xml-lang="en-US">Change {*} to {} * {} as in the following formula:</paragraph>
+<paragraph role="smathcode" id="par_id3304544" xml-lang="en-US" localize="false">W rSup { size 8{} * {} }</paragraph>
+<paragraph role="paragraph" id="par_id4941557" xml-lang="en-US">You can also use W^"*" to enter the character as direct text.</paragraph>
+<paragraph role="paragraph" id="par_id9961851" xml-lang="en-US">Some formulas start with an = sign. Use "=" to enter that character as direct text.</paragraph>
+<section id="relatedtopics">
+<embed href="text/smath/guide/main.xhp#main"/>
+</section>
+</body>
+</helpdocument>

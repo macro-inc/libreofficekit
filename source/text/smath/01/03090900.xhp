@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textsmath0103090900xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">$[officename] Math Examples</title>
+<filename>/text/smath/01/03090900.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="examples">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3151265"><bookmark_value>examples;$[officename] Math formulas</bookmark_value>
+<bookmark_value>$[officename] Math;examples</bookmark_value>
+<bookmark_value>formulas;examples</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3151265" xml-lang="en-US" level="1"><variable id="examples"><link href="text/smath/01/03090900.xhp" name="$[officename] Math Examples">$[officename] Math Examples</link>
+</variable></paragraph>
+<paragraph role="paragraph" id="par_id3153624" xml-lang="en-US">The following is a list of sample formulas in <emph>$[officename] Math</emph>.</paragraph>
+</section>
+<embed href="text/smath/01/03090901.xhp#indices"/>
+<embed href="text/smath/01/03090902.xhp#indices2"/>
+<embed href="text/smath/01/03090903.xhp#indices3"/>
+<embed href="text/smath/01/03090905.xhp#matrix2"/>
+<embed href="text/smath/01/03090904.xhp#matrix"/>
+<embed href="text/smath/01/03090906.xhp#matrix3"/>
+<embed href="text/smath/01/03090907.xhp#functions"/>
+<embed href="text/smath/01/03090908.xhp#square_root"/>
+<embed href="text/smath/01/03090909.xhp#font"/>
+<embed href="text/smath/01/03090910.xhp#attribute"/>
+</body>
+</helpdocument>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03090201xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Do...Loop Statement</title>
+    <filename>/text/sbasic/shared/03090201.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="doloop">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3156116">
+  <bookmark_value>Do...Loop statement</bookmark_value>
+  <bookmark_value>While; Do loop</bookmark_value>
+  <bookmark_value>Until</bookmark_value>
+  <bookmark_value>loops</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3156116" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03090201.xhp" name="Do...Loop Statement">Do...Loop Statement</link></paragraph>
+  <paragraph id="par_id3109850" role="paragraph" xml-lang="en-US">Repeats the statements between the <emph>Do</emph> and the <emph>Loop</emph> statement while the condition is <literal>True</literal> or until the condition becomes <literal>True</literal>.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<paragraph role="image" id="par_id311592320434736"><image src="media/helpimg/sbasic/Do_statement.svg" id="img_id601592320434736"><alt id="alt_id551592320434736">Do statement</alt></image></paragraph>
+<bascode>
+  <paragraph role="bascode" id="bas_id431592385468901" localize="false">Do {While | Until} condition = True</paragraph>
+  <paragraph role="bascode" id="bas_id171592386317704" xml-lang="en-US">' Do While: The statement block is repeated as long as the condition is true</paragraph>
+  <paragraph role="bascode" id="bas_id11592386319239"  xml-lang="en-US">' Do Until: The statement block is repeated as long as the condition is false</paragraph>
+  <paragraph role="bascode" id="bas_id131592385470352" localize="false">   statements</paragraph>
+  <paragraph role="bascode" id="bas_id581592385470803" localize="false">   [Exit Do]</paragraph>
+  <paragraph role="bascode" id="bas_id461592385471261" localize="false">   statements</paragraph>
+  <paragraph role="bascode" id="bas_id831592385471675" localize="false">Loop</paragraph>
+</bascode>
+
+<paragraph role="image" id="par_id591592320435808"><image src="media/helpimg/sbasic/Do-Loop_statement.svg" id="img_id691592320435808"><alt id="alt_id341592320435808">Do...Loop statement</alt></image></paragraph>
+<bascode>
+  <paragraph role="bascode" id="bas_id441592385468901" localize="false">Do</paragraph>
+  <paragraph role="bascode" id="bas_id141592385470352" localize="false">   statements</paragraph>
+  <paragraph role="bascode" id="bas_id541592385470803" localize="false">   [Exit Do]</paragraph>
+  <paragraph role="bascode" id="bas_id441592385471261" localize="false">   statements</paragraph>
+  <paragraph role="bascode" id="bas_id911592386676044" xml-lang="en-US">' Loop While: The statement block repeats as long as the condition is true</paragraph>
+  <paragraph role="bascode" id="bas_id971592386677004" xml-lang="en-US">' Loop Until: The statement block repeats until the condition is true</paragraph>
+  <paragraph role="bascode" id="bas_id841592385471675" localize="false">Loop {While | Until} condition = True</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3150791" role="paragraph" xml-lang="en-US">The <emph>Do...Loop</emph> statement executes a loop as long as, or until, a certain condition is <literal>True</literal>. The condition for exiting the loop must be entered following either the <emph>Do</emph> or the <emph>Loop</emph> statement. The above examples are valid combinations.</paragraph>
+<paragraph id="par_id3156344" role="paragraph" xml-lang="en-US"> <emph>condition:</emph> A comparison, numeric or Basic expression, that evaluates to either <literal>True</literal> or <literal>False</literal>.</paragraph>
+<paragraph id="par_id3149669" role="paragraph" xml-lang="en-US"> <emph>statements:</emph> Statements that you want to repeat while or until a condition is <literal>True</literal>.</paragraph>
+
+<paragraph id="par_id3149484" role="paragraph" xml-lang="en-US">Use the <emph>Exit Do</emph> statement to unconditionally end the loop. You can add this statement anywhere in a <emph>Do</emph>...<emph>Loop</emph> statement. You can also define an exit condition using the <emph>If...Then</emph> structure as follows:</paragraph>
+<bascode>
+  <paragraph role="bascode" id="bas_id831592387131224" localize="false">Do...</paragraph>
+  <paragraph role="bascode" id="bas_id621592387131776" localize="false">   statements</paragraph>
+  <paragraph role="bascode" id="bas_id721592387132161" localize="false">   If condition = True Then Exit Do</paragraph>
+  <paragraph role="bascode" id="bas_id141592387132344" localize="false">   statements</paragraph>
+  <paragraph role="bascode" id="bas_id91592387132592" localize="false">Loop...</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341080208" role="bascode" localize="false">Sub ExampleDoLoop</paragraph>
+<paragraph id="par_idm1341078976" role="bascode" localize="false">    Dim sFile As String</paragraph>
+<paragraph id="par_idm1341077744" role="bascode" localize="false">    Dim sPath As String</paragraph>
+<paragraph id="par_idm1341076512" role="bascode" localize="false">    sPath = "c:\"</paragraph>
+<paragraph id="par_idm1341075280" role="bascode" localize="false">    sFile = Dir$( sPath ,22)</paragraph>
+<paragraph id="par_idm1341074032" role="bascode" localize="false">    If sFile &lt;&gt; "" Then</paragraph>
+<paragraph id="par_idm1341072656" role="bascode" localize="false">        Do</paragraph>
+<paragraph id="par_idm1341071456" role="bascode" localize="false">            MsgBox sFile</paragraph>
+<paragraph id="par_idm1341070208" role="bascode" localize="false">            sFile = Dir$</paragraph>
+<paragraph id="par_idm1341068960" role="bascode" localize="false">        Loop Until sFile = ""</paragraph>
+<paragraph id="par_idm1341067712" role="bascode" localize="false">    End If</paragraph>
+<paragraph id="par_idm1341066480" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+
+<section id="relatedtopics">
+  <paragraph role="paragraph" id="par_id161588865796615"><link href="text/sbasic/shared/03090202.xhp" name="For statement">For</link>, <link href="text/sbasic/shared/03090102.xhp" name="Select Case statement">Select Case</link> or <link href="text/sbasic/shared/03090203.xhp" name="While statement">While</link> statements</paragraph>
+  <paragraph role="paragraph" id="par_id281588865818334"><link href="text/sbasic/shared/03090103.xhp" name="Iif function">Iif</link> or <link href="text/sbasic/shared/03090410.xhp" name="Switch function">Switch</link> functions</paragraph>
+</section>
+
+</body>
+</helpdocument>

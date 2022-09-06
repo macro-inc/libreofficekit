@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriterguideconditional_text2xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Conditional Text for Page Counts</title>
+    <filename>/text/swriter/guide/conditional_text2.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153108">
+  <bookmark_value>page counts</bookmark_value>
+  <bookmark_value>conditional text;page counts</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3153108" role="heading" level="1" xml-lang="en-US"><variable id="conditional_text2"><link href="text/swriter/guide/conditional_text2.xhp" name="Conditional Text for Page Counts">Conditional Text for Page Counts</link></variable></paragraph>
+<paragraph id="par_id3156228" role="paragraph" xml-lang="en-US">You can create a conditional text field that displays the word "pages" instead of "page" in conjunction with a page count field if your document contains more than one page.</paragraph>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id3156257" role="listitem" xml-lang="en-US">Place the cursor in your document where you want to insert the page count.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3150513" role="listitem" xml-lang="en-US">Choose <item type="menuitem">Insert - Field - Page Count</item>, and then enter a space.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3150537" role="listitem" xml-lang="en-US">Choose <item type="menuitem">Insert - Field - More Fields</item>, and then click the <item type="menuitem">Functions</item> tab.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3153166" role="listitem" xml-lang="en-US">Click "Conditional text" in the <item type="menuitem">Type</item> list.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3145256" role="listitem" xml-lang="en-US">Type <item type="literal">Page &gt; 1</item> in the <item type="menuitem">Condition</item> box.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3145280" role="listitem" xml-lang="en-US">Type <item type="literal">Pages</item> in the <item type="menuitem">Then</item> box.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3145305" role="listitem" xml-lang="en-US">Type <item type="literal">Page</item> in the <item type="menuitem">Else</item> box.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3155535" role="listitem" xml-lang="en-US">Click <emph>Insert</emph>, and then click <emph>Close</emph>.</paragraph>
+  </listitem>
+</list>
+<embed href="text/shared/00/00000004.xhp#related"/>
+<embed href="text/swriter/guide/conditional_text.xhp#conditional_text"/>
+<embed href="text/swriter/01/04090200.xhp#defining_conditions"/>
+<embed href="text/swriter/guide/fields.xhp#fields"/>
+</body>
+
+</helpdocument>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03030120xhp" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">DateDiff Function</title>
+    <filename>/text/sbasic/shared/03030120.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="datediff">
+<bookmark xml-lang="en-US" branch="index" id="bm_id6134830">
+  <bookmark_value>DateDiff function</bookmark_value>
+</bookmark>
+
+<h1 id="par_idN10542" xml-lang="en-US"><link href="text/sbasic/shared/03030120.xhp">DateDiff Function</link></h1>
+<paragraph id="par_idN10546" role="paragraph" xml-lang="en-US">Returns the number of date or time intervals between two given date values.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_idN10648" role="bascode" xml-lang="en-US">DateDiff (interval As String, date1 As Date, date2 As Date [, firstDayOfWeek As Integer [, firstWeekOfYear As Integer]]) As Double</paragraph>
+</bascode>
+
+<paragraph id="par_idN1064B" role="heading" level="2" xml-lang="en-US">Return value:</paragraph>
+<paragraph id="par_idN1064F" role="paragraph" xml-lang="en-US">A number.</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_idN10656" role="paragraph" xml-lang="en-US"> <emph>interval</emph> - A string expression from the following table, specifying the date or time interval.</paragraph>
+<embed href="text/sbasic/shared/03030110.xhp#datetable"/>
+<paragraph id="par_idN10664" role="paragraph" xml-lang="en-US"> <emph>date1, date2</emph> - The two date values to be compared.</paragraph>
+<embed href="text/sbasic/shared/01020100.xhp#DateLiterals"/>
+
+<section id="weekyear">
+<paragraph id="par_idN1066A" role="paragraph" xml-lang="en-US"> <emph>firstdayofweek</emph>: An optional parameter that specifies the starting day of a week. </paragraph>
+
+<table id="tbl_id8356883">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN1067A" role="tablehead" xml-lang="en-US">firstdayofweek value</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN10680" role="tablehead" xml-lang="en-US">Explanation</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10687" role="tablecontent" xml-lang="en-US">0</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN1068D" role="tablecontent" xml-lang="en-US">Use system default value</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10694" role="tablecontent" xml-lang="en-US">1</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN1069A" role="tablecontent" xml-lang="en-US">Sunday (default)</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN106A1" role="tablecontent" xml-lang="en-US">2</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN106A7" role="tablecontent" xml-lang="en-US">Monday</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN106AE" role="tablecontent" xml-lang="en-US">3</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN106B4" role="tablecontent" xml-lang="en-US">Tuesday</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN106BB" role="tablecontent" xml-lang="en-US">4</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN106C1" role="tablecontent" xml-lang="en-US">Wednesday</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN106C8" role="tablecontent" xml-lang="en-US">5</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN106CE" role="tablecontent" xml-lang="en-US">Thursday</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN106D5" role="tablecontent" xml-lang="en-US">6</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN106DB" role="tablecontent" xml-lang="en-US">Friday</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN106E2" role="tablecontent" xml-lang="en-US">7</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN106E8" role="tablecontent" xml-lang="en-US">Saturday</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<paragraph id="par_idN106EB" role="paragraph" xml-lang="en-US"> <emph>firstweekofyear</emph>: An optional parameter that specifies the starting week of a year. </paragraph>
+
+<table id="tbl_id1173436">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN106FB" role="tablehead" xml-lang="en-US">firstweekofyear value</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN10701" role="tablehead" xml-lang="en-US">Explanation</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10708" role="tablecontent" xml-lang="en-US">0</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN1070E" role="tablecontent" xml-lang="en-US">Use system default value</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10715" role="tablecontent" xml-lang="en-US">1</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN1071B" role="tablecontent" xml-lang="en-US">Week 1 is the week with January, 1st (default)</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10722" role="tablecontent" xml-lang="en-US">2</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN10728" role="tablecontent" xml-lang="en-US">Week 1 is the first week containing four or more days of that year</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN1072F" role="tablecontent" xml-lang="en-US">3</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN10735" role="tablecontent" xml-lang="en-US">Week 1 is the first week containing only days of the new year</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341501344" role="bascode" localize="false" xml-lang="en-US">Sub example_datediff</paragraph>
+<paragraph id="par_idm1341500112" role="bascode" localize="false" xml-lang="en-US">    MsgBox DateDiff("d", #1/1/2005#, #2005-12-31#)</paragraph>
+<paragraph id="par_idm1341498848" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

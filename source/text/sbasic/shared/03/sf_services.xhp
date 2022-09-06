@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+-->
+
+<meta>
+  <topic id="SF_Services" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">ScriptForge.Services service</title>
+    <filename>/text/sbasic/shared/03/sf_services.xhp</filename>
+  </topic>
+</meta>
+<body>
+<section id="abstract">
+  <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id751582710853363">
+    <bookmark_value>Services service</bookmark_value>
+  </bookmark>
+  <h1 id="hd_id471582710868716"><variable id="ScriptForgeServices"><link href="text/sbasic/shared/03/sf_services.xhp" name="Services service"><literal>ScriptForge</literal>.<literal>Services</literal> service</link></variable></h1>
+  <paragraph role="paragraph" id="par_id241627513489594">The main purpose of the <literal>Services</literal> module is to provide access to the <literal>CreateScriptService</literal> method, which can be called in user scripts to instantiate services that are implemented using the ScriptForge framework.</paragraph>
+</section>
+<paragraph role="paragraph" id="par_id351582710868545">In ScriptForge terminology a service is a collection of methods and properties that can be used for a common purpose. For example, the <literal>String</literal> service provides methods for manipulating strings whereas the <literal>FileSystem</literal> service allows for the manipulation of files and folders.</paragraph>
+<tip id="par_id541627513771828">The <literal>Services</literal> module of the ScriptForge library provides additional methods that are used either internally to register available services or by developers who are interested in extending ScriptForge by creating new services. The only method that is relevant for user scripts is <literal>CreateScriptService</literal>.</tip>
+
+<section id="CreateScriptService">
+  <comment> CreateScriptService ----------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id861582714020042">
+    <bookmark_value>Services service;CreateScriptService</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id751582714020043" localize="false">CreateScriptService</h2>
+  <paragraph role="paragraph" id="par_id871582714020043">This method is used to instantiate a ScriptForge service so it can be called in user scripts.</paragraph>
+  <paragraph role="paragraph" id="par_id711627514310039">The returned value is a Basic object or <literal>Nothing</literal> if an error occurred.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id961627475353964">
+    <input>svc.CreateScriptService(service: str, [arg0: any] ...): svc</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id971582714020045"><emph>service</emph>: The name of the service identified as a string in the format "library.service":</paragraph>
+  <list type="unordered">
+    <listitem>
+      <paragraph id="par_id11627475954271" role="listitem">The <emph>library</emph> is a Basic library that must exist in the <link href="text/sbasic/shared/03131900.xhp" name="GlobalScope">GlobalScope</link>. The default value is "ScriptForge".</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id811627475954641" role="listitem">The <emph>service</emph> is one of the services registered by the ScriptForge library.</paragraph>
+    </listitem>
+  </list>
+  <paragraph role="paragraph" id="par_id391582714020045"><emph>arg0, ...</emph>: A list of arguments required by the invoked service.</paragraph>
+  <paragraph role="paragraph" id="par_id841627475900817">If the first argument refers to an event manager, then <literal>arg0</literal> is mandatory and must be the UNO object representing the event provided as argument to the user macro.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id581582898149266">GlobalScope.BasicLibraries.loadLibrary("ScriptForge")</paragraph>
+    <paragraph role="bascode" id="bas_id981582898174133">' To be done once</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id281582898567582">Dim svc As Object</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id571582714020046">Set svc = CreateScriptService("Array")</paragraph>
+    <paragraph role="bascode" id="bas_id311582715700844">' Refers to the "ScriptForge.Array" service or SF_Array</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id671582715735064">Set svc = CreateScriptService("ScriptForge.Dictionary")</paragraph>
+    <paragraph role="bascode" id="bas_id61582715759468">' Returns a new empty dictionary class instance; "ScriptForge." is optional</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id231582715781789">Set svc = CreateScriptService("SFDocuments.Calc")</paragraph>
+    <paragraph role="bascode" id="bas_id901582715797722">' Refers to the Calc service, implemented in the associated SFDocuments library</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id841582715829454">Set svc = CreateScriptService("Timer", True)</paragraph>
+    <paragraph role="bascode" id="bas_id361582715845747">' Returns a Timer class instance starting immediately</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id11596298688112">Set svc = CreateScriptService("SFDocuments.DocumentEvent", oEvent)</paragraph>
+    <paragraph role="bascode" id="bas_id571596298708062">' Refers to the DocumentEvent service implemented in the associated SFDocuments library</paragraph>
+    <paragraph role="bascode" id="bas_id121613492254532">' Returns the instance of the Document class that fired the event</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id881627426495369">from scriptforge import CreateScriptService</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id431627426495747">svc = CreateScriptService("Array")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id681627426496018">svc = CreateScriptService("ScriptForge.Dictionary")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id811627426496299">svc = CreateScriptService("SFDocuments.Calc")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id811627426496564">svc = CreateScriptService("Timer", True)</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id921627426496940">svc = CreateScriptService("SFDocuments.DocumentEvent", oEvent)</paragraph>
+  </pycode>
+  <paragraph role="paragraph" id="par_id321627570607194">Python scripts support keyword arguments when calling <literal>CreateScriptService</literal>. The following example illustrates this concept by instantiating the <literal>Timer</literal> and <literal>Document</literal> services using keyword arguments.</paragraph>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id771627570744091">from scriptforge import CreateScriptService</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id351627570744359"># Timer</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id181627570744511">my_timer = CreateScriptService("Timer", start = True)</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id321627570744655"># Document</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id591627570744815">my_doc = CreateScriptService("Document", windowname = "some_file.ods")</paragraph>
+  </pycode>
+  <tip id="par_id901627576693156">To make writing Python scripts more fluid, ScriptForge provides the <literal>Basic</literal> service which allows Python scripts to call a collection of methods with the same syntax and meaning as their homonymous native Basic functions.</tip>
+  <paragraph role="paragraph" id="par_id41627644806288">The following example instantiates the <literal>Basic</literal> service and calls the <literal>MsgBox</literal> method, which is equivalent to the <literal>MsgBox</literal> function available in Basic:</paragraph>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id521627644939451">from scriptforge import CreateScriptService</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id241627644939717">bas = CreateScriptService("Basic")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id841627644939897">bas.MsgBox("Hello World!")</paragraph>
+  </pycode>
+  <note id="par_id581627645023307">Be aware that the <literal>Basic</literal> service has to be instantiated in Python scripts using the <literal>CreateScriptService</literal> method.</note>
+</section>
+
+<embed href="text/sbasic/shared/03/lib_ScriptForge.xhp#SF_InternalUse"/>
+
+<section id="relatedtopics">
+  <embed href="text/sbasic/shared/03/sf_basic.xhp#BasicService"/>
+  <embed href="text/sbasic/shared/03103700.xhp#Set_h1"/>
+  <embed href="text/sbasic/shared/03131900.xhp#GlobalScope_h1"/>
+</section>
+
+</body>
+</helpdocument>

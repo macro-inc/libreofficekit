@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+
+<meta>
+<topic id="textschart0105040200xml" indexer="include">
+<title id="tit" xml-lang="en-US">Y Axis</title>
+<filename>/text/schart/01/05040200.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3145673"><bookmark_value>Y axes; formatting</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/.uno:DiagramAxisY" id="bm_id3148491" localize="false"/>
+<h1 id="hd_id3145673">Y Axis</h1>
+<paragraph role="paragraph" id="par_id3155628" xml-lang="en-US"><variable id="yachse"><ahelp hid=".uno:DiagramAxisY">Opens the<emph> Y Axis </emph>dialog, to change properties of the Y axis.</ahelp>
+</variable></paragraph>
+<section id="howtoget">
+<embed href="text/schart/00/00000004.xhp#frtyas"/>
+</section>
+<embed href="text/shared/01/05200100.xhp#line"/>
+<embed href="text/shared/01/05020100.xhp#characters"/>
+<embed href="text/schart/01/05040201.xhp#scale"/>
+<embed href="text/schart/01/05040202.xhp#positioning"/>
+<embed href="text/shared/01/05020300.xhp#numbersh1"/>
+<embed href="text/schart/01/05020201.xhp#alignment"/>
+</body>
+</helpdocument>

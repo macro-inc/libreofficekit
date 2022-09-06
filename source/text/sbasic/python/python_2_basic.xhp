@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <!--
+    * This file is part of the LibreOffice project.
+    *
+    * This Source Code Form is subject to the terms of the Mozilla Public
+    * License, v. 2.0. If a copy of the MPL was not distributed with this
+    * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    *
+    -->
+<helpdocument version="1.0">
+   <meta>
+	  <topic id="python_2_basic">
+		 <title id="tit" xml-lang="en-US">Python to Basic</title>
+		 <filename>/text/sbasic/python/python_2_basic.xhp</filename>
+	  </topic>
+   </meta>
+   <body>
+	  <bookmark branch="index" id="N0330">
+		 <bookmark_value>Python;Calling Basic</bookmark_value>
+		 <bookmark_value>ParamArray</bookmark_value>
+	  </bookmark>
+          <h1 id="N0331"><variable id="py2ba_h1"><link href="text/sbasic/python/python_2_basic.xhp" name="Calling Basic macros from Python">Calling Basic Macros from Python</link></variable></h1>
+	  <paragraph role="paragraph" id="N0332">You can call %PRODUCTNAME Basic macros from Python scripts, and notable features can be obtained in return such as:</paragraph>
+	  <list type="unordered">
+              <listitem><paragraph role="listitem" id="N0333">Simple logging facilities out of <literal>Access2Base</literal> library Trace console,</paragraph></listitem>
+              <listitem><paragraph role="listitem" id="N0334"><literal>InputBox</literal> and <literal>MsgBox</literal> screen I/O functions based on Basic to ease Python development,</paragraph></listitem>
+              <listitem><paragraph role="listitem" id="N0335"><literal>Xray</literal> calls interrupting Python script execution to help inspect variables.</paragraph></listitem>
+	  </list>
+	  <section id="APIScriptingFramework" >
+		 <paragraph role="paragraph" id="N0336">The %PRODUCTNAME Application Programming Interface (API) Scripting Framework supports inter-language script execution between Python and Basic, or other supported programming languages for that matter. Arguments can be passed back and forth across calls, provided that they represent primitive data types that both languages recognize, and assuming that the Scripting Framework converts them appropriately.</paragraph>
+	  </section>
+	  <tip id="N0337">It is recommended to have knowledge of Python standard modules and %PRODUCTNAME API features prior to perform inter-language calls from Python to Basic, JavaScript or any other script engine.</tip>
+          <!-- WIP - Context clarifications needed in below warning -->
+	  <warning id="N0338">When running Python scripts from an Integrated Development Environment (IDE), the %PRODUCTNAME-embedded Basic engine may be absent. Avoid Python-to-%PRODUCTNAME Basic calls in such contexts. However Python environment and Universal Networks Objects (UNO) are fully available. Refer to <link href="text/sbasic/python/python_ide.xhp" name ="Setting Up an Integrated IDE for Python">Setting Up an Integrated IDE for Python</link> for more information.</warning>
+	  <h2 id="N0339">Retrieving %PRODUCTNAME Basic Scripts</h2>
+	  <paragraph role="paragraph" id="N0340">%PRODUCTNAME Basic macros can be personal, shared, or embedded in documents. In order to execute them, Python run time needs to be provided with Basic macro locations. Implementing the <link href="https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html" name ="XScriptProvider interface">com.sun.star.script.provider.XScriptProvider</link> interface allows the retrieval of executable scripts:</paragraph>
+	  <section id="Python_getBasicScript" >
+		 <bookmark branch="index" id="N0341">
+			<bookmark_value>API;script.provider.MasterScriptProviderFactory: Retrieving Basic scripts</bookmark_value>
+			<bookmark_value>API;script.provider.XScript: Executing Basic scripts</bookmark_value>
+			<bookmark_value>API;XScriptProvider: Retrieving Basic scripts</bookmark_value>
+		 </bookmark>
+		 <pycode>
+		 <paragraph role="pycode" id="N0342" localize="false">import uno</paragraph>
+		 <paragraph role="pycode" id="N0343" localize="false">from com.sun.star.script.provider import Xscript</paragraph>
+		 <paragraph role="pycode" id="N0344" localize="false">    </paragraph>
+		 <paragraph role="pycode" id="N0345" localize="false">def getBasicScript(macro=&apos;Main&apos;, module=&apos;Module1&apos;, library=&apos;Standard&apos;,</paragraph>
+		 <paragraph role="pycode" id="N0346" localize="false">        isEmbedded=False) -&gt; XScript:</paragraph>
+		 <paragraph role="pycode" id="N0347">    &apos;&apos;&apos;Grab Basic script object before invocation.&apos;&apos;&apos;</paragraph>
+		 <paragraph role="pycode" id="N0348" localize="false">    ctx = uno.getComponentContext()</paragraph>
+		 <paragraph role="pycode" id="N0349" localize="false">    smgr = ctx.ServiceManager</paragraph>
+		 <paragraph role="pycode" id="N0350" localize="false">    if isEmbedded:</paragraph>
+		 <paragraph role="pycode" id="N0351" localize="false">        desktop = smgr.createInstanceWithContext(&apos;com.sun.star.frame.Desktop&apos;, ctx)</paragraph>
+		 <paragraph role="pycode" id="N0352" localize="false">        scriptPro = desktop.CurrentComponent.getScriptProvider()</paragraph>
+		 <paragraph role="pycode" id="N0353" localize="false">        location = &quot;document&quot;</paragraph>
+		 <paragraph role="pycode" id="N0354" localize="false">    else:</paragraph>
+		 <paragraph role="pycode" id="N0355" localize="false">        mspf = smgr.createInstanceWithContext(</paragraph>
+		 <paragraph role="pycode" id="N0356" localize="false">            &quot;com.sun.star.script.provider.MasterScriptProviderFactory&quot;, ctx)</paragraph>
+		 <paragraph role="pycode" id="N0357" localize="false">        scriptPro = mspf.createScriptProvider(&quot;&quot;)</paragraph>
+		 <paragraph role="pycode" id="N0358" localize="false">        location = &quot;application&quot;</paragraph>
+		 <paragraph role="pycode" id="N0359" localize="false">    scriptName = &quot;vnd.sun.star.script:&quot;+library+&quot;.&quot;+module+&quot;.&quot;+macro+ \</paragraph>
+		 <paragraph role="pycode" id="N0360" localize="false">                 &quot;?language=Basic&amp;location=&quot;+location</paragraph>
+		 <paragraph role="pycode" id="N0361" localize="false">    xScript = scriptPro.getScript(scriptName)</paragraph>
+		 <paragraph role="pycode" id="N0362" localize="false">    return xScript</paragraph>
+		 </pycode>
+	  </section>
+	  <h2 id="N0363">Executing %PRODUCTNAME Basic Scripts</h2>
+	  <section id="APIScriptingFramework_XScript" >
+		 <bookmark branch="index" id="N0364ndx">
+			<bookmark_value>API;script.provider.XScript : Executing Basic scripts</bookmark_value>
+		 </bookmark>
+		 <paragraph role="paragraph" id="N0364">The %PRODUCTNAME Software Development Kit (SDK) documentation for <link href="https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html#a11a551f5a2520f74c5109cd8c9f8c7b7" name ="XScript interface">com.sun.star.script.provider.XScript</link> interface details the calling convention for inter-language calls. Invocation of functions requires three arrays:</paragraph>
+		 <list type="unordered">
+			<listitem><paragraph role="listitem" id="N0365">the first lists the arguments of the called routine</paragraph></listitem>
+			<listitem><paragraph role="listitem" id="N0366">the second identifies modified arguments</paragraph></listitem>
+			<listitem><paragraph role="listitem" id="N0367">the third stores the return values</paragraph></listitem>
+		 </list>
+	  </section>
+	  <h3 id="N0368">Python Syntax</h3>
+	  <paragraph role="paragraph" localize="false" id="N0369"><input>results = script.invoke((prompt,buttons,title), (), ())</input></paragraph>
+	  <paragraph role="paragraph" localize="false" id="N0370"><input>script.invoke((message,), tuple, ())</input></paragraph>
+	  <paragraph role="paragraph" localize="false" id="N0371"><input>script.invoke((args), (), results)</input></paragraph>
+	  <h3 id="N0372">Examples of Personal or Shared Scripts</h3>
+          <paragraph role="paragraph" id="N0373">Examples in <link href="text/sbasic/python/python_screen.xhp" name ="Input/Output to Screen">Input/Output to Screen</link> detail Python to Basic invocation calls. <link href="text/sbasic/python/python_document_events.xhp" name ="Monitoring Document Events">Monitoring Document Events</link> illustrates the usage of *args Python idiom to print a variable number of parameters to <literal>Access2Base</literal> logging console dialog.</paragraph>
+	  <tip id="N0374">At time of development you can interrupt Python script execution using <link href="https://berma.pagesperso-orange.fr/index2.html" name ="Xray extension">Xray extension</link> in order to inspect properties and methods of UNO objects. The APSO extension debugger allows object introspection using either Xray either MRI extensions.</tip>
+	  <pycode>
+	  <paragraph role="pycode" id="N0375" localize="false">def xray(myObject):</paragraph>
+	  <paragraph role="pycode" id="N0376" localize="false">	  script = getBasicScript(library=&quot;XrayTool&quot;, module=&quot;_Main&quot;, macro=&quot;Xray&quot;)</paragraph>
+	  <paragraph role="pycode" id="N0377" localize="false">	  script.invoke((myObject,), (), ())</paragraph>
+	  </pycode>
+	  <h3 id="N0378">Examples of Embedded Scripts in Documents</h3>
+	  <paragraph role="paragraph" id="N0379"><literal>*args</literal>Python simplified syntax can be used in conjunction with %PRODUCTNAME Basic routines that accept a variable number of arguments. Below <literal>Print</literal> and <literal>SUM</literal> Python functions call their Basic <literal>Print</literal> and <literal>SUM</literal> counterparts, using aforementioned <literal>getBasicScript</literal> function. Exception handling is not detailed.</paragraph>
+	  <pycode>
+	  <paragraph role="pycode" id="N0380" localize="false"># -*- coding: utf-8 -*-</paragraph>
+	  <paragraph role="pycode" id="N0381" localize="false">from __future__ import unicode_literals</paragraph>
+	  <paragraph role="pycode" id="N0382" localize="false">    </paragraph>
+	  <paragraph role="pycode" id="N0383" localize="false">def Print(*args):</paragraph>
+	  <paragraph role="pycode" id="N0384">    &quot;&quot;&quot;Outputs the specified strings or numeric expressions in a dialog box.&quot;&quot;&quot;</paragraph>
+	  <paragraph role="pycode" id="N0385" localize="false">    xScript = getBasicScript(&quot;Print&quot;, &quot;Scripting&quot;, embedded=True)</paragraph>
+	  <paragraph role="pycode" id="N0386" localize="false">    xScript.invoke((args), (), ())</paragraph>
+	  <paragraph role="pycode" id="N0387" localize="false">    </paragraph>
+	  <paragraph role="pycode" id="N0388" localize="false">def SUM(*args):</paragraph>
+	  <paragraph role="pycode" id="N0389">    &quot;&quot;&quot;SUM the specified number expression.&quot;&quot;&quot;</paragraph>
+	  <paragraph role="pycode" id="N0390" localize="false">    xScript = getBasicScript(&quot;SUM&quot;, &quot;Scripting&quot;, embedded=True)</paragraph>
+	  <paragraph role="pycode" id="N0391" localize="false">    res = xScript.invoke((args), (), ())</paragraph>
+	  <paragraph role="pycode" id="N0392" localize="false">    return res[0]</paragraph>
+	  <paragraph role="pycode" id="N0393" localize="false">    </paragraph>
+	  <paragraph role="pycode" id="N0394" localize="false"># def getBasicScript()  # see above</paragraph>
+	  <paragraph role="pycode" id="N0395" localize="false">    </paragraph>
+	  <paragraph role="pycode" id="N0396" localize="false">def playWithArgs():</paragraph>
+	  <paragraph role="pycode" id="N0397" localize="false">    Print(&quot;Fun with *args &quot;, -9.81, 297864.681974, 8762E-137)</paragraph>
+	  <paragraph role="pycode" id="N0398" localize="false">    Print(SUM(45, -9.81, 297864.681974))</paragraph>
+	  <paragraph role="pycode" id="N0399" localize="false">    Print(SUM(45, -9.81, 297864.681974, 8762E+137))</paragraph>
+	  <paragraph role="pycode" id="N0400" localize="false">    </paragraph>
+	  <paragraph role="pycode" id="N0401" localize="false">g_exportedScripts = (playWithArgs,)</paragraph>
+	  </pycode>
+	  <paragraph role="paragraph" id="N0402">The %PRODUCTNAME Basic <literal>Print</literal> and <literal>SUM</literal> document-based routines accept a variable number of arguments. The <literal>Private</literal> or <literal>Public</literal> attributes have no effect. The arguments type checking is skipped for clarity.</paragraph>
+	  <bascode>
+	  <paragraph role="bascode" id="N0403" localize="false">Option Compatible &apos; &quot;Standard.Scripting&quot; module</paragraph>
+	  <paragraph role="bascode" id="N0404" localize="false">Option Explicit</paragraph>
+	  <paragraph role="bascode" id="N0405" localize="false">    </paragraph>
+	  <paragraph role="bascode" id="N0406" localize="false">Private Sub Print(ParamArray args() As Variant, Optional sep As String = &quot; &quot;)</paragraph>
+	  <paragraph role="bascode" id="N0407">    &apos;&apos;&apos; Print item list of variable number &apos;&apos;&apos;</paragraph>
+	  <paragraph role="bascode" id="N0408">    &apos; all CStr() convertible args are accepted</paragraph>
+	  <paragraph role="bascode" id="N0409" localize="false">    Dim str As String, i As Integer</paragraph>
+	  <paragraph role="bascode" id="N0410" localize="false">    If UBound(args) &gt;= 0 Then</paragraph>
+	  <paragraph role="bascode" id="N0411" localize="false">        For i = 0 To UBound(args)</paragraph>
+	  <paragraph role="bascode" id="N0412" localize="false">            str = str + Cstr(args(i))+ sep </paragraph>
+	  <paragraph role="bascode" id="N0413" localize="false">        Next i</paragraph>
+	  <paragraph role="bascode" id="N0414" localize="false">    End If</paragraph>
+	  <paragraph role="bascode" id="N0415" localize="false">    Print str</paragraph>
+	  <paragraph role="bascode" id="N0416" localize="false">End Sub &apos; Standard.Scripting.Print()</paragraph>
+	  <paragraph role="bascode" id="N0417" localize="false">    </paragraph>
+	  <paragraph role="bascode" id="N0418" localize="false">Public Function SUM(ParamArray args() As Variant) As Variant</paragraph>
+	  <paragraph role="bascode" id="N0419">    &apos;&apos;&apos; SUM a variable list of numbers &apos;&apos;&apos;</paragraph>
+	  <paragraph role="bascode" id="N0420" localize="false">    Dim ndx As Integer</paragraph>
+	  <paragraph role="bascode" id="N0421" localize="false">    If UBound(args) &gt;= 0 Then</paragraph>
+	  <paragraph role="bascode" id="N0422" localize="false">        For ndx = 0 To UBound(args)</paragraph>
+	  <paragraph role="bascode" id="N0423" localize="false">            SUM = SUM + args(ndx)</paragraph>
+	  <paragraph role="bascode" id="N0424" localize="false">        Next ndx</paragraph>
+	  <paragraph role="bascode" id="N0425" localize="false">    End If</paragraph>
+	  <paragraph role="bascode" id="N0426" localize="false">End Function &apos; Standard.Scripting.SUM()</paragraph>
+	  </bascode>
+	  <section id="relatedtopics" >
+		 <embed href="text/sbasic/guide/basic_2_python.xhp#basic2python"/>
+		 <embed href="text/sbasic/python/python_examples.xhp#pythonexamples2"/>
+		 <embed href="text/sbasic/python/main0000.xhp#pythonscriptshelp"/>
+         <embed href="text/sbasic/shared/main0601.xhp#mainsbasic"/>
+	  </section>
+   </body>
+</helpdocument>

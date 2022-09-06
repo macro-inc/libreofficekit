@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textshared0103010000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Zoom &amp; View Layout</title>
+    <filename>/text/shared/01/03010000.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="zoom">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154682">
+  <bookmark_value>zooming;page views</bookmark_value>
+  <bookmark_value>views; scaling</bookmark_value>
+  <bookmark_value>screen; scaling</bookmark_value>
+  <bookmark_value>pages; scaling</bookmark_value>
+</bookmark>
+<comment>mw deleted "scaling;"</comment>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/ZoomDialog" id="bm_id2031101" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/@@nowidget@@" id="bm_@@nowidget@@" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/svx/ui/zoommenu/@@nowidget@@" id="bm_@@nowidget@@" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:Zoom" id="bm_id3153321" localize="false"/>
+
+<h1 id="hd_id3154682" xml-lang="en-US"><link href="text/shared/01/03010000.xhp">Zoom &amp; View Layout</link></h1>
+<paragraph id="par_id3149578" role="paragraph" xml-lang="en-US"><variable id="zoom_text"><variable id="massstabtext"><ahelp hid=".">Reduces or enlarges the screen display of %PRODUCTNAME.</ahelp></variable> </variable> The current zoom factor is displayed as a percentage value on the <emph>Status</emph> bar.</paragraph>
+</section>
+
+<section id="howtoget">
+<embed href="text/shared/00/00000403.xhp#zoom"/>
+</section>
+<paragraph id="par_id3149655" role="note" xml-lang="en-US">Zooming is handled differently on Unix, Linux, and Windows platforms. A document saved with a 100% zoom factor in Windows is displayed at a larger zoom factor on Unix/Linux platforms. To change the zoom factor, double-click or right-click the percentage value on the <emph>Status</emph> bar, and select the zoom factor that you want.</paragraph>
+
+<h2 id="hd_id3149669" xml-lang="en-US">Zoom factor</h2>
+<paragraph id="par_id3154389" role="paragraph" xml-lang="en-US">Set the zoom factor at which to display the current document and all documents of the same type that you open thereafter.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/optimal" id="bm_id3145606" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/svx/ui/zoommenu/optimal" id="bm_id3150498" localize="false"/>
+
+<h3 id="hd_id3153351" xml-lang="en-US">Optimal</h3>
+<paragraph id="par_id3144760" role="paragraph" xml-lang="en-US"><ahelp hid="."><switchinline select="appl"><caseinline select="CALC">Resizes the display to fit the width of the selected cell area at the moment the command is started.</caseinline><defaultinline>Resizes the display to fit the width of the text in the document at the moment the command is started.</defaultinline></switchinline></ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/fitwandh" id="bm_id3150359" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/svx/ui/zoommenu/page" id="bm_id3150358" localize="false"/>
+
+<h3 id="hd_id3151210" xml-lang="en-US">Fit width and height</h3>
+<paragraph id="par_id3150543" role="paragraph" xml-lang="en-US"><ahelp hid="."><switchinline select="appl"><caseinline select="CALC">Resizes the display to fit the width and height of the selected cell area at the moment the command is started.</caseinline><defaultinline>Displays the entire page on your screen.</defaultinline></switchinline></ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/fitw" id="bm_id3148797" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/svx/ui/zoommenu/width" id="bm_id3154140" localize="false"/>
+
+<h3 id="hd_id3152771" xml-lang="en-US">Fit width</h3>
+<paragraph id="par_id3143231" role="paragraph" xml-lang="en-US"><ahelp hid=".">Displays the complete width of the document page. The top and bottom edges of the page may not be visible.</ahelp></paragraph>
+
+<section id="zoom100">
+<bookmark xml-lang="en-US" branch="hid/svx/ui/zoommenu/100" id="bm_id3149560" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:Zoom100Percent" id="bm_id3159252" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/100pc" id="bm_id051420080349501" localize="false"/>
+
+<h3 id="hd_id3153106" xml-lang="en-US">100 %</h3>
+<paragraph id="par_id3147353" role="paragraph" xml-lang="en-US"><ahelp hid=".">Displays the document at its actual size.</ahelp></paragraph>
+</section>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/variable" id="bm_id3147478" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/zoomsb" id="bm_id3151352" localize="false"/>
+
+<h3 id="hd_id3153191" xml-lang="en-US">Variable</h3>
+<paragraph id="par_id3159125" role="paragraph" xml-lang="en-US"><ahelp hid=".">Enter the zoom factor at which you want to display the document. Enter a percentage in the box.</ahelp></paragraph>
+
+<h2 id="hd_id7319864" xml-lang="en-US">View layout</h2>
+<paragraph id="par_id3423871" role="paragraph" xml-lang="en-US">For text documents, you can set the view layout. Reduce the zoom factor to see the effects of different view layout settings.<comment>for this doc or all docs? answer: it's the same as before for the zoom factor.</comment></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/automatic" id="bm_id2504654" localize="false"/>
+
+<h3 id="hd_id3818475" xml-lang="en-US">Automatic</h3>
+<paragraph id="par_id3187353" role="paragraph" xml-lang="en-US"><ahelp hid=".">The automatic view layout displays pages side by side, as many as the zoom factor allows.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/singlepage" id="bm_id5292519" localize="false"/>
+
+<h3 id="hd_id8455153" xml-lang="en-US">Single page</h3>
+<paragraph id="par_id9912411" role="paragraph" xml-lang="en-US"><ahelp hid=".">The single page view layout displays pages beneath each other, but never side by side.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/columns" id="bm_id3984496" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/columnssb" id="bm_id9693899" localize="false"/>
+
+<h3 id="hd_id9204992" xml-lang="en-US">Columns</h3>
+<paragraph id="par_id1993774" role="paragraph" xml-lang="en-US"><ahelp hid=".">In columns view layout you see pages in a given number of columns side by side. Enter the number of columns.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/zoomdialog/bookmode" id="bm_id8689230" localize="false"/>
+
+<h3 id="hd_id2949919" xml-lang="en-US">Book mode</h3>
+<paragraph id="par_id2355113" role="paragraph" xml-lang="en-US"><ahelp hid=".">In book mode view layout you see two pages side by side as in an open book. The first page is a right page with an odd page number.</ahelp></paragraph>
+</body>
+
+</helpdocument>

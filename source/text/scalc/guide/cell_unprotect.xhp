@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+	
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+ 
+	
+<meta>
+      <topic id="textscalcguidecell_unprotectxml" indexer="include" status="PUBLISH">
+         <title xml-lang="en-US" id="tit">Unprotecting Cells</title>
+         <filename>/text/scalc/guide/cell_unprotect.xhp</filename>
+      </topic>
+   </meta>
+   <body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153252"><bookmark_value>cell protection; unprotecting</bookmark_value>
+      <bookmark_value>protecting; unprotecting cells</bookmark_value>
+      <bookmark_value>unprotecting cells</bookmark_value>
+</bookmark>
+<paragraph xml-lang="en-US" id="hd_id3153252" role="heading" level="1"><variable id="cell_unprotect"><link href="text/scalc/guide/cell_unprotect.xhp" name="Unprotecting Cells">Unprotecting Cells</link> 
+</variable></paragraph>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3151112" role="listitem">Click the sheet for which you want to cancel the protection.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3149656" role="listitem">Select <emph>Tools - Protect Sheet</emph> or <emph>Tools - Protect Spreadsheet Structure</emph> to remove the check mark indicating the protected status.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3145171" role="listitem">If you have assigned a password, enter it in this dialog and click <emph>OK</emph>.</paragraph>
+         </listitem>
+      </list>
+      <paragraph xml-lang="en-US" id="par_id3153771" role="paragraph">The cells can now be edited, the formulas can be viewed, and all cells can be printed until you reactivate the protection for the sheet or document.</paragraph>
+      <section id="relatedtopics">
+         <embed href="text/scalc/guide/cell_protect.xhp#cell_protect"/>
+      </section>
+   </body>
+</helpdocument>

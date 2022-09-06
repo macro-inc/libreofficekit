@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedautopi01120300xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Group Element Wizard: Field Values</title>
+<filename>/text/shared/autopi/01120300.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+  <bookmark xml-lang="en-US" branch="hid/modules/sabpilot/ui/optionvaluespage/OptionValuesPage" id="bm_id3865170" localize="false"/>
+  <bookmark xml-lang="en-US" branch="hid/modules/sabpilot/ui/optionvaluespage/@@nowidget@@" id="bm_id3865170" localize="false"/>
+  <section id="page3">
+  <paragraph id="hd_id3151097" role="heading" level="1" xml-lang="en-US"><link href="text/shared/autopi/01120300.xhp" name="Group Element Wizard: Field Values">Group Element Wizard: Field Values</link></paragraph>
+  <paragraph role="paragraph" id="par_id3151100" xml-lang="en-US">Assigns a reference value to each option field.</paragraph>
+  </section>
+  <paragraph xml-lang="en-US" role="paragraph" id="par_id3153323">Select a field from the option fields list and enter the corresponding <link href="text/shared/02/01170101.xhp" name="reference value">reference value</link>.</paragraph>
+  <section id="howtoget">
+  <embed href="text/shared/00/00000401.xhp#gruppen3"/>
+</section>
+  <paragraph role="heading" level="2" id="hd_id3152594" xml-lang="en-US">Which value do you want to assign to each option?</paragraph>
+  <paragraph role="paragraph" id="par_id3152425" xml-lang="en-US"><ahelp hid="modules/sabpilot/ui/optionvaluespage/optionvalue" visibility="visible">Select a number or a text as a reference value for the selected option field.</ahelp></paragraph>
+  <paragraph role="heading" level="2" id="hd_id3155555" xml-lang="en-US">Option fields</paragraph>
+  <paragraph role="paragraph" id="par_id3155941" xml-lang="en-US"><ahelp hid="modules/sabpilot/ui/optionvaluespage/radiobuttons" visibility="visible">Select the option field for which you want to assign the reference value.</ahelp></paragraph>
+ </body>
+</helpdocument>

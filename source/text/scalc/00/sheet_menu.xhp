@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textscalc0000000404xml" indexer="exclude" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Sheet Menu</title>
+    <filename>/text/scalc/00/sheet_menu.xhp</filename>
+  </topic>
+</meta>
+<body>
+<h1 id="hd_id160220162108024368">Sheet Menu</h1>
+<paragraph id="par_id160220162106567373" role="paragraph" xml-lang="en-US"><variable id="insert_rows_above">Choose <emph>Sheet - Insert Rows - Rows Above</emph>.</variable></paragraph>
+<paragraph id="par_id160220162109048207" role="paragraph" xml-lang="en-US"><variable id="insert_rows_below">Choose <emph>Sheet - Insert Rows - Rows Below</emph>.</variable></paragraph>
+<paragraph id="par_id160220162107055028" role="paragraph" xml-lang="en-US"><variable id="insert_columns_left">Choose <emph>Sheet - Insert Columns - Columns Before</emph>.</variable></paragraph>
+<paragraph id="par_id160220162109126013" role="paragraph" xml-lang="en-US"><variable id="insert_columns_right">Choose <emph>Sheet - Insert Columns - Columns After</emph>.</variable></paragraph>
+<paragraph role="paragraph" id="par_id3149095" xml-lang="en-US"><variable id="insert_page_break">Choose <emph>Sheet - Insert Page Break</emph>.</variable></paragraph>
+<paragraph role="paragraph" id="par_id3149398" xml-lang="en-US"><variable id="insert_page_break_row">Choose <emph>Sheet - Insert Page Break - Row Break</emph>.</variable></paragraph>
+<paragraph role="paragraph" id="par_id3150084" xml-lang="en-US"><variable id="insert_page_break_column">Choose <emph>Sheet - Insert Page Break - Column Break</emph>.</variable></paragraph>
+<paragraph id="par_id3153093" role="paragraph" xml-lang="en-US"><variable id="delete_page_break">Choose <emph>Sheet - Delete Page Break</emph>.</variable></paragraph>
+<paragraph id="par_id3153191" role="paragraph" xml-lang="en-US"><variable id="delete_page_break_row">Choose <emph>Sheet - Delete Page Break - Row Break</emph>.</variable></paragraph>
+<paragraph id="par_id3145645" role="paragraph" xml-lang="en-US"><variable id="delete_page_break_column">Choose <emph>Sheet - Delete Page Break - Column Break</emph>.</variable></paragraph>
+
+<paragraph role="paragraph" id="par_id281631903136031"><variable id="edit_comment">Choose <menuitem>Sheet - Cell Comments - Edit Comment</menuitem></variable></paragraph>
+<paragraph role="paragraph" id="par_id641631903140705"><variable id="hide_comment">Choose <menuitem>Sheet - Cell Comments - Hide Comment</menuitem></variable></paragraph>
+<paragraph role="paragraph" id="par_id611631903144777"><variable id="show_comment">Choose <menuitem>Sheet - Cell Comments - Show Comment</menuitem></variable></paragraph>
+<paragraph role="paragraph" id="par_id961631903149304"><variable id="delete_comment">Choose <menuitem>Sheet - Cell Comments - Delete Comment</menuitem></variable></paragraph>
+<paragraph role="paragraph" id="par_id471631903160977"><variable id="delete_all_comments">Choose <menuitem>Sheet - Cell Comments - Delete All Comments</menuitem></variable></paragraph>
+</body>
+</helpdocument>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03130000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Other Commands</title>
+<filename>/text/sbasic/shared/03130000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="other">
+<paragraph role="heading" id="hd_id3156027" xml-lang="en-US" level="1"><link href="text/sbasic/shared/03130000.xhp" name="Other Commands">Other Commands</link></paragraph>
+<paragraph role="paragraph" id="par_id3153312" xml-lang="en-US">This is a list of the functions and the statements that are not included in the other categories.</paragraph>
+</section>
+<embed href="text/sbasic/shared/03130100.xhp#beep"/>
+<embed href="text/sbasic/shared/03130500.xhp#shell"/>
+<embed href="text/sbasic/shared/03130600.xhp#wait"/>
+<embed href="text/sbasic/shared/03130610.xhp#waituntil"/>
+<embed href="text/sbasic/shared/03130700.xhp#getsystemticks"/>
+<embed href="text/sbasic/shared/GetPathSeparator.xhp#getpathseparator"/>
+<embed href="text/sbasic/shared/03130800.xhp#environ"/>
+<embed href="text/sbasic/shared/03131000.xhp#getsolarversion"/>
+<embed href="text/sbasic/shared/03132100.xhp#getguitype"/>
+<embed href="text/sbasic/shared/03131300.xhp#twipsperpixelx"/>
+<embed href="text/sbasic/shared/03131400.xhp#twipsperpixely"/>
+<embed href="text/sbasic/shared/03131900.xhp#globalscope"/>
+</body>
+</helpdocument>

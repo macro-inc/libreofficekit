@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03020406xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">FileCopy Statement</title>
+    <filename>/text/sbasic/shared/03020406.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="filecopy">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154840">
+  <bookmark_value>FileCopy statement</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3154840" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03020406.xhp" name="FileCopy Statement">FileCopy Statement</link></paragraph>
+<paragraph id="par_id3149497" role="paragraph" xml-lang="en-US">Copies a file.</paragraph>
+</section>
+
+<paragraph id="hd_id3147443" role="heading" level="2" xml-lang="en-US">Syntax:</paragraph>
+<bascode>
+<paragraph id="par_id3146957" role="bascode" xml-lang="en-US">FileCopy TextFrom As String, TextTo As String</paragraph>
+</bascode>
+
+<paragraph id="hd_id3153825" role="heading" level="2" xml-lang="en-US">Parameters:</paragraph>
+<paragraph id="par_id3155390" role="paragraph" xml-lang="en-US"> <emph>TextFrom:</emph> Any string expression that specifies the name of the file that you want to copy. The expression can contain optional path and drive information. If you want, you can enter a path in <link href="text/sbasic/shared/00000002.xhp" name="URL notation">URL notation</link>.</paragraph>
+<paragraph id="par_id3150669" role="paragraph" xml-lang="en-US"> <emph>TextTo:</emph> Any string expression that specifies where you want to copy the source file to. The expression can contain the destination drive, the path, and file name, or the path in URL notation.</paragraph>
+<paragraph id="par_id3150791" role="note" xml-lang="en-US">You can only use the FileCopy statement to copy files that are not opened.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+<embed href="text/sbasic/shared/00000003.xhp#err76"/>
+
+<paragraph id="hd_id3125863" role="heading" level="2" xml-lang="en-US">Example:</paragraph>
+<bascode>
+<paragraph id="par_idm1340767600" role="bascode" localize="false" xml-lang="en-US">Sub ExampleFileCopy</paragraph>
+<paragraph id="par_idm1340766368" role="bascode" localize="false" xml-lang="en-US">    FileCopy "c:\autoexec.bat", "c:\Temp\Autoexec.sav"</paragraph>
+<paragraph id="par_idm1340765104" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

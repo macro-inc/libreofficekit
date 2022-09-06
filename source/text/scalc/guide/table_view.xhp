@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalcguidetable_viewxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Changing Table Views</title>
+<filename>/text/scalc/guide/table_view.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3147304"><bookmark_value>row headers; hiding</bookmark_value>
+<bookmark_value>column headers; hiding</bookmark_value>
+<bookmark_value>tables; views</bookmark_value>
+<bookmark_value>views; tables</bookmark_value>
+<bookmark_value>grids;hiding lines in sheets</bookmark_value>
+<bookmark_value>hiding;headers/grid lines</bookmark_value>
+<bookmark_value>changing;table views</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3147304" xml-lang="en-US" level="1"><variable id="table_view"><link href="text/scalc/guide/table_view.xhp" name="Changing Table Views">Changing Table Views</link>
+</variable></paragraph>
+<paragraph role="paragraph" id="par_id3153192" xml-lang="en-US">To hide column and line headers in a table:</paragraph>
+<list type="unordered">
+<listitem>
+<paragraph role="listitem" id="par_id3153768" xml-lang="en-US">Under the menu item <switchinline select="sys"><caseinline select="MAC"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - %PRODUCTNAME Calc,</emph> go to the <emph>View</emph> tab page. Unmark<emph> Column/row headers</emph>. Confirm with <emph>OK</emph>.</paragraph>
+</listitem>
+</list>
+<paragraph role="paragraph" id="par_id3147436" xml-lang="en-US">To hide grid lines:</paragraph>
+<list type="unordered">
+<listitem>
+<paragraph role="listitem" id="par_id3153726" xml-lang="en-US">Under the menu item <switchinline select="sys"><caseinline select="MAC"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - %PRODUCTNAME Calc</emph>, go to the <emph>View</emph> tab page. Choose <emph>Hide</emph> in the <emph>Grid lines</emph> dropdown. Confirm with <emph>OK</emph>.</paragraph>
+</listitem>
+</list>
+<section id="relatedtopics">
+<embed href="text/scalc/guide/autoformat.xhp#autoformat"/>
+</section>
+</body>
+</helpdocument>

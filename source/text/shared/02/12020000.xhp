@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textshared0212020000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Sort Descending</title>
+<filename>/text/shared/02/12020000.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="sortdescending">
+<bookmark xml-lang="en-US" branch="hid/.uno:SortDown" id="bm_id5470183" localize="false"/>
+<h1 id="hd_id3154689"><link href="text/shared/02/12020000.xhp" name="Sort Descending">Sort Descending</link></h1>
+<paragraph role="paragraph" id="par_id3149987" xml-lang="en-US"><ahelp hid=".uno:SortDown" visibility="hidden">Sorts the data of the selected field in descending order.</ahelp> Text fields are sorted alphabetically, number fields are sorted by number.</paragraph>
+</section>
+<section id="howtoget">
+    <switch select="appl"><case select="CALC">
+        <embed href="text/scalc/00/00000412.xhp#datasortdescending"/>
+        <embed href="text/scalc/00/00000412.xhp#onthestandardbar"/>
+    </case></switch>
+    <embed href="text/scalc/00/00000412.xhp#sortdescending"/>
+</section>
+<embed href="text/shared/02/12010000.xhp#selektionsortieren"/>
+<embed href="text/shared/02/12010000.xhp#dialogsortieren"/>
+</body>
+</helpdocument>

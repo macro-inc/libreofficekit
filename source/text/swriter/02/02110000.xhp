@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textswriter0202110000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Toggle Ordered List</title>
+<filename>/text/swriter/02/02110000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="numbering">
+<section id="numberingh1">
+<bookmark xml-lang="en-US" branch="hid/.uno:DefaultNumbering" id="bm_id7054149" localize="false"/>
+<h1 id="hd_id3150220" xml-lang="en-US"><variable id="numberingh1"><link href="text/swriter/02/02110000.xhp" name="Numbering on/off">Toggle Ordered List</link></variable></h1>
+<paragraph role="paragraph" id="par_id3150240" xml-lang="en-US"><ahelp hid=".uno:DefaultNumbering">Adds or removes numbering from the selected paragraphs.</ahelp></paragraph>
+</section>
+<paragraph role="paragraph" id="par_id221649422095688">To define the numbering format, choose <emph>Format - Bullets and Numbering</emph>. To display the <emph>Bullets and Numbering</emph> Bar, choose <emph>View - Toolbars - Bullets and Numbering</emph>.<comment>UFI changed last sentence, see #60925</comment></paragraph>
+</section>
+<note id="par_id3150952" xml-lang="en-US">Some of the bullets and numbering options are not available when working in the <link href="text/swriter/01/03120000.xhp" name="Web Layout">Web Layout</link>.<comment>UFI: online layout is now web layout</comment></note>
+<section id="synumbering">
+<table id="tbl_id3154361">
+<tablerow>
+<tablecell>
+<paragraph role="paragraph" id="par_id3150502" xml-lang="en-US">
+<image id="img_id3150508" src="cmd/lc_defaultnumbering.png" width="1cm" height="1cm"><alt id="alt_id3150508" xml-lang="en-US">Toggle Ordered List Icon</alt></image></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="paragraph" id="par_id3147525" xml-lang="en-US">Toggle Ordered List</paragraph>
+</tablecell>
+</tablerow>
+</table>
+
+</section>
+<section id="relatedtopics">
+<paragraph role="paragraph" id="par_id3147549" xml-lang="en-US"><link href="text/shared/01/06050000.xhp" name="Bullets and Numbering">Bullets and Numbering</link></paragraph>
+</section>
+</body>
+</helpdocument>

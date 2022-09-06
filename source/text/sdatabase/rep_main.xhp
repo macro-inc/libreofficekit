@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textsharedexplorerdatabaserep_mainxml" indexer="include" status="PUBLISH">
+    <title xml-lang="en-US" id="tit">Report Builder</title>
+    <filename>/text/sdatabase/rep_main.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+  <bookmark xml-lang="en-US" branch="index" id="bm_id1614429">
+    <bookmark_value>Report Builder</bookmark_value>
+    <bookmark_value>Oracle Report Builder</bookmark_value>
+  </bookmark>
+  <h1 id="hd_id8773155"><variable id="rep_main"><link href="text/sdatabase/rep_main.xhp">Report Builder</link>
+</variable></h1>
+  <paragraph xml-lang="en-US" id="par_id5248573" role="paragraph">The Report Builder is a tool to create your own database reports. Unlike with the <link href="text/shared/autopi/01100000.xhp">Report Wizard</link>, using the Report Builder you can take control to design the report the way you want. The generated report is a Writer document that you can edit, too.</paragraph>
+  <note id="par_id7128818">To use the Report Builder, the Java Runtime Environment (JRE) software must be installed, and this software must be selected in %PRODUCTNAME.</note>
+  <h2 id="hd_id556047">To install the JRE software</h2>
+  <paragraph xml-lang="en-US" id="par_id4515823" role="paragraph">The Report Builder requires an installed Java Runtime Environment (JRE).</paragraph>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id4044312" role="listitem">Choose <switchinline select="sys"><caseinline select="MAC">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - %PRODUCTNAME - <link href="text/shared/optionen/java.xhp">Advanced</link>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id1369060" role="listitem">Wait up to one minute, while %PRODUCTNAME collects information on installed Java software on your system.</paragraph>
+            <paragraph xml-lang="en-US" id="par_id860927" role="listitem">If a recent JRE version is found on your system, you see an entry in the list.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id8581804" role="listitem">Click the option button in front of the entry to enable this JRE version for use in %PRODUCTNAME.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id7730033" role="listitem">Ensure that <emph>Use a Java runtime environment</emph> is enabled.</paragraph>
+         </listitem>
+      </list>
+      <paragraph xml-lang="en-US" id="par_id6317636" role="paragraph">If no JRE version is found on your system, open your web browser and download the JRE software from <link href="http://www.java.com">http://www.java.com</link>. Install the JRE software. Then restart %PRODUCTNAME and open <switchinline select="sys"><caseinline select="MAC">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - %PRODUCTNAME - Advanced again.</paragraph>
+      <h2 id="hd_id9759514">To open the Report Builder</h2>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id9076509" role="listitem">Open a Base file or create a new database. The database must contain at least one table with at least one data field and a primary key field.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id7050691" role="listitem">Click the Reports icon in the Base window, then choose Create Report in Design View.</paragraph>
+            <paragraph xml-lang="en-US" id="par_id7118747" role="listitem">The Report Builder window opens. </paragraph>
+         </listitem>
+      </list>
+      <paragraph xml-lang="en-US" id="par_id8283639" role="paragraph">The Report Builder is divided into three parts. On the top you see the menu, with the toolbars below.</paragraph>
+      <paragraph xml-lang="en-US" id="par_id2291024" role="paragraph">On the right you see the Properties window with the property values of the currently selected object.</paragraph>
+      <paragraph xml-lang="en-US" id="par_id2100589" role="paragraph">The left part of the Report Builder window shows the Report Builder view. The Report Builder view is initially divided into three sections, from top to bottom:</paragraph>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id5022125" role="listitem">
+               <emph>Page Header</emph> - drag control fields with fixed text into the Page Header area</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id6844386" role="listitem">
+               <emph>Detail</emph> - drag and drop database fields into the Detail area</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id7018646" role="listitem">
+               <emph>Page Footer</emph> - drag control fields with fixed text into the Page Footer area</paragraph>
+         </listitem>
+      </list>
+      <paragraph xml-lang="en-US" id="par_id5857112" role="paragraph">To insert an additional <emph>Report Header</emph> and <emph>Report Footer</emph> area choose <item type="menuitem">Edit - Insert Report Header/Footer</item>. These areas contain text that appears at the start and end of the whole report.</paragraph><comment>id="par_id2685323" If you want a multi-column report, choose Format - Page, click the Columns tab, and set the number of columns. Now you can also specify a Column Header and Column Footer in the Report Builder view.</comment><comment>column header/footer</comment>
+<paragraph xml-lang="en-US" id="par_id6042664" role="paragraph">Click the "-" icon in front of an area name to collapse that area to one line in the Report Builder view. The "-" icon changes to a "+" icon, and you can click this to expand the area again.</paragraph>
+      <paragraph xml-lang="en-US" id="par_id1589098" role="paragraph">You insert database fields by drag-and-drop into the Detail area. See the section "To insert fields into the report" below.</paragraph>
+      <paragraph xml-lang="en-US" id="par_id1278420" role="paragraph">In addition, you can click the Label Field or Text Box icon in the toolbar, then drag a rectangle in the Page Header or Page Footer area, to define a text that is the same on all pages. You enter the text in the Label box of the corresponding Properties window. You can also add graphics by using the Graphics icon.</paragraph>
+      <h2 id="par_id7479476">To connect the report to a database table</h2>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id2218390" role="listitem">Move the mouse to the Properties view. You see two tab pages General and Data.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id7771538" role="listitem">On the Data tab page, click Content to open the combo box.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id366527" role="listitem">Select the table for that you want to create the report.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id7996459" role="listitem">After selecting the table, press the Tab key to leave the Content box.</paragraph>
+         </listitem>
+      </list>
+     <paragraph xml-lang="en-US" id="par_id2531815" role="paragraph">The <link href="text/sdatabase/rep_insertfield.xhp" name="add_fields_link">Add fields to report</link> window opens automatically and shows all fields of the selected table.</paragraph>
+      <embed href="text/sdatabase/rep_insertfield.xhp#insertfieldstitle"/>
+      <comment>Align at Section toolbar</comment>
+<bookmark xml-lang="en-US" branch="hid/.uno:SectionAlignLeft" id="bm_id7889950" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id7657399" role="paragraph"><ahelp hid="." visibility="hidden">Select two or more objects and click this icon to align the objects at the left margin of the area.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/.uno:SectionAlignRight" id="bm_id3236182" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id8925138" role="paragraph"><ahelp hid="." visibility="hidden">Select two or more objects and click this icon to align the objects at the right margin of the area.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/.uno:SectionAlignTop" id="bm_id1251258" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id5461897" role="paragraph"><ahelp hid="." visibility="hidden">Select two or more objects and click this icon to align the objects at the top margin of the area.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/.uno:SectionAlignBottom" id="bm_id8111819" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id8919339" role="paragraph"><ahelp hid="." visibility="hidden">Select two or more objects and click this icon to align the objects at the bottom margin of the area.</ahelp></paragraph><comment>Object Resizing toolbar</comment>
+<bookmark xml-lang="en-US" branch="hid/.uno:SmallestWidth" id="bm_id9116794" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id4634235" role="paragraph"><ahelp hid="." visibility="hidden">Select two or more objects and click this icon to resize the objects to the smallest width.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/.uno:SmallestHeight" id="bm_id4381847" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id1393475" role="paragraph"><ahelp hid="." visibility="hidden">Select two or more objects and click this icon to resize the objects to the smallest height.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/.uno:GreatestWidth" id="bm_id1336710" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id6571550" role="paragraph"><ahelp hid="." visibility="hidden">Select two or more objects and click this icon to resize the objects to the greatest width.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/.uno:GreatestHeight" id="bm_id1221655" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id5376140" role="paragraph"><ahelp hid="." visibility="hidden">Select two or more objects and click this icon to resize the objects to the greatest height.</ahelp></paragraph><comment>Report Controls toolbar</comment>
+<bookmark xml-lang="en-US" branch="hid/.uno:HFixedLine" id="bm_id4408093" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id9611499" role="paragraph"><ahelp hid="." visibility="hidden">Inserts a horizontal line to the current area.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/.uno:VFixedLine" id="bm_id6949369" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id6765953" role="paragraph"><ahelp hid="." visibility="hidden">Inserts a vertical line to the current area.</ahelp></paragraph><comment>Shrink toolbar</comment>
+<bookmark xml-lang="en-US" branch="hid/.uno:SectionShrink" id="bm_id040920092222313" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id0409200922242612" role="paragraph"><ahelp hid="." visibility="hidden">Shrinks the selected section to remove top and bottom empty space.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/.uno:SectionShrinkTop" id="bm_id0409200922231489" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id0409200922242617" role="paragraph"><ahelp hid="." visibility="hidden">Shrinks the selected section to remove top empty space.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/.uno:SectionShrinkBottom" id="bm_id040920092223576" localize="false"/>
+<paragraph xml-lang="en-US" id="par_id0409200922242661" role="paragraph"><ahelp hid="." visibility="hidden">Shrinks the selected section to remove bottom empty space.</ahelp></paragraph>
+      <paragraph xml-lang="en-US" id="par_id1511581" role="paragraph">After inserting fields in the Detail view, the report is ready for execution.</paragraph>
+      <h2 id="par_id4881740">To execute a report</h2>
+      <paragraph xml-lang="en-US" id="par_id8286385" role="paragraph">Click the Execute Report icon  on the toolbar.</paragraph>
+      <section id="executereporticon">
+<table id="tab_id401642784887817">
+    <tablerow>
+        <tablecell>
+            <paragraph id="par_id341642784887818" role="paragraph">
+                <image src="cmd/sc_executereport.svg" id="img_id181642784887819" width="1cm"  height="1cm"><alt xml-lang="en-US" id="alt_id561642784887821">Execute Report icon</alt></image>
+            </paragraph>
+        </tablecell>
+        <tablecell>
+            <paragraph id="par_id71642784887822" role="paragraph" xml-lang="en-US">Execute Report icon</paragraph>
+        </tablecell>
+    </tablerow>
+</table>
+</section>
+      <paragraph xml-lang="en-US" id="par_id2354197" role="paragraph">A Writer document opens and shows the report you have created, which contains all values of the database table which you have insert.</paragraph>
+      <paragraph xml-lang="en-US" id="par_id2485122" role="paragraph">If the database contents did change, execute the report again to update the result report.<comment>automatic? message?</comment></paragraph>
+      <h2 id="hd_id8746910">To edit a report</h2>
+      <paragraph xml-lang="en-US" id="par_id9636524" role="paragraph">First decide if you want to edit the generated report, which is a static Writer document, or if you want to edit the Report Builder view and then generate a new report based on the new design.</paragraph>
+      <paragraph xml-lang="en-US" id="par_id5941648" role="paragraph">The Writer document is opened read-only. To edit the Writer document, click <emph>Edit Document</emph> on the information bar, or choose <emph>Edit - Edit Mode</emph>.<comment>saved automatically with the Base file?</comment></paragraph>
+      <paragraph xml-lang="en-US" id="par_id8307138" role="paragraph">If you want to edit the Report Builder view, you can change some of its properties.</paragraph>
+      <paragraph xml-lang="en-US" id="par_id7138889" role="paragraph">Click in the Details area. Then in the Properties window, change some properties, for example the background color.</paragraph>
+      <paragraph xml-lang="en-US" id="par_id9869380" role="paragraph">After finishing, click the Execute Report icon
+ to create a new report.</paragraph>
+<embed href="text/sdatabase/rep_main.xhp#executereporticon"/>
+      <paragraph xml-lang="en-US" id="par_id12512" role="paragraph">If you close the Report Builder, you will be asked if the report should be saved. Click Yes, give the report a name, and click OK.<comment>report part of Base file?</comment></paragraph>
+      <h2 id="par_id2676168">Sorting the report</h2>
+      <paragraph xml-lang="en-US" id="par_id2626422" role="paragraph">Without sorting or grouping, the records will be inserted into the report in the order in which they are retrieved from the database.</paragraph>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id1743827" role="listitem">Open the Report Builder view and click the Sorting and Grouping icon on the toolbar. You see the <link href="text/sdatabase/rep_sort.xhp">Sorting and Grouping</link> dialog.</paragraph>
+         </listitem>
+     </list>
+     <table id="tab_id231642785406291">
+         <tablerow>
+             <tablecell>
+                 <paragraph id="par_id241642785406292" role="paragraph">
+                    <image id="img_id9557786" src="cmd/sc_dbsortingandgrouping.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id9557786">Icon Sort and Grouping</alt></image>
+                 </paragraph>
+             </tablecell>
+             <tablecell>
+                 <paragraph id="par_id81642785406296" role="paragraph" xml-lang="en-US">Icon Sort and Grouping</paragraph>
+             </tablecell>
+         </tablerow>
+     </table>
+     <list type="ordered" startwith="2">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id4331797" role="listitem">In the Groups box, click the field which you want as the first sort field, and set the Sorting property.<comment>what meaning has the order of fields / move up down button?</comment></paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id4191717" role="listitem">Execute the report.</paragraph>
+         </listitem>
+      </list>
+      <h2 id="par_id2318796">Grouping</h2>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id399182" role="listitem">Open the Report Builder view and click the Sorting and Grouping icon on the toolbar. You see the <link href="text/sdatabase/rep_sort.xhp">Sorting and Grouping</link> dialog.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id7588732" role="listitem">In the Groups box, open the Group Header list box and select to show a group header.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id95828" role="listitem">Click the Add Field icon  to open the Add Field window.</paragraph>
+         </listitem>
+         </list>
+         <table id="tab_id571642785710910">
+             <tablerow>
+                 <tablecell>
+                     <paragraph id="par_id911642785710911" role="paragraph">
+                         <image id="Graphic3" src="cmd/sc_addfield.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_">Icon Add Field</alt></image>
+                     </paragraph>
+                 </tablecell>
+                 <tablecell>
+                     <paragraph id="par_id831642785710915" role="paragraph" xml-lang="en-US">Icon Add Field</paragraph>
+                 </tablecell>
+             </tablerow>
+         </table>
+
+         <list type="ordered" startwith="4">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id5675527" role="listitem">Drag-and-drop the field entry that you want to group into the group header section. Then drag-and-drop the remaining fields into the Detail section.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3496200" role="listitem">Execute the report. The report shows the grouped records.</paragraph>
+         </listitem>
+      </list>
+      <paragraph xml-lang="en-US" id="par_id7599108" role="paragraph">If you like to sort and group, open the Report Builder view, then open the Sorting and Grouping dialog. Select to show a Group Header for the fields that you want to group, and select to hide the Group Header for the fields that you want to be sorted. Close the Sorting and Grouping window and execute the report.</paragraph>
+      <h2 id="par_id888698">Updating and printing your data</h2>
+      <paragraph xml-lang="en-US" id="par_id3394573" role="paragraph">When you insert some new data or edit data in the table, a new report will show the updated data.</paragraph>
+      <paragraph xml-lang="en-US" id="par_id7594225" role="paragraph">Click the Reports icon and double-click your last saved report. A new Writer document will be created which shows the new data.</paragraph>
+      <table id="tab_id221642785888795">
+          <tablerow>
+              <tablecell>
+                  <paragraph id="par_id191642785888796" role="paragraph">
+                      <image id="img_id4678487" src="dbaccess/res/reports_32.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id4678487">Icon Reports</alt></image>
+                  </paragraph>
+              </tablecell>
+              <tablecell>
+                  <paragraph id="par_id701642785888800" role="paragraph" xml-lang="en-US">Icon Reports</paragraph>
+              </tablecell>
+          </tablerow>
+      </table>
+
+      <paragraph xml-lang="en-US" id="par_id8147221" role="paragraph">To print a report, choose <item type="menuitem">File - Print</item> from the Writer document.</paragraph>
+   </body>
+</helpdocument>

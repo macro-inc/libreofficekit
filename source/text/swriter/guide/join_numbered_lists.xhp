@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriterguidejoin_numbered_listsxml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Combining Numbered Lists</title>
+    <filename>/text/swriter/guide/join_numbered_lists.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150495">
+  <bookmark_value>numbering; combining</bookmark_value>
+  <bookmark_value>merging;numbered lists</bookmark_value>
+  <bookmark_value>joining;numbered lists</bookmark_value>
+  <bookmark_value>lists;combining numbered lists</bookmark_value>
+  <bookmark_value>paragraphs;numbering non-consecutive</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3150495" xml-lang="en-US"><variable id="join_numbered_lists"><link href="text/swriter/guide/join_numbered_lists.xhp" name="Combining Numbered Lists">Combining Ordered Lists</link></variable></h1>
+<paragraph id="par_id3149692" role="paragraph" xml-lang="en-US">You can combine two ordered lists into a single list.</paragraph>
+
+<h2 id="hd_id3149452" xml-lang="en-US">To Combine Two Ordered Lists</h2>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id3154479" role="listitem" xml-lang="en-US">Select all of the paragraphs in the lists.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3155911" role="listitem" xml-lang="en-US">On the <menuitem>Formatting</menuitem> Bar, click the <menuitem>Toggle Ordered List</menuitem> icon twice.</paragraph>
+  </listitem>
+</list>
+
+<h2 id="hd_id3155870" xml-lang="en-US">To Create a Ordered List From Non-consecutive Paragraphs</h2>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id3153417" role="listitem" xml-lang="en-US">Hold down <switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline> and drag a selection in the first numbered paragraph. You only have to select one character.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3149644" role="listitem" xml-lang="en-US">Continue to hold down <switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>, and drag a selection in each numbered paragraph of the lists you want to combine.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3145102" role="listitem" xml-lang="en-US">On the <menuitem>Formatting</menuitem> Bar, click the <menuitem>Toggle Ordered List</menuitem> icon twice.</paragraph>
+  </listitem>
+</list>
+<tip id="par_id751615828987862">To add selected paragraphs to an existing list, use <link href="text/swriter/02/add_to_list.xhp" name="Add to List"><menuitem>Format - Lists - Add to List</menuitem></link>.</tip>
+<section id="relatedtopics">
+<embed href="text/swriter/guide/using_numbering.xhp#using_numbering"/>
+<embed href="text/swriter/guide/using_numbered_lists.xhp#using_numbered_lists"/>
+<embed href="text/swriter/guide/using_numbered_lists2.xhp#using_numbered_lists2"/>
+<embed href="text/shared/guide/numbering_stop.xhp#numbering_stop"/>
+<embed href="text/swriter/guide/captions.xhp#captions"/>
+<embed href="text/swriter/guide/number_sequence.xhp#number_sequence"/>
+</section>
+</body>
+
+</helpdocument>
