@@ -1,0 +1,2897 @@
+#. extracted from helpcontent2/source/text/shared/04
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-03-21 12:31+0100\n"
+"PO-Revision-Date: 2022-07-01 16:24+0000\n"
+"Last-Translator: Rizal Muttaqin <riz_17_oke@yahoo.co.id>\n"
+"Language-Team: Indonesian <https://translations.documentfoundation.org/projects/libo_help-master/textshared04/id/>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1564162250.000000\n"
+
+#. GEuoc
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "General Shortcut Keys in $[officename]"
+msgstr "Tombol Pintas Umum dalam $[officename]"
+
+#. xFAX2
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"bm_id3149991\n"
+"help.text"
+msgid "<bookmark_value>keyboard; general commands</bookmark_value><bookmark_value>shortcut keys; general</bookmark_value><bookmark_value>text input fields</bookmark_value><bookmark_value>AutoComplete function in text and list boxes</bookmark_value><bookmark_value>macros; interrupting</bookmark_value><bookmark_value>Unicode; input with keyboard</bookmark_value><bookmark_value>Unicode; shortcut keys</bookmark_value><bookmark_value>shortcut keys; Unicode</bookmark_value>"
+msgstr "<bookmark_value>papan ketik; perintah umum</bookmark_value><bookmark_value>tombol pintas; umum</bookmark_value><bookmark_value>ruas masukan teks</bookmark_value><bookmark_value>fungsi Pelengkapan Otomatis dakan kotak daftar dan teks</bookmark_value><bookmark_value>makro; menginterupsi</bookmark_value><bookmark_value>Unicode; masukan dengan papan ketik</bookmark_value><bookmark_value>Unicode; tombol pintas</bookmark_value><bookmark_value>tombol pintas; Unicode</bookmark_value>"
+
+#. snVCa
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149991\n"
+"help.text"
+msgid "<variable id=\"common_keys\"><link href=\"text/shared/04/01010000.xhp\" name=\"General Shortcut Keys in $[officename]\">General Shortcut Keys in $[officename]</link></variable>"
+msgstr "<variable id=\"common_keys\"><link href=\"text/shared/04/01010000.xhp\" name=\"Tombol Pintas Umum dalam $[officename]\">Tombol Pintas Umum dalam $[officename]</link></variable>"
+
+#. 89AtX
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3150702\n"
+"help.text"
+msgid "Using Shortcut Keys"
+msgstr "Menggunakan Tombol Pintas"
+
+#. UkinP
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3151299\n"
+"help.text"
+msgid "A great deal of your application's functionality can be called up by using shortcut keys. For example, the <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command+O</item></caseinline><defaultinline><item type=\"keycode\">Ctrl+O</item></defaultinline></switchinline> shortcut keys are shown next to the <emph>Open</emph> entry in the <item type=\"menuitem\">File</item> menu. If you want to access this function by using the shortcut keys, press and hold down <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline> and then press the <item type=\"keycode\">O</item> key. Release both keys after the dialog appears."
+msgstr "Beragam fungsi aplikasi dapat Anda  panggil dengan menggunakan pintasan. Misalnya, <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command+O</item></caseinline><defaultinline><item type=\"keycode\">Ctrl+O</item></defaultinline></switchinline> yang ditampilkan di samping menu<emph>Buka</emph> di menu <item type=\"menuitem\">File</item> menu. Jika Anda ingin mengakses fungsi ini dengan menggunakan pintasan, tekan dan tahan <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline> dan kemudian tekan tombol <item type=\"keycode\">O</item> kunci. Lepaskan kedua kunci setelah dialog muncul."
+
+#. hJP5t
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153894\n"
+"help.text"
+msgid "When operating your application, you can choose between using the mouse or the keyboard for almost all of the operations available."
+msgstr "Saat mengoperasikan aplikasi Anda, Anda bisa memilih antara menggunakan tetikus (mouse) atau papan ketik untuk hampir semua operasi yang ada."
+
+#. Q2ALG
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154186\n"
+"help.text"
+msgid "Calling Menus with Mnemonics"
+msgstr "Memanggil Menu dengan Mnemonic"
+
+#. Lv2Sv
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3152425\n"
+"help.text"
+msgid "Some of the characters shown on the menu bar are underlined. You can access these menus directly by pressing the underlined character together with the <keycode>Alt</keycode> key. Once the menu is opened, you will again find underlined characters. You can access these menu items directly by simply pressing the underlined character key."
+msgstr "Beberapa karakter yang ditunjukkan pada bilah menu digarisbawahi. Anda dapat mengakses menu-menu ini secara langsung dengan menekan karater yang digarisbawahi bersama dengan tombol <keycode>Alt</keycode>. Sekali menu terbuka, Anda akan menemukan lagi karakter bergaris bawah. Anda dapat mengakses butir-butir menu ini secara langsung cukup dengan menekan tombol karakter yang digarisbawahi."
+
+#. AXjNG
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id541591272518903\n"
+"help.text"
+msgid "Entering Unicode Characters"
+msgstr "Memasukkan Karakter Unicode"
+
+#. p6or4
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id851591272526169\n"
+"help.text"
+msgid "You can enter arbitrary Unicode characters in the document typing the Unicode hexadecimal code point and then pressing <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+Option+X</keycode></caseinline><defaultinline><keycode>Alt+X</keycode></defaultinline></switchinline> (default). Type the Unicode hexadecimal notation and press <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+Option+X</keycode></caseinline><defaultinline><keycode>Alt+X</keycode></defaultinline></switchinline> to toggle between the Unicode character and its hexadecimal notation. Selection is not necessary but the conversion will apply to the selected characters. Toggling occurs on the characters prior to the cursor position when these characters form a valid Unicode hexadecimal point. Hexadecimal code points with value in the range U+0000 to U+0020 are not converted."
+msgstr "Anda dapat memasukkan sebarang karakter Unicode dalam dokumen dengan mengetikkan titik kode heksadesimal Unicode lalu menekan <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+Option+X</keycode></caseinline><defaultinline><keycode>Alt+X</keycode></defaultinline></switchinline> (baku). Ketikkan notasi heksadesimal Unicode dan tekan <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+Option+X</keycode></caseinline><defaultinline><keycode>Alt+X</keycode></defaultinline></switchinline> untuk menjungkit antara karakter Unicode dan notasi heksadesimalnya. Pilihan tidak perlu tapi konversi akan diterapkan ke karakter yang dipilih. Penjungkitan terjadi pada karakter sebelum posisi kursor ketika karakter ini membentuk titik heksadesimal Unicode yang valid. Titik kode heksadesimal dengan nilai dalam rentang U+0000 sampai U+0020 tidak dikonversi."
+
+#. PwHVE
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id1001591272531804\n"
+"help.text"
+msgid "The default Unicode conversion shortcut is <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+Option+X</keycode></caseinline><defaultinline><keycode>Alt+X</keycode></defaultinline></switchinline> and <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+Option+C</keycode></caseinline><defaultinline><keycode>Alt+C</keycode></defaultinline></switchinline> in some locales where the default Unicode shortcut interferes with the main menu shortcut. To reassign the shortcut, choose <menuitem>Tools - Customize - Keyboard</menuitem> and select <emph>Category:Options</emph> with <emph>Function:Toggle Unicode Notation</emph>."
+msgstr "Pintasan konversi Unicode baku adalah <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+Option+X</keycode></caseinline><defaultinline><keycode>Alt+X</keycode></defaultinline></switchinline> dan <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+Option+C</keycode></caseinline><defaultinline><keycode>Alt+C</keycode></defaultinline></switchinline> dalam beberapa lokal dimana pintasan Unicode baku berinterferensi dengan pintasan menu utama. Untuk menugaskan ulang pintasan, pilih <menuitem>Perkasa - Sesuaikan - Papan Ketik</menuitem> dan pilih <emph>Kategori:Opsi</emph> dengan <emph>Fungsi:Jungkitkan Notasi Unicode</emph>."
+
+#. cBDHp
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3156410\n"
+"help.text"
+msgid "Using Shortcut Keys to Control Dialogs"
+msgstr "Menggunakan Tombol Pintas untuk Dialog Kendali"
+
+#. gYnek
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3154288\n"
+"help.text"
+msgid "There is always one element highlighted in any given dialog - usually shown by a broken frame. This element, which can be either a button, an option field, an entry in a list box or a check box, is said to have the focus on it. If the focal point is a button, pressing <item type=\"keycode\">Enter</item> runs it as if you had clicked it. A check box is toggled by pressing the <item type=\"keycode\">Spacebar</item>. If an option field has the focus, use the arrow keys to change the activated option field in that area. Use the <item type=\"keycode\">Tab</item> key to go from one element or area to the next one, use <item type=\"keycode\">Shift+Tab</item> to go in the reverse direction."
+msgstr "Akan selalu ada satu elemen yang disorot pada dialog yang diberikan - biasanya ditunjukkan dengan bingkai rusak. Elemen ini, yang dapat berupa tombol, opsi ruas, entri pada kotak daftar atau kotak centang, dikatakan memiliki fokus kepadanya. Jika titik fokus ada pada tombol, menekan <item type=\"keycode\">Enter</item> menjalankannya seperti anda mengekliknya. Kotak centang dijungkit dengan menekan <item type=\"keycode\">Spasi</item>. Jika opsi ruas memiliki fokus, gunakan tombol arah untuk merubah opsi ruas yang aktif pada wilayah tersebut. Gunakan tombol <item type=\"keycode\">Tab</item> untuk menuju elemen atau wilayah selanjutnya, gunakan <item type=\"keycode\">Shift+Tab</item> untuk menuju ke arah sebaliknya."
+
+#. MreaT
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149177\n"
+"help.text"
+msgid "Pressing <item type=\"keycode\">Esc</item> closes the dialog without saving changes. <switchinline select=\"sys\"><caseinline select=\"MAC\"></caseinline><defaultinline>If you place the focus on a button, not only will you see the dotted line framing the name of the button, but also a thicker shadow under the button selected. This indicates that if you exit the dialog by pressing the <item type=\"keycode\">Enter</item> key, it is the equivalent of pressing that button itself.</defaultinline></switchinline>"
+msgstr "Menekan <item type=\"keycode\">Esc</item> menutup dialog tanpa menyimpan perubahan. <switchinline select=\"sys\"><caseinline select=\"MAC\"></caseinline><defaultinline>Jika anda menempatkan fokus pada tombol, anda tidak akan melihat garis titik yang melingkari nama tombol tersebut, tetapi juga menebalkan bayangan di bawah tombol yang dipilih. Ini menandakan bahwa jika anda keluar dari dialog dengan menekan tombol <item type=\"keycode\">Enter</item>, ini sama dengan menekan tombol tersebut.</defaultinline></switchinline>"
+
+#. QJfCQ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147209\n"
+"help.text"
+msgid "Shortcut Keys for Mouse Actions"
+msgstr "Tombol Pintas untuk Aksi Tetikus (Mouse)"
+
+#. DTCiZ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3154749\n"
+"help.text"
+msgid "If you are using drag-and-drop, selecting with the mouse or clicking objects and names, you can use the keys <item type=\"keycode\">Shift</item>, <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline> and occasionally <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Option</item></caseinline><defaultinline><item type=\"keycode\">Alt</item></defaultinline></switchinline> to access additional functionality. The modified functions available when holding down keys during drag-and-drop are indicated by the mouse pointer changing form. When selecting files or other objects, the modifier keys can extend the selection - the functions are explained where applicable. <switchinline select=\"sys\"><caseinline select=\"UNIX\"><embedvar href=\"text/shared/00/00000099.xhp#winmanager\"/></caseinline></switchinline>"
+msgstr "Jika anda menggunakan seret dan jatuhkan, memilih dengan tetikus atau mengklik objek dan nama, Anda dapat menggunakan tombol <item type=\"keycode\">Shift</item>, <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline> dan terkadang <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Pilihan</item></caseinline><defaultinline><item type=\"keycode\">Alt</item></defaultinline></switchinline>untuk mengakses fungsi tambahan. Fungsi yang termodifikasi tersedia saat menahan tombol selama seret dan jatuhkan menandakan bahwa penunjuk tetikus berubah bentuk. Saat memilih berkas atau objek lain, tombol pengubah dapat melebarkan pemilihan - fungsi dijelaskan saat berlaku. <switchinline select=\"sys\"><caseinline select=\"UNIX\"><embedvar href=\"text/shared/00/00000099.xhp#winmanager\"/></caseinline></switchinline>"
+
+#. DkC38
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154046\n"
+"help.text"
+msgid "Practical Text Input Fields"
+msgstr "Ruas Masukan Teks Praktikal"
+
+#. sgmqX
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3145673\n"
+"help.text"
+msgid "You can open a context menu, which contains some of the most often-used commands."
+msgstr "Anda bisa membuka menu konteks, di mana menu tersebut memiliki beberapa perintah yang cukup sering digunakan."
+
+#. 8DJ5t
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153088\n"
+"help.text"
+msgid "Use <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+A</item> to select the entire text. Use the right or left arrow key to remove the selection."
+msgstr "Gunakan<switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+A</item> untuk memilih seluruh teks. Gunakan tombol panah kanan atau kiri untuk menghapus pilihan."
+
+#. 2DfDB
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149514\n"
+"help.text"
+msgid "Double-click a word to select it."
+msgstr "Klik ganda sebuah kata untuk memilihnya."
+
+#. ZcQYZ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149785\n"
+"help.text"
+msgid "A triple-click in a text input field selects the entire field. A triple-click in a text document selects the current sentence."
+msgstr "Tiga kali klik pada ruas masukan teks, akan memilih seluruh ruas. Tiga kali klik pada dokumen teks, akan memilih kalimat saat ini."
+
+#. o5vEt
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150976\n"
+"help.text"
+msgid "Use <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Del</item> to delete everything from the cursor position to the end of the word."
+msgstr "Gunakan <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Del</item> untuk menghapus semuanya dari posisi kursor hingga akhir kata."
+
+#. rK66J
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3147264\n"
+"help.text"
+msgid "By using <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline> and right or left arrow key, the cursor will jump from word to word; if you also hold down the <item type=\"keycode\">Shift</item> key, one word after the other is selected."
+msgstr "Dengan menggunakan <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline>dan tombol panah kanan atau kiri, kursor akan melompat dari kata ke kata; jika Anda juga menekan tombol <item type=\"keycode\">Shift</item> satu kata setelah yang lain dipilih."
+
+#. FPcq5
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3154346\n"
+"help.text"
+msgid "<item type=\"keycode\">INSRT</item> is used to switch between the insert mode and the overwrite mode and back again."
+msgstr "<item type=\"keycode\">INSRT</item> digunakan untuk berpindah antara modus sisip dan modus timpa tulis dan kembali lagi."
+
+#. wGamM
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3148757\n"
+"help.text"
+msgid "Drag-and-drop can be used within and outside of a text box."
+msgstr "Teknik seret dan jatuhkan (drag and drop) bisa dipakai baik di dalam maupun di luar kotak teks."
+
+#. 7o4zf
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150358\n"
+"help.text"
+msgid "The <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Z</item> shortcut keys are used to undo modifications one step at a time; the text will then have the status it had before the first change."
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Z</item> digunakan untuk membatalkan modifikasi satu langkah dalam satu waktu; teks akan memiliki status sebelum perubahan pertama."
+
+#. CxR2B
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153968\n"
+"help.text"
+msgid "$[officename] has an <emph>AutoComplete</emph> function which activates itself in some text and list boxes. For example, enter <switchinline select=\"sys\"><caseinline select=\"WIN\"><emph>c:\\a</emph></caseinline><defaultinline><emph>~/a</emph></defaultinline></switchinline> into the URL field and the <emph>AutoComplete</emph> function displays the first file or first directory found <switchinline select=\"sys\"><caseinline select=\"WIN\">on the C: drive</caseinline><defaultinline>in your home folder</defaultinline></switchinline> that starts with the letter \"a\"."
+msgstr "$[officename] memiliki fungsi <emph>AutoComplete</emph> yang mengaktifkan dirinya pada beberapa teks dan kotak centang. Sebagai contoh, masukkan <switchinline select=\"sys\"><caseinline select=\"WIN\"><emph>c:\\a</emph></caseinline><defaultinline><emph>~/a</emph></defaultinline></switchinline> ke dalam ruas URL dan fungsi <emph></emph> menampilkan berkas pertama atau direktori pertama yang ditemukan <switchinline select=\"sys\"><caseinline select=\"WIN\">pada drive C:</caseinline><defaultinline> pada folder beranda anda</defaultinline></switchinline> yang dimulai dengan huruf \"a\"."
+
+#. cCWVA
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3144760\n"
+"help.text"
+msgid "Use the <item type=\"keycode\">Down Arrow</item> key to scroll through the other files and directories. Use the <item type=\"keycode\">Right Arrow</item> key to also display an existing subdirectory in the URL field. Quick AutoComplete is available if you press the <item type=\"keycode\">End</item> key after entering part of the URL. Once you find the document or directory you want, press <item type=\"keycode\">Enter</item>."
+msgstr "Gunakan tombol <item type=\"keycode\">Panah Bawah</item> untuk menggulir ke berkas dan direktori lain. Gunakan tombol <item type=\"keycode\">Panah Kanan</item> untuk menampilkan subdirektori yang sudah ada pada ruas URL. Quick AutoComplete tersedia jika anda menekan tombol <item type=\"keycode\">End</item> setelah memasukkan bagian dari URL. Setelah anda menemukan dokumen atau direktori yang anda inginkan, tekan <item type=\"keycode\">Enter</item>."
+
+#. Bkjt8
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3150767\n"
+"help.text"
+msgid "Interrupting Macros"
+msgstr "Menginterupsi Makro"
+
+#. 5mn5F
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3159150\n"
+"help.text"
+msgid "If you want to terminate a macro that is currently running, press <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Shift+Q</item>."
+msgstr "Jika anda ingin menghentikan makro yang sedang berjalan, tekan <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Shift+Q</item>."
+
+#. DNtr2
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154123\n"
+"help.text"
+msgid "List of General Shortcut Keys in $[officename]"
+msgstr "Daftar Tombol Pintas umum pada $[officename]"
+
+#. BmE6R
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3145421\n"
+"help.text"
+msgid "The shortcut keys are shown on the right hand side of the menu lists next to the corresponding menu command. <switchinline select=\"sys\"><caseinline select=\"MAC\">(Not all of the mentioned keys for controlling dialogs are available on macOS.)</caseinline></switchinline>"
+msgstr "Tombol pintas ditampilkan pada sisi kanan daftar menu, bersebelahan dengan menu yang bersangkutan.<switchinline select=\"sys\"><caseinline select=\"MAC\">(Tidak semua tombol yang disebutkan untuk mengontrol dialog turut tersedia pada Macintosh.)</caseinline></switchinline>"
+
+#. 44FiF
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id31541231\n"
+"help.text"
+msgid "Shortcut keys for controlling dialogs"
+msgstr "Tombol pintas untuk mengendalikan dialog"
+
+#. W58zP
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3153367\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Tombol Pintas"
+
+#. 43BGc
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3156060\n"
+"help.text"
+msgid "Effect"
+msgstr "Efek"
+
+#. pzjuS
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149260\n"
+"help.text"
+msgid "Enter key"
+msgstr "Tombol Enter"
+
+#. 6FRpR
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153727\n"
+"help.text"
+msgid "Activates the focused button in a dialog."
+msgstr "Mengaktifkan tombol yang menjadi fokus pada dialog"
+
+#. zMuRZ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3153142\n"
+"help.text"
+msgid "Esc"
+msgstr "Esc"
+
+#. 9AiDc
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3155412\n"
+"help.text"
+msgid "Terminates the action or dialog. If in $[officename] Help: goes up one level."
+msgstr "Mematikan aksi atau diloag. Apabila sedang berada di Bantuan $[officename]: pergi naik satu tingkat."
+
+#. SSAAP
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3151118\n"
+"help.text"
+msgid "Spacebar"
+msgstr "Spasi"
+
+#. BknTj
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3147435\n"
+"help.text"
+msgid "Toggles the focused check box in a dialog."
+msgstr "Mencentang kotak centang yang menjadi fokus pada dialog."
+
+#. qHKoT
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3152791\n"
+"help.text"
+msgid "Arrow keys"
+msgstr "Tombol panah"
+
+#. LFu4h
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3151113\n"
+"help.text"
+msgid "Changes the active control field in an option section of a dialog."
+msgstr "Mengubah kendali yang aktif pada seksi pilihan pada dialog."
+
+#. wGvAd
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154188\n"
+"help.text"
+msgid "Tab"
+msgstr "Tab"
+
+#. pSELE
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3146975\n"
+"help.text"
+msgid "Advances focus to the next section or element in a dialog."
+msgstr "Berpindah fokus pada seksi atau elemen selanjutnya pada dialog."
+
+#. vDtmh
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3153363\n"
+"help.text"
+msgid "Shift+Tab"
+msgstr "Shift+Tab"
+
+#. DqJ9i
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149665\n"
+"help.text"
+msgid "Moves the focus to the previous section or element in a dialog."
+msgstr "Berpindah fokus pada seksi atau elemen sebelumnya pada dialog."
+
+#. XVZUa
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147317\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Down Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option </caseinline><defaultinline>Alt</defaultinline></switchinline>+Panah Bawah"
+
+#. BZsFR
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153224\n"
+"help.text"
+msgid "Opens the list of the control field currently selected in a dialog. These shortcut keys apply not only to combo boxes but also to icon buttons with pop-up menus. Close an opened list by pressing the <item type=\"keycode\">Esc</item> key."
+msgstr "Membuka daftar dari ruas kendali bersangkutan yang dipilih pada sebuah dialog. Tombol pintas ini menerapkan tidak saja pada kotak kombo, tetapi juga pada tombol ikon dengan menu pop-up. Tutup daftar yang terbuka dengan menekan tombol <item type=\"keycode\">Esc</item>"
+
+#. hD8D6
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id31541232\n"
+"help.text"
+msgid "Shortcut keys for controlling documents and windows"
+msgstr "Tombol pintas untuk mengendalikan dokumen dan jendela"
+
+#. DMjEv
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id31533671\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Tombol Pintas"
+
+#. CgjFQ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id31560601\n"
+"help.text"
+msgid "Effect"
+msgstr "Efek"
+
+#. 6moty
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3156437\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+O"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. pj6AK
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149123\n"
+"help.text"
+msgid "Opens a document."
+msgstr "Membuka dokumen."
+
+#. GBCGr
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3155064\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+S"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. Y8YG8
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "Saves the current document."
+msgstr "Menyimpan dokumen."
+
+#. GynnK
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3156377\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+N"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. xqoAS
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3155764\n"
+"help.text"
+msgid "Creates a new document."
+msgstr "Membuat dokumen."
+
+#. f4Cmw
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3151357\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+N"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+N"
+
+#. HYFcp
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3148408\n"
+"help.text"
+msgid "Opens the <emph>Templates</emph> dialog."
+msgstr "Membuka dialog <emph>Templat</emph>."
+
+#. HFzTa
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3150043\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+P"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+P"
+
+#. mmAyJ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3147100\n"
+"help.text"
+msgid "Prints document."
+msgstr "Mencetak dokumen."
+
+#. pKePk
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3158474\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. zGeUf
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150091\n"
+"help.text"
+msgid "Activates the <emph>Find</emph> toolbar."
+msgstr "Mengaktifkan bilah perkakas <emph>Cari</emph>."
+
+#. sBABS
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3158414\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+H"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+H"
+
+#. aKfgm
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150090\n"
+"help.text"
+msgid "Calls the <emph>Find & Replace</emph> dialog."
+msgstr "Memanggil dialog <emph>Cari & Ganti</emph>."
+
+#. t4pUG
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3148800\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F"
+
+#. b5NKt
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149527\n"
+"help.text"
+msgid "Searches for the last entered search term."
+msgstr "Mencari kata terakhir yang terakhir kali dimasukkan (untuk dicari)."
+
+#. 5GtFA
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154198\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>Ctrl+Shift+J</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>Ctrl+Shift+J</defaultinline></switchinline>"
+
+#. aYbuU
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150567\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>Toggles the view between fullscreen mode and normal mode in Writer or Calc.</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>Menjungkit tampilan antara modus layar penuh dan modus normal pada Writer atau Calc.</defaultinline></switchinline>"
+
+#. Wt6UX
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3151049\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+R"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+R"
+
+#. 4DmEx
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3148462\n"
+"help.text"
+msgid "Redraws the document view."
+msgstr "Menggambar ulang tampilan dokumen."
+
+#. bEQDk
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149035\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+I"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+I"
+
+#. AKSAZ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150665\n"
+"help.text"
+msgid "Enable or disable the selection cursor in read-only text."
+msgstr "Mengaktifkan atau menonaktifkan kursor pemilihan pada teks yang hanya bisa dibaca."
+
+#. qcpY5
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149404\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>F1</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>F1</defaultinline></switchinline>"
+
+#. 9xmZD
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3145410\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>Starts the $[officename] Help.</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>Memulai Bantuan $[officename]</defaultinline></switchinline>"
+
+#. qZRd8
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153697\n"
+"help.text"
+msgid "In the $[officename] Help: jumps to main help page."
+msgstr "Pada Bantuan $[officename]: melompat ke halaman bantuan utama."
+
+#. 2nvcM
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154951\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>Shift+F1</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>Shift+F1</defaultinline></switchinline>"
+
+#. C6GrN
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153309\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>Context Help</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"/><defaultinline>Bantuan Konteks</defaultinline></switchinline>"
+
+#. n6cqC
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3159220\n"
+"help.text"
+msgid "Shift+F2"
+msgstr "Shift+F2"
+
+#. p6gbj
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3151241\n"
+"help.text"
+msgid "Turns on <emph>Extended Tips</emph> for the currently selected command, icon or control."
+msgstr "Mengaktifkan <emph>Kiat Tambahan </emph> untuk perintah, ikon, atau kendali saat ini."
+
+#. F8BdC
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154532\n"
+"help.text"
+msgid "F6"
+msgstr "F6"
+
+#. G8yZx
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3144506\n"
+"help.text"
+msgid "Sets focus in next visible subwindow, including menu bar, toolbars, windows such as Sidebar and Navigator, and document canvas/data source."
+msgstr "Atur fokus dalam sub jendela tampak selanjutnya, termasuk bilah menu, bilah alat, jendela seperti Bilah Sisi dan Navigator, dan kanvas dokumen/sumber data."
+
+#. Enxuj
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3144771\n"
+"help.text"
+msgid "Shift+F6"
+msgstr "Shift+F6"
+
+#. F9BVa
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3147075\n"
+"help.text"
+msgid "Sets focus in previous subwindow."
+msgstr "Mengeset fokus dalam subjendela sebelumnya."
+
+#. BnTGx
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id341612296864115\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+F6</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+F6</keycode>"
+
+#. SvF5v
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id521612296878916\n"
+"help.text"
+msgid "Sets focus in the document canvas/data source."
+msgstr "Atur fokus dalam kanvas dokumen/sumber data."
+
+#. Y7pzu
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3156191\n"
+"help.text"
+msgid "F10"
+msgstr "F10"
+
+#. k3xTg
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3156172\n"
+"help.text"
+msgid "Activates the first menu (File menu)."
+msgstr "Mengaktifkan menu pertama (menu Berkas)"
+
+#. JKjqz
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3159093\n"
+"help.text"
+msgid "Shift+F10"
+msgstr "Shift+F10"
+
+#. iyod3
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3148606\n"
+"help.text"
+msgid "Opens the context menu."
+msgstr "Membuka menu konteks."
+
+#. GSfvr
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id631612398592490\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Shift+F10</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Shift+F10</keycode>"
+
+#. QFqB4
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id111612398626979\n"
+"help.text"
+msgid "Docks and undocks floating subwindows such as unlocked toolbars, Sidebar and Navigator."
+msgstr "Melabuh dan melepas sub jendela mengambang seperti bilah alat yang tak terkunci, Bilah Sisi, dan Navigator."
+
+#. CFAWe
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3159094\n"
+"help.text"
+msgid "Ctrl+Alt+Shift+Home"
+msgstr "Ctrl+Alt+Shift+Home"
+
+#. FZEC6
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3148607\n"
+"help.text"
+msgid "Shows/hides main menu."
+msgstr "Tampil/sembunyikan menu utama."
+
+#. Ad6S9
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3146871\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F4 or <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+F4"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F4 atau <switchinline select=\"sys\"><caseinline select=\"MAC\">Option </caseinline><defaultinline>Alt</defaultinline></switchinline>+F4"
+
+#. wCZc7
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3157978\n"
+"help.text"
+msgid "Closes the current document. Closes $[officename] when the last open document is closed."
+msgstr "Menutup dokumen yang bersangkutan (menutup $[officename] apabila dokumen terakhir yang terbuka telah ditutup)"
+
+#. nCdVL
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149258\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Q"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. jZKyH
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153966\n"
+"help.text"
+msgid "Exits application."
+msgstr "Keluar dari aplikasi."
+
+#. TbBRc
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id31541233\n"
+"help.text"
+msgid "Shortcut keys for editing or formatting documents"
+msgstr "Tombol pintas untuk menyunting atau memformat dokumen"
+
+#. gFNeG
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id31533672\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Tombol Pintas"
+
+#. BGHGZ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id31560602\n"
+"help.text"
+msgid "Effect"
+msgstr "Efek"
+
+#. GCwfN
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149488\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+
+#. rRieV
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149912\n"
+"help.text"
+msgid "When positioned at the start of a header, a tab is inserted."
+msgstr "Apabial diposisikan pada awal kop, sebuah tab akan disisipkan."
+
+#. YXBqA
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3148573\n"
+"help.text"
+msgid "Enter (if an OLE object is selected)"
+msgstr "Enter (apabila objek OLE terpilih)"
+
+#. kBfDJ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3154162\n"
+"help.text"
+msgid "Activates the selected OLE object."
+msgstr "Mengaktifkan objek OLE yang terpilih tersebut."
+
+#. hQEQr
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3146990\n"
+"help.text"
+msgid "Enter (if a drawing object or text object is selected)"
+msgstr "Enter (apabila objek menggambar atau objek teks terpilih)"
+
+#. zTMsJ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153839\n"
+"help.text"
+msgid "Activates text input mode."
+msgstr "Mengaktifkan modus masukan teks."
+
+#. ajEHu
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3153538\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+X"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. zsCST
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3166450\n"
+"help.text"
+msgid "Cuts out the selected elements."
+msgstr "Memotong elemen yang terpilih."
+
+#. pAx9m
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3155904\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+C"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. gkGB4
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3148537\n"
+"help.text"
+msgid "Copies the selected items."
+msgstr "Menyalin item yang dipilih."
+
+#. XLAfA
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3156318\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+V"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. W36zD
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3147005\n"
+"help.text"
+msgid "Pastes from the clipboard."
+msgstr "Menempel dari hasil salinan di papan klip."
+
+#. QkVYn
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id071620091225295\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Shift+V"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Option</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Shift+V"
+
+#. jeD6B
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id0716200912253022\n"
+"help.text"
+msgid "Pastes unformatted text from the clipboard. The text is pasted using the format that exists at the insertion point."
+msgstr "Menempelkan teks tak terformat dari papan klip. Teks ditempelkan memakai format yang ada pada titik penyisipan."
+
+#. FK2WE
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN10F47\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+V"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F"
+
+#. 6cHAW
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN10F4B\n"
+"help.text"
+msgid "Opens the <emph>Paste Special</emph> dialog."
+msgstr "Membuka dialog <emph>Tempel Spesial</emph>."
+
+#. infCs
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3153789\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+A"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. CXhQR
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3155581\n"
+"help.text"
+msgid "Selects all."
+msgstr "Memilih semua."
+
+#. YfcEB
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149738\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Z"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. oG6L7
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149816\n"
+"help.text"
+msgid "Undoes last action."
+msgstr "Membatalkan aksi terakhir."
+
+#. 2cYyW
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147095\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Shift+Z</caseinline><defaultinline>Ctrl+Y</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F"
+
+#. Ru3MP
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150345\n"
+"help.text"
+msgid "Redoes last action."
+msgstr "Mengulang aksi terakhir yang telah dibatalkan sebelumnya."
+
+#. n6ZdW
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id7297280\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Y"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F"
+
+#. CyfRy
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id8709677\n"
+"help.text"
+msgid "Repeats last command."
+msgstr "Mengulang perintah terakhir."
+
+#. SRQHW
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3145588\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+I"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+I"
+
+#. jADFT
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3148753\n"
+"help.text"
+msgid "The \"Italic\" attribute is applied to the selected area. If the cursor is positioned in a word, this word is also marked in italic."
+msgstr "Atribut Miring akan diterapkan pada wilayah yang dipilih. Apabila kursor ditempatkan pada sebuah kata, maka kata tersebut akan dicetak miring."
+
+#. CywF9
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3166428\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+B"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+B"
+
+#. veBQU
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150490\n"
+"help.text"
+msgid "The \"Bold\" attribute is applied to the selected area. If the cursor is positioned in a word, this word is also put in bold."
+msgstr "Atribut Tebal akan diterapkan pada wilayah yang dipilih. Apabila kursor ditempatkan pada sebuah kata, maka kata tersebut akan dicetak tebal."
+
+#. Z9EBQ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154815\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+U"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+U"
+
+#. nvvQ5
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153228\n"
+"help.text"
+msgid "The \"Underlined\" attribute is applied to the selected area. If the cursor is positioned in a word, this word is also underlined."
+msgstr "Atribut Garis Bawah akan diterapkan pada wilayah yang dipilih. Apabila kursor ditempatkan pada sebuah kata, maka kata tersebut akan dicetak bergaris bawah."
+
+#. EVCzG
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN10BC0\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+M"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+M"
+
+#. xoBua
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN10BE8\n"
+"help.text"
+msgid "Removes direct formatting from selected text or objects (as in <item type=\"menuitem\">Format - Clear Direct Formatting</item>)."
+msgstr "Membuang pemformatan langsung dari teks atau objek yang dipilih (seperti dalam (as in <item type=\"menuitem\">Format - Bersihkan Pemformatan Langsung</item>)."
+
+#. 2B6BC
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3153288\n"
+"help.text"
+msgid "Shortcut keys in the Gallery"
+msgstr "Tombol pintas di Galeri"
+
+#. 5sheM
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3156308\n"
+"help.text"
+msgid "Shortcut keys"
+msgstr "Tombol pintas"
+
+#. ngmEb
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149440\n"
+"help.text"
+msgid "Effect"
+msgstr "Efek"
+
+#. MVoEa
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149971\n"
+"help.text"
+msgid "Tab"
+msgstr "Tab"
+
+#. ni9BH
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153110\n"
+"help.text"
+msgid "Moves between areas."
+msgstr "Berpindah antara wilayah."
+
+#. FfLes
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3148971\n"
+"help.text"
+msgid "Shift+Tab"
+msgstr "Shift+Tab"
+
+#. Vk9qA
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3154059\n"
+"help.text"
+msgid "Moves backwards between areas."
+msgstr "Bergerak mundur antar wilayah."
+
+#. WASE5
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3152368\n"
+"help.text"
+msgid "Shortcut keys in the <emph>New Theme</emph> area of the Gallery:"
+msgstr "Pintasan<emph>Tema Baru</emph> pada galeri:"
+
+#. uVzeb
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN11555\n"
+"help.text"
+msgid "Shortcut keys"
+msgstr "Tombol pintas"
+
+#. RLBzL
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN1155B\n"
+"help.text"
+msgid "Effect"
+msgstr "Efek"
+
+#. 3rop2
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3159192\n"
+"help.text"
+msgid "Up Arrow"
+msgstr "Panah Atas"
+
+#. APJna
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3152540\n"
+"help.text"
+msgid "Moves the selection up one."
+msgstr "Menaikkan pemilihan satu tingkat."
+
+#. pMq7N
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3150892\n"
+"help.text"
+msgid "Down Arrow"
+msgstr "Panah Bawah"
+
+#. PMoE7
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3151004\n"
+"help.text"
+msgid "Moves the selection down."
+msgstr "Menurunkan pemilihan satu tingkat."
+
+#. Bez8w
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3153976\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
+
+#. dGTxG
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3146894\n"
+"help.text"
+msgid "Opens the <emph>Properties</emph> dialog."
+msgstr "Buka <emph>Properti</emph> dialog."
+
+#. eBWAV
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3148652\n"
+"help.text"
+msgid "Shift+F10"
+msgstr "Shift+F10"
+
+#. uSmmc
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153250\n"
+"help.text"
+msgid "Opens a context menu."
+msgstr "Membuka menu konteks."
+
+#. Eo7i9
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3155614\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+U"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+U"
+
+#. 3hwFd
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150099\n"
+"help.text"
+msgid "Refreshes the selected theme."
+msgstr "Menyegarkan tema terpilih."
+
+#. ehG7A
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3145755\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+R"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+R"
+
+#. oJgjw
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3146776\n"
+"help.text"
+msgid "Opens the <emph>Enter Title</emph> dialog."
+msgstr "Membuka dialog <emph>Memasukkan Judul</emph>."
+
+#. CjGvG
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154642\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+D"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+D"
+
+#. pwrwu
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153653\n"
+"help.text"
+msgid "Deletes the selected theme."
+msgstr "Menghapus tema terpilih."
+
+#. SRh75
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3155946\n"
+"help.text"
+msgid "Insert"
+msgstr "Insert"
+
+#. iULfw
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3145372\n"
+"help.text"
+msgid "Inserts a new theme."
+msgstr "Menyisipkan tema baru"
+
+#. EXQoG
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3150633\n"
+"help.text"
+msgid "Shortcut keys in the <emph>Gallery Preview</emph> area:"
+msgstr "Pintasan pada wilayah <emph>Pratinjau Galeri</emph>:"
+
+#. wWMe4
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN116D6\n"
+"help.text"
+msgid "Shortcut keys"
+msgstr "Tombol pintas"
+
+#. czPcK
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN116DC\n"
+"help.text"
+msgid "Effect"
+msgstr "Efek"
+
+#. XZ9nV
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149343\n"
+"help.text"
+msgid "Home"
+msgstr "Home"
+
+#. pLbVY
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153241\n"
+"help.text"
+msgid "Jumps to the first entry."
+msgstr "Melompat ke entri pertama."
+
+#. 5dgJ3
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3148809\n"
+"help.text"
+msgid "End"
+msgstr "End"
+
+#. HWqnm
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3148902\n"
+"help.text"
+msgid "Jumps to the last entry."
+msgstr "Melompat ke entri terakhir."
+
+#. Hg6qP
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149382\n"
+"help.text"
+msgid "Left Arrow"
+msgstr "Panah Kiri"
+
+#. hBCRR
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150048\n"
+"help.text"
+msgid "Selects the next Gallery element on the left."
+msgstr "Memilih elemen Galeri di sebelah kiri."
+
+#. xD4yt
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3152926\n"
+"help.text"
+msgid "Right Arrow"
+msgstr "Panah Kanan"
+
+#. fVqN3
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153802\n"
+"help.text"
+msgid "Selects the next Gallery element on the right."
+msgstr "Memilih elemen Galeri di sebelah kanan."
+
+#. JDdQF
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3150776\n"
+"help.text"
+msgid "Up Arrow"
+msgstr "Panah Atas"
+
+#. AC5Bs
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149800\n"
+"help.text"
+msgid "Selects the next Gallery element above."
+msgstr "Memilih elemen Galeri di sebelah atas."
+
+#. NrHRr
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147517\n"
+"help.text"
+msgid "Down Arrow"
+msgstr "Panah Bawah"
+
+#. zYxj2
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3151223\n"
+"help.text"
+msgid "Selects the next Gallery element below."
+msgstr "Memilih elemen Galeri di sebelah bawah."
+
+#. yUFwL
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3145602\n"
+"help.text"
+msgid "Page Up"
+msgstr "Page Up"
+
+#. ChrFJ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3147081\n"
+"help.text"
+msgid "Scrolls up one screen."
+msgstr "Menggulung satu layar ke atas."
+
+#. 88duF
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3153045\n"
+"help.text"
+msgid "Page Down"
+msgstr "Page Down"
+
+#. XaBHS
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150411\n"
+"help.text"
+msgid "Scrolls down one screen."
+msgstr "Menggulung satu layar ke bawah."
+
+#. TbEqQ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147278\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Insert"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Insert"
+
+#. 2Bcex
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153614\n"
+"help.text"
+msgid "Inserts the selected object as a linked object into the current document."
+msgstr "Menyisipkan objek terpilih sebagai objek yang berkait pada dokumen bersangkutan."
+
+#. RvALF
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3155345\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+I"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+I"
+
+#. Eg8RN
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153608\n"
+"help.text"
+msgid "Inserts a copy of the selected object into the current document."
+msgstr "Menyisipkan salinan objek terpilih pada dokumen bersangkutan."
+
+#. 2MNZx
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3143278\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+T"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+T"
+
+#. prAMd
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3156370\n"
+"help.text"
+msgid "Opens the <emph>Enter Title</emph> dialog."
+msgstr "Membuka dialog <emph>Memasukkan Judul</emph>."
+
+#. AraCk
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3145114\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+P"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+P"
+
+#. qWF4U
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3146107\n"
+"help.text"
+msgid "Switches between themes view and object view."
+msgstr "Berpindah antara tampilan tema dan tampilan objek."
+
+#. suCZz
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147552\n"
+"help.text"
+msgid "Spacebar"
+msgstr "Spasi"
+
+#. MDSEc
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3145324\n"
+"help.text"
+msgid "Switches between themes view and object view."
+msgstr "Berpindah antara tampilan tema dan tampilan objek."
+
+#. B6Eph
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3148978\n"
+"help.text"
+msgid "Enter"
+msgstr "Enter"
+
+#. 58moe
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3155743\n"
+"help.text"
+msgid "Switches between themes view and object view."
+msgstr "Berpindah antara tampilan tema dan tampilan objek."
+
+#. vEABC
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154108\n"
+"help.text"
+msgid "Step backward (only in object view)."
+msgstr "Mundur (hanya pada tampilan objek)"
+
+#. MZJrd
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153294\n"
+"help.text"
+msgid "Switches back to main overview."
+msgstr "Kembali pada ikhtisar utama."
+
+#. Amxsb
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149722\n"
+"help.text"
+msgid "Selecting Rows and Columns in a Database Table (opened by <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Shift+F4</item> keys)"
+msgstr "Menyeleksi Baris dan Kolom pada Tabel Basis Data (dibuka oleh <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline>tombol <item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Shift+F4</item>)"
+
+#. aqYUg
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN11906\n"
+"help.text"
+msgid "Shortcut keys"
+msgstr "Tombol pintas"
+
+#. nQMXK
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN1190C\n"
+"help.text"
+msgid "Effect"
+msgstr "Efek"
+
+#. o2WAx
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3150963\n"
+"help.text"
+msgid "Spacebar"
+msgstr "Spasi"
+
+#. EkQWs
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3146883\n"
+"help.text"
+msgid "Toggles row selection, except when the row is in edit mode."
+msgstr "Memilih/menyorot baris, kecuali pada saat baris pada modus sunting."
+
+#. EC6vP
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149787\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Spacebar"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Bilah spasi"
+
+#. AFgC2
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149028\n"
+"help.text"
+msgid "Toggles row selection."
+msgstr "Menjungkitkan pemilihan baris."
+
+#. 74cbE
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147482\n"
+"help.text"
+msgid "Shift+Spacebar"
+msgstr "Shift+Spasi"
+
+#. j3KnD
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149319\n"
+"help.text"
+msgid "Selects the current column."
+msgstr "Memilih baris yang bersangkutan."
+
+#. H2YBw
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id1418805\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Up"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Up"
+
+#. FaFvk
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id1743522\n"
+"help.text"
+msgid "Moves pointer to the first row."
+msgstr "Memindahkan penunjuk pada baris terakhir"
+
+#. uDCCQ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id5994140\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Down"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Down"
+
+#. DMEH3
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id7870113\n"
+"help.text"
+msgid "Moves pointer to the last row."
+msgstr "Memindahkan penunjuk pada baris terakhir."
+
+#. PR2RY
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147411\n"
+"help.text"
+msgid "Shortcut Keys for Drawing Objects"
+msgstr "Tombol Pintas untuk Objek Menggambar"
+
+#. PBpaK
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN1199F\n"
+"help.text"
+msgid "Shortcut keys"
+msgstr "Tombol pintas"
+
+#. RcQMi
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_idN119A5\n"
+"help.text"
+msgid "Effect"
+msgstr "Efek"
+
+#. 9YRDb
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149684\n"
+"help.text"
+msgid "Select the toolbar with <item type=\"keycode\">F6</item>. Use the <item type=\"keycode\">Down Arrow</item> and <item type=\"keycode\">Right Arrow</item> keys to select the desired toolbar icon and press <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Enter</item>."
+msgstr "Pilih bilah alat <item type=\"keycode\">F6</item>. Gunakan <item type=\"keycode\">Panah Bawah</item> dan <item type=\"keycode\">Panah Kanan</item> untuk memilih ikon bilah alat yang diinginkan dan tekan <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+Enter</item>."
+
+#. SSc2F
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3155994\n"
+"help.text"
+msgid "Inserts a Drawing Object."
+msgstr "Menyisipkan Objek Menggambar."
+
+#. GN4Et
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3150264\n"
+"help.text"
+msgid "Select the document with <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+F6</item> and press <item type=\"keycode\">Tab</item>."
+msgstr "Pilih dokumen dengan <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"keycode\">Command</item></caseinline><defaultinline><item type=\"keycode\">Ctrl</item></defaultinline></switchinline><item type=\"keycode\">+F6</item> dan tekan <item type=\"keycode\">Tab</item>."
+
+#. EjNHq
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3154055\n"
+"help.text"
+msgid "Selects a Drawing Object."
+msgstr "Memilih Objek Menggambar."
+
+#. cSKFZ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149242\n"
+"help.text"
+msgid "Tab"
+msgstr "Tab"
+
+#. 7WFfj
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3157902\n"
+"help.text"
+msgid "Selects the next Drawing Object."
+msgstr "Memilih Objek Menggambar selanjutnya."
+
+#. gKcS9
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3149349\n"
+"help.text"
+msgid "Shift+Tab"
+msgstr "Shift+Tab"
+
+#. Yf5DF
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150836\n"
+"help.text"
+msgid "Selects the previous Drawing Object."
+msgstr "Memilih Objek Menggambar sebelumnya."
+
+#. GDoyd
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3109846\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Home"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Home"
+
+#. DxBkB
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3154276\n"
+"help.text"
+msgid "Selects the first Drawing Object."
+msgstr "Memilih Objek Menggambar pertama."
+
+#. KrkDA
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3145829\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+End"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+End"
+
+#. haUNP
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3161664\n"
+"help.text"
+msgid "Selects the last Drawing Object."
+msgstr "Memilih Objek Menggambar terakhir."
+
+#. RMU7W
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3153099\n"
+"help.text"
+msgid "Esc"
+msgstr "Esc"
+
+#. rimEe
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149009\n"
+"help.text"
+msgid "Ends Drawing Object selection."
+msgstr "Mengakhiri pemilihan Objek Menggambar."
+
+#. fDviV
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3156271\n"
+"help.text"
+msgid "Esc (in Handle Selection Mode)"
+msgstr "Esc (dalam Modus Pemilihan Pegangan)"
+
+#. duxtb
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3152818\n"
+"help.text"
+msgid "Exits <emph>Handle Selection Mode</emph> and return to <emph>Object Selection Mode</emph>."
+msgstr "Keluar dari <emph>Modus Pemilihan Pegangan</emph> dan kembali ke<emph> Modus Pemilihan Objek.</emph>"
+
+#. mGEkk
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3151258\n"
+"help.text"
+msgid "Up/Down/Left/Right Arrow"
+msgstr "Panah Atas/Bawah/Kiri/Kanan"
+
+#. BjWXA
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3159162\n"
+"help.text"
+msgid "Moves the selected point (the snap-to-grid functions are temporarily disabled, but end points still snap to each other)."
+msgstr "Memindahkan titik terpilih (fungsi kancing ke jejaring secara temporer dinonaktifkan, tetapi titik akhir akan tetapi dikancing pada tiap lainnya)."
+
+#. ZUCFt
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3146874\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Up/Down/Left/Right Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option </caseinline><defaultinline>Alt</defaultinline></switchinline>+Panah Atas/Bawah/Kiri/Kanan"
+
+#. bM4BU
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3144422\n"
+"help.text"
+msgid "Moves the selected drawing object one pixel (in Selection Mode)."
+msgstr "Memindahkan Objek Menggambar terpilih satu piksel (dalam Modus Pemilihan)"
+
+#. kWifC
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153386\n"
+"help.text"
+msgid "Resizes a drawing object (in Handle Selection Mode)."
+msgstr "Mengubah ukuran Objek Menggambar (dalam Modus Pemilihan Pegangan)"
+
+#. EcyKN
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3145306\n"
+"help.text"
+msgid "Rotates a drawing object (in Rotation Mode)."
+msgstr "Memutar Objek Menggambar (dalam Modus Rotasi)"
+
+#. oSEbX
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3159244\n"
+"help.text"
+msgid "Opens the properties dialog for a drawing object."
+msgstr "Membuka dialog properti Objek Menggambar."
+
+#. CDiwF
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150763\n"
+"help.text"
+msgid "Activates the Point Selection mode for the selected drawing object."
+msgstr "Mengaktikan modus Pemilihan Titik untuk objek menggambar yang dipilih."
+
+#. EiYd5
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3153580\n"
+"help.text"
+msgid "Spacebar"
+msgstr "Spasi"
+
+#. xsruK
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3153053\n"
+"help.text"
+msgid "Selects a point of a drawing object (in Point Selection mode) / Cancel selection."
+msgstr "Memilih sebuah titik dari sebuah objek menggambar (dalam modus Pemilihan Titik) / Batalkan pemilihan."
+
+#. CpNBA
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3145629\n"
+"help.text"
+msgid "The selected point blinks once per second."
+msgstr "Titik yang dipilih berkedip tiap detik."
+
+#. pCjDR
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3148624\n"
+"help.text"
+msgid "Shift+Spacebar"
+msgstr "Shift+Spasi"
+
+#. r4BaQ
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3154842\n"
+"help.text"
+msgid "Selects an additional point in Point Selection mode."
+msgstr "Memilih titik tambahan dalam modus Pemilihan Titik."
+
+#. bEFGY
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147424\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+
+#. 4XM3J
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3152955\n"
+"help.text"
+msgid "Selects the next point of the drawing object (Point Selection mode)."
+msgstr "Memilih titik selanjutnya dari objek menggambar (modus Pemilihan Titik)"
+
+#. vEJKn
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149753\n"
+"help.text"
+msgid "In <emph>Rotation</emph> mode, the center of rotation can also be selected."
+msgstr "Dalam modus <emph>Rotasi</emph>, pusat dari rotasi bisa pula dipilih."
+
+#. EqUv7
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147233\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
+
+#. 5YFrE
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3151296\n"
+"help.text"
+msgid "Selects the previous point of the drawing object (Point Selection mode)"
+msgstr "Memilih titik sebelumnya dari objek menggambar (modus Pemilihan Titik)"
+
+#. J9iXa
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3150933\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
+
+#. cQM6k
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3145662\n"
+"help.text"
+msgid "A new drawing object with default size is placed in the center of the current view."
+msgstr "Objek menggambar baru dengan ukuran standar diletakkan pada pusat tampilan bersangkutan."
+
+#. ogw3P
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3147563\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter at the <emph>Selection</emph> icon"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter pada<emph>Pemilihan</emph> ikon"
+
+#. WrBrp
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3150860\n"
+"help.text"
+msgid "Activates the first drawing object in the document."
+msgstr "Mengaktifkan objek menggambar pertama dalam dokumen."
+
+#. bRmeE
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3154569\n"
+"help.text"
+msgid "Esc"
+msgstr "Esc"
+
+#. 59BbM
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3149994\n"
+"help.text"
+msgid "Leaves the <emph>Point Selection</emph> mode. The drawing object is selected afterwards."
+msgstr "Meninggalkan modus <emph>Pemilihan Titik</emph>. Objek menggambar akan dipilih seusainya."
+
+#. WvMGd
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3155512\n"
+"help.text"
+msgid "Edits a point of a drawing object (Point Edit mode)."
+msgstr "Menyunting titik dari sebuah objek menggambar (modus Sunting Titik)"
+
+#. CWKSa
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"hd_id3148580\n"
+"help.text"
+msgid "Any text or numerical key"
+msgstr "Tombol teks atau tombol numerik apa saja"
+
+#. P5dAB
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id3152918\n"
+"help.text"
+msgid "If a drawing object is selected, switches to edit mode and places the cursor at the end of the text in the drawing object. A printable character is inserted."
+msgstr "Apabila objek menggambar telah terpilih, akan berpindah ke modus sunting dan meletakkan kursor pada akhir teks dalam objek menggambar. Sebuah karakter dapat dicetak akan disisipkan."
+
+#. hEyPF
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id2693563\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> key while creating or scaling a graphic object"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option </caseinline><defaultinline>Alt</defaultinline></switchinline>+Panah Atas/Bawah/Kiri/Kanan"
+
+#. cDSDC
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id8308969\n"
+"help.text"
+msgid "The position of the object's center is fixed."
+msgstr "Posisi titik pusat objek adalah tetap."
+
+#. sCAnA
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id526444\n"
+"help.text"
+msgid "Shift key while creating or scaling a graphic object"
+msgstr "Tombol Shift sembari membuat atau menskala objek grafis"
+
+#. uTEXC
+#: 01010000.xhp
+msgctxt ""
+"01010000.xhp\n"
+"par_id4939725\n"
+"help.text"
+msgid "The ratio of the object's width to height is fixed."
+msgstr "Rasio lebar dan tinggi objek adalah tetap."
+
+#. apJTN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Database Shortcut Keys"
+msgstr "Tombol Pintas Basis Data"
+
+#. bLBCN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3149809\n"
+"help.text"
+msgid "<bookmark_value>shortcut keys; in databases</bookmark_value><bookmark_value>databases; shortcut keys</bookmark_value>"
+msgstr "<bookmark_value>tombol pintas; dalam basis data</bookmark_value><bookmark_value>basis data; tombol pintas</bookmark_value>"
+
+#. b99D3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149809\n"
+"help.text"
+msgid "<variable id=\"DB_keys\"><link href=\"text/shared/04/01020000.xhp\" name=\"Database Shortcut Keys\">Database Shortcut Keys</link></variable>"
+msgstr "<variable id=\"DB_keys\"><link href=\"text/shared/04/01020000.xhp\" name=\"Tombol Pintas Basis Data\">Tombol Pintas Basis Data</link></variable>"
+
+#. XtS9J
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152462\n"
+"help.text"
+msgid "The following is a list of shortcut keys available within databases."
+msgstr "Berikut ini adalah daftar tombol pintas yang tersedia dalam Basis data."
+
+#. KdAHW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147350\n"
+"help.text"
+msgid "The general <link href=\"text/shared/04/01010000.xhp\" name=\"shortcut keys in $[officename]\">shortcut keys in $[officename]</link> also apply."
+msgstr "<link href=\"text/shared/04/01010000.xhp\" name=\"tombol pintas dalam $[officename]\">tombol pintas pada $[officename]</link> juga bisa digunakan."
+
+#. xVHCv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3159155\n"
+"help.text"
+msgid "Shortcut keys for databases"
+msgstr "Tombol pintas untuk basis data"
+
+#. LgAzS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149378\n"
+"help.text"
+msgid "In the query design"
+msgstr "Dalam desain sortir"
+
+#. AaAyE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148389\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Tombol Pintas"
+
+#. DRSRA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151051\n"
+"help.text"
+msgid "Effect"
+msgstr "efek"
+
+#. WmgCC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149417\n"
+"help.text"
+msgid "F6"
+msgstr "F6"
+
+#. LJaVh
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155852\n"
+"help.text"
+msgid "Jump between the query design areas."
+msgstr "Melompat antarwilayah dalam desain sortir."
+
+#. vrm2o
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149583\n"
+"help.text"
+msgid "Delete"
+msgstr "Delete"
+
+#. DGPFH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150593\n"
+"help.text"
+msgid "Deletes a table from the query design."
+msgstr "Menghapus sebuah tabel dari desain sortir."
+
+#. q3hiq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148879\n"
+"help.text"
+msgid "Tab"
+msgstr "Tab"
+
+#. 7pFom
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145645\n"
+"help.text"
+msgid "Selects the connection line."
+msgstr "Memilih garis koneksi."
+
+#. bUnEW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3157975\n"
+"help.text"
+msgid "Shift+F10"
+msgstr "Shift+F10"
+
+#. naA2w
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150418\n"
+"help.text"
+msgid "Opens the context menu."
+msgstr "Membuka menu konteks."
+
+#. vyznX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151318\n"
+"help.text"
+msgid "F4"
+msgstr "F4"
+
+#. DCaap
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3157846\n"
+"help.text"
+msgid "Shows a Preview."
+msgstr "Tampilkan Pratinjau"
+
+#. CbUX7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id8985259\n"
+"help.text"
+msgid "F5"
+msgstr "F5"
+
+#. xBKb5
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id336313\n"
+"help.text"
+msgid "Runs query."
+msgstr "Menjalankan sortir"
+
+#. KRzyr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id5499435\n"
+"help.text"
+msgid "F7"
+msgstr "F7"
+
+#. cGaMg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id346995\n"
+"help.text"
+msgid "Adds table or query."
+msgstr "Menambah tabel atau sortiran"
+
+#. ZQynK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149403\n"
+"help.text"
+msgid "Control Properties Window"
+msgstr "Jendela Properti Kendali"
+
+#. rue6r
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN1075E\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Tombol Pintas"
+
+#. BYavF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10764\n"
+"help.text"
+msgid "Effect"
+msgstr "efek"
+
+#. mFUGX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153510\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Down Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option </caseinline><defaultinline>Alt</defaultinline></switchinline>+Panah Bawah"
+
+#. ktTta
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148572\n"
+"help.text"
+msgid "Opens the combo box."
+msgstr "Membuka kotak kombo."
+
+#. VboBJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151205\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Up Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option </caseinline><defaultinline>Alt</defaultinline></switchinline>+Panah Atas"
+
+#. LJKq2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145302\n"
+"help.text"
+msgid "Closes the combo box."
+msgstr "Menutup kotak kombo."
+
+#. Gh7Gu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3158416\n"
+"help.text"
+msgid "Shift+Enter"
+msgstr "Shift+Enter"
+
+#. jiEh3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153948\n"
+"help.text"
+msgid "Inserts a new line."
+msgstr "Menyisipkan baris baru."
+
+#. UQysN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150327\n"
+"help.text"
+msgid "Up arrow"
+msgstr "Panah atas"
+
+#. Hg8EF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145168\n"
+"help.text"
+msgid "Positions the cursor in the previous line."
+msgstr "Menempatkan kursor pada baris sebelumnya."
+
+#. GyGem
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3157866\n"
+"help.text"
+msgid "Down arrow"
+msgstr "Panah bawah"
+
+#. HyVjn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154480\n"
+"help.text"
+msgid "Puts the cursor into the next line."
+msgstr "Menempatkan kursor pada baris selanjutnya."
+
+#. DtGG4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154756\n"
+"help.text"
+msgid "Enter"
+msgstr "Enter"
+
+#. m3rP3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152962\n"
+"help.text"
+msgid "Completes the input in the field and places the cursor into the next field."
+msgstr "Melengkapi masukan pada ruas dan menempatkan kursor pada ruas selanjutnya."
+
+#. xTEB4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155766\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F6"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F6"
+
+#. KHoRz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149018\n"
+"help.text"
+msgid "Sets the focus (if not in design mode) to the first control. The first control is the first one listed in the Form Navigator."
+msgstr "Mengatur fokus (apabila tidak dalam modus desain) ke kendali pertama. Kendali pertama adalah yang didaftar pertama kali pada Navigator Formulir."
+
+#. WVFvV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148996\n"
+"help.text"
+msgid "Shortcuts for creating Basic dialogs"
+msgstr "Pintas untuk membuat dialog Basic"
+
+#. ua2GB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN1089C\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Tombol Pintas"
+
+#. NLysc
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN108A2\n"
+"help.text"
+msgid "Effect"
+msgstr "Efek"
+
+#. TDcsn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156054\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+PgUp"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+PgUp"
+
+#. SAM9h
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150389\n"
+"help.text"
+msgid "Jumps between tabs."
+msgstr "Melompat antara halaman tab."
+
+#. Rgcje
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156384\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+PgDn"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+PgDn"
+
+#. BbZS7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151251\n"
+"help.text"
+msgid "Jumps between tabs."
+msgstr "Melompat antara halaman tab."
+
+#. ospMB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145297\n"
+"help.text"
+msgid "F6"
+msgstr "F6"
+
+#. 5FDKF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151016\n"
+"help.text"
+msgid "Jumps between windows."
+msgstr "Melompat antara jendela."
+
+#. F76Ez
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153965\n"
+"help.text"
+msgid "Tab"
+msgstr "Tab"
+
+#. i66Mb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153535\n"
+"help.text"
+msgid "Selection of the control fields."
+msgstr "Pemilihan ruas kendali."
+
+#. 6JfBA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3152484\n"
+"help.text"
+msgid "Shift+Tab"
+msgstr "Shift+Tab"
+
+#. QrwAy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149257\n"
+"help.text"
+msgid "Selection of the control fields in opposite direction."
+msgstr "Pemilihan ruas kendali dalam arah berlawan."
+
+#. ETutr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154967\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
+
+#. LHjAE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147255\n"
+"help.text"
+msgid "Inserts the selected control."
+msgstr "Menyisipkan kendali yang dipilih."
+
+#. jSEbF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3163726\n"
+"help.text"
+msgid "Arrow key"
+msgstr "Tombol panah"
+
+#. 7qxzB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN109BA\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+arrow key"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Home"
+
+#. FpPvX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145791\n"
+"help.text"
+msgid "Moves the selected control in steps of 1 mm in the respective direction. In point edit mode, it changes the size of the selected control."
+msgstr "Memindahkan kendali yang dipilih sejauh 1 mm dalam arah yang respektif. Dalam modus sunting titik, hal ini akan mengubah ukuran dari kendali yang dipilih."
+
+#. pTsL2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154665\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command </caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+
+#. YBeX9
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155581\n"
+"help.text"
+msgid "In point edit mode, jumps to next handle."
+msgstr "Pada modus sunting titik, melompat pada pegangan selanjutnya."
+
+#. 4Cfoh
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150208\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+msgstr "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
+
+#. PBnzy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147506\n"
+"help.text"
+msgid "In point edit mode, jumps to previous handle."
+msgstr "Pada modus sunting titik, melompat pada pegangan sebelumnya."
+
+#. FVYQW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153231\n"
+"help.text"
+msgid "Esc"
+msgstr "Esc"
+
+#. exA5h
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152969\n"
+"help.text"
+msgid "Leaves the current selection."
+msgstr "Meninggkalkan pemilihan saat ini."

@@ -1,0 +1,1106 @@
+#. extracted from helpcontent2/source/auxiliary
+msgid ""
+msgstr ""
+"Project-Id-Version: auxiliary\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2021-11-25 19:33+0100\n"
+"PO-Revision-Date: 2020-01-24 14:44+0000\n"
+"Last-Translator: kompilainenn <79045_79045@mail.ru>\n"
+"Language-Team: Russian <https://weblate.documentfoundation.org/projects/libo_help-master/auxiliary/ru/>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1564779105.000000\n"
+
+#. fEEXD
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07\n"
+"help_section.text"
+msgid "Macros and Scripting"
+msgstr "Макросы и скрипты"
+
+#. pDA36
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0701\n"
+"node.text"
+msgid "%PRODUCTNAME BASIC"
+msgstr "%PRODUCTNAME BASIC"
+
+#. Ua99d
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070101\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Общие сведения и пользовательский интерфейс"
+
+#. ooCCn
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070102\n"
+"node.text"
+msgid "Command Reference"
+msgstr "Справочник команд"
+
+#. ZhxZF
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010202\n"
+"node.text"
+msgid "Functions, Statements and Operators"
+msgstr ""
+
+#. 3SEZD
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010201\n"
+"node.text"
+msgid "Alphabetic List of Functions, Statements and Operators"
+msgstr ""
+
+#. jhVCB
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010205\n"
+"node.text"
+msgid "Advanced Basic Libraries"
+msgstr "Расширенные библиотеки Basic"
+
+#. cFRyM
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"07010305\n"
+"node.text"
+msgid "ScriptForge Library"
+msgstr ""
+
+#. Vkt9E
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070103\n"
+"node.text"
+msgid "Guides"
+msgstr "Руководства"
+
+#. f7k4A
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0702\n"
+"node.text"
+msgid "Python Scripts Help"
+msgstr "Справка по макросам на Python"
+
+#. pVb5g
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070201\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Общие сведения и пользовательский интерфейс"
+
+#. D6bPQ
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070202\n"
+"node.text"
+msgid "Programming with Python"
+msgstr "Программирование на Python"
+
+#. JCHAg
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"0703\n"
+"node.text"
+msgid "Script Development Tools"
+msgstr ""
+
+#. KsAjT
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08\n"
+"help_section.text"
+msgid "Spreadsheets (Calc)"
+msgstr "Электронные таблицы (Calc)"
+
+#. DnZNf
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0801\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Общие сведения и пользовательский интерфейс"
+
+#. DdtJy
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0802\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Справочник по командам и меню"
+
+#. 8g9EE
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"080201\n"
+"node.text"
+msgid "Menus"
+msgstr "Меню"
+
+#. jwFgp
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"080202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Панели инструментов"
+
+#. sHFhh
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0803\n"
+"node.text"
+msgid "Functions Types and Operators"
+msgstr "Типы функций и операторы"
+
+#. DSUE2
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0804\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Открытие, Сохранение, Импорт, Экспорт и Редактура"
+
+#. yRwiN
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0805\n"
+"node.text"
+msgid "Formatting"
+msgstr "Форматирование"
+
+#. 5wLkU
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0806\n"
+"node.text"
+msgid "Filtering and Sorting"
+msgstr "Фильтрация и сортировка"
+
+#. yCyBs
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0807\n"
+"node.text"
+msgid "Printing"
+msgstr "Печать"
+
+#. GTRoC
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0808\n"
+"node.text"
+msgid "Data Ranges"
+msgstr "Диапазоны данных"
+
+#. cM3fi
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0809\n"
+"node.text"
+msgid "Pivot Table"
+msgstr "Сводная таблица"
+
+#. ZBuq9
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08091\n"
+"node.text"
+msgid "Pivot Chart"
+msgstr "Сводная диаграмма"
+
+#. RowUw
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0810\n"
+"node.text"
+msgid "Scenarios"
+msgstr "Сценарии"
+
+#. NHiVG
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"08101\n"
+"node.text"
+msgid "Subtotals"
+msgstr ""
+
+#. CzARM
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0811\n"
+"node.text"
+msgid "References"
+msgstr "Ссылки"
+
+#. ELC6F
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0812\n"
+"node.text"
+msgid "Viewing, Selecting, Copying"
+msgstr "Просмотр, выбор, копирование"
+
+#. VFHig
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0813\n"
+"node.text"
+msgid "Formulas and Calculations"
+msgstr "Формулы и вычисления"
+
+#. bCMSS
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0814\n"
+"node.text"
+msgid "Protection"
+msgstr "Защита"
+
+#. m2Dpj
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0815\n"
+"node.text"
+msgid "Writing Calc Macros"
+msgstr ""
+
+#. Q59GN
+#: scalc.tree
+msgctxt ""
+"scalc.tree\n"
+"0815\n"
+"node.text"
+msgid "Miscellaneous"
+msgstr "Прочее"
+
+#. 6Saoi
+#: schart.tree
+msgctxt ""
+"schart.tree\n"
+"05\n"
+"help_section.text"
+msgid "Charts and Diagrams"
+msgstr "Диаграммы и схемы"
+
+#. gu6pZ
+#: schart.tree
+msgctxt ""
+"schart.tree\n"
+"0501\n"
+"node.text"
+msgid "General Information"
+msgstr "Общие сведения"
+
+#. Q5EUA
+#: sdatabase.tree
+msgctxt ""
+"sdatabase.tree\n"
+"09\n"
+"help_section.text"
+msgid "Database Functionality (Base)"
+msgstr ""
+
+#. tLWiE
+#: sdatabase.tree
+msgctxt ""
+"sdatabase.tree\n"
+"0901\n"
+"node.text"
+msgid "General Information"
+msgstr ""
+
+#. xU49Q
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11\n"
+"help_section.text"
+msgid "Drawings (Draw)"
+msgstr "Рисование (Draw)"
+
+#. UcMAA
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1101\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Общие сведения и пользовательский интерфейс"
+
+#. ZDeBD
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1102\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Справочник по командам и меню"
+
+#. kq7Az
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11020201\n"
+"node.text"
+msgid "Menus"
+msgstr "Меню"
+
+#. SFgJ7
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"11020202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Панели инструментов"
+
+#. 9ojH7
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1103\n"
+"node.text"
+msgid "Loading, Saving, Importing, and Exporting"
+msgstr "Загрузка, сохранение, импорт и экспорт"
+
+#. fJYHX
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1104\n"
+"node.text"
+msgid "Formatting"
+msgstr "Форматирование"
+
+#. HkVUY
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1105\n"
+"node.text"
+msgid "Printing"
+msgstr "Печать"
+
+#. G8GoF
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1106\n"
+"node.text"
+msgid "Effects"
+msgstr "Эффекты"
+
+#. fd9tS
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1107\n"
+"node.text"
+msgid "Objects, Graphics, and Bitmaps"
+msgstr "Объекты, графические объекты и растровые изображения"
+
+#. crdMY
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1108\n"
+"node.text"
+msgid "Groups and Layers"
+msgstr "Группы и слои"
+
+#. G3s8n
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1109\n"
+"node.text"
+msgid "Text in Drawings"
+msgstr "Текст в рисунках"
+
+#. rxRmL
+#: sdraw.tree
+msgctxt ""
+"sdraw.tree\n"
+"1110\n"
+"node.text"
+msgid "Viewing"
+msgstr "Просмотр"
+
+#. 4zaCG
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"01\n"
+"help_section.text"
+msgid "%PRODUCTNAME Installation"
+msgstr "Установка %PRODUCTNAME"
+
+#. 3EUAC
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"10\n"
+"help_section.text"
+msgid "Common Help Topics"
+msgstr "Общие разделы справки"
+
+#. 3GoWS
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1001\n"
+"node.text"
+msgid "General Information"
+msgstr "Общие сведения"
+
+#. vFfKE
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1002\n"
+"node.text"
+msgid "%PRODUCTNAME and Microsoft Office"
+msgstr "%PRODUCTNAME и Microsoft Office"
+
+#. GBR3F
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1004\n"
+"node.text"
+msgid "%PRODUCTNAME Options"
+msgstr "Параметры %PRODUCTNAME"
+
+#. d4gAD
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1005\n"
+"node.text"
+msgid "Wizards"
+msgstr "Мастера"
+
+#. aXMeh
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100501\n"
+"node.text"
+msgid "Letter Wizard"
+msgstr "Мастер писем"
+
+#. 6qzVL
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100502\n"
+"node.text"
+msgid "Fax Wizard"
+msgstr "Мастер факсов"
+
+#. GMiKt
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100504\n"
+"node.text"
+msgid "Agenda Wizard"
+msgstr "Мастер повестки дня"
+
+#. gvsML
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100506\n"
+"node.text"
+msgid "HTML Export Wizard"
+msgstr "Мастер экспорта HTML"
+
+#. 8tHJK
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"100510\n"
+"node.text"
+msgid "Document Converter Wizard"
+msgstr "Мастер конвертера документов"
+
+#. zhnAF
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1006\n"
+"node.text"
+msgid "Configuring %PRODUCTNAME"
+msgstr "Настройка %PRODUCTNAME"
+
+#. 2rp8T
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1007\n"
+"node.text"
+msgid "Working with the User Interface"
+msgstr "Работа с пользовательским интерфейсом"
+
+#. mFuDH
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"10071\n"
+"node.text"
+msgid "Digital Signatures"
+msgstr "Цифровые подписи"
+
+#. drtXn
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1008\n"
+"node.text"
+msgid "Printing, Faxing, Sending"
+msgstr "Принтеры, факсы, отправка"
+
+#. ZJbym
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1009\n"
+"node.text"
+msgid "Drag & Drop"
+msgstr "Перетаскивание"
+
+#. DFzj6
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1010\n"
+"node.text"
+msgid "Copy and Paste"
+msgstr "Копирование и вставка"
+
+#. hQXmX
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1012\n"
+"node.text"
+msgid "Charts and Diagrams"
+msgstr "Диаграммы и схемы"
+
+#. GVohQ
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1013\n"
+"node.text"
+msgid "Load, Save, Import, Export, PDF"
+msgstr "Открыть, Сохранить, Импортировать, Экспортировать, PDF"
+
+#. Ty8Du
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1014\n"
+"node.text"
+msgid "Links and References"
+msgstr "Связи и ссылки"
+
+#. nDFsH
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1015\n"
+"node.text"
+msgid "Document Version Tracking"
+msgstr "Отслеживание версий документов"
+
+#. AnvYc
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1016\n"
+"node.text"
+msgid "Labels and Business Cards"
+msgstr "Этикетки и визитки"
+
+#. tEYBw
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1018\n"
+"node.text"
+msgid "Inserting External Data"
+msgstr "Вставка внешних данных"
+
+#. X2KH4
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1019\n"
+"node.text"
+msgid "Automatic Functions"
+msgstr "Автоматические функции"
+
+#. EGqAp
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1020\n"
+"node.text"
+msgid "Searching and Replacing"
+msgstr "Поиск и замена"
+
+#. 4GGhC
+#: shared.tree
+msgctxt ""
+"shared.tree\n"
+"1021\n"
+"node.text"
+msgid "Guides"
+msgstr "Инструкции"
+
+#. BjDNf
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04\n"
+"help_section.text"
+msgid "Presentations (Impress)"
+msgstr "Презентации (Impress)"
+
+#. hBFX8
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0401\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Общие сведения и пользовательский интерфейс"
+
+#. XaGTA
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0402\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Справочник по командам и меню"
+
+#. ADAgH
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04020101\n"
+"node.text"
+msgid "Menus"
+msgstr "Меню"
+
+#. fqLWR
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"04020102\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Панели инструментов"
+
+#. fiLDS
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0403\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Открытие, Сохранение, Импорт, Экспорт и Редактура"
+
+#. jMBsp
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0404\n"
+"node.text"
+msgid "Formatting"
+msgstr "Форматирование"
+
+#. HtUGZ
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0405\n"
+"node.text"
+msgid "Printing"
+msgstr "Печать"
+
+#. FxREt
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0406\n"
+"node.text"
+msgid "Effects"
+msgstr "Эффекты"
+
+#. RX5V8
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0407\n"
+"node.text"
+msgid "Objects, Graphics, and Bitmaps"
+msgstr "Объекты, графические объекты и растровые изображения"
+
+#. aDbFG
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0409\n"
+"node.text"
+msgid "Text in Presentations"
+msgstr "Текст в презентациях"
+
+#. s8GCo
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0410\n"
+"node.text"
+msgid "Viewing"
+msgstr "Просмотр"
+
+#. Lo4YZ
+#: simpress.tree
+msgctxt ""
+"simpress.tree\n"
+"0411\n"
+"node.text"
+msgid "Slide Shows"
+msgstr "Слайд-шоу"
+
+#. m5CkC
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"03\n"
+"help_section.text"
+msgid "Formulas (Math)"
+msgstr "Формулы (Math)"
+
+#. kAkAL
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0301\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Общие сведения и пользовательский интерфейс"
+
+#. 3BZ8j
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"030101\n"
+"node.text"
+msgid "%PRODUCTNAME Formula Elements"
+msgstr "Элементы формулы %PRODUCTNAME"
+
+#. V99im
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0302\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Справочник по командам и меню"
+
+#. CGoih
+#: smath.tree
+msgctxt ""
+"smath.tree\n"
+"0303\n"
+"node.text"
+msgid "Working with Formulas"
+msgstr "Работа с формулами"
+
+#. FxCSV
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"02\n"
+"help_section.text"
+msgid "Text Documents (Writer)"
+msgstr "Текстовые документы (Writer)"
+
+#. jWyEV
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0201\n"
+"node.text"
+msgid "General Information and User Interface Usage"
+msgstr "Общие сведения и пользовательский интерфейс"
+
+#. mT2iu
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0202\n"
+"node.text"
+msgid "Command and Menu Reference"
+msgstr "Справочник по командам и меню"
+
+#. 4RREa
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"020201\n"
+"node.text"
+msgid "Menus"
+msgstr "Меню"
+
+#. SQkvD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"020202\n"
+"node.text"
+msgid "Toolbars"
+msgstr "Панели инструментов"
+
+#. AExWW
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0210\n"
+"node.text"
+msgid "Navigating Text Documents"
+msgstr "Навигация в текстовых документах"
+
+#. hjKKD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0212\n"
+"node.text"
+msgid "Formatting Text Documents"
+msgstr "Форматирование текстовых документов"
+
+#. 6gFto
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"021201\n"
+"node.text"
+msgid "Templates and Styles"
+msgstr "Шаблоны и стили"
+
+#. 7BQES
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0204\n"
+"node.text"
+msgid "Graphics in Text Documents"
+msgstr "Графические объекты в текстовых документах"
+
+#. QsiTB
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0205\n"
+"node.text"
+msgid "Tables in Text Documents"
+msgstr "Таблицы в текстовых документах"
+
+#. Xx5Fp
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0206\n"
+"node.text"
+msgid "Objects in Text Documents"
+msgstr "Объекты в текстовых документах"
+
+#. 47SjN
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0207\n"
+"node.text"
+msgid "Sections and Frames in Text Documents"
+msgstr "Разделы и врезки в текстовых документах"
+
+#. E2N9E
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0208\n"
+"node.text"
+msgid "Tables of Contents and Indexes"
+msgstr "Оглавление и указатели"
+
+#. yi6ro
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0209\n"
+"node.text"
+msgid "Fields in Text Documents"
+msgstr "Поля в текстовых документах"
+
+#. ZgfjA
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0211\n"
+"node.text"
+msgid "Calculating in Text Documents"
+msgstr "Вычисления в текстовых документах"
+
+#. wVGdF
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0213\n"
+"node.text"
+msgid "Special Text Elements"
+msgstr "Специальные элементы текста"
+
+#. FxdVR
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0214\n"
+"node.text"
+msgid "Automatic Functions"
+msgstr "Автоматические функции"
+
+#. hi36Q
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0215\n"
+"node.text"
+msgid "Numbering and Lists"
+msgstr "Нумерация и списки"
+
+#. 2FPcB
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0216\n"
+"node.text"
+msgid "Spellchecking, Thesaurus, and Languages"
+msgstr "Проверка орфографии, тезаурус и языки"
+
+#. vDffD
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0218\n"
+"node.text"
+msgid "Troubleshooting Tips"
+msgstr "Советы по устранению неполадок"
+
+#. qLMLk
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0219\n"
+"node.text"
+msgid "Loading, Saving, Importing, Exporting and Redacting"
+msgstr "Открытие, Сохранение, Импорт, Экспорт и Редактура"
+
+#. 8GC4J
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0220\n"
+"node.text"
+msgid "Master Documents"
+msgstr "Составные документы"
+
+#. wbJh4
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0221\n"
+"node.text"
+msgid "Links and References"
+msgstr "Связи и ссылки"
+
+#. vHzyn
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0222\n"
+"node.text"
+msgid "Printing"
+msgstr "Печать"
+
+#. F4LCk
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"0223\n"
+"node.text"
+msgid "Searching and Replacing"
+msgstr "Поиск и замена"
+
+#. CYQr2
+#: swriter.tree
+msgctxt ""
+"swriter.tree\n"
+"06\n"
+"help_section.text"
+msgid "HTML Documents (Writer Web)"
+msgstr "HTML документы (Writer Web)"

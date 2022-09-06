@@ -1,0 +1,260 @@
+#. extracted from scp2/source/writer
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2021-02-16 16:36+0000\n"
+"Last-Translator: Mister Update <mr.update@yahoo.de>\n"
+"Language-Team: German <https://translations.documentfoundation.org/projects/libo_ui-master/scp2sourcewriter/de/>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.4\n"
+"X-POOTLE-MTIME: 1532152739.000000\n"
+
+#. V3iDr
+#: folderitem_writer.ulf
+msgctxt ""
+"folderitem_writer.ulf\n"
+"STR_FI_NAME_HTMLDOKUMENT\n"
+"LngText.text"
+msgid "HTML Document"
+msgstr "HTML-Dokument"
+
+#. SL8qT
+#: folderitem_writer.ulf
+msgctxt ""
+"folderitem_writer.ulf\n"
+"STR_FI_NAME_TEXTDOKUMENT\n"
+"LngText.text"
+msgid "Text Document"
+msgstr "Textdokument"
+
+#. QEKcn
+#: folderitem_writer.ulf
+msgctxt ""
+"folderitem_writer.ulf\n"
+"STR_FI_TOOLTIP_WRITER\n"
+"LngText.text"
+msgid "Create and edit text and images in letters, reports, documents and Web pages by using Writer."
+msgstr "Erstellen und Bearbeiten von Text und Bildern in Briefen, Berichten, Dokumenten und Webseiten – Writer macht es möglich."
+
+#. 3iX4u
+#: module_writer.ulf
+msgctxt ""
+"module_writer.ulf\n"
+"STR_NAME_MODULE_PRG_WRT\n"
+"LngText.text"
+msgid "%PRODUCTNAME Writer"
+msgstr "%PRODUCTNAME Writer"
+
+#. FEGQU
+#: module_writer.ulf
+msgctxt ""
+"module_writer.ulf\n"
+"STR_DESC_MODULE_PRG_WRT\n"
+"LngText.text"
+msgid "Create and edit text and images in letters, reports, documents and Web pages by using %PRODUCTNAME Writer."
+msgstr "Erstellen und Bearbeiten von Text und Bildern in Briefen, Berichten, Dokumenten und Webseiten mit %PRODUCTNAME Writer."
+
+#. GCUDe
+#: module_writer.ulf
+msgctxt ""
+"module_writer.ulf\n"
+"STR_NAME_MODULE_PRG_WRT_BIN\n"
+"LngText.text"
+msgid "Program Module"
+msgstr "Programmmodul"
+
+#. CzaW6
+#: module_writer.ulf
+msgctxt ""
+"module_writer.ulf\n"
+"STR_DESC_MODULE_PRG_WRT_BIN\n"
+"LngText.text"
+msgid "The application %PRODUCTNAME Writer"
+msgstr "Die Anwendung %PRODUCTNAME Writer"
+
+#. zYAFQ
+#: module_writer.ulf
+msgctxt ""
+"module_writer.ulf\n"
+"STR_NAME_MODULE_PRG_WRT_HELP\n"
+"LngText.text"
+msgid "%PRODUCTNAME Writer Help"
+msgstr "%PRODUCTNAME Writer Hilfe"
+
+#. j3zwV
+#: module_writer.ulf
+msgctxt ""
+"module_writer.ulf\n"
+"STR_DESC_MODULE_PRG_WRT_HELP\n"
+"LngText.text"
+msgid "Help about %PRODUCTNAME Writer"
+msgstr "Hilfe zu %PRODUCTNAME Writer"
+
+#. 5BavU
+#: module_writer.ulf
+msgctxt ""
+"module_writer.ulf\n"
+"STR_NAME_MODULE_PRG_WRT_WRITER2LATEX\n"
+"LngText.text"
+msgid "LaTeX Export"
+msgstr "LaTeX-Export"
+
+#. YN2aC
+#: module_writer.ulf
+msgctxt ""
+"module_writer.ulf\n"
+"STR_DESC_MODULE_PRG_WRT_WRITER2LATEX\n"
+"LngText.text"
+msgid "LaTeX export filter for Writer documents."
+msgstr "LaTeX-Exportfilter für Writer-Dokumente."
+
+#. 9mhd6
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_NEW\n"
+"LngText.text"
+msgid "&New"
+msgstr "&Neu"
+
+#. GaQQD
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_SO60_TEXT\n"
+"LngText.text"
+msgid "%SXWFORMATNAME %SXWFORMATVERSION Text Document"
+msgstr "%SXWFORMATNAME %SXWFORMATVERSION Text Dokument"
+
+#. dG5h9
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_SO60_MASTERDOC\n"
+"LngText.text"
+msgid "%SXWFORMATNAME %SXWFORMATVERSION Master Document"
+msgstr "%SXWFORMATNAME %SXWFORMATVERSION Globaldokument"
+
+#. iZ8qv
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_SO60_WRITER_TEMPLATE\n"
+"LngText.text"
+msgid "%SXWFORMATNAME %SXWFORMATVERSION Text Document Template"
+msgstr "%SXWFORMATNAME %SXWFORMATVERSION Textdokument Dokumentvorlage"
+
+#. Xd6BL
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_OO_WRITER\n"
+"LngText.text"
+msgid "OpenDocument Text"
+msgstr "OpenDocument Text"
+
+#. HACXx
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_OO_WRITER_TEMPLATE\n"
+"LngText.text"
+msgid "OpenDocument Text Template"
+msgstr "OpenDocument Textdokument Dokumentvorlage"
+
+#. LNxi7
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_OO_MASTERDOC\n"
+"LngText.text"
+msgid "OpenDocument Master Document"
+msgstr "OpenDocument Globaldokument"
+
+#. 9pRkz
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_OO_WEBDOC\n"
+"LngText.text"
+msgid "HTML Document Template"
+msgstr "HTML-Dokument Dokumentvorlage"
+
+#. 9LaGH
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_MS_WORD_DOCUMENT_OLD\n"
+"LngText.text"
+msgid "Microsoft Word 97-2003 Document"
+msgstr "Microsoft Word 97–2003 Dokument"
+
+#. S7R4Z
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_MS_WORD_DOCUMENT\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word Dokument"
+
+#. uEDNQ
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_MS_WORD_TEMPLATE_OLD\n"
+"LngText.text"
+msgid "Microsoft Word 97-2003 Template"
+msgstr "Microsoft Word 97–2003 Dokumentvorlage"
+
+#. kzVhN
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_MS_WORD_TEMPLATE\n"
+"LngText.text"
+msgid "Microsoft Word Template"
+msgstr "Microsoft Word Dokumentvorlage"
+
+#. wyEB5
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_MS_RTF_DOCUMENT\n"
+"LngText.text"
+msgid "Rich Text Document"
+msgstr "Rich Text Dokument"
+
+#. 2xDoA
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_UNIFORM_OFFICE_FORMAT_TEXT\n"
+"LngText.text"
+msgid "Uniform Office Format Text Document"
+msgstr "Uniform Office Format Textdokument"
+
+#. jaoyB
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_WORDPRO_DOCUMENT\n"
+"LngText.text"
+msgid "Lotus Word Pro Document"
+msgstr "Lotus Word Pro Dokument"
+
+#. B4Fya
+#: registryitem_writer.ulf
+msgctxt ""
+"registryitem_writer.ulf\n"
+"STR_REG_VAL_T602_TEXT_FILE\n"
+"LngText.text"
+msgid "T602 Text File"
+msgstr "T602-Textdatei"

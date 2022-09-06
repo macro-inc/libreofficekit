@@ -1,0 +1,469 @@
+#. extracted from fpicker/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: LibreOffice 7.4\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-06-13 09:50+0200\n"
+"PO-Revision-Date: 2022-06-02 11:23+0200\n"
+"Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
+"Language-Team: sl.libreoffice.org\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
+"X-Generator: Virtaal 0.7.1\n"
+"X-Accelerator-Marker: ~\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Project-Style: openoffice\n"
+
+#: fpicker/inc/strings.hrc:24
+msgctxt "STR_EXPLORERFILE_OPEN"
+msgid "Open"
+msgstr "Odpri"
+
+#: fpicker/inc/strings.hrc:25
+msgctxt "STR_EXPLORERFILE_SAVE"
+msgid "Save as"
+msgstr "Shrani kot"
+
+#: fpicker/inc/strings.hrc:26
+msgctxt "STR_EXPLORERFILE_BUTTONSAVE"
+msgid "~Save"
+msgstr "~Shrani"
+
+#: fpicker/inc/strings.hrc:27
+msgctxt "STR_PATHNAME"
+msgid "~Path:"
+msgstr "~Pot:"
+
+#: fpicker/inc/strings.hrc:28
+msgctxt "STR_PATHSELECT"
+msgid "Select path"
+msgstr "Izberite pot"
+
+#: fpicker/inc/strings.hrc:29
+msgctxt "STR_BUTTONSELECT"
+msgid "~Select"
+msgstr "I~zberi"
+
+#: fpicker/inc/strings.hrc:30
+msgctxt "STR_PREVIEW"
+msgid "File Preview"
+msgstr "Predogled datoteke"
+
+#: fpicker/inc/strings.hrc:31
+msgctxt "STR_DEFAULT_DIRECTORY"
+msgid "My Documents"
+msgstr "Moji dokumenti"
+
+#: fpicker/inc/strings.hrc:32
+msgctxt "RID_FILEOPEN_NOTEXISTENTFILE"
+msgid ""
+"The file $name$ does not exist.\n"
+"Make sure you have entered the correct file name."
+msgstr ""
+"Datoteka $name$ ne obstaja.\n"
+"Preverite, da ste vnesli pravilno ime datoteke."
+
+#: fpicker/inc/strings.hrc:33
+msgctxt "STR_SVT_NEW_FOLDER"
+msgid "Folder"
+msgstr "Mapa"
+
+#: fpicker/inc/strings.hrc:34
+msgctxt "STR_SVT_NOREMOVABLEDEVICE"
+msgid ""
+"No removable storage device detected.\n"
+"Make sure it is plugged in properly and try again."
+msgstr ""
+"Nobene prenosne pomnilniške naprave ni mogoče najti.\n"
+"Preverite, da je pravilno priključena in poskusite znova."
+
+msgctxt "stock"
+msgid "_Add"
+msgstr "Doda_j"
+
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_Uporabi"
+
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "Pre_kliči"
+
+msgctxt "stock"
+msgid "_Close"
+msgstr "Z_apri"
+
+msgctxt "stock"
+msgid "_Delete"
+msgstr "I_zbriši"
+
+msgctxt "stock"
+msgid "_Edit"
+msgstr "U_redi"
+
+msgctxt "stock"
+msgid "_Help"
+msgstr "Po_moč"
+
+msgctxt "stock"
+msgid "_New"
+msgstr "_Nov"
+
+msgctxt "stock"
+msgid "_No"
+msgstr "_Ne"
+
+msgctxt "stock"
+msgid "_OK"
+msgstr "V _redu"
+
+msgctxt "stock"
+msgid "_Remove"
+msgstr "Odst_rani"
+
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_Ponastavi"
+
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Da"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:129
+msgctxt "explorerfiledialog|connect_to_server"
+msgid "Servers..."
+msgstr "Strežniki ..."
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:133
+msgctxt "explorerfiledialog|connect_to_server|tooltip_text"
+msgid "Connect To Server"
+msgstr "Poveži se s strežnikom"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:137
+msgctxt "explorerfiledialog|connect_to_server-atkobject"
+msgid "Connect To Server"
+msgstr "Poveži se s strežnikom"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:193
+msgctxt "explorerfiledialog|new_folder|tooltip_text"
+msgid "Create New Folder"
+msgstr "Ustvari novo mapo"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:199
+msgctxt "explorerfiledialog|new_folder-atkobject"
+msgid "Create New Folder"
+msgstr "Ustvari novo mapo"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:261
+msgctxt "explorerfiledialog|places"
+msgid "Places"
+msgstr "Mesta"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:296
+msgctxt "explorerfiledialog|add"
+msgid "Add current folder to Places"
+msgstr "Dodaj trenutno mapo med Mesta"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:311
+msgctxt "explorerfiledialog|add"
+msgid "Remove selected folder from Places"
+msgstr "Odstrani izbrano mapo iz Mest"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:365
+msgctxt "explorerfiledialog|name"
+msgid "Name"
+msgstr "Ime"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:385
+msgctxt "explorerfiledialog|type"
+msgid "Type"
+msgstr "Vrsta"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:399
+msgctxt "explorerfiledialog|size"
+msgid "Size"
+msgstr "Velikost"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:413
+msgctxt "explorerfiledialog|date"
+msgid "Date modified"
+msgstr "Spremenjeno dne"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:495
+msgctxt "explorerfiledialog|open"
+msgid "_Open"
+msgstr "_Odpri"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:542
+msgctxt "explorerfiledialog|play"
+msgid "_Play"
+msgstr "_Predvajaj"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:580
+msgctxt "explorerfiledialog|file_name_label"
+msgid "File _name:"
+msgstr "_Ime datoteke:"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:606
+msgctxt "explorerfiledialog|file_type_label"
+msgid "File _type:"
+msgstr "Vrsta _datoteke:"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:670
+msgctxt "explorerfiledialog|readonly"
+msgid "_Read-only"
+msgstr "Samo za _branje"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:693
+msgctxt "explorerfiledialog|password"
+msgid "Save with password"
+msgstr "Shrani z geslom"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:706
+msgctxt "explorerfiledialog|extension"
+msgid "_Automatic file name extension"
+msgstr "_Samodejna končnica imena datoteke"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:719
+msgctxt "explorerfiledialog|options"
+msgid "Edit _filter settings"
+msgstr "Uredi nastavitve _filtra"
+
+#: fpicker/uiconfig/ui/explorerfiledialog.ui:746
+msgctxt "explorerfiledialog|gpgencrypt"
+msgid "Encrypt with GPG key"
+msgstr "Šifriraj s ključem GPG"
+
+#: fpicker/uiconfig/ui/foldernamedialog.ui:8
+msgctxt "foldernamedialog|FolderNameDialog"
+msgid "Folder Name"
+msgstr "Ime mape"
+
+#: fpicker/uiconfig/ui/foldernamedialog.ui:86
+msgctxt "foldernamedialog|label2"
+msgid "Na_me:"
+msgstr "I_me:"
+
+#: fpicker/uiconfig/ui/foldernamedialog.ui:116
+msgctxt "foldernamedialog|label1"
+msgid "Create New Folder"
+msgstr "Ustvari novo mapo"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:61
+msgctxt "remotefilesdialog|edit_service"
+msgid "_Add service"
+msgstr "_Dodaj storitev"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:69
+msgctxt "remotefilesdialog|edit_service"
+msgid "_Edit service"
+msgstr "_Uredi storitev"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:77
+msgctxt "remotefilesdialog|delete_service"
+msgid "_Delete service"
+msgstr "_Izbriši storitev"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:85
+msgctxt "remotefilesdialog|change_password"
+msgid "_Change password"
+msgstr "Spre_meni geslo"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:93
+msgctxt "remotefilesdialog|RemoteFilesDialog"
+msgid "Remote Files"
+msgstr "Oddaljene datoteke"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:142
+msgctxt "remotefilesdialog|open"
+msgid "_Open"
+msgstr "_Odpri"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:175
+msgctxt "remotefilesdialog|label1"
+msgid "Service:"
+msgstr "Storitev:"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:203
+msgctxt "remotefilesdialog|add_service_btn"
+msgid "_Manage services"
+msgstr "_Upravljaj storitve"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:253
+msgctxt "remotefilesdialog|list_view|tooltip_text"
+msgid "List view"
+msgstr "Pogled seznama"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:268
+msgctxt "remotefilesdialog|icon_view|tooltip_text"
+msgid "Icon view"
+msgstr "Pogled ikon"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:284
+msgctxt "remotefilesdialog|new_folder|tooltip_text"
+msgid "Create New Folder"
+msgstr "Ustvari novo mapo"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:389
+msgctxt "remotefilesdialog|name"
+msgid "Name"
+msgstr "Ime"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:409
+msgctxt "remotefilesdialog|size"
+msgid "Size"
+msgstr "Velikost"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:423
+msgctxt "remotefilesdialog|date"
+msgid "Date modified"
+msgstr "Spremenjeno dne"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:499
+msgctxt "remotefilesdialog|filterLabel"
+msgid "Filter"
+msgstr "Filter"
+
+#: fpicker/uiconfig/ui/remotefilesdialog.ui:513
+msgctxt "remotefilesdialog|nameLabel"
+msgid "File name"
+msgstr "Ime datoteke"
+
+#: include/fpicker/strings.hrc:14
+msgctxt "STR_SVT_FILEPICKER_AUTO_EXTENSION"
+msgid "~Automatic file name extension"
+msgstr "~Samodejna končnica imena datoteke"
+
+#: include/fpicker/strings.hrc:15
+msgctxt "STR_SVT_FILEPICKER_PASSWORD"
+msgid "Save with pass~word"
+msgstr "Shrani z ges~lom"
+
+#. dear loplugins, please don't remove this constant, it will be used in follow-up commits
+#: include/fpicker/strings.hrc:17
+msgctxt "STR_SVT_FILEPICKER_GPGENCRYPT"
+msgid "Encrypt with ~GPG key"
+msgstr "Šifriraj s ključem ~GPG"
+
+#: include/fpicker/strings.hrc:18
+msgctxt "STR_SVT_FILEPICKER_FILTER_OPTIONS"
+msgid "~Edit filter settings"
+msgstr "Uredi nastavitve ~filtra"
+
+#: include/fpicker/strings.hrc:19
+msgctxt "STR_SVT_FILEPICKER_READONLY"
+msgid "~Read-only"
+msgstr "Samo za ~branje"
+
+#: include/fpicker/strings.hrc:20
+msgctxt "STR_SVT_FILEPICKER_INSERT_AS_LINK"
+msgid "~Link"
+msgstr "~Povezava"
+
+#: include/fpicker/strings.hrc:21
+msgctxt "STR_SVT_FILEPICKER_SHOW_PREVIEW"
+msgid "Pr~eview"
+msgstr "Pr~edogled"
+
+#: include/fpicker/strings.hrc:22
+msgctxt "STR_SVT_FILEPICKER_PLAY"
+msgid "~Play"
+msgstr "~Predvajaj"
+
+#: include/fpicker/strings.hrc:23
+msgctxt "STR_SVT_FILEPICKER_VERSION"
+msgid "~Version:"
+msgstr "Ra~zličica:"
+
+#: include/fpicker/strings.hrc:24
+msgctxt "STR_SVT_FILEPICKER_TEMPLATES"
+msgid "S~tyles:"
+msgstr "S~logi:"
+
+#: include/fpicker/strings.hrc:25
+msgctxt "STR_SVT_FILEPICKER_IMAGE_TEMPLATE"
+msgid "Style:"
+msgstr "Slog:"
+
+#: include/fpicker/strings.hrc:26
+msgctxt "STR_SVT_FILEPICKER_IMAGE_ANCHOR"
+msgid "A~nchor:"
+msgstr "Si~dro:"
+
+#: include/fpicker/strings.hrc:27
+msgctxt "STR_SVT_FILEPICKER_SELECTION"
+msgid "~Selection"
+msgstr "I~zbor"
+
+#: include/fpicker/strings.hrc:28
+msgctxt "STR_SVT_FILEPICKER_FILTER_TITLE"
+msgid "File ~type:"
+msgstr "Vrsta ~datoteke:"
+
+#: include/fpicker/strings.hrc:29
+msgctxt "STR_SVT_FOLDERPICKER_DEFAULT_TITLE"
+msgid "Select Path"
+msgstr "Izberi pot"
+
+#: include/fpicker/strings.hrc:30
+msgctxt "STR_SVT_FOLDERPICKER_DEFAULT_DESCRIPTION"
+msgid "Please select a folder."
+msgstr "Izberite mapo."
+
+#: include/fpicker/strings.hrc:31
+msgctxt "STR_SVT_ALREADYEXISTOVERWRITE"
+msgid ""
+"A file named \"$filename$\" already exists.\n"
+"\n"
+"Do you want to replace it?"
+msgstr ""
+"Datoteka z imenom »$filename$« že obstaja.\n"
+"\n"
+"Jo želite nadomestiti?"
+
+#: include/fpicker/strings.hrc:32
+msgctxt "STR_SVT_ALREADYEXISTOVERWRITE_SECONDARY"
+msgid "The file already exists in \"$dirname$\". Replacing it will overwrite its contents."
+msgstr "Datoteka že obstaja v mapi »$dirname$«. S prepisom bo njena vsebina izgubljena."
+
+#: include/fpicker/strings.hrc:33
+msgctxt "STR_SVT_ALLFORMATS"
+msgid "All Formats"
+msgstr "Vse vrste datotek"
+
+#: include/fpicker/strings.hrc:34
+msgctxt "STR_SVT_DELETESERVICE"
+msgid ""
+"Are you sure you want to delete the service?\n"
+"\"$servicename$\""
+msgstr ""
+"Ali ste prepričani, da želite izbrisati storitev?\n"
+"»$servicename$«"
+
+#: include/fpicker/strings.hrc:35
+msgctxt "STR_SVT_ROOTLABEL"
+msgid "Root"
+msgstr "Korenska mapa"
+
+#: include/fpicker/strings.hrc:36
+msgctxt "STR_FILTERNAME_ALL"
+msgid "All files"
+msgstr "Vse datoteke"
+
+#: include/fpicker/strings.hrc:37
+msgctxt "STR_FILEDLG_OPEN"
+msgid "Open"
+msgstr "Odpri"
+
+#: include/fpicker/strings.hrc:38
+msgctxt "STR_FILEDLG_TYPE"
+msgid "File ~type"
+msgstr "~Vrsta datoteke"
+
+#: include/fpicker/strings.hrc:39
+msgctxt "STR_FILEDLG_SAVE"
+msgid "Save"
+msgstr "Shrani"

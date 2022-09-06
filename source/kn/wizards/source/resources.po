@@ -1,0 +1,5080 @@
+#. extracted from wizards/source/resources
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2020-10-27 12:31+0100\n"
+"PO-Revision-Date: 2019-06-06 16:07+0000\n"
+"Last-Translator: Omshivaprakash <omshivaprakash@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: kn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1559837226.000000\n"
+
+#. 8UKfi
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_0\n"
+"property.text"
+msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
+msgstr "ಕೋಶ '%1'ಅನ್ನು ನಿರ್ಮಿಸಲಾಗಲಿಲ್ಲ. <BR> ನಿಮ್ಮ ಹಾರ್ಡ್ ಡಿಸ್ಕಿನಲ್ಲಿ ಸಾಕಷ್ಟು ಜಾಗ ಇಲ್ಲದೆ ಇರಬಹುದು."
+
+#. zDuJi
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_1\n"
+"property.text"
+msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
+msgstr "ಪಠ್ಯ ದಸ್ತಾವೇಜನ್ನು ನಿರ್ಮಿಸಲಾಗಲಿಲ್ಲ. <BR> ದಯವಿಟ್ಟು 'PRODUCTNAME Writer' ಎಂಬ ಘಟಕವು ಅನುಸ್ಥಾಪಿಸಲಾಗಿದೆಯೆ ಎಂದು ಪರೀಕ್ಷಿಸಿ."
+
+#. BydGz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_2\n"
+"property.text"
+msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
+msgstr "ಸ್ಪ್ರೆಡ್‌ಶೀಟ್ ಅನ್ನು ನಿರ್ಮಿಸಲಾಗಲಿಲ್ಲ. <BR> ದಯವಿಟ್ಟು 'PRODUCTNAME Calc' ಎಂಬ ಘಟಕವು ಅನುಸ್ಥಾಪಿತವಾಗಿದೆಯೆ ಎಂದು ಪರೀಕ್ಷಿಸಿ."
+
+#. jAyjL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_3\n"
+"property.text"
+msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
+msgstr "ಪ್ರೆಸೆಂಟೇಷನ್ ಅನ್ನು ನಿರ್ಮಿಸಲಾಗಲಿಲ್ಲ. <BR> ದಯವಿಟ್ಟು 'PRODUCTNAME Impress' ಎಂಬ ಘಟಕವು ಅನುಸ್ಥಾಪಿತವಾಗಿದೆಯೆ ಎಂದು ಪರೀಕ್ಷಿಸಿ."
+
+#. 3mrBG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_4\n"
+"property.text"
+msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
+msgstr "ಡ್ರಾಯಿಂಗ್ ಅನ್ನು ನಿರ್ಮಿಸಲಾಗಿಲ್ಲ. <BR> ದಯವಿಟ್ಟು 'PRODUCTNAME Draw' ಎಂಬ ಘಟಕವು ಅನುಸ್ಥಾಪಿತವಾಗಿದೆಯೆ ಎಂದು ಪರೀಕ್ಷಿಸಿ."
+
+#. rMsgf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_5\n"
+"property.text"
+msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
+msgstr "ಫಾರ್ಮುಲಾವನ್ನು ನಿರ್ಮಿಸಲಾಗಿಲ್ಲ. <BR> ದಯವಿಟ್ಟು 'PRODUCTNAME Math' ಎಂಬ ಘಟಕವು ಅನುಸ್ಥಾಪಿತವಾಗಿದೆಯೆ ಎಂದು ಪರೀಕ್ಷಿಸಿ."
+
+#. j5GzW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_6\n"
+"property.text"
+msgid "The files required could not be found.<BR>Please start the %PRODUCTNAME Setup and choose 'Repair'."
+msgstr "ಅವಶ್ಯಕತೆಯಿರುವ ಕಡತಗಳನ್ನು ಪತ್ತೆ ಮಾಡಲಾಗಲಿಲ್ಲ.<BR> ದಯವಿಟ್ಟು %PRODUCTNAME ಸಿದ್ಧತೆಯನ್ನು ಪ್ರಾರಂಭಿಸಿ ನಂತರ 'ಸರಿಪಡಿಸು'ಅನ್ನು ಆಯ್ಕೆ ಮಾಡಿ."
+
+#. BFtze
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_7\n"
+"property.text"
+msgid "The file '<PATH>' already exists.<BR><BR>Would you like to overwrite the existing file?"
+msgstr "'<PATH>' ಕಡತವು ಈಗಾಗಲೆ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ. <BR><BR> ಈಗಿರುವ ಕಡತವನ್ನು ತಿದ್ದಿ ಬರೆಯಲು ಇಚ್ಛಿಸುತ್ತೀರಾ?"
+
+#. 7AvGR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_8\n"
+"property.text"
+msgid "Yes"
+msgstr "ಹೌದು"
+
+#. GPG93
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_9\n"
+"property.text"
+msgid "Yes to All"
+msgstr "ಎಲ್ಲದಕ್ಕೂ ಹೌದು"
+
+#. oBhQ5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_10\n"
+"property.text"
+msgid "No"
+msgstr "ಇಲ್ಲ"
+
+#. wMBK7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_11\n"
+"property.text"
+msgid "Cancel"
+msgstr "ರದ್ದು ಮಾಡು"
+
+#. boSx2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_12\n"
+"property.text"
+msgid "~Finish"
+msgstr "ಮುಗಿಸು(~F)"
+
+#. apFF8
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_13\n"
+"property.text"
+msgid "< ~Back"
+msgstr "< ಹಿಂದಕ್ಕೆ (~B)"
+
+#. q8epA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_14\n"
+"property.text"
+msgid "~Next >"
+msgstr "ಮುಂದಕ್ಕೆ (~N) >>"
+
+#. rSt56
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_15\n"
+"property.text"
+msgid "~Help"
+msgstr "ಸಹಾಯ(~H)"
+
+#. 9GUa6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_16\n"
+"property.text"
+msgid "Steps"
+msgstr "ಹಂತಗಳು"
+
+#. 9wWVR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_17\n"
+"property.text"
+msgid "Close"
+msgstr "ಮುಚ್ಚು"
+
+#. zUv9u
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_18\n"
+"property.text"
+msgid "OK"
+msgstr "ಸರಿ"
+
+#. 6kGc4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_19\n"
+"property.text"
+msgid "The file already exists. Do you want to overwrite it?"
+msgstr "ಕಡತವು ಈಗಾಗಲೆ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ. ಅದನ್ನು ನೀವು ತಿದ್ದಿ ಬರೆಯಲು ಇಚ್ಛಿಸುತ್ತೀರಾ?"
+
+#. BGj7a
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_20\n"
+"property.text"
+msgid "Template created via <wizard_name> on <current_date>."
+msgstr "<current_date> ರಂದು <wizard_name> ಮೂಲಕ ನಮೂನೆಯನ್ನು ನಿರ್ಮಿಸಲಾಗಿದೆ."
+
+#. zRGEs
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_COMMON_21\n"
+"property.text"
+msgid "The wizard could not be run, because important files were not found.\\nUnder 'Tools - Options - %PRODUCTNAME - Paths' click the 'Default' button to reset the paths to the original default settings.\\nThen run the wizard again."
+msgstr ""
+"ಗಾರುಡಿಯನ್ನು ಪ್ರಾರಂಭಿಸಲು ಆಗಲಿಲ್ಲ ಏಕೆಂದರೆ ಮುಖ್ಯವಾದ ಕಡತಗಳು ಕಂಡುಬಂದಿಲ್ಲ.\n"
+"ಮಾರ್ಗಗಳನ್ನು ಪೂರ್ವನಿಯೋಜಿತ ಸಿದ್ಧತೆಗಳಿಗೆ ಮರುಹೊಂದಿಸಲು 'ಉಪಕರಣ - ಆಯ್ಕೆಗಳು - %PRODUCTNAME - ಮಾರ್ಗಗಳು' ನಲ್ಲಿನ 'ಪೂರ್ವನಿಯೋಜಿತ' ಗುಂಡಿಯನ್ನು ಕ್ಲಿಕ್ಕಿಸಿ.\n"
+"ನಂತರ ಗಾರುಡಿಯನ್ನು ಪ್ರಾರಂಭಿಸಿ."
+
+#. GohbP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_0\n"
+"property.text"
+msgid "Report Wizard"
+msgstr "ವರದಿಯ ಗಾರುಡಿ"
+
+#. BZtXG
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_3\n"
+"property.text"
+msgid "~Table"
+msgstr "ಕೋಷ್ಟಕ (~T)"
+
+#. BhUoK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_4\n"
+"property.text"
+msgid "Colu~mns"
+msgstr "ಲಂಬಸಾಲುಗಳು(~m)"
+
+#. KgzkD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_7\n"
+"property.text"
+msgid "Report_"
+msgstr "ವರದಿ_"
+
+#. uKDkU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_8\n"
+"property.text"
+msgid "- undefined -"
+msgstr "- ಸೂಚಿಸದೆ ಇರುವ -"
+
+#. ZZqKE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_9\n"
+"property.text"
+msgid "~Fields in report"
+msgstr "ವರದಿಯಲ್ಲಿರುವ ವರ್ಗಗಳು(~F)"
+
+#. hMbDC
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_11\n"
+"property.text"
+msgid "Grouping"
+msgstr "ಗುಂಪುಗೂಡಿಕೆ"
+
+#. wVXwx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_12\n"
+"property.text"
+msgid "Sort options"
+msgstr "ವಿಂಗಡಣಾ ಆಯ್ಕೆಗಳು"
+
+#. 7EUD3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_13\n"
+"property.text"
+msgid "Choose layout"
+msgstr "ರೂಪವಿನ್ಯಾಸವನ್ನು ಆಯ್ಕೆಮಾಡಿ"
+
+#. 45SFZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_14\n"
+"property.text"
+msgid "Create report"
+msgstr "ವರದಿಯನ್ನು ರಚಿಸಿ"
+
+#. cKDcw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_15\n"
+"property.text"
+msgid "Layout of data"
+msgstr "ದತ್ತಾಂಶ ರೂಪವಿನ್ಯಾಸ"
+
+#. HhPzF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_16\n"
+"property.text"
+msgid "Layout of headers and footers"
+msgstr "ಶಿರೋಲೇಖ ಮತ್ತು ಅಡಿಲೇಖಗಳ ರೂಪವಿನ್ಯಾಸ"
+
+#. bN2Fw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_19\n"
+"property.text"
+msgid "Fields"
+msgstr "ವರ್ಗಗಳು"
+
+#. qHq62
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_20\n"
+"property.text"
+msgid "~Sort by"
+msgstr "ಹೀಗೆ ವಿಂಗಡಿಸು(~S)"
+
+#. 8CX4A
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_21\n"
+"property.text"
+msgid "T~hen by"
+msgstr "ಆನಂತರ ಇದರಿಂದ(~h)"
+
+#. kvzxk
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_22\n"
+"property.text"
+msgid "Orientation"
+msgstr "ವಾಲಿಕೆ"
+
+#. b3YDa
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_23\n"
+"property.text"
+msgid "Portrait"
+msgstr "ಭಾವಚಿತ್ರ"
+
+#. DT8hG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_24\n"
+"property.text"
+msgid "Landscape"
+msgstr "ಪ್ರಕೃತಿದೃಶ್ಯ"
+
+#. TErmd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_28\n"
+"property.text"
+msgid "Which fields do you want to have in your report?"
+msgstr "ನಿಮ್ಮ ವರದಿಯಲ್ಲಿ ಯಾವ ವರ್ಗಗಳನ್ನು ಹೊಂದಲು ಇಚ್ಛಿಸುತ್ತೀರಿ?"
+
+#. HZgJU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_29\n"
+"property.text"
+msgid "Do you want to add grouping levels?"
+msgstr "ಗುಂಪುಗೂಡಿಸುವ ಸ್ತರಗಳನ್ನು ಸೇರಿಸಲು ಇಚ್ಛಿಸುವಿರಾ?"
+
+#. xPoaP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_30\n"
+"property.text"
+msgid "According to which fields do you want to sort the data?"
+msgstr "ಯಾವ ವರ್ಗದ ಆಧಾರದ ಮೇಲೆ ದತ್ತವನ್ನು ವಿಂಗಡಿಸಲು ಇಚ್ಛಿಸುತ್ತೀರಿ?"
+
+#. kAjMy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_31\n"
+"property.text"
+msgid "How do you want your report to look?"
+msgstr "ನಿಮ್ಮ ವರದಿಯು ಯಾವ ರೀತಿ ಕಾಣಬೇಕೆಂದು ಇಚ್ಛಿಸುತ್ತೀರಿ?"
+
+#. QvM65
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_32\n"
+"property.text"
+msgid "Decide how you want to proceed"
+msgstr "ನೀವು ಹೇಗೆ ಮುಂದುವರೆಯಬೇಕೆಂದು ನಿರ್ಣಯಿಸಿ"
+
+#. GqD3n
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_33\n"
+"property.text"
+msgid "Title of report"
+msgstr "ವರದಿಯ ಶೀರ್ಷಿಕೆ"
+
+#. Nm8v3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_34\n"
+"property.text"
+msgid "Display report"
+msgstr "ವರದಿಯನ್ನು ತೋರಿಸು"
+
+#. crCtw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_35\n"
+"property.text"
+msgid "Create report"
+msgstr "ವರದಿಯನ್ನು ರಚಿಸಿ"
+
+#. EiKBA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_36\n"
+"property.text"
+msgid "Ascending"
+msgstr "ಆರೋಹಣ"
+
+#. BboXx
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_37\n"
+"property.text"
+msgid "Descending"
+msgstr "ಅವರೋಹಣ"
+
+#. sHcrv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_40\n"
+"property.text"
+msgid "~Dynamic report"
+msgstr "ಕ್ರಿಯಾತ್ಮಕ ವರದಿ(~D)"
+
+#. CxGG7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_41\n"
+"property.text"
+msgid "~Create report now"
+msgstr "ತಕ್ಷಣವೆ ವರದಿಯನ್ನು ತಯಾರು ಮಾಡು(~C)"
+
+#. FVhkR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_42\n"
+"property.text"
+msgid "~Modify report layout"
+msgstr "ವರದಿಯ ರೂಪವಿನ್ಯಾಸವನ್ನು ಬದಲಾಯಿಸು(~M)"
+
+#. BBFba
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_43\n"
+"property.text"
+msgid "Static report"
+msgstr "ಸ್ಥಿರ ವರದಿ"
+
+#. gSyfQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_44\n"
+"property.text"
+msgid "Save as"
+msgstr "ಹೀಗೆ ಉಳಿಸು"
+
+#. hdCaM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_50\n"
+"property.text"
+msgid "Groupings"
+msgstr "ಗುಂಪುಗೂಡಿಕೆ"
+
+#. XrhAA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_51\n"
+"property.text"
+msgid "Then b~y"
+msgstr "ಆನಂತರ ಇದರಿಂದ(~y)"
+
+#. dnjA2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_52\n"
+"property.text"
+msgid "~Then by"
+msgstr "ಆನಂತರ ಇದರಿಂದ(~T)"
+
+#. ZuRZA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_53\n"
+"property.text"
+msgid "Asc~ending"
+msgstr "ಏರಿಕೆಕ್ರಮ(~e)"
+
+#. 2aQcz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_54\n"
+"property.text"
+msgid "Ascend~ing"
+msgstr "ಏರಿಕೆಕ್ರಮ(~i)"
+
+#. d7S3o
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_55\n"
+"property.text"
+msgid "Ascendin~g"
+msgstr "ಏರಿಕೆಕ್ರಮ(~g)"
+
+#. 8YKTL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_56\n"
+"property.text"
+msgid "De~scending"
+msgstr "ಇಳಿಕೆಕ್ರಮ(~s)"
+
+#. 82XcF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_57\n"
+"property.text"
+msgid "Des~cending"
+msgstr "ಇಳಿಕೆಕ್ರಮ(~c)"
+
+#. SCPyV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_58\n"
+"property.text"
+msgid "De~scending"
+msgstr "ಇಳಿಕೆಕ್ರಮ(~s)"
+
+#. s4E5A
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_60\n"
+"property.text"
+msgid "Binary fields cannot be displayed in the report."
+msgstr "ಬೈನರಿ ವರ್ಗಗಳನ್ನು ವರದಿಯಲ್ಲಿ ತೋರಿಸಲಾಗುವುದಿಲ್ಲ."
+
+#. zhqsu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_61\n"
+"property.text"
+msgid "The table '<TABLENAME>' does not exist."
+msgstr "'<TABLENAME>' ಎಂಬ ಹೆಸರಿನ ಕೋಷ್ಟಕವು ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ."
+
+#. JdC5d
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_62\n"
+"property.text"
+msgid "Creating Report..."
+msgstr "ವರದಿಯನ್ನು ತಯಾರಿಸಲಾಗುತ್ತಿದೆ..."
+
+#. PQ4E9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_63\n"
+"property.text"
+msgid "Number of records inserted: <COUNT>"
+msgstr "ಸೇರಿಸಲಾದ ದಾಖಲೆಗಳ ಒಟ್ಟು ಸಂಖ್ಯೆ: <COUNT>"
+
+#. BUWNB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_64\n"
+"property.text"
+msgid "The form '<REPORTFORM>' does not exist."
+msgstr "<REPORTFORM> ಎಂಬ ಫಾರ್ಮ್ ಲಭ್ಯವಿಲ್ಲ."
+
+#. AyMsD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_65\n"
+"property.text"
+msgid "The query with the statement <BR>'<STATEMENT>' <BR> could not be run. <BR> Check your data source."
+msgstr "<BR>'<STATEMENT>'<BR> ಎಂಬ ಹೇಳಿಕೆಯನ್ನು ಹೊಂದಿರುವ ಪ್ರಶ್ನೆಯನ್ನು ಚಲಾಯಿಸು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. <BR> ನಿಮ್ಮ ದತ್ತ ಆಕರವನ್ನು ಪರೀಕ್ಷಿಸಿ."
+
+#. LW9DZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_66\n"
+"property.text"
+msgid "The following hidden control in the form '<REPORTFORM>' could not be read: '<CONTROLNAME>'."
+msgstr "ಈ ಕೆಳಗಿನ ಗುಪ್ತ ನಿಯಂತ್ರಣದಲ್ಲಿರುವ ಫಾರ್ಮ್ '<REPORTFORM>'  ಅನ್ನು ಓದಲಾಗಲಿಲ್ಲ: '<CONTROLNAME>'."
+
+#. GvE8h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_67\n"
+"property.text"
+msgid "Importing data..."
+msgstr "ದತ್ತವನ್ನು ಆಮದು ಮಾಡಲಾಗುತ್ತಿದೆ..."
+
+#. LujCA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_68\n"
+"property.text"
+msgid "Labeling fields"
+msgstr "ಗುರುತುಚೀಟಿ ವರ್ಗಗಳು"
+
+#. HPxDv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_69\n"
+"property.text"
+msgid "How do you want to label the fields?"
+msgstr "ವರ್ಗಗಳನ್ನು ಹೇಗೆ ಗುರುತಿಸಲು ಬಯಸುತ್ತೀರಿ?"
+
+#. C2Caz
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_70\n"
+"property.text"
+msgid "Label"
+msgstr "ಲೇಬಲ್"
+
+#. EknR9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_71\n"
+"property.text"
+msgid "Field"
+msgstr "ವರ್ಗ"
+
+#. agw3x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_72\n"
+"property.text"
+msgid "An error occurred in the wizard.<BR>The template '%PATH' could be erroneous.<BR>Either the required sections or tables do not exist or exist under the wrong name.<BR>See the Help for more detailed information.<BR>Please select another template."
+msgstr "ಗಾರುಡಿಯಲ್ಲಿ ಒಂದು ದೋಷ ಉಂಟಾಗಿದೆ.<BR> '%PATH' ನಮೂನೆಯಲ್ಲಿ ದೋಷವಿರಬಹುದು. <BR>ಅವಶ್ಯಕವಾದ ವಿಭಾಗಗಳು ಅಥವ ಕೋಷ್ಟಕಗಳು ಅಸ್ತಿತ್ವದಲ್ಲಿ ಇಲ್ಲದಿರಬಹುದು ಅಥವಾ ತಪ್ಪಾದ ಹೆಸರನ್ನು ಹೊಂದಿರಬಹುದು. <BR>ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗೆ ಸಹಾಯವನ್ನು ನೋಡಿ. <BR>ದಯವಿಟ್ಟು ಬೇರೊಂದು ನಮೂನೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ."
+
+#. Za86f
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_73\n"
+"property.text"
+msgid "There is an invalid user field in a table."
+msgstr "ಒಂದು ಕೋಷ್ಟಕದಲ್ಲಿ ಒಂದು ಅಮಾನ್ಯವಾದ ಬಳಕೆದಾರ ವರ್ಗವಿದೆ."
+
+#. rXZZH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_74\n"
+"property.text"
+msgid "The sort criterion '<FIELDNAME>' was chosen twice. Each criterion can only be chosen once."
+msgstr "ವಿಂಡಗಣಾ ಮಾನದಂಡ '<FIELDNAME>' ಅನ್ನು ಎರಡು ಬಾರಿ ಆರಿಸಲಾಗಿದೆ. ಪ್ರತಿಯೊಂದು ಮಾನದಂಡವನ್ನು ಕೇವಲ ಒಂದು ಬಾರಿ ಆರಿಸಬಹುದು."
+
+#. ZNk6M
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_75\n"
+"property.text"
+msgid "Note: The dummy text will be replaced by data from the database when the report is created."
+msgstr "ಸೂಚನೆ: ವರದಿಯನ್ನು ರಚಿಸುವಾಗ ದತ್ತಸಂಚಯದಲ್ಲಿನ ದತ್ತಾಂಶದಿಂದ ನಕಲಿ ಪಠ್ಯವನ್ನು ಬದಲಾಯಿಸಲಾಗುವುದು."
+
+#. 5VdG4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_76\n"
+"property.text"
+msgid "A report '%REPORTNAME' already exists in the database. Please assign another name."
+msgstr "ದತ್ತಸಂಚಯದಲ್ಲಿ ಒಂದು ವರದಿ '%REPORTNAME' ಈಗಾಗಲೆ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ. ದಯವಿಟ್ಟು ಬೇರೊಂದು ಹೆಸರನ್ನು ಸೂಚಿಸಿ."
+
+#. TD56g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_78\n"
+"property.text"
+msgid "How do you want to proceed after creating the report?"
+msgstr "ವರದಿಯನ್ನು ರಚಿಸಿದ ನಂತರ ನೀವು ಹೇಗೆ ಮುಂದುವರೆಯಲು ಇಚ್ಛಿಸುತ್ತೀರಿ?"
+
+#. fpEwz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_79\n"
+"property.text"
+msgid "What kind of report do you want to create?"
+msgstr "ನೀವು ಯಾವ ರೀತಿಯ ವರದಿಯನ್ನು ರಚಿಸಲು ಬಯಸುತ್ತೀರಿ?"
+
+#. s3vBB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_80\n"
+"property.text"
+msgid "Tabular"
+msgstr "ಕೋಷ್ಟಕ"
+
+#. dDWAD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_81\n"
+"property.text"
+msgid "Columnar, single-column"
+msgstr "ಲಂಬಸಾಲಿನಂತಿರುವ, ಒಂದು-ಲಂಬಸಾಲು"
+
+#. MwR8x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_82\n"
+"property.text"
+msgid "Columnar, two columns"
+msgstr "ಲಂಬಸಾಲಿನಂತಿರುವ, ಎರಡು ಲಂಬಸಾಲುಗಳು"
+
+#. UsKmm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_83\n"
+"property.text"
+msgid "Columnar, three columns"
+msgstr "ಲಂಬಸಾಲಿನಂತಿರುವ, ಎರಡು ಲಂಬಸಾಲುಗಳು"
+
+#. RG9ds
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_84\n"
+"property.text"
+msgid "In blocks, labels left"
+msgstr "ಖಂಡಗಳಲ್ಲಿ, ಎಡಭಾಗದ ಗುರುತುಚೀಟಿಗಳು"
+
+#. dspnP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_85\n"
+"property.text"
+msgid "In blocks, labels above"
+msgstr "ಖಂಡಗಳಲ್ಲಿ, ಮೇಲಿನ ಗುರುತುಚೀಟಿಗಳು"
+
+#. FXJtW
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_86\n"
+"property.text"
+msgid "Title:"
+msgstr "ಶೀರ್ಷಿಕೆ (_T):"
+
+#. 2z2JH
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_87\n"
+"property.text"
+msgid "Author:"
+msgstr "ಕರ್ತೃ:"
+
+#. uESaE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_88\n"
+"property.text"
+msgid "Date:"
+msgstr "ದಿನಾಂಕ:"
+
+#. GzkD4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_89\n"
+"property.text"
+msgid "Page #page# of #count#"
+msgstr "#count# ರಲ್ಲಿ #page# ಪುಟ"
+
+#. 3FXVE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_90\n"
+"property.text"
+msgid "Page number:"
+msgstr "ಪುಟದ ಸಂಖ್ಯೆ:"
+
+#. 9HCyq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_91\n"
+"property.text"
+msgid "Page count:"
+msgstr "ಪುಟದ ಎಣಿಕೆ:"
+
+#. FAa63
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_92\n"
+"property.text"
+msgid "No valid report template was found."
+msgstr "ಯಾವುದೆ ಮಾನ್ಯ ವರದಿ ನಮೂನೆಯು ಕಂಡುಬಂದಿಲ್ಲ."
+
+#. F6vrA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_93\n"
+"property.text"
+msgid "Page:"
+msgstr "ಪುಟ"
+
+#. v8gUF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_94\n"
+"property.text"
+msgid "Align Left - Border"
+msgstr "ಎಡಕ್ಕೆ ಹೊಂದಿಸು - ಅಂಚು"
+
+#. TV3AA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_95\n"
+"property.text"
+msgid "Align Left - Compact"
+msgstr "ಎಡಕ್ಕೆ ಹೊಂದಿಸು - ಕುಗ್ಗಿಸಿದ"
+
+#. DL6ZJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_96\n"
+"property.text"
+msgid "Align Left - Elegant"
+msgstr "ಎಡಕ್ಕೆ ಹೊಂದಿಸು - ಮನೋಹರ"
+
+#. wRNAq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_97\n"
+"property.text"
+msgid "Align Left - Highlighted"
+msgstr "ಎಡಕ್ಕೆ ಹೊಂದಿಸು - ಹೈಲೈಟ್ ಮಾಡಿದ"
+
+#. JnhXj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_98\n"
+"property.text"
+msgid "Align Left - Modern"
+msgstr "ಎಡಕ್ಕೆ ಹೊಂದಿಸು - ಮಾಡರ್ನ್"
+
+#. 4Djyg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_99\n"
+"property.text"
+msgid "Align Left - Red & Blue"
+msgstr "ಎಡಕ್ಕೆ ಹೊಂದಿಸು - ಕೆಂಪು ಮತ್ತು ನೀಲಿ"
+
+#. BvcfB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_100\n"
+"property.text"
+msgid "Default"
+msgstr "ಪೂರ್ವನಿಯೋಜಿತ"
+
+#. Bca59
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_101\n"
+"property.text"
+msgid "Outline - Borders"
+msgstr "ಹೊರರೇಖೆ - ಅಂಚುಗಳು"
+
+#. C9umd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_102\n"
+"property.text"
+msgid "Outline - Compact"
+msgstr "ಹೊರರೇಖೆ - ಕುಗ್ಗಿಸಿದ"
+
+#. uYz2T
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_103\n"
+"property.text"
+msgid "Outline - Elegant"
+msgstr "ಹೊರರೇಖೆ - ಮನೋಹರ"
+
+#. iFk6x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_104\n"
+"property.text"
+msgid "Outline - Highlighted"
+msgstr "ಹೊರರೇಖೆ - ಹೈಲೈಟ್ ಮಾಡಿದ"
+
+#. jhJnN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_105\n"
+"property.text"
+msgid "Outline - Modern"
+msgstr "ಹೊರರೇಖೆ - ಆಧುನಿಕ"
+
+#. mXnKN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_106\n"
+"property.text"
+msgid "Outline - Red & Blue"
+msgstr "ಹೊರರೇಖೆ - ಕೆಂಪು ಮತ್ತು ನೀಲಿ"
+
+#. zKFcj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_107\n"
+"property.text"
+msgid "Outline, indented - Borders"
+msgstr "ಹೊರರೇಖೆ, ಇಂಡೆಂಟ್ ಮಾಡಿದ - ಅಂಚುಗಳು"
+
+#. 8XBee
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_108\n"
+"property.text"
+msgid "Outline, indented - Compact"
+msgstr "ಹೊರರೇಖೆ, ಇಂಡೆಂಟ್ ಮಾಡಿದ - ಕುಗ್ಗಿಸಿದ"
+
+#. e47Xn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_109\n"
+"property.text"
+msgid "Outline, indented - Elegant"
+msgstr "ಹೊರರೇಖೆ, ಇಂಡೆಂಟ್ ಮಾಡಿದ - ಮನೋಹರ"
+
+#. CGQuu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_110\n"
+"property.text"
+msgid "Outline, indented - Highlighted"
+msgstr "ಹೊರರೇಖೆ, ಇಂಡೆಂಟ್ ಮಾಡಿದ - ಹೈಲೈಟ್ ಮಾಡಿದ"
+
+#. ABC5q
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_111\n"
+"property.text"
+msgid "Outline, indented - Modern"
+msgstr "ಹೊರರೇಖೆ, ಇಂಡೆಂಟ್ ಮಾಡಿದ - ಮಾಡರ್ನ್"
+
+#. urT2J
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_112\n"
+"property.text"
+msgid "Outline, indented - Red & Blue"
+msgstr "ಹೊರರೇಖೆ, ಇಂಡೆಂಟ್ ಮಾಡಿದ - ಕೆಂಪು ಮತ್ತು ನೀಲಿ"
+
+#. TzXg5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_113\n"
+"property.text"
+msgid "Bubbles"
+msgstr "ಗುಳ್ಳೆ"
+
+#. RGiTm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_114\n"
+"property.text"
+msgid "Cinema"
+msgstr "ಸಿನೆಮಾ"
+
+#. Eo2jG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_115\n"
+"property.text"
+msgid "Controlling"
+msgstr "ನಿಯಂತ್ರಿಸುವಿಕೆ"
+
+#. fpiSX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_116\n"
+"property.text"
+msgid "Default"
+msgstr "ಪೂರ್ವನಿಯೋಜಿತ"
+
+#. 927HM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_117\n"
+"property.text"
+msgid "Drafting"
+msgstr "ಚಿತ್ರರಚನೆ"
+
+#. BGvCk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_118\n"
+"property.text"
+msgid "Finances"
+msgstr "ಹಣಕಾಸು ವ್ಯವಹಾರ"
+
+#. mhJr6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_119\n"
+"property.text"
+msgid "Flipchart"
+msgstr "ಕ್ರಮಸೂಚಿ ನಕ್ಷೆ"
+
+#. t5VdL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_120\n"
+"property.text"
+msgid "Formal with Company Logo"
+msgstr "ಕಂಪನಿಯ ಲಾಂಛನದೊಂದಿಗೆ ಅಧೀಕೃತ"
+
+#. iwANQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_121\n"
+"property.text"
+msgid "Generic"
+msgstr "ಸಾಮಾನ್ಯ"
+
+#. RkArE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_REPORT_122\n"
+"property.text"
+msgid "Worldmap"
+msgstr "ಪ್ರಪಂಚನಕ್ಷೆ"
+
+#. wpr5T
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_0\n"
+"property.text"
+msgid "C~reate"
+msgstr "ನಿರ್ಮಿಸು(~r)"
+
+#. W6xLZ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_1\n"
+"property.text"
+msgid "~Cancel"
+msgstr "ರದ್ದು ಮಾಡು(~C)"
+
+#. ecMFi
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_2\n"
+"property.text"
+msgid "< ~Back"
+msgstr "< ಹಿಂದಕ್ಕೆ (~B)"
+
+#. HvEAE
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_3\n"
+"property.text"
+msgid "~Next >"
+msgstr "ಮುಂದಕ್ಕೆ (~N) >>"
+
+#. u5rzd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_4\n"
+"property.text"
+msgid "~Database"
+msgstr "ದತ್ತಸಂಚಯ(~D)"
+
+#. sCeDP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_5\n"
+"property.text"
+msgid "~Table name"
+msgstr "ಕೋಷ್ಟಕದ ಹೆಸರು(~T)"
+
+#. KC4Dw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_6\n"
+"property.text"
+msgid "An error occurred while running the wizard. The wizard will be terminated."
+msgstr "ಗಾರುಡಿಯು ಚಾಲನೆಯಲ್ಲಿದ್ದಾಗ ದೋಷ ಉಂಟಾಗಿದೆ. ಗಾರುಡಿಯನ್ನು ಸ್ಥಗಿತಗೊಳಿಸಲಾಗುತ್ತದೆ."
+
+#. ZG95j
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_8\n"
+"property.text"
+msgid "No database has been installed. At least one database is required before the wizard for forms can be started."
+msgstr ""
+
+#. GCAgB
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_9\n"
+"property.text"
+msgid "The database does not contain any tables."
+msgstr "ದತ್ತಸಂಚಯವು \"#\" ಎಂಬ ಹೆಸರಿನ ಒಂದು ಕೋಷ್ಟಕವನ್ನು ಹೊಂದಿಲ್ಲ."
+
+#. ikZ7F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_10\n"
+"property.text"
+msgid "This title already exists in the database. Please enter another name."
+msgstr ""
+
+#. Dposv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_11\n"
+"property.text"
+msgid "The title must not contain any spaces or special characters."
+msgstr ""
+
+#. FUgQA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_12\n"
+"property.text"
+msgid "The database service (com.sun.data.DatabaseEngine) could not be instantiated."
+msgstr ""
+
+#. HRAeA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_13\n"
+"property.text"
+msgid "The selected table or query could not be opened."
+msgstr ""
+
+#. VAphN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_14\n"
+"property.text"
+msgid "No connection to the database could be established."
+msgstr "ದತ್ತಸಂಚಯಕ್ಕೆ ಯಾವುದೆ ಸಂಪರ್ಕವನ್ನು ಜೋಡಿಸಲು ಸಾಧಿಸಲಾಗಲಿಲ್ಲ."
+
+#. z9FhA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_20\n"
+"property.text"
+msgid "~Help"
+msgstr "ಸಹಾಯ(~H)"
+
+#. eXWrX
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_21\n"
+"property.text"
+msgid "~Stop"
+msgstr "ನಿಲ್ಲಿಸು (~S)"
+
+#. GiCi2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_30\n"
+"property.text"
+msgid "The document could not be saved."
+msgstr "ದಸ್ತಾವೇಜನ್ನು ಉಳಿಸಲಾಗಿಲ್ಲ."
+
+#. UkQEx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_33\n"
+"property.text"
+msgid "Exiting the wizard"
+msgstr "ಗಾರುಡಿಯಿಂದ ಹೊರಬರಲಾಗುತ್ತಿದೆ"
+
+#. HrveE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_34\n"
+"property.text"
+msgid "Connecting to data source..."
+msgstr "ದತ್ತಾಂಶ ಆಕರಕ್ಕೆ ಸಂಪರ್ಕಿತಗೊಳ್ಳುತ್ತಿದೆ..."
+
+#. se64P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_35\n"
+"property.text"
+msgid "The connection to the data source could not be established."
+msgstr "ದತ್ತಾಂಶ ಆಕರಕ್ಕೆ ಸಂಪರ್ಕವನ್ನು ಸಾಧಿಸಲಾಗಲಿಲ್ಲ."
+
+#. Ch5MD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_36\n"
+"property.text"
+msgid "The file path entered is not valid."
+msgstr "ನಮೂದಿಸಲಾದ ಕಡತದ ಮಾರ್ಗವು ಮಾನ್ಯವಾದುದಾಗಿಲ್ಲ."
+
+#. kPABE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_37\n"
+"property.text"
+msgid "Please select a data source"
+msgstr "ದಯವಿಟ್ಟು ಒಂದು ದತ್ತಾಂಶ ಆಕರವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. XDBBC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_38\n"
+"property.text"
+msgid "Please select a table or query"
+msgstr "ದಯವಿಟ್ಟು ಒಂದು ಕೋಷ್ಟಕವನ್ನು ಅಥವ ಪ್ರಶ್ನೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. AgeWk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_39\n"
+"property.text"
+msgid "Add field"
+msgstr "ವರ್ಗವನ್ನು ಸೇರಿಸು"
+
+#. FoExR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_40\n"
+"property.text"
+msgid "Remove field"
+msgstr "ವರ್ಗವನ್ನು ತೆಗೆದು ಹಾಕು"
+
+#. BuUZ5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_41\n"
+"property.text"
+msgid "Add all fields"
+msgstr "ಎಲ್ಲಾ ವರ್ಗಗಳನ್ನು ಸೇರಿಸು"
+
+#. PVELV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_42\n"
+"property.text"
+msgid "Remove all fields"
+msgstr "ಎಲ್ಲಾ ವರ್ಗಗಳನ್ನು ತೆಗೆ"
+
+#. jAXRw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_43\n"
+"property.text"
+msgid "Move field up"
+msgstr "ವರ್ಗವನ್ನು ಮೇಲಕ್ಕೆ ಜರುಗಿಸು"
+
+#. Ao2Z6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_44\n"
+"property.text"
+msgid "Move field down"
+msgstr "ವರ್ಗವನ್ನು ಕೆಳಕ್ಕೆ ಜರುಗಿಸು"
+
+#. B4mWx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_DB_COMMON_45\n"
+"property.text"
+msgid "The field names from '%NAME' could not be retrieved."
+msgstr "'%NAME' ದಿಂದ ವರ್ಗದ ಹೆಸರನ್ನು ಮರಳಿ ಪಡೆಯಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ."
+
+#. SNhe5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_0\n"
+"property.text"
+msgid "Query Wizard"
+msgstr "ಪ್ರಶ್ನೆ ಗಾರುಡಿ"
+
+#. RySqB
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_1\n"
+"property.text"
+msgid "Query"
+msgstr "ಕೇಳು"
+
+#. wKhwS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_2\n"
+"property.text"
+msgid "Query Wizard"
+msgstr "ಪ್ರಶ್ನೆ ಗಾರುಡಿ"
+
+#. QEtRG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_3\n"
+"property.text"
+msgid "~Tables"
+msgstr "ಕೋಷ್ಟಕಗಳು(~T)"
+
+#. s2KnF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_4\n"
+"property.text"
+msgid "A~vailable fields"
+msgstr "ಲಭ್ಯವಿರುವ ವರ್ಗಗಳು(~v)"
+
+#. Wsx8x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_5\n"
+"property.text"
+msgid "Name ~of the query"
+msgstr "ಪ್ರಶ್ನೆಯ ಹೆಸರು(~o)"
+
+#. t9MEU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_6\n"
+"property.text"
+msgid "Display ~Query"
+msgstr "ಪ್ರಶ್ನೆಯನ್ನು ತೋರಿಸು(~Q)"
+
+#. UBWUX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_7\n"
+"property.text"
+msgid "~Modify Query"
+msgstr "ಪ್ರಶ್ನೆಯನ್ನು ಬದಲಾಯಿಸು(~M)"
+
+#. AoeET
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_8\n"
+"property.text"
+msgid "~How do you want to proceed after creating the query?"
+msgstr "ಪ್ರಶ್ನೆಯನ್ನು ರಚಿಸಿದ ಮೇಲೆ ಹೇಗೆ ಮುಂದುವರೆಯಲು ಇಚ್ಛಿಸುತ್ತೀರಾ(~H)?"
+
+#. kofEg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_9\n"
+"property.text"
+msgid "Match ~all of the following"
+msgstr "ಈ ಕೆಳಗಿನವುಗಳಲ್ಲಿ ಎಲ್ಲವುಗಳ ಜೊತೆಗೂ ಹೋಲಿಸು(~a)"
+
+#. 4xM3Z
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_10\n"
+"property.text"
+msgid "~Match any of the following"
+msgstr "ಈ ಕೆಳಗಿನವುಗಳಲ್ಲಿ ಯಾವುದಾದರು ಒಂದರ ಜೊತೆಗೆ ಹೋಲಿಸು(~M)"
+
+#. WLFFc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_11\n"
+"property.text"
+msgid "~Detailed query (Shows all records of the query.)"
+msgstr "ವಿವರವಾದ ಪ್ರಶ್ನೆ(ಪ್ರಶ್ನೆಯ ಎಲ್ಲಾ ದಾಖಲೆಗಳನ್ನು ತೋರಿಸುತ್ತದೆ.)(~D)"
+
+#. fnzhE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_12\n"
+"property.text"
+msgid "~Summary query (Shows only results of aggregate functions.)"
+msgstr "ಸಾರಾಂಶದ ಪ್ರಶ್ನೆ (ಕೇವಲ ಸರಾಸರಿ ಕ್ರಿಯೆಗಳ ಫಲಿತಾಂಶವನ್ನು ಮಾತ್ರ ತೋರಿಸುತ್ತದೆ.)(~S)"
+
+#. SdQBk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_16\n"
+"property.text"
+msgid "Aggregate functions"
+msgstr "ಸರಾಸರಿ ಕ್ರಿಯೆಗಳು"
+
+#. tFNb2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_17\n"
+"property.text"
+msgid "Fields"
+msgstr "ವರ್ಗಗಳು"
+
+#. D9sGR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_18\n"
+"property.text"
+msgid "~Group by"
+msgstr "ಇದರ ಮೇರೆಗೆ ಗುಂಪುಗೂಡಿಸು(~G)"
+
+#. E5N85
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_19\n"
+"property.text"
+msgid "Field"
+msgstr "ವರ್ಗ"
+
+#. 2dqd2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_20\n"
+"property.text"
+msgid "Alias"
+msgstr "ಆಲಿಯಾಸ್"
+
+#. 8eMER
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_21\n"
+"property.text"
+msgid "Table:"
+msgstr "ಕೋಷ್ಟಕ: "
+
+#. jaKR7
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_22\n"
+"property.text"
+msgid "Query:"
+msgstr "ಪ್ರಶ್ನೆ: "
+
+#. TpbSv
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_24\n"
+"property.text"
+msgid "Condition"
+msgstr "ಸ್ಥಿತಿ"
+
+#. Dvk6K
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_25\n"
+"property.text"
+msgid "Value"
+msgstr "ಮೌಲ್ಯ"
+
+#. oP8P9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_26\n"
+"property.text"
+msgid "is equal to"
+msgstr "ಇದಕ್ಕೆ ಸಮನಾಗಿರುವ"
+
+#. D7K36
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_27\n"
+"property.text"
+msgid "is not equal to"
+msgstr "ಇದಕ್ಕೆ ಸಮನಾಗಿರದ"
+
+#. n9gFB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_28\n"
+"property.text"
+msgid "is smaller than"
+msgstr "ಇದಕ್ಕಿಂತ ಚಿಕ್ಕದಾದ"
+
+#. FAiPg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_29\n"
+"property.text"
+msgid "is greater than"
+msgstr "ಇದಕ್ಕಿಂತ ದೊಡ್ಡದಾದ"
+
+#. pFsPY
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_30\n"
+"property.text"
+msgid "is equal or less than"
+msgstr "ಇದಕ್ಕೆ ಸಮನಾದ ಅಥವ ಚಿಕ್ಕದಾದ"
+
+#. yT9cM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_31\n"
+"property.text"
+msgid "is equal or greater than"
+msgstr "ಇದಕ್ಕೆ ಸಮನಾದ ಅಥವ ದೊಡ್ಡದಾದ"
+
+#. GFnAN
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_32\n"
+"property.text"
+msgid "like"
+msgstr "ಈ ರೀತಿಯ"
+
+#. JZCLd
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_33\n"
+"property.text"
+msgid "not like"
+msgstr "ಈ ರೀತಿ ಇರದ"
+
+#. TiHHv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_34\n"
+"property.text"
+msgid "is null"
+msgstr "ಶೂನ್ಯವಾಗಿರುವ"
+
+#. dpAdZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_35\n"
+"property.text"
+msgid "is not null"
+msgstr "ಶೂನ್ಯವಾಗಿರದ"
+
+#. ZnCKf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_36\n"
+"property.text"
+msgid "true"
+msgstr "ಸತ್ಯ"
+
+#. AwCQp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_37\n"
+"property.text"
+msgid "false"
+msgstr "ಅಸತ್ಯ"
+
+#. GEGKb
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_38\n"
+"property.text"
+msgid "and"
+msgstr "ಮತ್ತು"
+
+#. GDvQV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_39\n"
+"property.text"
+msgid "or"
+msgstr "ಅಥವ"
+
+#. BaA5J
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_40\n"
+"property.text"
+msgid "get the sum of"
+msgstr "ಇದರ ಮೊತ್ತವನ್ನು ಪಡೆದುಕೊ"
+
+#. uCRgg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_41\n"
+"property.text"
+msgid "get the average of"
+msgstr "ಇದರ ಸರಾಸರಿಯನ್ನು ಪಡೆದುಕೊ"
+
+#. UjEVW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_42\n"
+"property.text"
+msgid "get the minimum of"
+msgstr "ಇದರ ಕನಿಷ್ಟವನ್ನು ಪಡೆದುಕೊ"
+
+#. qpN4C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_43\n"
+"property.text"
+msgid "get the maximum of"
+msgstr "ಇದರ ಗರಿಷ್ಟವನ್ನು ಪಡೆದುಕೊ"
+
+#. DAZUE
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_44\n"
+"property.text"
+msgid "get the count of"
+msgstr "ಇದರ ಮೊತ್ತವನ್ನು ಪಡೆದುಕೊ"
+
+#. BBEEj
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_48\n"
+"property.text"
+msgid "(none)"
+msgstr "(ಏನೂ ಇಲ್ಲ)"
+
+#. agTUo
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_50\n"
+"property.text"
+msgid "Fie~lds in the Query:"
+msgstr "ಪ್ರಶ್ನೆಯಲ್ಲಿರುವ ವರ್ಗಗಳು(~l): "
+
+#. CScUQ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_51\n"
+"property.text"
+msgid "Sorting order:"
+msgstr "ವಿಂಗಡಣಾ ರೀತಿ: "
+
+#. JDHFH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_52\n"
+"property.text"
+msgid "No sorting fields were assigned."
+msgstr "ಯಾವುದೆ ವಿಂಗಡಣಾ ವರ್ಗಗಳನ್ನು ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ."
+
+#. GLtfA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_53\n"
+"property.text"
+msgid "Search conditions:"
+msgstr "ಹುಡುಕು ಮಾನದಂಡಗಳು: "
+
+#. DocWB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_54\n"
+"property.text"
+msgid "No conditions were assigned."
+msgstr "ಯಾವುದೆ ಮಾನದಂಡಗಳನ್ನು ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ."
+
+#. BfAEG
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_55\n"
+"property.text"
+msgid "Aggregate functions:"
+msgstr "ಸರಾಸರಿ ಕ್ರಿಯೆಗಳು: "
+
+#. mArUE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_56\n"
+"property.text"
+msgid "No aggregate functions were assigned."
+msgstr "ಯಾವುದೆ ಸರಾಸರಿ ಕ್ರಿಯೆಗಳನ್ನು ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ."
+
+#. uDTRV
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_57\n"
+"property.text"
+msgid "Grouped by:"
+msgstr "ಗುಂಪುಗೂಡಿಸಲಾದ ಕ್ರಮ: "
+
+#. WXLSS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_58\n"
+"property.text"
+msgid "No Groups were assigned."
+msgstr "ಯಾವುದೆ ಗುಂಪುಗಳನ್ನು ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ."
+
+#. jhPaR
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_59\n"
+"property.text"
+msgid "Grouping conditions:"
+msgstr "ಗುಂಪುಗೂಡಿಸುವ ನಿಬಂಧನೆಗಳು: "
+
+#. EoMHV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_60\n"
+"property.text"
+msgid "No grouping conditions were assigned."
+msgstr "ಯಾವುದೆ ಗುಂಪುಗೂಡಿಸುವ ನಿಬಂಧನೆಗಳನ್ನು ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ."
+
+#. NNF8b
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_70\n"
+"property.text"
+msgid "Select the fields (columns) for your query"
+msgstr "ನಿಮ್ಮ ಪ್ರಶ್ನೆಗಾಗಿ ವರ್ಗಗಳನ್ನು(ಲಂಬಸಾಲುಗಳು) ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. kX9cK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_71\n"
+"property.text"
+msgid "Select the sorting order"
+msgstr "ವಿಂಗಡಣಾ ಕ್ರಮವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. 7jmnS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_72\n"
+"property.text"
+msgid "Select the search conditions"
+msgstr "ಹುಡುಕು ಮಾನದಂಡಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. UHCrm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_73\n"
+"property.text"
+msgid "Select the type of query"
+msgstr "ಪ್ರಶ್ನೆಯ ಬಗೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. ZY6MS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_74\n"
+"property.text"
+msgid "Select the groups"
+msgstr "ಗುಂಪುಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. N8n8X
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_75\n"
+"property.text"
+msgid "Select the grouping conditions"
+msgstr "ಗುಂಪು ಮಾಡುವ ಮಾನದಂಡಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. sy7Lt
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_76\n"
+"property.text"
+msgid "Assign aliases if desired"
+msgstr "ಅಗತ್ಯವಿದ್ದಲ್ಲಿ ಆಲಿಯಾಸ್‌ಗಳನ್ನು ನಿಯೋಜಿಸಿ"
+
+#. exiZ6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_77\n"
+"property.text"
+msgid "Check the overview and decide how to proceed"
+msgstr "ಸಮಗ್ರನೋಟವನ್ನು ಕ್ಲಿಕ್ಕಿಸಿ ನಂತರ ಹೇಗೆ ಮುಂದುವರೆಯಬೇಕು ಎಂದು ನಿರ್ಧರಿಸಿ"
+
+#. 2uhKR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_80\n"
+"property.text"
+msgid "Field selection"
+msgstr "ವರ್ಗದ ಆಯ್ಕೆ"
+
+#. LzPyD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_81\n"
+"property.text"
+msgid "Sorting order"
+msgstr "ವಿಂಗಡಣಾ ಕ್ರಮ"
+
+#. pVVLS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_82\n"
+"property.text"
+msgid "Search conditions"
+msgstr "ಹುಡುಕು ಮಾನದಂಡಗಳು"
+
+#. Z22GZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_83\n"
+"property.text"
+msgid "Detail or summary"
+msgstr "ವಿವರಣೆ ಅಥವ ಸಾರಾಂಶ"
+
+#. 4EYC7
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_84\n"
+"property.text"
+msgid "Grouping"
+msgstr "ಗುಂಪುಗೂಡಿಕೆ"
+
+#. MziCd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_85\n"
+"property.text"
+msgid "Grouping conditions"
+msgstr "ಗುಂಪು ಮಾಡುವ ಮಾನದಂಡಗಳು"
+
+#. EB7JF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_86\n"
+"property.text"
+msgid "Aliases"
+msgstr "ಆಲಿಯಾಸ್‌ಗಳು"
+
+#. WzptL
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_87\n"
+"property.text"
+msgid "Overview"
+msgstr "ಅವಲೋಕನ"
+
+#. f4xrP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_88\n"
+"property.text"
+msgid "A field that has not been assigned an aggregate function must be used in a group."
+msgstr "ಸರಾಸರಿ ಕಾರ್ಯಭಾರವನ್ನು ನಿಯೋಜಿಸದೆ ಇರುವ ಒಂದು ವರ್ಗವನ್ನು ಒಂದು ಗುಂಪಿನಲ್ಲಿ ಬಳಸಬೇಕು."
+
+#. 2C2nu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_89\n"
+"property.text"
+msgid "The condition '<FIELDNAME> <LOGICOPERATOR> <VALUE>' was chosen twice. Each condition can only be chosen once"
+msgstr "ನಿಬಂಧನೆ '<FIELDNAME> <LOGICOPERATOR> <VALUE>' ಅನ್ನು ಎರಡನೆ ಬಾರಿ ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ. ಪ್ರತಿಯೊಂದು ನಿಬಂಧನೆಯನ್ನು ಕೇವಲ ಒಂದು ಬಾರಿ ಮಾತ್ರ ಆಯ್ಕೆ ಮಾಡಬಹುದಾಗಿದೆ"
+
+#. ZAHzB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_90\n"
+"property.text"
+msgid "The aggregate function <FUNCTION> has been assigned twice to the fieldname '<NUMERICFIELD>'."
+msgstr "ಸರಾಸರಿ ಕಾರ್ಯಭಾರ <FUNCTION> ಅನ್ನು '<NUMERICFIELD>' ವರ್ಗದಹೆಸರಿಗೆ ಎರಡು ಬಾರಿ ನಿಯೋಜಿಸಲಾಗಿದೆ."
+
+#. s2MGE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_91\n"
+"property.text"
+msgid ","
+msgstr ""
+
+#. D8bmB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_92\n"
+"property.text"
+msgid "<FIELDTITLE> (<FIELDNAME>)"
+msgstr "<FIELDTITLE> (<FIELDNAME>)"
+
+#. dGCJv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_93\n"
+"property.text"
+msgid "<FIELDNAME> (<SORTMODE>)"
+msgstr "<FIELDNAME> (<SORTMODE>)"
+
+#. RAt2h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_94\n"
+"property.text"
+msgid "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+msgstr "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+
+#. pbBGo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_95\n"
+"property.text"
+msgid "<CALCULATEDFUNCTION> <FIELDNAME>"
+msgstr "<CALCULATEDFUNCTION> <FIELDNAME>"
+
+#. MBwoM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_QUERY_96\n"
+"property.text"
+msgid "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+msgstr "<FIELDNAME> <LOGICOPERATOR> <VALUE>"
+
+#. yheet
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_0\n"
+"property.text"
+msgid "Form Wizard"
+msgstr "ಫಾರ್ಮ್ ಗಾರುಡಿ"
+
+#. H4MXV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_1\n"
+"property.text"
+msgid "Fields in ~the form"
+msgstr "ಫಾರ್ಮಿನಲ್ಲಿರುವ ವರ್ಗಗಳು(~t)"
+
+#. 6J6EJ
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_2\n"
+"property.text"
+msgid "Binary fields are always listed and selectable from the left list.\\nIf possible, they are interpreted as images."
+msgstr ""
+"ಬೈನರಿ ವರ್ಗಗಳು ಯಾವಾಗಲೂ ಪಟ್ಟಿ ಮಾಡಲಾಗಿರುತ್ತವೆ ಹಾಗು ಎಡಭಾಗದ ಪಟ್ಟಿಯಿಂದ ಆಯ್ಕೆ ಮಾಡಬಹುದಾಗಿದೆ.\n"
+"ಸಾಧ್ಯವಾದರೆ, ಅವುಗಳನ್ನು ಚಿತ್ರಗಳು ಎಂದು ಪರಿಗಣಿಸಲಾಗುತ್ತದೆ."
+
+#. BCBCd
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_3\n"
+"property.text"
+msgid "A subform is a form that is inserted in another form.\\nUse subforms to show data from tables or queries with a one-to-many relationship."
+msgstr ""
+"ಒಂದು ಉಪನಮೂನೆ ಎನ್ನುವುದು ಒಂದು ನಮೂನೆಯಲ್ಲಿ ಅಡಕಗೊಳಿಸಲಾದಂತಹ ಇನ್ನೊಂದು ನಮೂನೆಯಾಗಿರುತ್ತದೆ.\n"
+"ಕೋಷ್ಟಕಗಳಿಂದ ಅಥವ ಪ್ರಶ್ನೆಗಳಿಂದ ಒಂದರಿಂದ-ಹಲವಾರು ಸಂಬಂಧಗಳೊಂದಿಗೆ ದತ್ತಾಂಶವನ್ನು ತೋರಿಸಲು ಉಪನಮೂನೆಗಳನ್ನು ಬಳಸಿ."
+
+#. h4XzG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_4\n"
+"property.text"
+msgid "~Add Subform"
+msgstr "ಉಪಫಾರ್ಮನ್ನು ಸೇರಿಸು(~A)"
+
+#. GSiwE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_5\n"
+"property.text"
+msgid "~Subform based on existing relation"
+msgstr "ಈಗಿರುವ ಸಂಬಂಧಕ್ಕೆ ಆಧರಿತವಾದಂತಹ ಉಪನಮೂನೆ(~S)"
+
+#. oFM6V
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_6\n"
+"property.text"
+msgid "Tables or queries"
+msgstr "ಕೋಷ್ಟಕಗಳು ಅಥವಾ ಪ್ರಶ್ನೆಗಳು"
+
+#. 2BEab
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_7\n"
+"property.text"
+msgid "Subform based on ~manual selection of fields"
+msgstr "ವರ್ಗಗಳ ಮಾನವಕೃತ ಆಯ್ಕೆಯ ಮೇಲೆ ಆಧರಿತವಾದ ಉಪನಮೂನೆಗಳು(~m)"
+
+#. PShA6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_8\n"
+"property.text"
+msgid "~Which relation do you want to add?"
+msgstr "ಯಾವ ಸಂಬಂಧವನ್ನು ನೀವು ಸೇರಿಸಲು ಬಯಸುತ್ತೀರಿ(~W)?"
+
+#. yGGuc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_9\n"
+"property.text"
+msgid "Fields in the ~subform"
+msgstr "ಉಪಫಾರ್ಮಿನಲ್ಲಿರುವ ವರ್ಗಗಳು (~s)"
+
+#. KG4Hj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_12\n"
+"property.text"
+msgid "~Available fields"
+msgstr "ಲಭ್ಯವಿರುವ ವರ್ಗಗಳು(~A)"
+
+#. pB2Mv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_13\n"
+"property.text"
+msgid "Fields in form"
+msgstr "ಫಾರ್ಮಿನಲ್ಲಿರುವ ವರ್ಗಗಳು"
+
+#. fFuDk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_19\n"
+"property.text"
+msgid "The join '<FIELDNAME1>' and '<FIELDNAME2>' has been selected twice.\\nBut joins may only be used once."
+msgstr "'<FIELDNAME1>' ಹಾಗು '<FIELDNAME2>' ಅನ್ನು ಜೋಡಿಸುವಿಕೆಯನ್ನು ಎರಡು ಬಾರಿ ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ. \\nಆದರೆ ಕೇವಲ ಒಮ್ಮೆ ಮಾತ್ರ ಜೋಡಿಸುವಿಕೆಯನ್ನು ಬಳಸಬಹುದಾಗಿದೆ."
+
+#. 9uFd2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_20\n"
+"property.text"
+msgid "~First joined subform field"
+msgstr "ಮೊದಲನೆ ಬಾರಿಗೆ ಜೋಡಿಸಿದ ಉಪಫಾರ್ಮಿನ ವರ್ಗಗಳು(~F)"
+
+#. NfpyC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_21\n"
+"property.text"
+msgid "~Second joined subform field"
+msgstr "ಎರಡನೆ ಬಾರಿಗೆ ಜೋಡಿಸಿದ ಉಪಫಾರ್ಮಿನ ವರ್ಗಗಳು(~S)"
+
+#. 5F4nf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_22\n"
+"property.text"
+msgid "~Third joined subform field"
+msgstr "ಮೂರನೆ ಬಾರಿಗೆ ಜೋಡಿಸಿದ ಉಪಫಾರ್ಮಿನ ವರ್ಗಗಳು(~T)"
+
+#. BJBzR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_23\n"
+"property.text"
+msgid "~Fourth joined subform field"
+msgstr "ನಾಲ್ಕನೆ ಬಾರಿಗೆ ಜೋಡಿಸಿದ ಉಪಫಾರ್ಮಿನ ವರ್ಗಗಳು(~F)"
+
+#. EAJxx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_24\n"
+"property.text"
+msgid "F~irst joined main form field"
+msgstr "ಮೊದಲನೆ ಬಾರಿಗೆ ಜೋಡಿಸಿದ ಮುಖ್ಯ ಫಾರ್ಮ ವರ್ಗಗಳು (~i)"
+
+#. S72RL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_25\n"
+"property.text"
+msgid "S~econd joined main form field"
+msgstr "ಎರಡನೆ ಬಾರಿಗೆ ಜೋಡಿಸಿದ ಮುಖ್ಯಫಾರ್ಮಿನ ವರ್ಗಗಳು(~e)"
+
+#. C73ZZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_26\n"
+"property.text"
+msgid "T~hird joined main form field"
+msgstr "ಮೂರನೆ ಬಾರಿಗೆ ಜೋಡಿಸಿದ ಮುಖ್ಯಫಾರ್ಮಿನ ವರ್ಗಗಳು(~h)"
+
+#. AwNUu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_27\n"
+"property.text"
+msgid "F~ourth joined main form field"
+msgstr "ನಾಲ್ಕನೆ ಬಾರಿಗೆ ಜೋಡಿಸಿದ ಮುಖ್ಯಫಾರ್ಮಿನ ವರ್ಗಗಳು(~o)"
+
+#. KCNEY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_28\n"
+"property.text"
+msgid "Field border"
+msgstr "ವರ್ಗದ ಮಿತಿ"
+
+#. oQq6u
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_29\n"
+"property.text"
+msgid "No border"
+msgstr "ಅಂಚು ಇಲ್ಲ"
+
+#. hk9Xa
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_30\n"
+"property.text"
+msgid "3D look"
+msgstr "3D ನೋಟ"
+
+#. noMiL
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_31\n"
+"property.text"
+msgid "Flat"
+msgstr "ಸಪಾಟು"
+
+#. kCBjw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_32\n"
+"property.text"
+msgid "Label placement"
+msgstr "ಗುರುತುಚೀಟಿ ಇರಿಸುವಿಕೆ"
+
+#. Vrww6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_33\n"
+"property.text"
+msgid "Align left"
+msgstr "ಎಡಕ್ಕೆ ಹೊಂದಿಸು"
+
+#. Qrt6U
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_34\n"
+"property.text"
+msgid "Align right"
+msgstr "ಬಲಕ್ಕೆ ಹೊಂದಿಸು"
+
+#. KNG6r
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_35\n"
+"property.text"
+msgid "Arrangement of DB fields"
+msgstr "DB ವರ್ಗಗಳ ವ್ಯವಸ್ಥೆ"
+
+#. nRTak
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_36\n"
+"property.text"
+msgid "Columnar - Labels Left"
+msgstr "ಲಂಬಸಾಲಿನಲ್ಲಿ - ಗುರುತುಚೀಟಿಗಳ ಎಡಕ್ಕೆ"
+
+#. HcbRM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_37\n"
+"property.text"
+msgid "Columnar - Labels on Top"
+msgstr "ಲಂಬಸಾಲಿನಲ್ಲಿ - ಗುರುತುಚೀಟಿಗಳ ಮೇಲಕ್ಕೆ"
+
+#. dRw3C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_38\n"
+"property.text"
+msgid "In Blocks - Labels Left"
+msgstr "ಚೌಕಟ್ಟಿನಲ್ಲಿ - ಗುರುತುಚೀಟಿಗಳ ಎಡಕ್ಕೆ"
+
+#. m99kS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_39\n"
+"property.text"
+msgid "In Blocks - Labels Above"
+msgstr "ಚೌಕಟ್ಟಿನಲ್ಲಿ - ಗುರುತುಚೀಟಿಗಳು ಮೇಲಕ್ಕೆ"
+
+#. ZNTvC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_40\n"
+"property.text"
+msgid "As Data Sheet"
+msgstr "ದತ್ತಾಂಶ ಹಾಳೆಯಂತೆ"
+
+#. F5dN5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_41\n"
+"property.text"
+msgid "Arrangement of the main form"
+msgstr "ಮುಖ್ಯ ಫಾರ್ಮಿನಲ್ಲಿನ ಸಿದ್ಧತೆ"
+
+#. BEN4F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_42\n"
+"property.text"
+msgid "Arrangement of the subform"
+msgstr "ಉಪ ಫಾರ್ಮಿನಲ್ಲಿನ ಸಿದ್ಧತೆ"
+
+#. ZAxZE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_44\n"
+"property.text"
+msgid "The form is to be ~used for entering new data only."
+msgstr "ಈ ಫಾರ್ಮನ್ನು ಕೇವಲ ಹೊಸ ದತ್ತಾಂಶವನ್ನು ನಮೂದಿಸಲು ಮಾತ್ರ ಉಪಯೋಗಿಸಬೇಕು(~u)."
+
+#. epRse
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_45\n"
+"property.text"
+msgid "Existing data will not be displayed"
+msgstr "ಇರುವ ದತ್ತಾಂಶವನ್ನು ತೋರಿಸಲಾಗುವುದಿಲ್ಲ "
+
+#. hrpiG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_46\n"
+"property.text"
+msgid "T~he form is to display all data"
+msgstr "ಈ ಫಾರ್ಮ್ ಎಲ್ಲಾ ದತ್ತಾಂಶವನ್ನು ತೋರಿಸುತ್ತದೆ(~h)"
+
+#. jqEHe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_47\n"
+"property.text"
+msgid "Do not allow ~modification of existing data"
+msgstr "ಈಗಿರುವ ದತ್ತಾಂಶವನ್ನು ಬದಲಾಯಿಸಲು ಅನುಮತಿಸಬೇಡ(~m)"
+
+#. FE9no
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_48\n"
+"property.text"
+msgid "Do not allow ~deletion of existing data"
+msgstr "ಈಗಿರುವ ದತ್ತಾಂಶವನ್ನು ಅಳಿಸಲು ಅನುಮತಿಸಬೇಡ(~d)"
+
+#. KwdDp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_49\n"
+"property.text"
+msgid "Do not allow ~addition of new data"
+msgstr "ಹೊಸ ದತ್ತಾಂಶವನ್ನು ಸೇರಿಸಲು ಅನುಮತಿಸಬೇಡ(~a)"
+
+#. Z7Wzp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_50\n"
+"property.text"
+msgid "Name of ~the form"
+msgstr "ಫಾರ್ಮಿನ ಹೆಸರು(~t)"
+
+#. AdLhz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_51\n"
+"property.text"
+msgid "How do you want to proceed after creating the form?"
+msgstr "ಫಾರ್ಮನ್ನು ನಿರ್ಮಿಸಿದ ಮೇಲೆ ಹೇಗೆ ಮುಂದುವರೆಯಲು ಇಚ್ಛಿಸುತ್ತೀರಾ?"
+
+#. G7CYq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_52\n"
+"property.text"
+msgid "~Work with the form"
+msgstr "ಫಾರ್ಮನ್ನು ಉಪಯೋಗಿಸು(~W)"
+
+#. iCnFm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_53\n"
+"property.text"
+msgid "~Modify the form"
+msgstr "ಫಾರ್ಮಿನಲ್ಲಿ ಮಾರ್ಪಡಿಸು(~M)"
+
+#. 5EgBu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_55\n"
+"property.text"
+msgid "~Page Styles"
+msgstr "ಪುಟದ ಶೈಲಿಗಳು(~P)"
+
+#. D99cE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_80\n"
+"property.text"
+msgid "Field selection"
+msgstr "ವರ್ಗದ ಆಯ್ಕೆ"
+
+#. AspWz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_81\n"
+"property.text"
+msgid "Set up a subform"
+msgstr "ಉಪಫಾರ್ಮನ್ನು ಸಿದ್ಧಪಡಿಸು"
+
+#. YayFB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_82\n"
+"property.text"
+msgid "Add subform fields"
+msgstr "ಉಪಫಾರ್ಮಿನ ವರ್ಗಗಳನ್ನು ಸೇರಿಸು"
+
+#. V2Q6R
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_83\n"
+"property.text"
+msgid "Get joined fields"
+msgstr "ಜೋಡಿಸಿದ ವರ್ಗಗಳನ್ನು ಪಡೆದುಕೊ"
+
+#. orBm4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_84\n"
+"property.text"
+msgid "Arrange controls"
+msgstr "ನಿಯಂತ್ರಣಗಳನ್ನು ಹೊಂದಿಸು"
+
+#. QGCau
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_85\n"
+"property.text"
+msgid "Set data entry"
+msgstr "ದತ್ತಾಂಶ ನಮೂದನ್ನು ಸಿದ್ಧಪಡಿಸು"
+
+#. vFeqn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_86\n"
+"property.text"
+msgid "Apply styles"
+msgstr "ಶೈಲಿಗಳನ್ನು ಅನ್ವಯಿಸು"
+
+#. 24keF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_87\n"
+"property.text"
+msgid "Set name"
+msgstr "ಹೆಸರನ್ನು ಇರಿಸು"
+
+#. H25LH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_88\n"
+"property.text"
+msgid "(Date)"
+msgstr "(ದಿನಾಂಕ)"
+
+#. EACeJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_89\n"
+"property.text"
+msgid "(Time)"
+msgstr "(ಸಮಯ)"
+
+#. scXkg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_90\n"
+"property.text"
+msgid "Select the fields of your form"
+msgstr "ನಿಮ್ಮ ಫಾರ್ಮಿನ ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. s6xRo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_91\n"
+"property.text"
+msgid "Decide if you want to set up a subform"
+msgstr "ಉಪ ಫಾರ್ಮನ್ನು ಸಿದ್ಧಪಡಿಸಬೇಕೆ ಎಂದು ನಿರ್ಣಯಿಸಿ"
+
+#. 4pHsF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_92\n"
+"property.text"
+msgid "Select the fields of your subform"
+msgstr "ನಿಮ್ಮ ಉಪಫಾರ್ಮಿನ ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. WT3Gn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_93\n"
+"property.text"
+msgid "Select the joins between your forms"
+msgstr "ನಿಮ್ಮ ಫಾರ್ಮುಗಳ ನಡುವೆ ಸಂಪರ್ಕ ಏರ್ಪಡಿಸುವ ಕೊಂಡಿಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. DWvza
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_94\n"
+"property.text"
+msgid "Arrange the controls on your form"
+msgstr "ನಿಮ್ಮ ಫಾರ್ಮಿನ ನಿಯಂತ್ರಣಗಳನ್ನು ಹೊಂದಿಸಿ"
+
+#. j6uv4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_95\n"
+"property.text"
+msgid "Select the data entry mode"
+msgstr "ದತ್ತಾಂಶವನ್ನು ಸೇರಿಸಲು ಮಾಧ್ಯಮವನ್ನು ಆಯ್ಕೆಮಾಡಿ"
+
+#. TWztZ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_96\n"
+"property.text"
+msgid "Apply the style of your form"
+msgstr "ನಿಮ್ಮ ಫಾರ್ಮಿನ ಶೈಲಿಯನ್ನು ಅನ್ವಯಿಸಿ"
+
+#. zZiae
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_97\n"
+"property.text"
+msgid "Set the name of the form"
+msgstr "ನಿಮ್ಮ ಫಾರ್ಮಿಗೆ ಹೆಸರನ್ನು ನೀಡಿ"
+
+#. JTRXV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_FORM_98\n"
+"property.text"
+msgid "A form with the name '%FORMNAME' already exists.\\nChoose another name."
+msgstr "'%FORMNAME' ಈ ಹೆಸರಿನ ಫಾರ್ಮ್ ಈಗಾಗಲೆ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ.\\nಬೇರೊಂದು ಹೆಸರನ್ನು ಆಯ್ಕೆ ಮಾಡಿ."
+
+#. KJkgf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_1\n"
+"property.text"
+msgid "Table Wizard"
+msgstr "ಕೋಷ್ಟಕ ಗಾರುಡಿ"
+
+#. hGMoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_2\n"
+"property.text"
+msgid "Select fields"
+msgstr "ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡು"
+
+#. XEQgp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_3\n"
+"property.text"
+msgid "Set types and formats"
+msgstr "ಮಾದರಿ ಹಾಗು ವಿನ್ಯಾಸಗಳನ್ನು ಸಿದ್ಧಪಡಿಸು"
+
+#. Lww9c
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_4\n"
+"property.text"
+msgid "Set primary key"
+msgstr "ಪ್ರಾಥಮಿಕ ಕೀಲಿಯನ್ನು ಹೊಂದಿಸು"
+
+#. LkTBf
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_5\n"
+"property.text"
+msgid "Create table"
+msgstr "ಕೋಷ್ಟಕವನ್ನು ರಚಿಸಿ"
+
+#. hei5Y
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_8\n"
+"property.text"
+msgid "Select fields for your table"
+msgstr "ನಿಮ್ಮ ಕೋಷ್ಟಕಕ್ಕೆ ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. 5DXT6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_9\n"
+"property.text"
+msgid "Set field types and formats"
+msgstr "ವರ್ಗಗಳ ಬಗೆಯನ್ನು ಮತ್ತು ವಿನ್ಯಾಸಗಳನ್ನು ಸಿದ್ಧಪಡಿಸು"
+
+#. bAfiP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_10\n"
+"property.text"
+msgid "Set primary key"
+msgstr "ಪ್ರಾಥಮಿಕ ಕೀಲಿಯನ್ನು ಹೊಂದಿಸು"
+
+#. UHTbE
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_11\n"
+"property.text"
+msgid "Create table"
+msgstr "ಕೋಷ್ಟಕವನ್ನು ರಚಿಸಿ"
+
+#. XyCFc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_14\n"
+"property.text"
+msgid "This wizard helps you to create a table for your database. After selecting a table category and a sample table, choose the fields you want to include in your table. You can include fields from more than one sample table."
+msgstr "ಈ ಗಾರುಡಿಯು ನಿಮ್ಮ ದತ್ತಸಂಚಯಕ್ಕಾಗಿ ಒಂದು ಕೋಷ್ಟಕವನ್ನು ರಚಿಸಲು ನಿಮಗೆ ನೆರವಾಗುತ್ತದೆ. ಒಂದು ಕೋಷ್ಟಕ ಪಂಗಡವನ್ನು ಹಾಗು ಒಂದು ನಮೂನೆ ಕೋಷ್ಟಕವನ್ನು ಆಯ್ಕೆ ಮಾಡಿದ ನಂತರ ನಿಮ್ಮ ಕೋಷ್ಟಕದಲ್ಲಿ ಅಡಕಗೊಳಿಸಬೇಕಿರುವ ವರ್ಗಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ. ನೀವು ಒಂದಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ಕೋಷ್ಟಕದಿಂದ ವರ್ಗಗಳನ್ನು ಒಳಗೊಳ್ಳಿಸಬಹುದಾಗಿದೆ."
+
+#. FEU9Q
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_15\n"
+"property.text"
+msgid "Ca~tegory"
+msgstr "ಪಂಗಡ(~t)"
+
+#. aBFKF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_16\n"
+"property.text"
+msgid "B~usiness"
+msgstr "ವ್ಯಾವಹಾರಿಕ(~u)"
+
+#. nfCjy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_17\n"
+"property.text"
+msgid "P~ersonal"
+msgstr "ವೈಯಕ್ತಿಕ(~e)"
+
+#. NrVBB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_18\n"
+"property.text"
+msgid "~Sample tables"
+msgstr "ಮಾದರಿ ಕೋಷ್ಟಕಗಳು(~S)"
+
+#. itXJ9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_19\n"
+"property.text"
+msgid "A~vailable fields"
+msgstr "ಲಭ್ಯವಿರುವ ವರ್ಗಗಳು(~v)"
+
+#. JteH7
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_20\n"
+"property.text"
+msgid "Field information"
+msgstr "ವರ್ಗದ ಮಾಹಿತಿ"
+
+#. NqEog
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_21\n"
+"property.text"
+msgid "+"
+msgstr ""
+
+#. BhFze
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_22\n"
+"property.text"
+msgid "-"
+msgstr ""
+
+#. B8Qeu
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_23\n"
+"property.text"
+msgid "Field name"
+msgstr "ಸ್ಥಳದ ಹೆಸರು:"
+
+#. gF5v4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_24\n"
+"property.text"
+msgid "Field type"
+msgstr "ವರ್ಗದ ಬಗೆ"
+
+#. S82Up
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_25\n"
+"property.text"
+msgid "~Selected fields"
+msgstr "ಆಯ್ಕೆ ಮಾಡಲಾದ ವರ್ಗಗಳು(~S)"
+
+#. iWG72
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_26\n"
+"property.text"
+msgid "A primary key uniquely identifies each record in a database table. Primary keys ease the linking of information in separate tables, and it is recommended that you have a primary key in every table. Without a primary key, it will not be possible to enter data into this table."
+msgstr "ಒಂದು ಪ್ರಾಥಮಿಕ ಕೀಲಿಯು ದತ್ತಸಂಚಯದಲ್ಲಿನ ಪ್ರತಿಯೊಂದು ದಾಖಲೆಗಳನ್ನು ವಿಶಿಷ್ಟವಾಗಿ ಗುರುತಿಸುತ್ತದೆ. ವಿವಿಧ ಕೋಷ್ಟಕಗಳ ನಡುವೆ ಮಾಹಿತಿಯ ಜೋಡಣೆಯನ್ನು ಪ್ರಾಥಮಿಕ ಕೀಲಿಯು ಸುಲಭಗೊಳಿಸುತ್ತದೆ, ಆದ್ದರಿಂದ ನೀವು ಪ್ರತಿಯೊಂದು ಕೋಷ್ಟಕದಲ್ಲೂ ಒಂದು ಪ್ರಾಥಮಿಕ ಕೀಲಿಯನ್ನು ಹೊಂದಿರುವಂತೆ ಸಲಹೆ ಮಾಡುತ್ತೇವೆ. ಪ್ರಾಥಮಿಕ ಕೀಲಿಯಿಲ್ಲದೆ ನೀವು ಕೋಷ್ಟಕದಲ್ಲಿ ದತ್ತಾಂಶವನ್ನು ನಮೂದಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ."
+
+#. 3kaaw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_27\n"
+"property.text"
+msgid "~Create a primary key"
+msgstr "ಒಂದು ಪ್ರಾಥಮಿಕ ಕೀಲಿಯನ್ನು ರಚಿಸು(~C)"
+
+#. xGC6Z
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_28\n"
+"property.text"
+msgid "~Automatically add a primary key"
+msgstr "ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಒಂದು ಪ್ರಾಥಮಿಕ ಕೀಲಿಯನ್ನು ಸೇರಿಸು(~A)"
+
+#. aP3ai
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_29\n"
+"property.text"
+msgid "~Use an existing field as a primary key"
+msgstr "ಈಗಿರುವ ಒಂದು ಪ್ರಾಥಮಿಕ ಕೀಲಿಯನ್ನು ಬಳಸು(~U)"
+
+#. KBVAL
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_30\n"
+"property.text"
+msgid "Define p~rimary key as a combination of several fields"
+msgstr "ಹಲವಾರು ವರ್ಗಗಳ ಸಿದ್ಧತೆಯಾಗಿ ಪ್ರಾಥಮಿಕ ಕೀಲಿಯನ್ನು ಸೂಚಿಸು(~r)"
+
+#. PQfF2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_31\n"
+"property.text"
+msgid "F~ieldname"
+msgstr "ವರ್ಗದ ಹೆಸರು(~i)"
+
+#. AK4Vf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_32\n"
+"property.text"
+msgid "~Primary key fields"
+msgstr "ಪ್ರಾಥಮಿಕ ಕೀಲಿ ವರ್ಗಗಳು(~P)"
+
+#. ZykVT
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_33\n"
+"property.text"
+msgid "Auto ~value"
+msgstr "ಸ್ವಯಂ ಮೌಲ್ಯ(~v)"
+
+#. AnaDG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_34\n"
+"property.text"
+msgid "What do you want to name your table?"
+msgstr "ನಿಮ್ಮ ಕೋಷ್ಟಕಕ್ಕೆ ಯಾವ ಹೆಸರಿಡಲು ಬಯಸುತ್ತೀರಿ?"
+
+#. vVHAs
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_35\n"
+"property.text"
+msgid "Congratulations. You have entered all the information needed to create your table."
+msgstr "ಅಭಿನಂದನೆಗಳು. ನಿಮ್ಮ ಕೋಷ್ಟಕವನ್ನು ನಿರ್ಮಿಸಲು ಬೇಕಾದ ಎಲ್ಲಾ ಮಾಹಿತಿಯನ್ನು ಒದಗಿಸಿದ್ದೀರಿ."
+
+#. 9wGua
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_36\n"
+"property.text"
+msgid "What do you want to do next?"
+msgstr "ನೀವು ಮುಂದೇನು ಮಾಡಲು ಇಚ್ಛಿಸುತ್ತೀರಿ?"
+
+#. satRX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_37\n"
+"property.text"
+msgid "Modify the table design"
+msgstr "ಕೋಷ್ಟಕದ ವಿನ್ಯಾಸವನ್ನು ಬದಲಾಯಿಸು"
+
+#. GEjDE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_38\n"
+"property.text"
+msgid "Insert data immediately"
+msgstr "ದತ್ತಾಂಶವನ್ನು ತಕ್ಷಣವೆ ಸೇರಿಸು"
+
+#. E8SB9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_39\n"
+"property.text"
+msgid "C~reate a form based on this table"
+msgstr "ಈ ಕೋಷ್ಟಕದ ಆಧಾರದ ಮೇಲೆ ಒಂದು ನಮೂನೆಯನ್ನು ರಚಿಸು(~r)"
+
+#. FkbmE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_40\n"
+"property.text"
+msgid "The table you have created could not be opened."
+msgstr "ನೀವು ನಿರ್ಮಿಸಿದ ಕೋಷ್ಟಕವನ್ನು ತೆರೆಯಲಾಗಲಿಲ್ಲ."
+
+#. mZMcY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_41\n"
+"property.text"
+msgid "The table name '%TABLENAME' contains a character ('%SPECIALCHAR') that might not be supported by the database."
+msgstr "ಕೋಷ್ಟಕ '%TABLENAME' ದತ್ತಸಂಚಯದಿಂದ ಬೆಂಬಲವಿರದೆ ಇರದೆ ಇರಬಹುದಾದಂತಹ ಒಂದು ಅಕ್ಷರವನ್ನು ('%SPECIALCHAR') ಹೊಂದಿದೆ."
+
+#. GGfLR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_42\n"
+"property.text"
+msgid "The field name '%FIELDNAME' contains a special character ('%SPECIALCHAR') that might not be supported by the database."
+msgstr "ದತ್ತಸಂಚಯದಿಂದ ಬೆಂಬಲವಿರದೆ ಇರದೆ ಇರಬಹುದಾದಂತಹ ಒಂದು ವಿಶೇಷ ಅಕ್ಷರವನ್ನು ('%SPECIALCHAR') ವರ್ಗದ ಹೆಸರು '%FIELDNAME' ಹೊಂದಿದೆ."
+
+#. CtXqK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_43\n"
+"property.text"
+msgid "Field"
+msgstr "ವರ್ಗ"
+
+#. LCMUy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_44\n"
+"property.text"
+msgid "MyTable"
+msgstr "MyTable"
+
+#. g7GJC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_45\n"
+"property.text"
+msgid "Add a Field"
+msgstr "ವರ್ಗವನ್ನು ಸೇರಿಸು"
+
+#. EC4Xn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_46\n"
+"property.text"
+msgid "Remove the selected Field"
+msgstr "ಆಯ್ಕೆ ಮಾಡಲಾದ ವರ್ಗವನ್ನು ತೆಗೆದುಹಾಕು"
+
+#. rhV9g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_47\n"
+"property.text"
+msgid "The field cannot be inserted because this would exceed the maximum number of %COUNT possible fields in the database table"
+msgstr "ವರ್ಗವನ್ನು ಸೇರಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ ಏಕೆಂದರೆ ಇದರಿಂದಾಗಿ ದತ್ತಸಂಚಯದಲ್ಲಿ ಸಾಧ್ಯವಿರುವ ಗರಿಷ್ಟ ಸಂಖ್ಯೆ%COUNT ವರ್ಗಗಳನ್ನು ಮೀರಿದಂತಾಗುತ್ತದೆ"
+
+#. jbZRo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_48\n"
+"property.text"
+msgid "The name '%TABLENAME' already exists.\\nPlease enter another name."
+msgstr "'%TABLENAME' ಹೆಸರು ಈಗಾಗಲೆ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ.\\nದಯವಿಟ್ಟು ಬೇರೆ ಹೆಸರನ್ನು ನಮೂದಿಸಿ."
+
+#. CSsZM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_49\n"
+"property.text"
+msgid "Catalog of the table"
+msgstr "ಕೋಷ್ಟಕದ ಕೆಟೆಲಾಗ್"
+
+#. vYCp3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_50\n"
+"property.text"
+msgid "Schema of the table"
+msgstr "ಕೋಷ್ಟಕದ ಸ್ಕೀಮಾ"
+
+#. UnUxG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RID_TABLE_51\n"
+"property.text"
+msgid "The field '%FIELDNAME' already exists."
+msgstr "'%FIELDNAME' ವರ್ಗವು ಈಗಾಗಲೆ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ."
+
+#. Jqd4i
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_0\n"
+"property.text"
+msgid "~Cancel"
+msgstr "ರದ್ದು ಮಾಡು(~C)"
+
+#. t9bGA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_1\n"
+"property.text"
+msgid "~Help"
+msgstr "ಸಹಾಯ(~H)"
+
+#. TQ8fA
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_2\n"
+"property.text"
+msgid "< ~Back"
+msgstr "< ಹಿಂದಕ್ಕೆ (~B)"
+
+#. XD8JL
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_3\n"
+"property.text"
+msgid "~Convert"
+msgstr "ರೂಪಾಂತರಿಸು (~C)"
+
+#. tGJBz
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_4\n"
+"property.text"
+msgid "Note: Currency amounts from external links and currency conversion factors in formulas cannot be converted."
+msgstr "ಸೂಚನೆ: ಹೊರಗಿನ ಸಂಪರ್ಕಕೊಂಡಿಯಲ್ಲಿನ ಚಲಾವಣಾನಾಣ್ಯದ ಮೊತ್ತವನ್ನು ಹಾಗು ಸೂತ್ರಗಳಲ್ಲಿನ ಪರಿವರ್ತನ ಅಂಶವನ್ನು ಉಪಯೋಗಿಸಿಕೊಂಡು ಪರಿವರ್ತಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ."
+
+#. GdxoQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_5\n"
+"property.text"
+msgid "First, unprotect all sheets."
+msgstr "ಮೊದಲು, ಎಲ್ಲಾ ಹಾಳೆಗಳ ಸಂರಕ್ಷಣೆಯನ್ನು ತೆಗೆಯಿರಿ."
+
+#. fUudC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_6\n"
+"property.text"
+msgid "Currencies:"
+msgstr "ಚಲಾವಣಾನಾಣ್ಯಗಳು:"
+
+#. 5Uug9
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_7\n"
+"property.text"
+msgid "C~ontinue >"
+msgstr "ಮುಂದುವರಿಸು(~o)>>"
+
+#. 9JLmA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_ZERO_8\n"
+"property.text"
+msgid "C~lose"
+msgstr "ಮುಚ್ಚು(~l)"
+
+#. pkLZp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_0\n"
+"property.text"
+msgid "~Entire document"
+msgstr "ಸಂಪೂರ್ಣ ದಸ್ತಾವೇಜು(~E)"
+
+#. KTycA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_1\n"
+"property.text"
+msgid "Selection"
+msgstr "ಆಯ್ಕೆ"
+
+#. NCtfG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_2\n"
+"property.text"
+msgid "Cell S~tyles"
+msgstr "ಕೋಶದ ಶೈಲಿಗಳು(~t)"
+
+#. W4CcY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_3\n"
+"property.text"
+msgid "Currency cells in the current ~sheet"
+msgstr "ಪ್ರಸಕ್ತ ಹಾಳೆಯಲ್ಲಿನ ಚಲಾವಣಾನಾಣ್ಯದ ಕೋಶಗಳು(~s)"
+
+#. XBbAm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_4\n"
+"property.text"
+msgid "Currency cells in the entire ~document"
+msgstr "ಸಂಪೂರ್ಣ ದಸ್ತಾವೇಜಿನಲ್ಲಿ ಚಲಾವಣಾನಾಣ್ಯದ ಕೋಶಗಳು (~d)"
+
+#. dRGpU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_5\n"
+"property.text"
+msgid "~Selected range"
+msgstr "ಆಯ್ಕೆ ಮಾಡಿದ ವ್ಯಾಪ್ತಿ(~S)"
+
+#. KGDmq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_6\n"
+"property.text"
+msgid "Select Cell Styles"
+msgstr "ಕೋಶಶೈಲಿಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡು"
+
+#. rEiCE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_7\n"
+"property.text"
+msgid "Select currency cells"
+msgstr "ಚಲಾವಣಾನಾಣ್ಯ ಕೋಶಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡು"
+
+#. yXtpS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_8\n"
+"property.text"
+msgid "Currency ranges:"
+msgstr "ಚಲಾವಣಾನಾಣ್ಯದ ವ್ಯಾಪ್ತಿಗಳು:"
+
+#. d2faA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_CONVERTER_9\n"
+"property.text"
+msgid "Templates:"
+msgstr "ನಮೂನೆಗಳು:"
+
+#. 63WRQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_0\n"
+"property.text"
+msgid "Extent"
+msgstr "ವಿಸ್ತಾರ"
+
+#. CDmMh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_1\n"
+"property.text"
+msgid "~Single %PRODUCTNAME Calc document"
+msgstr "ಒಂದು %PRODUCTNAME Calc ದಸ್ತಾವೇಜು(~S)"
+
+#. nUcAR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_2\n"
+"property.text"
+msgid "Complete ~directory"
+msgstr "ಕಡತಕೋಶವನ್ನು ಪೂರ್ಣಗೊಳಿಸು(~d)"
+
+#. eUtmF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_3\n"
+"property.text"
+msgid "Source Document:"
+msgstr "ಆಕರ ದಸ್ತಾವೇಜು:"
+
+#. iQj6g
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_4\n"
+"property.text"
+msgid "Source directory:"
+msgstr "ಆಕರ ಕಡತಕೋಶ:"
+
+#. JM8cN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_5\n"
+"property.text"
+msgid "~Including subfolders"
+msgstr "ಉಪಕಡತಕೋಶಗಳನ್ನು ಒಳಗೊಳ್ಳಿಸು(~I)"
+
+#. BFR2F
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_6\n"
+"property.text"
+msgid "Target directory:"
+msgstr "ನಿಗದಿತ ಕಡತಕೋಶ:"
+
+#. 2q8vo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_7\n"
+"property.text"
+msgid "Temporarily unprotect sheet without query"
+msgstr "ಪ್ರಶ್ನೆ ಇಲ್ಲದೆಯೆ ತಾತ್ಕಾಲಿಕವಾಗಿ ಹಾಳೆಯ ಸಂರಕ್ಷಣೆಯನ್ನು ತೆಗೆದುಹಾಕಿ"
+
+#. BVhae
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_AUTOPILOT_10\n"
+"property.text"
+msgid "Also convert fields and tables in text documents"
+msgstr "ಪಠ್ಯ ದಸ್ತಾವೇಜಿನಲ್ಲಿರುವ ವರ್ಗಗಳನ್ನು ಹಾಗು ಕೋಷ್ಟಕಗಳನ್ನು ಸಹ ಪರಿವರ್ತಿಸು"
+
+#. sFtH8
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_0\n"
+"property.text"
+msgid "Conversion status:"
+msgstr "ಪರಿವರ್ತನೆಯ ಸ್ಥಿತಿ: "
+
+#. 8EcKA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_1\n"
+"property.text"
+msgid "Conversion status of the cell templates:"
+msgstr "ಕೋಶದ ನಮೂನೆಗಳ ಪರಿವರ್ತನೆಯ ಸ್ಥಿತಿ:"
+
+#. BAX9w
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_2\n"
+"property.text"
+msgid "Registration of the relevant ranges: Sheet %1Number%1 of %2TotPageCount%2"
+msgstr "ಸಂಬಂಧಿತ ವ್ಯಾಪ್ತಿಗಳ ನೋಂದಣಿ: %2TotPageCount%2 ನಲ್ಲಿ %1Number%1"
+
+#. EbBJf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_3\n"
+"property.text"
+msgid "Entry of the ranges to be converted..."
+msgstr "ಪರಿವರ್ತಿಸಬೇಕಾದ ವ್ಯಾಪ್ತಿಗಳ ನಮೂದನೆ..."
+
+#. f3Erf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_4\n"
+"property.text"
+msgid "Sheet protection for each sheet will be restored..."
+msgstr "ಪ್ರತಿ ಹಾಳೆಯ ಸಂರಕ್ಷಣೆಯನ್ನು ಮರಳಿ ಹೊಂದಿಸಲಾಗುತ್ತದೆ..."
+
+#. 5sPuS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STATUSLINE_5\n"
+"property.text"
+msgid "Conversion of the currency units in the cell templates..."
+msgstr "ಕೋಶದ ನಮೂನೆಯಲ್ಲಿರುವ ಚಲಾವಣಾನಾಣ್ಯ ಅಂಶಗಳ ಪರಿವರ್ತನೆ...."
+
+#. JuVQA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_0\n"
+"property.text"
+msgid "~Finish"
+msgstr "ಮುಗಿಸು(~F)"
+
+#. xsatA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_1\n"
+"property.text"
+msgid "Select directory"
+msgstr "ಕಡತಕೋಶವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. o4Myk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_2\n"
+"property.text"
+msgid "Select file"
+msgstr "ಕಡತವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. 5khdm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_3\n"
+"property.text"
+msgid "Select target directory"
+msgstr "ನಿಗದಿತ ಕಡತಕೋಶವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ"
+
+#. Ldc4o
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_4\n"
+"property.text"
+msgid "non-existent"
+msgstr "ಅಸ್ತಿತ್ವದಲ್ಲಿ ಇರದಿರುವ"
+
+#. bh9MB
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_5\n"
+"property.text"
+msgid "Euro Converter"
+msgstr "ಯೂರೋ ಪರಿವರ್ತಕ"
+
+#. tb9sF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_6\n"
+"property.text"
+msgid "Should protected spreadsheets be temporarily unprotected?"
+msgstr "ಸಂರಕ್ಷಿಸಲಾಗಿರುವ ಸ್ಪ್ರೆಡ್‌ಶೀಟ್‌ಗಳ ಸಂರಕ್ಷಣೆಯನ್ನು ತಾತ್ಕಾಲಿಕವಾಗಿ ತೆಗೆಯಬೇಕೆ?"
+
+#. zFqxc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_7\n"
+"property.text"
+msgid "Enter the password to unprotect the table %1TableName%1"
+msgstr "%1TableName%1 ಕೋಷ್ಟಕದ ಸಂರಕ್ಷಣೆಯನ್ನು ತೆಗೆಯಲು ಗುಪ್ತಪದವನ್ನು ನಮೂದಿಸಿ"
+
+#. t2n9c
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_8\n"
+"property.text"
+msgid "Wrong Password!"
+msgstr "ತಪ್ಪಾದ ಗುಪ್ತಪದ!"
+
+#. YPd7L
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_9\n"
+"property.text"
+msgid "Protected Sheet"
+msgstr "ಹಾಳೆ ಸಂರಕ್ಷಿತವಾಗಿದೆ"
+
+#. JbEyK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_10\n"
+"property.text"
+msgid "Warning!"
+msgstr "ಎಚ್ಚರಿಕೆ!"
+
+#. tYfDo
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_11\n"
+"property.text"
+msgid "Protection for the sheets will not be removed."
+msgstr "ಹಾಳೆಯ ರಕ್ಷಣಾ ವ್ಯವಸ್ತೆಯನ್ನು ತೆಗೆಯಲಾಗುವುದಿಲ್ಲ."
+
+#. YfPkn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_12\n"
+"property.text"
+msgid "Sheet cannot be unprotected"
+msgstr "ಹಾಳೆಗೆ ಸಂರಕ್ಷಣೆಯನ್ನು ತೆಗೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ"
+
+#. PisTE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_13\n"
+"property.text"
+msgid "The Wizard cannot edit this document as cell formats cannot be modified in documents containing protected spreadsheets."
+msgstr "ಸಂರಕ್ಷಿಸಲಾಗಿರುವ ಸ್ಪ್ರೆಡ್‌ಷೀಟ್‌ಗಳ ದಸ್ತಾವೇಜಿನ ಕೋಶದ ರೂಪುಗಳನ್ನು ಬದಲಾಯಿಸಲು ಸಾಧ್ಯವಿರದ ಕಾರಣ ಗಾರುಡಿಯು ಈ ದಸ್ತಾವೇಜನ್ನು ಸಂಪಾದಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ."
+
+#. t5jgU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_14\n"
+"property.text"
+msgid "Please note that the Euro Converter will, otherwise, not be able to edit this document!"
+msgstr "ದಯವಿಟ್ಟು ಗಮನಿಸಿ, ಯುರೊ ಪರಿವರ್ತಕದಿಂದ ಹೊರತುಪಡಿಸಿ ಬೇರಾವುದೆ ಈ ದಸ್ತಾವೇಜನ್ನು ಸಂಪಾದಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ!"
+
+#. MwoXF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_15\n"
+"property.text"
+msgid "Please choose a currency to be converted first!"
+msgstr "ಮೊದಲು ಪರಿವರ್ತಿಸಲು ಒಂದು ಚಲಾವಣಾನಾಣ್ಯವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ!"
+
+#. CzTMy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_16\n"
+"property.text"
+msgid "Password:"
+msgstr "ಗುಪ್ತಪದ:"
+
+#. QBznu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_17\n"
+"property.text"
+msgid "OK"
+msgstr "ಸರಿ"
+
+#. ALxZG
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_18\n"
+"property.text"
+msgid "Cancel"
+msgstr "ರದ್ದು ಮಾಡು"
+
+#. bTNoR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_19\n"
+"property.text"
+msgid "Please select a %PRODUCTNAME Calc document for editing!"
+msgstr "ದಯವಿಟ್ಟು ಸಂಪಾದಿಸಲು ಒಂದು %PRODUCTNAME Calc ದಸ್ತಾವೇಜನ್ನು ಆಯ್ಕೆ ಮಾಡಿ!"
+
+#. 8QobR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_20\n"
+"property.text"
+msgid "'<1>' is not a directory!"
+msgstr "'<1>' ಕಡತಕೋಶವಾಗಿಲ್ಲ!"
+
+#. saw7C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_21\n"
+"property.text"
+msgid "Document is read-only!"
+msgstr "ದಸ್ತಾವೇಜನ್ನು ಕೇವಲ ಓದಲು ಮಾತ್ರವಾಗಿದೆ!"
+
+#. GZECF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_22\n"
+"property.text"
+msgid "The '<1>' file already exists.<CR>Do you want to overwrite it?"
+msgstr "'<1>' ಕಡತ ಈಗಾಗಲೆ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ. <CR> ನೀವು ಅದನ್ನು ತಿದ್ದಿಬರೆಯಲು ಇಚ್ಚಿಸುತ್ತೀರಾ?"
+
+#. 9dJcF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_23\n"
+"property.text"
+msgid "Do you really want to terminate conversion at this point?"
+msgstr "ನೀವು ನಿಜವಾಗಲು ಪರಿವರ್ತನೆಯನ್ನು ಇಲ್ಲಿಯೆ ಅಂತ್ಯಗೊಳಿಸಲು ಇಷ್ಟಪಡುತ್ತೀರಾ?"
+
+#. ufpoR
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"MESSAGES_24\n"
+"property.text"
+msgid "Cancel Wizard"
+msgstr "ಗಾರುಡಿಯನ್ನು ರದ್ದು ಮಾಡು"
+
+#. HCfhF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_0\n"
+"property.text"
+msgid "Portuguese Escudo"
+msgstr "ಪೋರ್ಚುಗೀಸ್ ಎಸ್ಕುಡೊ"
+
+#. 4PAvX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_1\n"
+"property.text"
+msgid "Dutch Guilder"
+msgstr "ಡಚ್ ಗಿಲ್ಡರ್"
+
+#. VzRz9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_2\n"
+"property.text"
+msgid "French Franc"
+msgstr "ಫ್ರೆಂಚ್ ಫ್ರಾಂಕ್"
+
+#. rQFWP
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_3\n"
+"property.text"
+msgid "Spanish Peseta"
+msgstr "ಸ್ಪಾನಿಷ್ ಪೆಸೆಟ"
+
+#. tc8KC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_4\n"
+"property.text"
+msgid "Italian Lira"
+msgstr "ಇಟಾಲಿಯನ್ ಲಿರಾ"
+
+#. XgEB3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_5\n"
+"property.text"
+msgid "German Mark"
+msgstr "ಜರ್ಮನ್ ಮಾರ್ಕ್"
+
+#. 7sBxK
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_6\n"
+"property.text"
+msgid "Belgian Franc"
+msgstr "ಬೆಲ್ಜಿಯನ್ ಫ್ರಾಂಕ್"
+
+#. nLYJf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_7\n"
+"property.text"
+msgid "Irish Punt"
+msgstr "ಐರಿಶ್ ಪಂಟ್"
+
+#. rujpn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_8\n"
+"property.text"
+msgid "Luxembourg Franc"
+msgstr "ಲಕ್ಸಂಬರ್ಗ್ ಫ್ರಾಂಕ್"
+
+#. jR3cM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_9\n"
+"property.text"
+msgid "Austrian Schilling"
+msgstr "ಆಸ್ಟ್ರಿಯನ್ ಶಿಲ್ಲಿಂಗ್"
+
+#. 8x4oF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_10\n"
+"property.text"
+msgid "Finnish Mark"
+msgstr "ಫಿನ್ನಿಷ್ ಮಾರ್ಕ್"
+
+#. LsUXE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_11\n"
+"property.text"
+msgid "Greek Drachma"
+msgstr "ಗ್ರೀಕ್ ಡ್ರಾಕ್ಮ"
+
+#. cks9C
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_12\n"
+"property.text"
+msgid "Slovenian Tolar"
+msgstr "ಸ್ಲೊವೆನಿಯನ್ ಟೊಲರ್"
+
+#. CMbyy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_13\n"
+"property.text"
+msgid "Cypriot Pound"
+msgstr "ಸಿಪ್ರಿಯಾಟ್ ಪೌಂಡ್"
+
+#. HyCde
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_14\n"
+"property.text"
+msgid "Maltese Lira"
+msgstr "ಮಾಲ್ಟೀಸ್ ಲಿರಾ"
+
+#. GAtT3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_15\n"
+"property.text"
+msgid "Slovak Koruna"
+msgstr "ಸ್ಲೊವಾಕ್ ಕೊರುನಾ"
+
+#. iXDND
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_16\n"
+"property.text"
+msgid "Estonian Kroon"
+msgstr "ಎಸ್ಟೋನಿಯನ್ ಕ್ರೂನ್"
+
+#. NRqiA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_17\n"
+"property.text"
+msgid "Latvian Lats"
+msgstr "ಲಾಟ್ವಿಯಾದ ಲಾಟ್‌ಗಳು"
+
+#. N9Psc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_18\n"
+"property.text"
+msgid "Lithuanian Litas"
+msgstr ""
+
+#. eDjBr
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_0\n"
+"property.text"
+msgid "Progress"
+msgstr "ಪ್ರಗತಿ"
+
+#. JhTCq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_1\n"
+"property.text"
+msgid "Retrieving the relevant documents..."
+msgstr "ವಿಷಯಕ್ಕೆ ಸಂಬಂಧಿಸಿದ ದಸ್ತಾವೇಜುಗಳನ್ನು ಪತ್ತೆಹಚ್ಚಿ ತರಲಾಗುತ್ತಿದೆ..."
+
+#. CLY8k
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_2\n"
+"property.text"
+msgid "Converting the documents..."
+msgstr "ದಸ್ತಾವೇಜುಗಳನ್ನು ಪರಿವರ್ತಿಸಲಾಗುತ್ತಿದೆ..."
+
+#. Fh3Fg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_3\n"
+"property.text"
+msgid "Settings:"
+msgstr "ಸಿದ್ಧತೆಗಳು:"
+
+#. C3AGk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STEP_LASTPAGE_4\n"
+"property.text"
+msgid "Sheet is always unprotected"
+msgstr "ಹಾಳೆಗೆ ಯಾವಾಗಲು ಸಂರಕ್ಷಿತವಾಗಿರುವುದಿಲ್ಲ"
+
+#. BBZaA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_0\n"
+"property.text"
+msgid "Theme Selection"
+msgstr "ಥೀಮ್‌ನ ಆಯ್ಕೆ"
+
+#. DbGhN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_1\n"
+"property.text"
+msgid "Error while saving the document to the clipboard! The following action cannot be undone."
+msgstr "ದಸ್ತಾವೇಜನ್ನು ನಕಲುಫಲಕಕ್ಕೆ ಉಳಿಸುವಾಗ ದೋಷ ಉಂಟಾಗಿದೆ. ಈ ಕ್ರಿಯೆಯನ್ನು ಹಿಂಪಡೆಯಲು ಆಗುವುದಿಲ್ಲ."
+
+#. LTS44
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_2\n"
+"property.text"
+msgid "~Cancel"
+msgstr "ರದ್ದು ಮಾಡು(~C)"
+
+#. qXu5G
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLES_3\n"
+"property.text"
+msgid "~OK"
+msgstr "ಸರಿ (~O)"
+
+#. VkFhm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_0\n"
+"property.text"
+msgid "(Standard)"
+msgstr "ಶಿಷ್ಟ"
+
+#. YUTxB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_1\n"
+"property.text"
+msgid "Autumn Leaves"
+msgstr "ಶರತ್ಕಾಲದ ಎಲೆಗಳು"
+
+#. Bmx9P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_2\n"
+"property.text"
+msgid "Be"
+msgstr "ಬಿ"
+
+#. AYcUq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_3\n"
+"property.text"
+msgid "Black and White"
+msgstr "ಕಪ್ಪು ಮತ್ತು ಬಿಳುಪು"
+
+#. kNA76
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_4\n"
+"property.text"
+msgid "Blackberry Bush"
+msgstr "ಬ್ಲಾಕ್‌ಬೆರಿ ಪೊದೆ"
+
+#. AsnuA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_5\n"
+"property.text"
+msgid "Blue Jeans"
+msgstr "ನೀಲಿ ಜೀನ್ಸ್"
+
+#. VgzDD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_6\n"
+"property.text"
+msgid "Fifties Diner"
+msgstr "ಫಿಫ್ಟೀಸ್ ಡೈನರ್"
+
+#. YDRhE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_7\n"
+"property.text"
+msgid "Glacier"
+msgstr "ಹಿಮನದಿ"
+
+#. 769K8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_8\n"
+"property.text"
+msgid "Green Grapes"
+msgstr "ಹಸಿರು ದ್ರಾಕ್ಷಿ"
+
+#. bNeCA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_9\n"
+"property.text"
+msgid "Marine"
+msgstr "ನೀಲಿ ಮಿಶ್ರಿತ ಹಸಿರು"
+
+#. LYvgg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_10\n"
+"property.text"
+msgid "Millennium"
+msgstr "ಮಿಲೇನಿಯಮ್"
+
+#. 2dsey
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_11\n"
+"property.text"
+msgid "Nature"
+msgstr "ಪ್ರಕೃತಿ"
+
+#. sobFj
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_12\n"
+"property.text"
+msgid "Neon"
+msgstr "ನಿಯಾನ್"
+
+#. E9VPF
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_13\n"
+"property.text"
+msgid "Night"
+msgstr "ರಾತ್ರಿ"
+
+#. VFByN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_14\n"
+"property.text"
+msgid "PC Nostalgia"
+msgstr "PC ನಾಸ್ಟಾಲ್ಜಿಯ"
+
+#. FCRpD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_15\n"
+"property.text"
+msgid "Pastel"
+msgstr "ಅಂಟಿಸು"
+
+#. uAsPp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_16\n"
+"property.text"
+msgid "Pool Party"
+msgstr "ಪೂಲ್ ಪಾರ್ಟಿ"
+
+#. GDi2u
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"STYLENAME_17\n"
+"property.text"
+msgid "Pumpkin"
+msgstr "ಸಿಹಿಗುಂಬಳ"
+
+#. piSqr
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_0\n"
+"property.text"
+msgid "Addressee"
+msgstr "ವಿಳಾಸದಾರ"
+
+#. Cy8W9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_1\n"
+"property.text"
+msgid "One recipient"
+msgstr "ಒಬ್ಬ ಸ್ವೀಕರಿಸುವವನು"
+
+#. rH3a3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_2\n"
+"property.text"
+msgid "Several recipients (address database)"
+msgstr "ಅನೇಕ ಸ್ವೀಕರಿಸುವವರ ವಿಳಾಸ(ವಿಳಾಸ ದತ್ತಸಂಚಯ)"
+
+#. G8T6x
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceDialog_3\n"
+"property.text"
+msgid "Use of This Template"
+msgstr "ಈ ನಮೂನೆಯ ಬಳಕೆ"
+
+#. wTrM9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceMsgError\n"
+"property.text"
+msgid "An error has occurred."
+msgstr "ಒಂದು ದೋಷವು ಉಂಟಾಗಿದೆ."
+
+#. K77VB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_0\n"
+"property.text"
+msgid "Click placeholder and overwrite"
+msgstr "ಸ್ಥಳಸೂಚಕದ ಮೇಲೆ ಕ್ಲಿಕ್ಕಿಸಿ ನಂತರ ತಿದ್ದಿಬರೆಯಿರಿ."
+
+#. hRJRf
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_1\n"
+"property.text"
+msgid "Company"
+msgstr "ಸಂಸ್ಥೆ"
+
+#. c6Zjp
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_2\n"
+"property.text"
+msgid "Department"
+msgstr "ವಿಭಾಗ"
+
+#. cYzGQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_3\n"
+"property.text"
+msgid "First Name"
+msgstr "ಮೊದಲ ಹೆಸರು"
+
+#. BEmdM
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_4\n"
+"property.text"
+msgid "Last Name"
+msgstr "ಕೊನೆಯ ಹೆಸರು"
+
+#. fxfq5
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_5\n"
+"property.text"
+msgid "Street"
+msgstr "ರಸ್ತೆ"
+
+#. DxdCD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_6\n"
+"property.text"
+msgid "Country"
+msgstr "ದೇಶ"
+
+#. uNexF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_7\n"
+"property.text"
+msgid "ZIP/Postal Code"
+msgstr "ಝಿಪ್/ಅಂಚೆ ಕೋಡ್"
+
+#. qHMFm
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_8\n"
+"property.text"
+msgid "City"
+msgstr "ಊರು"
+
+#. AqdCs
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_9\n"
+"property.text"
+msgid "Title"
+msgstr "ಶೀರ್ಷಿಕೆ"
+
+#. s8G9A
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_10\n"
+"property.text"
+msgid "Position"
+msgstr "ಸ್ಥಾನ"
+
+#. Wa8WF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_11\n"
+"property.text"
+msgid "Form of Address"
+msgstr "ವಿಳಾಸದ ನಮೂನೆ"
+
+#. 5FwLR
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_12\n"
+"property.text"
+msgid "Initials"
+msgstr "ಇನಿಷಿಯಲ್‌ಗಳು"
+
+#. zH6b3
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_13\n"
+"property.text"
+msgid "Salutation"
+msgstr "ವಂದನೆ"
+
+#. wDEfh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_14\n"
+"property.text"
+msgid "Home Phone"
+msgstr "ಮನೆಯ ದೂರವಾಣಿ"
+
+#. LJ5ou
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_15\n"
+"property.text"
+msgid "Work Phone"
+msgstr "ಕೆಲಸದ ದೂರವಾಣಿ"
+
+#. hJQtY
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_16\n"
+"property.text"
+msgid "Fax"
+msgstr "ಫ್ಯಾಕ್ಸ್"
+
+#. jmiN2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_17\n"
+"property.text"
+msgid "Email"
+msgstr ""
+
+#. w7uK5
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_18\n"
+"property.text"
+msgid "URL"
+msgstr "URL"
+
+#. bgJJe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_19\n"
+"property.text"
+msgid "Notes"
+msgstr "ಟಿಪ್ಪಣಿಗಳು"
+
+#. EhQEg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_20\n"
+"property.text"
+msgid "Alt. Field 1"
+msgstr "ಪರ್ಯಾಯ ವರ್ಗ 1"
+
+#. bZ4za
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_21\n"
+"property.text"
+msgid "Alt. Field 2"
+msgstr "ಪರ್ಯಾಯ ವರ್ಗ 2"
+
+#. vgr7W
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_22\n"
+"property.text"
+msgid "Alt. Field 3"
+msgstr "ಪರ್ಯಾಯ ವರ್ಗ 3"
+
+#. TGKbX
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_23\n"
+"property.text"
+msgid "Alt. Field 4"
+msgstr "ಪರ್ಯಾಯ ವರ್ಗ 4"
+
+#. HTUTU
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_24\n"
+"property.text"
+msgid "ID"
+msgstr "ID"
+
+#. BkAJF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_25\n"
+"property.text"
+msgid "State"
+msgstr "ರಾಜ್ಯ"
+
+#. 8NXAm
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_26\n"
+"property.text"
+msgid "Office Phone"
+msgstr "ಕಛೇರಿಯ ದೂರವಾಣಿ"
+
+#. RvvuS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_27\n"
+"property.text"
+msgid "Pager"
+msgstr "ಪೇಜರ್"
+
+#. M65e8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_28\n"
+"property.text"
+msgid "Mobile Phone"
+msgstr "ಮೊಬೈಲ್ ದೂರವಾಣಿ"
+
+#. hNCCT
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_29\n"
+"property.text"
+msgid "Other Phone"
+msgstr "ಇತರೆ ದೂರವಾಣಿ"
+
+#. jNWYd
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_30\n"
+"property.text"
+msgid "Calendar URL"
+msgstr "ಕ್ಯಾಲೆಂಡರ್ ಜಾಲತಾಣಸೂಚಿ"
+
+#. Ad3kk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceFields_31\n"
+"property.text"
+msgid "Invite"
+msgstr "ಆಹ್ವಾನಿಸು"
+
+#. gpGUV
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceNoTextmark_0\n"
+"property.text"
+msgid "The bookmark 'Recipient' is missing."
+msgstr "\"ಸ್ವೀಕರಿಸುವವರು\" ಎನ್ನುವ ಪುಟಗುರುತು ಕಾಣೆಯಾಗಿದೆ."
+
+#. G6KuE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CorrespondenceNoTextmark_1\n"
+"property.text"
+msgid "Form letter fields can not be included."
+msgstr "ನಮೂನೆ ಅಕ್ಷರದ ವರ್ಗವನ್ನು ಒಳಗೊಳ್ಳಿಸಲಾಗುವುದಿಲ್ಲ."
+
+#. WM8Eu
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgName\n"
+"property.text"
+msgid "Minutes Template"
+msgstr "ವರದಿಯ ನಮೂನೆ"
+
+#. 3Yeqe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgNoCancel\n"
+"property.text"
+msgid "An option must be confirmed."
+msgstr "ಆಯ್ಕೆಯನ್ನು ಖಚಿತಪಡಿಸಬೇಕಾಗುತ್ತದೆ."
+
+#. BEWBh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgFrame\n"
+"property.text"
+msgid "Minutes Type"
+msgstr "ವರದಿಯ ಪ್ರಕಾರ"
+
+#. hyGRE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgButton1\n"
+"property.text"
+msgid "Results Minutes"
+msgstr "ಫಲಿತಾಂಶಗಳ ವರದಿ"
+
+#. DMfQn
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"AgendaDlgButton2\n"
+"property.text"
+msgid "Evaluation Minutes"
+msgstr "ಮೌಲ್ಯನಿರ್ಣಯದ ವರದಿ"
+
+#. 9zy6P
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextField\n"
+"property.text"
+msgid "User data field is not defined!"
+msgstr "ಬಳಕೆದಾರನ ದತ್ತಾಂಶ ವರ್ಗವನ್ನು ಸೂಚಿಸಲಾಗಿಲ್ಲ!"
+
+#. DzUkS
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"NoDirCreation\n"
+"property.text"
+msgid "The '%1' directory cannot be created:"
+msgstr " '%1' ಕೋಶವನ್ನು ನಿರ್ಮಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ: "
+
+#. JDcBR
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MsgDirNotThere\n"
+"property.text"
+msgid "The '%1' directory does not exist."
+msgstr " '%1' ಕೋಶವು ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ."
+
+#. WcmGg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"QueryfornewCreation\n"
+"property.text"
+msgid "Do you want to create it now?"
+msgstr "ನೀವು ಈಗಲೆ ಅದನ್ನು ರಚಿಸಲು ಬಯಸುತ್ತೀರೆ?"
+
+#. 6rvR2
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"HelpButton\n"
+"property.text"
+msgid "~Help"
+msgstr "ಸಹಾಯ(~H)"
+
+#. qeDY7
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CancelButton\n"
+"property.text"
+msgid "~Cancel"
+msgstr "ರದ್ದು ಮಾಡು(~C)"
+
+#. yZGTC
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"BackButton\n"
+"property.text"
+msgid "< ~Back"
+msgstr "< ಹಿಂದಕ್ಕೆ (~B)"
+
+#. Wc2Fp
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"NextButton\n"
+"property.text"
+msgid "Ne~xt >"
+msgstr "ಮುಂದಿನ(~x) >>"
+
+#. tntS5
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"BeginButton\n"
+"property.text"
+msgid "~Convert"
+msgstr "ರೂಪಾಂತರಿಸು (~C)"
+
+#. CL4tm
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"CloseButton\n"
+"property.text"
+msgid "~Close"
+msgstr "ಮುಚ್ಚು (~C)"
+
+#. 3FYU3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"WelcometextLabel1\n"
+"property.text"
+msgid "This wizard convert legacy format documents to Open Document Format for Office Applications."
+msgstr "ಈ ಮಾರ್ಗದರ್ಶಿಯು ಆಫೀಸ್ ಅನ್ವಯಗಳನ್ನು ಪಾರಂಪರಿಕ ವಿನ್ಯಾಸದ ದಸ್ತಾವೇಜುಗಳನ್ನು ಓಪನ್ ಡಾಕ್ಯುಮೆಂಟ್ ವಿನ್ಯಾಸವಾಗಿ ಪರಿವರ್ತಿಸುತ್ತದೆ."
+
+#. ZQwGS
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"WelcometextLabel3\n"
+"property.text"
+msgid "Select the document type for conversion:"
+msgstr "ಪರಿವರ್ತನೆ ಮಾಡಲು ದಸ್ತಾವೇಜಿನ ಬಗೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ:"
+
+#. 8QmDc
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_1_\n"
+"property.text"
+msgid "Word templates"
+msgstr "ವರ್ಡ್ ನಮೂನೆಗಳು"
+
+#. AujXQ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_2_\n"
+"property.text"
+msgid "Excel templates"
+msgstr "ಎಕ್ಸೆಲ್ ನಮೂನೆಗಳು"
+
+#. hPB75
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSTemplateCheckbox_3_\n"
+"property.text"
+msgid "PowerPoint templates"
+msgstr "ಪವರ್ ಪಾಯಿಂಟ್ ನಮೂನೆಗಳು"
+
+#. QUiMA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_1_\n"
+"property.text"
+msgid "Word documents"
+msgstr "ವರ್ಡ್ ದಸ್ತಾವೇಜುಗಳು"
+
+#. BDr26
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_2_\n"
+"property.text"
+msgid "Excel documents"
+msgstr "ಎಕ್ಸೆಲ್ ದಸ್ತಾವೇಜುಗಳು"
+
+#. 9RwAv
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSDocumentCheckbox_3_\n"
+"property.text"
+msgid "PowerPoint/Publisher documents"
+msgstr "PowerPoint/Publisher ದಸ್ತಾವೇಜುಗಳು"
+
+#. uCxvB
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MSContainerName\n"
+"property.text"
+msgid "Microsoft Office"
+msgstr "ಮೈಕ್ರೊಸಾಫ್ಟ್ ಆಫೀಸ್"
+
+#. s4vuw
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SummaryHeader\n"
+"property.text"
+msgid "Summary:"
+msgstr "ಸಾರಾಂಶ:"
+
+#. uAmbh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"GroupnameDefault\n"
+"property.text"
+msgid "Imported_Templates"
+msgstr "ಅಮದುಮಾಡಲಾದ_ನಮೂನೆಗಳು"
+
+#. As7iy
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressMoreDocs\n"
+"property.text"
+msgid "Documents"
+msgstr "ದಸ್ತಾವೇಜುಗಳು"
+
+#. tbXgc
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressMoreTemplates\n"
+"property.text"
+msgid "Templates"
+msgstr "ಮಾದರಿಗಳು"
+
+#. foG9h
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"FileExists\n"
+"property.text"
+msgid "The '<1>' file already exists.<CR>Do you want to overwrite it?"
+msgstr "'<1>' ಕಡತ ಈಗಾಗಲೆ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ. <CR> ನೀವು ಅದನ್ನು ತಿದ್ದಿಬರೆಯಲು ಇಚ್ಚಿಸುತ್ತೀರಾ?"
+
+#. bvMuH
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"MorePathsError3\n"
+"property.text"
+msgid "Directories do not exist"
+msgstr "ಕೋಶಗಳು ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ"
+
+#. Jh3WF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ConvertError1\n"
+"property.text"
+msgid "Do you really want to terminate conversion at this point?"
+msgstr "ನೀವು ನಿಜವಾಗಲು ಪರಿವರ್ತನೆಯನ್ನು ಇಲ್ಲಿಯೆ ಅಂತ್ಯಗೊಳಿಸಲು ಇಷ್ಟಪಡುತ್ತೀರಾ?"
+
+#. zuFo9
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"ConvertError2\n"
+"property.text"
+msgid "Cancel Wizard"
+msgstr "ಗಾರುಡಿಯನ್ನು ರದ್ದು ಮಾಡು"
+
+#. MNVFe
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RTErrorDesc\n"
+"property.text"
+msgid "An error has occurred in the wizard."
+msgstr ""
+
+#. VzQoq
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"RTErrorHeader\n"
+"property.text"
+msgid "Error"
+msgstr "ದೋಷ"
+
+#. mFTyW
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"OverwriteallFiles\n"
+"property.text"
+msgid "Do you want to overwrite documents without being asked?"
+msgstr "ದಸ್ತಾವೇಜುಗಳನ್ನು ತಿದ್ದಿಬರೆಯುವ ಮುನ್ನ ನಿಮ್ಮನ್ನು ಕೇಳಬೇಕೆ?"
+
+#. rWgBN
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ReeditMacro\n"
+"property.text"
+msgid "Document macro has to be revised."
+msgstr "ದಸ್ತಾವೇಜಿನ ಮಾಕ್ರೊವನ್ನು ಮರುಪರಿಶೀಲಿಸಬೇಕಾಗಿದೆ."
+
+#. GDbH6
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CouldNotsaveDocument\n"
+"property.text"
+msgid "Document '<1>' could not be saved."
+msgstr "'<1>' ದಸ್ತಾವೇಜನ್ನು ಉಳಿಸಲಾಗಿಲ್ಲ."
+
+#. GcGjC
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CouldNotopenDocument\n"
+"property.text"
+msgid "Document '<1>' could not be opened."
+msgstr " '<1>' ದಸ್ತಾವೇಜನ್ನು ತೆರೆಯಲಾಗಲಿಲ್ಲ."
+
+#. XG3Dg
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"PathDialogMessage\n"
+"property.text"
+msgid "Select a directory"
+msgstr "ಒಂದು ಕೋಶವನ್ನು ಆಯ್ಕೆಮಾಡಿ"
+
+#. 8DV2D
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"DialogTitle\n"
+"property.text"
+msgid "Document Converter"
+msgstr "ದಸ್ತಾವೇಜು ಪರಿವರ್ತಕ"
+
+#. 6hySA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SearchInSubDir\n"
+"property.text"
+msgid "Including subdirectories"
+msgstr "ಉಪಕೋಶಗಳನ್ನು ಒಳಗೊಳ್ಳಿಸಲಾಗುತ್ತಿದೆ."
+
+#. Juv8i
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage1\n"
+"property.text"
+msgid "Progress"
+msgstr "ಪ್ರಗತಿ"
+
+#. EWECA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage2\n"
+"property.text"
+msgid "Retrieving the relevant documents:"
+msgstr "ಸೂಕ್ತವಾದ ದಸ್ತಾವೇಜುಗಳನ್ನು ಪತ್ತೆಹಚ್ಚಿ ತರಲಾಗುತ್ತಿದೆ:"
+
+#. zTpAx
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage3\n"
+"property.text"
+msgid "Converting the documents"
+msgstr "ದಸ್ತಾವೇಜುಗಳನ್ನು ಪರಿವರ್ತಿಸಲಾಗುತ್ತಿದೆ"
+
+#. B6PuJ
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressFound\n"
+"property.text"
+msgid "Found:"
+msgstr "ಕಂಡುಬಂದಿರುವುದು:"
+
+#. 9G86q
+#: resources_en_US.properties
+#, fuzzy
+msgctxt ""
+"resources_en_US.properties\n"
+"ProgressPage5\n"
+"property.text"
+msgid "\"%1 found"
+msgstr "%1 ಕಂಡುಬಂದಿದೆ"
+
+#. GmveL
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"Ready\n"
+"property.text"
+msgid "Finished"
+msgstr "ಮುಗಿಯಿತು"
+
+#. yZCLk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SourceDocuments\n"
+"property.text"
+msgid "Source documents"
+msgstr "ಆಕರ ದಸ್ತಾವೇಜುಗಳು"
+
+#. vDd4X
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TargetDocuments\n"
+"property.text"
+msgid "Target documents"
+msgstr "ಉದ್ದೇಶಿತ ದಸ್ತಾವೇಜುಗಳು"
+
+#. VyLKU
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"LogfileSummary\n"
+"property.text"
+msgid "<COUNT> documents converted"
+msgstr "<COUNT> ಪರಿವರ್ತಿತ ದಸ್ತಾವೇಜುಗಳು"
+
+#. D8KY3
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumInclusiveSubDir\n"
+"property.text"
+msgid "All subdirectories will be taken into account"
+msgstr "ಎಲ್ಲಾ ಉಪಕೋಶಗಳನ್ನು ಪರಿಗಣಿಸಲಾಗುವುದು."
+
+#. 8Bmz9
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumSaveDokumente\n"
+"property.text"
+msgid "These will be exported to the following directory:"
+msgstr "ಇವೆಲ್ಲವನ್ನು ಮುಂದೆ ತಿಳಿಸಿರುವ ಕೋಶಕ್ಕೆ ರಫ್ತು ಮಾಡಲಾಗುವುದು:"
+
+#. 8atHD
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextImportLabel\n"
+"property.text"
+msgid "Import from:"
+msgstr "ಇದರಿಮದ ಅಮದು ಮಾಡಿಕೊ:"
+
+#. zpCFk
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"TextExportLabel\n"
+"property.text"
+msgid "Save to:"
+msgstr "ಇದಕ್ಕೆ ಉಳಿಸು:"
+
+#. C7a2B
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CreateLogfile\n"
+"property.text"
+msgid "Create log file"
+msgstr "ದಾಖಲೆ ಕಡತವನ್ನು ನಿರ್ಮಿಸು"
+
+#. pzBG4
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"LogfileHelpText\n"
+"property.text"
+msgid "A log file will be created in your work directory"
+msgstr "ನಿಮ್ಮ ಕೆಲಸದ ಕೋಶದಲ್ಲಿ ಒಂದು ದಾಖಲೆ ಕಡತವನ್ನು ನಿರ್ಮಿಸಲಾಗುವುದು"
+
+#. mDG8Y
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"ShowLogfile\n"
+"property.text"
+msgid "Show log file"
+msgstr "ದಾಖಲೆಯ ಕಡತವನ್ನು ತೋರಿಸು"
+
+#. 7S3Ct
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTextDocuments\n"
+"property.text"
+msgid "All Word documents contained in the following directory will be imported:"
+msgstr "ಮುಂದೆ ತಿಳಿಸಲಾಗಿರುವ ಕಡತಕೋಶದಿಂದ ಎಲ್ಲಾ ವರ್ಡ್ ದಸ್ತಾವೇಜುಗಳನ್ನು ಅಮದು ಮಾಡಿಕೊಳ್ಳಲಾಗುವುದು:"
+
+#. iBJo8
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTableDocuments\n"
+"property.text"
+msgid "All Excel documents contained in the following directory will be imported:"
+msgstr "ಮುಂದೆ ತಿಳಿಸಲಾಗಿರುವ ಕಡತಕೋಶದಿಂದ ಎಲ್ಲಾ ಎಕ್ಸೆಲ್ ದಸ್ತಾವೇಜುಗಳನ್ನು ಆಮದು ಮಾಡಿಕೊಳ್ಳಲಾಗುವುದು:"
+
+#. kZfUh
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSDrawDocuments\n"
+"property.text"
+msgid "All PowerPoint/Publisher documents contained in the following directory will be imported:"
+msgstr "ಈ ಕೆಳಗಿನ ಕೋಶದಲ್ಲಿನ ಎಲ್ಲಾ PowerPoint/Publisher ದಸ್ತಾವೇಜುಗಳನ್ನು ಆಮದು ಮಾಡಲಾಗುತ್ತದೆ:"
+
+#. AEPyE
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTextTemplates\n"
+"property.text"
+msgid "All Word templates contained in the following directory will be imported:"
+msgstr "ಮುಂದೆ ತಿಳಿಸಲಾಗಿರುವ ಕಡತಕೋಶದಿಂದ ಎಲ್ಲಾ ವರ್ಡ್ ನಮೂನೆಗಳನ್ನು ಆಮದು ಮಾಡಿಕೊಳ್ಳಲಾಗುವುದು:"
+
+#. G2vMa
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSTableTemplates\n"
+"property.text"
+msgid "All Excel templates contained in the following directory will be imported:"
+msgstr "ಮುಂದೆ ತಿಳಿಸಲಾಗಿರುವ ಕಡತಕೋಶದಿಂದ ಎಲ್ಲಾ ಎಕ್ಸೆಲ್ ನಮೂನೆಗಳನ್ನು ಆಮದು ಮಾಡಿಕೊಳ್ಳಲಾಗುವುದು:"
+
+#. AEEwA
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"SumMSDrawTemplates\n"
+"property.text"
+msgid "All PowerPoint templates contained in the following directory will be imported:"
+msgstr "ಮುಂದೆ ತಿಳಿಸಲಾಗಿರುವ ಕಡತಕೋಶದಿಂದ ಎಲ್ಲಾ ಪವರ್ ಪಾಯಿಂಟ್ ನಮೂನೆಗಳನ್ನು ಆಮದು ಮಾಡಿಕೊಳ್ಳಲಾಗುವುದು:"

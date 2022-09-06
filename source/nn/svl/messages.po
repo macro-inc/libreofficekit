@@ -1,0 +1,120 @@
+#. extracted from svl
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-01-31 18:20+0100\n"
+"PO-Revision-Date: 2022-04-04 09:50+0000\n"
+"Last-Translator: Kolbjørn Stuestøl <kolbjoern@stuestoel.no>\n"
+"Language-Team: Norwegian Nynorsk <https://translations.documentfoundation.org/projects/libo_ui-master/svlmessages/nn/>\n"
+"Language: nn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.11.2\n"
+"X-POOTLE-MTIME: 1519743581.000000\n"
+
+#. PDMJD
+#. Internet Media Type Presentations
+#: include/svl/svl.hrc:26
+msgctxt "STR_SVT_MIMETYPE_CNT_FSYSBOX"
+msgid "Workplace"
+msgstr "Arbeidsområde"
+
+#. k4iRz
+#: include/svl/svl.hrc:27
+msgctxt "STR_FILECTRL_BUTTONTEXT"
+msgid "Browse..."
+msgstr "Bla gjennom …"
+
+#. jPdyf
+#. tdf#145919 localizable strings to be shared in vcl and cui modules
+#: include/svl/svl.hrc:30
+msgctxt "GRTSTR_PASSED"
+msgid "PASSED"
+msgstr "GODKJEND"
+
+#. CreDg
+#: include/svl/svl.hrc:31
+msgctxt "GRTSTR_QUIRKY"
+msgid "QUIRKY"
+msgstr "RAR"
+
+#. DAmDx
+#: include/svl/svl.hrc:32
+msgctxt "GRTSTR_FAILED"
+msgid "FAILED"
+msgstr "MISLUKKA"
+
+#. kR2Uu
+#: include/svl/svl.hrc:33
+msgctxt "GRTSTR_SKIPPED"
+msgid "SKIPPED"
+msgstr "SLØYFA"
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_Legg til"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_Bruk"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_Avbryt"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_Lukk"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_Slett"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_Rediger"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_Hjelp"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_Ny(tt)"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_Nei"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_OK"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_Fjern"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_Tilbakestill"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_Ja"

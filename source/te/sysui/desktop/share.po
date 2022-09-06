@@ -1,0 +1,613 @@
+#. extracted from sysui/desktop/share
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2016-05-09 12:04+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: Telugu <Fedora-trans-te@redhat.com>\n"
+"Language: te\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1462795468.000000\n"
+
+#. a9uCy
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document"
+msgstr ""
+
+#. 9mfCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document Template"
+msgstr ""
+
+#. hj5SQ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"master-document\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Master Document"
+msgstr ""
+
+#. 8tGE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"formula\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Formula"
+msgstr ""
+
+#. iJFTG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation"
+msgstr ""
+
+#. CA7gZ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation Template"
+msgstr ""
+
+#. AuLrq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing"
+msgstr ""
+
+#. sHiv9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing Template"
+msgstr ""
+
+#. rSDA2
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet"
+msgstr ""
+
+#. iUGdT
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet Template"
+msgstr ""
+
+#. dup8a
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text\n"
+"LngText.text"
+msgid "OpenDocument Text"
+msgstr "ఓపెన్ డాక్యుమెంట్ పాఠం"
+
+#. Tvbts
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Text (Flat XML)"
+msgstr "OpenDocument Text (Flat XML)"
+
+#. 7rxHH
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-template\n"
+"LngText.text"
+msgid "OpenDocument Text Template"
+msgstr "ఓపెన్ డాక్యుమెంట్ పాఠం మూస"
+
+#. qGKKU
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document\n"
+"LngText.text"
+msgid "OpenDocument Master Document"
+msgstr "ఓపెన్ డాక్యుమెంట్ మాస్టర్ పత్రము"
+
+#. LDcMd
+#: documents.ulf
+#, fuzzy
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document-template\n"
+"LngText.text"
+msgid "OpenDocument Master Document Template"
+msgstr "ఓపెన్ డాక్యుమెంట్ మాస్టర్ పత్రము"
+
+#. xUvzk
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-formula\n"
+"LngText.text"
+msgid "OpenDocument Formula"
+msgstr "ఓపెన్ డాక్యుమెంట్ సూత్రం"
+
+#. QaoV9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation\n"
+"LngText.text"
+msgid "OpenDocument Presentation"
+msgstr "ఓపెన్ డాక్యుమెంట్ ప్రజంటేషన్ "
+
+#. 7KXDa
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Presentation (Flat XML)"
+msgstr "OpenDocument Presentation (Flat XML)"
+
+#. r5mkr
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-template\n"
+"LngText.text"
+msgid "OpenDocument Presentation Template"
+msgstr "ఓపెన్ డాక్యుమెంట్ ప్రజంటేషన్  మూస"
+
+#. ABKBq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing\n"
+"LngText.text"
+msgid "OpenDocument Drawing"
+msgstr "ఓపెన్ డాక్యుమెంట్ చిత్రలేఖనము"
+
+#. uAguG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Drawing (Flat XML)"
+msgstr "OpenDocument Drawing (Flat XML)"
+
+#. nbGeB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-template\n"
+"LngText.text"
+msgid "OpenDocument Drawing Template"
+msgstr "ఓపెన్ డాక్యుమెంట్ చిత్రలేఖనము మూస"
+
+#. ww4GY
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet"
+msgstr "ఓపెన్ డాక్యుమెంట్ స్ర్పెడ్ షీట్"
+
+#. U6S6A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet (Flat XML)"
+msgstr "OpenDocument Spreadsheet (Flat XML)"
+
+#. GRcE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-template\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet Template"
+msgstr "ఓపెన్ డాక్యుమెంట్ స్ర్పెడ్ షీట్ మూస"
+
+#. FBzW7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-database\n"
+"LngText.text"
+msgid "OpenDocument Database"
+msgstr "ఓపెన్ డాక్యుమెంట్ డాటాబేస్"
+
+#. PHjCX
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-web-template\n"
+"LngText.text"
+msgid "HTML Document Template"
+msgstr "HTML  పత్రము మూస"
+
+#. z5v7A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"extension\n"
+"LngText.text"
+msgid "%PRODUCTNAME Extension"
+msgstr "%PRODUCTNAME పొడిగింపు"
+
+#. yfXFW
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "మైక్రోసాఫ్ట్ ఎక్సెల్ వర్క్షీట్"
+
+#. GFWsF
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "మైక్రోసాఫ్ట్ పవర్ పాయింట్ ప్రజంటేషన్ "
+
+#. sXwCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "మైక్రోసాఫ్టు వర్డు పత్రము"
+
+#. N9WPd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document2\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "మైక్రోసాఫ్టు వర్డు పత్రము"
+
+#. jtBEd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "మైక్రోసాఫ్ట్ ఎక్సెల్ వర్క్షీట్"
+
+#. YMdW5
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-template-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "మైక్రోసాఫ్ట్ ఎక్సెల్  వర్కుషీటు మూస"
+
+#. kg6D4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "మైక్రోసాఫ్ట్ పవర్ పాయింట్ ప్రజంటేషన్ "
+
+#. 7TjD7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-template-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "మైక్రోసాఫ్ట్ పవర్ పాయింట్ ప్రజంటేషన్  మూస"
+
+#. 9YtZo
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document-12\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "మైక్రోసాఫ్టు వర్డు పత్రము"
+
+#. PXrJC
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-template-12\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "మైక్రోసాఫ్టు వర్డుపత్రము మూస"
+
+#. EENV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "మైక్రోసాఫ్ట్ పవర్ పాయింట్ ప్రజంటేషన్ "
+
+#. aBQW3
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-template\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "మైక్రోసాఫ్ట్ పవర్ పాయింట్ ప్రజంటేషన్  మూస"
+
+#. CTtV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "మైక్రోసాఫ్ట్ ఎక్సెల్ వర్క్షీట్"
+
+#. Dk7Bj
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-template\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "మైక్రోసాఫ్ట్ ఎక్సెల్  వర్కుషీటు మూస"
+
+#. So2PB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "మైక్రోసాఫ్టు వర్డు పత్రము"
+
+#. gHPAp
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-template\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "మైక్రోసాఫ్టు వర్డుపత్రము మూస"
+
+#. rJW59
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-binary-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "మైక్రోసాఫ్ట్ ఎక్సెల్ వర్క్షీట్"
+
+#. Bpj3J
+#: launcher_comment.ulf
+#, fuzzy
+msgctxt ""
+"launcher_comment.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "Create and edit text and images in letters, reports, documents and Web pages by using Writer."
+msgstr "పత్రము మరియు లేఖ యొక్క చిత్రరూపములు,నివేదనలు,పత్రములు మరియు వ్రాయు యంత్రమును ఉపయోగించిన వెబ్  పుటలును నిర్మించి సరిచేయుము. "
+
+#. hnW8F
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "Create and edit presentations for slideshows, meeting and Web pages by using Impress."
+msgstr "స్లైడ్ షోలు యొక్క ప్రజంటేషన్ లు,సభ మరియు వెబ్  పుటలును ఇంప్రెస్ వుపయోగించినిర్మించి, సరిచేయుము."
+
+#. YkHme
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "Create and edit drawings, flow charts, and logos by using Draw."
+msgstr "చిత్రలేఖనము,ఫ్లోచార్ట్ మరియు,దేవుని చిత్రములను నిర్మించి సరిచేయుము."
+
+#. US56A
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "Perform calculations, analyze information and manage lists in spreadsheets by using Calc."
+msgstr "Calc వినియోగించి స్ర్పెడ్‌షీట్‌లలో జాబితాలను నిర్వహించును,సమాచారమును విశ్లేషించును మరియు గణలను జరుపును."
+
+#. xb7SC
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"math\n"
+"LngText.text"
+msgid "Create and edit scientific formulas and equations by using Math."
+msgstr "శాస్త్ర సూత్రములు మరియు   సమీకరణములను  మేథ్ తో నిర్మించి, సరిచేయుము"
+
+#. mbYRJ
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"base\n"
+"LngText.text"
+msgid "Manage databases, create queries and reports to track and manage your information by using Base."
+msgstr "దత్తంశస్థానముల నిర్వాహణ,ప్రశ్నలు మరియు నివేదనలు మరియు స్థానము తో ఉపయోగించిన మీ సమాచారమును నిర్మించు."
+
+#. 8R6uw
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"startcenter\n"
+"LngText.text"
+msgid "The office productivity suite compatible to the open and standardized ODF document format. Supported by The Document Foundation."
+msgstr "కార్యాలయ ఉత్పాదక ఉపకరణాల సమదాయం  అరక్షిత మరియు ప్రామాణీకరించబడిన ODF పత్ర తీరుతో సరిపోలినది. ద డాక్యుమెంట్ ఫౌండేషన్ మద్దతు కలిగినది"
+
+#. BhNQQ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "Word Processor"
+msgstr "వర్డ్ ప్రాసెసర్"
+
+#. zknFm
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "Presentation"
+msgstr "ప్రజంటేషన్ "
+
+#. czB83
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "Spreadsheet"
+msgstr "స్ర్పెడ్ షీట్"
+
+#. AXNAJ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"base\n"
+"LngText.text"
+msgid "Database Development"
+msgstr "డాటాబేస్ డెవలప్‌మెంట్"
+
+#. EkVbD
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"math\n"
+"LngText.text"
+msgid "Formula Editor"
+msgstr "ఫార్ములా సరికూర్పరి"
+
+#. oDGKs
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "Drawing Program"
+msgstr "చిత్రలేఖక ప్రోగ్రాము"
+
+#. DdFuQ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"startcenter\n"
+"LngText.text"
+msgid "Office"
+msgstr "కార్యాలయం"
+
+#. N3RXU
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"xsltfilter\n"
+"LngText.text"
+msgid "XSLT based filters"
+msgstr "XSLT ఆధారిత ఫిల్టర్స్"
+
+#. DE2Gk
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "New Document"
+msgstr "కొత్త పత్రం"
+
+#. Wz7Fu
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "New Presentation"
+msgstr "కొత్త ప్రజంటేషన్ "
+
+#. 7VLq2
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "New Spreadsheet"
+msgstr "కొత్త స్ప్రెడ్ షీట్"
+
+#. UXCET
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"base\n"
+"LngText.text"
+msgid "New Database"
+msgstr "కొత్తడాటాబేస్"
+
+#. FDPZi
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"math\n"
+"LngText.text"
+msgid "New Formula"
+msgstr "కొత్త సూత్రం"
+
+#. UQjBd
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "New Drawing"
+msgstr "కొత్త చిత్రలేఖనము"

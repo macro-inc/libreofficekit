@@ -1,0 +1,1232 @@
+#. extracted from desktop/inc
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-05-25 12:36+0200\n"
+"PO-Revision-Date: 2022-05-10 13:18+0000\n"
+"Last-Translator: Samson B <sambelet@yahoo.com>\n"
+"Language-Team: Amharic <https://translations.documentfoundation.org/projects/libo_ui-master/desktopmessages/am/>\n"
+"Language: am\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1546553778.000000\n"
+
+#. v2iwK
+#: desktop/inc/strings.hrc:24
+msgctxt "RID_STR_COPYING_PACKAGE"
+msgid "Copying: "
+msgstr "ኮፒ በማድረግ ላይ: "
+
+#. 2dzDt
+#: desktop/inc/strings.hrc:25
+msgctxt "RID_STR_ERROR_WHILE_ADDING"
+msgid "Error while adding: "
+msgstr "ስህተት በመደመር ላይ: "
+
+#. CUrtD
+#: desktop/inc/strings.hrc:26
+msgctxt "RID_STR_ERROR_WHILE_REMOVING"
+msgid "Error while removing: "
+msgstr "ስህተት በማስወገድ ላይ: "
+
+#. XyESz
+#: desktop/inc/strings.hrc:27
+msgctxt "RID_STR_PACKAGE_ALREADY_ADDED"
+msgid "Extension has already been added: "
+msgstr "ተጨማሪው ቀደም ሲል ተጨምሯል: "
+
+#. cuydq
+#: desktop/inc/strings.hrc:28
+msgctxt "RID_STR_NO_SUCH_PACKAGE"
+msgid "There is no such extension deployed: "
+msgstr "እንደዚህ ያለ ተጨማሪ የለም: "
+
+#. wzGYv
+#: desktop/inc/strings.hrc:29
+msgctxt "RID_STR_SYNCHRONIZING_REPOSITORY"
+msgid "Synchronizing repository for %NAME extensions"
+msgstr "ማጠራቀሚያውን በማስማማት ላይ ለ %NAME ተጨማሪዎች"
+
+#. dp8bf
+#: desktop/inc/strings.hrc:31
+msgctxt "RID_STR_REGISTERING_PACKAGE"
+msgid "Enabling: "
+msgstr "በማስቻል ላይ : "
+
+#. xBysg
+#: desktop/inc/strings.hrc:32
+msgctxt "RID_STR_REVOKING_PACKAGE"
+msgid "Disabling: "
+msgstr "በማሰናከል ላይ : "
+
+#. HDgpp
+#: desktop/inc/strings.hrc:33
+msgctxt "RID_STR_CANNOT_DETECT_MEDIA_TYPE"
+msgid "Cannot detect media-type: "
+msgstr "መገናኛ-አይነት ማግኘት አልተቻለም: "
+
+#. QfGM7
+#: desktop/inc/strings.hrc:34
+msgctxt "RID_STR_UNSUPPORTED_MEDIA_TYPE"
+msgid "This media-type is not supported: "
+msgstr "ይህ መገናኛ -አይነት የ ተደገፈ አይደለም: "
+
+#. VHcMc
+#: desktop/inc/strings.hrc:35
+msgctxt "RID_STR_ERROR_WHILE_REGISTERING"
+msgid "An error occurred while enabling: "
+msgstr "በማስቻል ላይ እያለ ስህተት ተፈጥሯል : "
+
+#. BqmAM
+#: desktop/inc/strings.hrc:36
+msgctxt "RID_STR_ERROR_WHILE_REVOKING"
+msgid "An error occurred while disabling: "
+msgstr "በማሰናከል ላይ እያለ ስህተት ተፈጥሯል : "
+
+#. Avii2
+#: desktop/inc/strings.hrc:38
+msgctxt "RID_STR_CONF_SCHEMA"
+msgid "Configuration Schema"
+msgstr "ገጽታ ማዋቀሪያ"
+
+#. cL9MC
+#: desktop/inc/strings.hrc:39
+msgctxt "RID_STR_CONF_DATA"
+msgid "Configuration Data"
+msgstr "ዳታ ማዋቀሪያ"
+
+#. S8Pj8
+#: desktop/inc/strings.hrc:41
+msgctxt "RID_STR_BASIC_LIB"
+msgid "Basic Library"
+msgstr "መሰረታዊ መጻህፍት ቤት"
+
+#. Tnphj
+#: desktop/inc/strings.hrc:42
+msgctxt "RID_STR_DIALOG_LIB"
+msgid "Dialog Library"
+msgstr "የ ንግግር መጻህፍት ቤት"
+
+#. ThJQm
+#: desktop/inc/strings.hrc:43
+msgctxt "RID_STR_CANNOT_DETERMINE_LIBNAME"
+msgid "The library name could not be determined."
+msgstr "የ መጻህፍት ቤቱን ስም መወሰን አልተቻለም"
+
+#. G6SqW
+#: desktop/inc/strings.hrc:45
+msgctxt "RID_STR_PACKAGE_BUNDLE"
+msgid "Extension"
+msgstr "ተጨማሪ"
+
+#. o6NBi
+#: desktop/inc/strings.hrc:46
+msgctxt "RID_STR_PACKAGE_BUNDLE"
+msgid "All supported files"
+msgstr "ሁሉንም የተደገፉ ፋይሎች"
+
+#. 5TAZB
+#: desktop/inc/strings.hrc:48
+msgctxt "RID_STR_DYN_COMPONENT"
+msgid "UNO Dynamic Library Component"
+msgstr "UNO Dynamic Library Component"
+
+#. SK5Ay
+#: desktop/inc/strings.hrc:49
+msgctxt "RID_STR_JAVA_COMPONENT"
+msgid "UNO Java Component"
+msgstr "UNO Java Component"
+
+#. a7o4C
+#: desktop/inc/strings.hrc:50
+msgctxt "RID_STR_PYTHON_COMPONENT"
+msgid "UNO Python Component"
+msgstr "UNO Python Component"
+
+#. QyN3F
+#: desktop/inc/strings.hrc:51
+msgctxt "RID_STR_COMPONENTS"
+msgid "UNO Components"
+msgstr "UNO Components"
+
+#. G6LCn
+#: desktop/inc/strings.hrc:52
+msgctxt "RID_STR_RDB_TYPELIB"
+msgid "UNO RDB Type Library"
+msgstr "UNO RDB Type Library"
+
+#. KcXfh
+#: desktop/inc/strings.hrc:53
+msgctxt "RID_STR_JAVA_TYPELIB"
+msgid "UNO Java Type Library"
+msgstr "UNO Java Type Library"
+
+#. wBhDU
+#: desktop/inc/strings.hrc:55
+msgctxt "RID_STR_SFWK_LIB"
+msgid "%MACROLANG Library"
+msgstr "%MACROLANG መጻሕፍት ቤት"
+
+#. k2PBJ
+#: desktop/inc/strings.hrc:57
+msgctxt "RID_STR_HELP"
+msgid "Help"
+msgstr "እርዳታ"
+
+#. wPwGt
+#: desktop/inc/strings.hrc:58
+msgctxt "RID_STR_HELPPROCESSING_GENERAL_ERROR"
+msgid "The extension cannot be installed because:\n"
+msgstr "ተጨማሪውን መግጠም አይቻልም ምክንያቱም :\n"
+
+#. PBXkt
+#: desktop/inc/strings.hrc:59
+msgctxt "RID_STR_HELPPROCESSING_XMLPARSING_ERROR"
+msgid "The extension will not be installed because an error occurred in the Help files:\n"
+msgstr "ተጨማሪውን መግጠም አይቻልም ምክንያቱም በእርዳታ ፋይሎች ውስጥ ስህተት ተፈጥሯል :\n"
+
+#. u3kcb
+#: desktop/inc/strings.hrc:61
+msgctxt "RID_STR_ADD_PACKAGES"
+msgid "Add Extension(s)"
+msgstr "ተጨማሪ(ዎች) መጨመሪያ"
+
+#. DDxFn
+#: desktop/inc/strings.hrc:62
+msgctxt "RID_CTX_ITEM_REMOVE"
+msgid "~Remove"
+msgstr "~ማስወገጃ"
+
+#. s6iho
+#: desktop/inc/strings.hrc:63
+msgctxt "RID_CTX_ITEM_ENABLE"
+msgid "~Enable"
+msgstr "~ማስቻያ"
+
+#. CeKUw
+#: desktop/inc/strings.hrc:64
+msgctxt "RID_CTX_ITEM_DISABLE"
+msgid "~Disable"
+msgstr "~ማሰናከያ"
+
+#. Z7G4r
+#: desktop/inc/strings.hrc:65
+msgctxt "RID_CTX_ITEM_CHECK_UPDATE"
+msgid "~Update..."
+msgstr "~ማሻሻያ..."
+
+#. iFBQd
+#: desktop/inc/strings.hrc:66
+msgctxt "RID_STR_ADDING_PACKAGES"
+msgid "Adding %EXTENSION_NAME"
+msgstr "በ መጨመር ላይ %EXTENSION_NAME"
+
+#. J5KAU
+#: desktop/inc/strings.hrc:67
+msgctxt "RID_STR_REMOVING_PACKAGES"
+msgid "Removing %EXTENSION_NAME"
+msgstr "በ ማስወገድ ላይ %EXTENSION_NAME"
+
+#. A6AzC
+#: desktop/inc/strings.hrc:68
+msgctxt "RID_STR_ENABLING_PACKAGES"
+msgid "Enabling %EXTENSION_NAME"
+msgstr "በ ማስቻል ላይ %EXTENSION_NAME"
+
+#. Mh7ag
+#: desktop/inc/strings.hrc:69
+msgctxt "RID_STR_DISABLING_PACKAGES"
+msgid "Disabling %EXTENSION_NAME"
+msgstr "በ ማሰናከል ላይ %EXTENSION_NAME"
+
+#. GjgyB
+#: desktop/inc/strings.hrc:70
+msgctxt "RID_STR_ACCEPT_LICENSE"
+msgid "Accept license for %EXTENSION_NAME"
+msgstr "ፍቃዱን ይቀበሉ ለ %EXTENSION_NAME"
+
+#. buqgv
+#: desktop/inc/strings.hrc:71
+msgctxt "RID_STR_ERROR_UNKNOWN_STATUS"
+msgid "Error: The status of this extension is unknown"
+msgstr "ስህተት: የ ተጨማሪው ሁኔታ የማይታወቅ ነው"
+
+#. H6NGb
+#: desktop/inc/strings.hrc:72
+msgctxt "RID_STR_CLOSE_BTN"
+msgid "Close"
+msgstr "መዝጊያ"
+
+#. T9Gqg
+#: desktop/inc/strings.hrc:73
+msgctxt "RID_STR_EXIT_BTN"
+msgid "Quit"
+msgstr "ማጥፊያ"
+
+#. AEv5h
+#: desktop/inc/strings.hrc:74
+msgctxt "RID_STR_NO_ADMIN_PRIVILEGE"
+msgid ""
+"%PRODUCTNAME has been updated to a new version. Some shared %PRODUCTNAME extensions are not compatible with this version and need to be updated before %PRODUCTNAME can be started.\n"
+"\n"
+"Updating of shared extension requires administrator privileges. Contact your system administrator to update the following shared extensions:"
+msgstr ""
+"%PRODUCTNAME ወደ አዲሱ እትም ተሻሽሏል አንዳንዶቹን ይካፈላል %PRODUCTNAME ተጨማሪዎቹ ከዚህ እትም ጋር አይስማሙም እና ማሻሻል ያስፈልገዋል በፊት %PRODUCTNAME ከ መጀመሩ በፊት \n"
+"\n"
+"የሚካፈሉዋቸውን ተጨማሪዎች ለ ማሻሻል የ አስተዳዳሪ ፍቃድ ያስፈልጋል: የ ስር አት አስተዳዳሪውን ያነጋግሩ የሚካፈሉዋቸውን ተጨማሪዎች ለማሻሻል:"
+
+#. mQAQ9
+#: desktop/inc/strings.hrc:77
+msgctxt "RID_STR_ERROR_MISSING_DEPENDENCIES"
+msgid "The extension cannot be enabled as the following system dependencies are not fulfilled:"
+msgstr "እነዚህ ጥገኞች እስካልተሟሉ ድረስ ተጨማሪውን ማስቻል አይቻልም :"
+
+#. X4uSy
+#: desktop/inc/strings.hrc:78
+msgctxt "RID_STR_ERROR_MISSING_LICENSE"
+msgid "This extension is disabled because you haven't accepted the license yet.\n"
+msgstr "ይህ ተጨማሪ ተሰናክሏል ምክንያቱም የፍቃድ ስምምነቱን ስላልተቀበሉ\n"
+
+#. ky6LA
+#: desktop/inc/strings.hrc:79
+msgctxt "RID_STR_SHOW_LICENSE_CMD"
+msgid "Show license"
+msgstr "ፍቃዱን ማሳያ"
+
+#. xyCf9
+#: desktop/inc/strings.hrc:80
+msgctxt "RID_STR_WARNING_INSTALL_EXTENSION"
+msgid ""
+"You are about to install the extension '%NAME'.\n"
+"Click 'OK' to proceed with the installation.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"ተጨማሪውን ሊገጥሙ ነው '%NAME'.\n"
+"ይጫኑ 'እሺ' መግጠሙን ለመቀጠል\n"
+"ይጫኑ 'መሰረዣ' መግጠሙን ለማስቆም"
+
+#. Y4EHy
+#: desktop/inc/strings.hrc:83
+msgctxt "RID_STR_WARNING_INSTALL_EXTENSION_DISABLED"
+msgid "Extension installation is currently disabled. Please consult your system administrator for more information."
+msgstr "ተጨማሪ መግጠሚያ አሁን ተሰናክሏል: እባክዎን ለ በለጠ መረጃ የ ስርአት አስተዳዳሪውን ያማክሩ"
+
+#. JiEFG
+#: desktop/inc/strings.hrc:85
+msgctxt "RID_STR_WARNING_REMOVE_EXTENSION_DISABLED"
+msgid "Extension removal is currently disabled. Please consult your system administrator for more information."
+msgstr "ተጨማሪ ማስወገጃ አሁን ተሰናክሏል: እባክዎን ለ በለጠ መረጃ የ ስርአት አስተዳዳሪውን ያማክሩ"
+
+#. LncbY
+#: desktop/inc/strings.hrc:87
+msgctxt "RID_STR_WARNING_REMOVE_EXTENSION"
+msgid ""
+"You are about to remove the extension '%NAME'.\n"
+"Click 'OK' to remove the extension.\n"
+"Click 'Cancel' to stop removing the extension."
+msgstr ""
+"ተጨማሪውን ሊያስወግዱ ነው '%NAME'.\n"
+"ይጫኑ 'እሺ' ተጨማሪውን ለማስወገድ\n"
+"ይጫኑ 'መሰረዣ' ተጨማሪ ማስወገጃውን ለማስቆም"
+
+#. fiYMH
+#: desktop/inc/strings.hrc:90
+msgctxt "RID_STR_WARNING_REMOVE_SHARED_EXTENSION"
+msgid ""
+"Make sure that no further users are working with the same %PRODUCTNAME, when changing shared extensions in a multi user environment.\n"
+"Click 'OK' to remove the extension.\n"
+"Click 'Cancel' to stop removing the extension."
+msgstr ""
+"እርግጠኛ ይሁኑ ማንም ተጠቃሚ እንደማይጠቀምበት %PRODUCTNAME, በበርካታ ተጠቃሚዎች የሚካፈሉዋቸውን ተጨማሪዎች አካባቢ \n"
+"ይጫኑ 'እሺ' ተጨማሪውን ለማስወገድ \n"
+"ይጫኑ 'መሰረዣ' ተጨማሪ ማስወገጃውን ለማስቆም"
+
+#. bQ675
+#: desktop/inc/strings.hrc:94
+msgctxt "RID_STR_WARNING_ENABLE_SHARED_EXTENSION"
+msgid ""
+"Make sure that no further users are working with the same %PRODUCTNAME, when changing shared extensions in a multi user environment.\n"
+"Click 'OK' to enable the extension.\n"
+"Click 'Cancel' to stop enabling the extension."
+msgstr ""
+"እርግጠኛ ይሁኑ ማንም ተጠቃሚ እንደማይጠቀምበት %PRODUCTNAME, በበርካታ ተጠቃሚዎች የሚካፈሉዋቸውን ተጨማሪዎች አካባቢ \n"
+"ይጫኑ 'እሺ' ተጨማሪውን ለማስወገድ \n"
+"ይጫኑ 'መሰረዣ' ተጨማሪ ማስወገጃውን ለማስቆም"
+
+#. zEGzE
+#: desktop/inc/strings.hrc:98
+msgctxt "RID_STR_WARNING_DISABLE_SHARED_EXTENSION"
+msgid ""
+"Make sure that no further users are working with the same %PRODUCTNAME, when changing shared extensions in a multi user environment.\n"
+"Click 'OK' to disable the extension.\n"
+"Click 'Cancel' to stop disabling the extension."
+msgstr ""
+"እርግጠኛ ይሁኑ ማንም ተጠቃሚ እንደማይጠቀምበት %PRODUCTNAME, በበርካታ ተጠቃሚዎች የሚካፈሉዋቸውን ተጨማሪዎች አካባቢ \n"
+"ይጫኑ 'እሺ' ተጨማሪውን ለማሰናከል \n"
+"ይጫኑ 'መሰረዣ' ተጨማሪ ማሰናከያውን ለማስቆም"
+
+#. bfdYH
+#: desktop/inc/strings.hrc:102
+msgctxt "RID_STR_UNSUPPORTED_PLATFORM"
+msgid "The extension '%Name' does not work on this computer."
+msgstr "ተጨማሪው '%Name' በዚህ ኮምፒዩተር ላይ መስራት አይችልም"
+
+#. cGEv7
+#: desktop/inc/strings.hrc:104
+msgctxt "RID_DLG_UPDATE_INSTALL_INSTALLING"
+msgid "Installing extensions..."
+msgstr "ተጨማሪዎችን በመግጠም ላይ..."
+
+#. TP9Jx
+#: desktop/inc/strings.hrc:105
+msgctxt "RID_DLG_UPDATE_INSTALL_FINISHED"
+msgid "Installation finished"
+msgstr "መግጠሙ ተፈጽሟል"
+
+#. vga5X
+#: desktop/inc/strings.hrc:106
+msgctxt "RID_DLG_UPDATE_INSTALL_NO_ERRORS"
+msgid "No errors."
+msgstr "ስህተቶች የሉም"
+
+#. GtBF5
+#: desktop/inc/strings.hrc:107
+msgctxt "RID_DLG_UPDATE_INSTALL_ERROR_DOWNLOAD"
+msgid "Error while downloading extension %NAME. "
+msgstr "ስህተት ተጨማሪዎችን በማውረድ ላይ %NAME. "
+
+#. 8wV4e
+#: desktop/inc/strings.hrc:108
+msgctxt "RID_DLG_UPDATE_INSTALL_THIS_ERROR_OCCURRED"
+msgid "The error message is: "
+msgstr "የ ስህተቱ መልእክት ይህ ነው: "
+
+#. vAP5D
+#: desktop/inc/strings.hrc:109
+msgctxt "RID_DLG_UPDATE_INSTALL_ERROR_INSTALLATION"
+msgid "Error while installing extension %NAME. "
+msgstr "ስህተት ተጨማሪዎችን በ መግጠም ላይ %NAME. "
+
+#. DNwGS
+#: desktop/inc/strings.hrc:110
+msgctxt "RID_DLG_UPDATE_INSTALL_ERROR_LIC_DECLINED"
+msgid "The license agreement for extension %NAME was refused. "
+msgstr "ለ ተጨማሪው የ ፍቃድ ስምምነቱን %NAME አልተቀበሉም "
+
+#. q4fDv
+#: desktop/inc/strings.hrc:111
+msgctxt "RID_DLG_UPDATE_INSTALL_EXTENSION_NOINSTALL"
+msgid "The extension will not be installed."
+msgstr "ተጨማሪዎች አይገጠሙም"
+
+#. 2yEGV
+#: desktop/inc/strings.hrc:113
+msgctxt "RID_DEPLOYMENT_DEPENDENCIES_UNKNOWN"
+msgid "Unknown"
+msgstr "ያልታወቀ"
+
+#. kGwZa
+#: desktop/inc/strings.hrc:114
+msgctxt "RID_DEPLOYMENT_DEPENDENCIES_OOO_MIN"
+msgid "Extension requires at least OpenOffice.org reference version %VERSION"
+msgstr "ተጨማሪው ቢያንስ ይህን OpenOffice.org ማመሳከሪያ እትም ይፈልጋል %VERSION"
+
+#. rcfFe
+#: desktop/inc/strings.hrc:115
+msgctxt "RID_DEPLOYMENT_DEPENDENCIES_OOO_MAX"
+msgid "Extension does not support OpenOffice.org reference versions greater than %VERSION"
+msgstr "ተጨማሪው ድጋፍ አይሰጥም ለ OpenOffice.org ማመሳከሪያ እትሞች ይህን ለሚበልጡ %VERSION"
+
+#. 776kM
+#: desktop/inc/strings.hrc:116
+msgctxt "RID_DEPLOYMENT_DEPENDENCIES_LO_MIN"
+msgid "Extension requires at least %PRODUCTNAME version %VERSION"
+msgstr "ተጨማሪው ቢያንስ ይህን እትም ይፈልጋል %PRODUCTNAME version %VERSION"
+
+#. P4pgb
+#: desktop/inc/strings.hrc:117
+msgctxt "RID_DEPLOYMENT_DEPENDENCIES_LO_MAX"
+msgid "Extension does not support %PRODUCTNAME versions greater than %VERSION"
+msgstr "ይህ ተጨማሪ አይደገፍም %PRODUCTNAME በዚህ እትም ወይንም ከዚህ ለበለጠ %VERSION"
+
+#. dNBtG
+#: desktop/inc/strings.hrc:119
+msgctxt "RID_STR_WARNING_VERSION_LESS"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"The newer version $DEPLOYED is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"ይህን እትም ሊገጥሙ ነው $NEW ተጨማሪውን '$NAME'.\n"
+"አዲሱ እትም $DEPLOYED ቀደም ሲል ተገጥሟል \n"
+"ይጫኑ 'እሺ' የተገጠመውን ተጨማሪ ለመተካት\n"
+"ይጫኑ 'መሰረዣ' መግጠሙን ለማስቆም"
+
+#. TmQCx
+#: desktop/inc/strings.hrc:123
+msgctxt "RID_STR_WARNINGBOX_VERSION_LESS_DIFFERENT_NAMES"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"The newer version $DEPLOYED, named '$OLDNAME', is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"ይህን እትም ሊገጥሙ ነው $NEW ተጨማሪውን '$NAME'.\n"
+"አዲሱ እትም $DEPLOYED ስሙ '$OLDNAME',ቀደም ሲል ተገጥሟል\n"
+"ይጫኑ 'እሺ' የተገጠመውን ተጨማሪ ለመቀየር\n"
+"ይጫኑ 'መሰረዣ' መግጠሙን ለማስቆም"
+
+#. AMTBi
+#: desktop/inc/strings.hrc:127
+msgctxt "RID_STR_WARNING_VERSION_EQUAL"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"That version is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"ይህን እትም ሊገጥሙ ነው $NEW ተጨማሪውን '$NAME'.\n"
+"አዲሱ እትም ቀደም ሲል ተገጥሟል\n"
+"ይጫኑ 'እሺ' የተገጠመውን ተጨማሪ ለመተካት\n"
+"ይጫኑ 'መሰረዣ' መግጠሙን ለማስቆም"
+
+#. 5TDnT
+#: desktop/inc/strings.hrc:131
+msgctxt "RID_STR_WARNINGBOX_VERSION_EQUAL_DIFFERENT_NAMES"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"That version, named '$OLDNAME', is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"ይህን እትም ሊገጥሙ ነው $NEW ተጨማሪውን '$NAME'.\n"
+"ይህ እትም '$OLDNAME', ቀደም ሲል ተገጥሟል\n"
+"ይጫኑ 'እሺ' የተገጠመውን ተጨማሪ ለመተካት\n"
+"ይጫኑ 'መሰረዣ' መግጠሙን ለማስቆም"
+
+#. 9wcAB
+#: desktop/inc/strings.hrc:135
+msgctxt "RID_STR_WARNING_VERSION_GREATER"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"The older version $DEPLOYED is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"ይህን እትም ሊገጥሙ ነው $NEW ተጨማሪውን '$NAME'.\n"
+"አሮጌው እትም $DEPLOYED ቀደም ሲል ተገጥሟል\n"
+"ይጫኑ 'እሺ' የተገጠመውን ተጨማሪ ለመተካት\n"
+"ይጫኑ 'መሰረዣ' መግጠሙን ለማስቆም"
+
+#. 2WQJk
+#: desktop/inc/strings.hrc:139
+msgctxt "RID_STR_WARNINGBOX_VERSION_GREATER_DIFFERENT_NAMES"
+msgid ""
+"You are about to install version $NEW of the extension '$NAME'.\n"
+"The older version $DEPLOYED, named '$OLDNAME', is already installed.\n"
+"Click 'OK' to replace the installed extension.\n"
+"Click 'Cancel' to stop the installation."
+msgstr ""
+"ይህን እትም ሊገጥሙ ነው $NEW ተጨማሪው '$NAME'.\n"
+"አሮጌው እትም $DEPLOYED የተሰየመው '$OLDNAME', ቀደም ሲል ተገጥሟል\n"
+"ይጫኑ 'እሺ' የተገጠመውን ተጨማሪ ለመቀየር\n"
+"ይጫኑ 'መሰረዣ' የሚለውን መግጠሙን ለማስቆም"
+
+#. J2X2b
+#: desktop/inc/strings.hrc:144
+msgctxt "RID_DLG_UPDATE_NONE"
+msgid "No new updates are available."
+msgstr "አዲስ ማሻሻያ የለም"
+
+#. y7gVg
+#: desktop/inc/strings.hrc:145
+msgctxt "RID_DLG_UPDATE_NOINSTALLABLE"
+msgid "No installable updates are available. To see ignored or disabled updates, mark the check box 'Show all updates'."
+msgstr "ምንም የሚገጠም ማሻሻያ የለም ፡ የተተዉ ወይም የተሰናከሉ ማሻሻያዎችን ለማየት በምልክት ማሳያው ሳጥን ውስጥ ምልክት ያድርጉ 'ሁሉንም ማሻሻያ ማሳያ'"
+
+#. rq2Co
+#: desktop/inc/strings.hrc:146
+msgctxt "RID_DLG_UPDATE_FAILURE"
+msgid "An error occurred:"
+msgstr "ስህተት ተፈጥሯል:"
+
+#. 77Hco
+#: desktop/inc/strings.hrc:147
+msgctxt "RID_DLG_UPDATE_UNKNOWNERROR"
+msgid "Unknown error."
+msgstr "ያልታወቀ ስህተት"
+
+#. 7xdom
+#: desktop/inc/strings.hrc:148
+msgctxt "RID_DLG_UPDATE_NODESCRIPTION"
+msgid "No more details are available for this update."
+msgstr "ለዚህ ማሻሻያ ምንም ተጨማሪ ዝርዝር የለም"
+
+#. NECjC
+#: desktop/inc/strings.hrc:149
+msgctxt "RID_DLG_UPDATE_NOINSTALL"
+msgid "The extension cannot be updated because:"
+msgstr "ተጨማሪውን ማሻሻል አይቻልም ምክንያቱም:"
+
+#. BstEF
+#: desktop/inc/strings.hrc:150
+msgctxt "RID_DLG_UPDATE_NODEPENDENCY"
+msgid "Required %PRODUCTNAME version doesn't match:"
+msgstr "ያስፈልጋል %PRODUCTNAME የእትም አለመስማማት :"
+
+#. fz5C3
+#: desktop/inc/strings.hrc:151
+msgctxt "RID_DLG_UPDATE_NODEPENDENCY_CUR_VER"
+msgid "You have %PRODUCTNAME %VERSION"
+msgstr "የ እርስዎ %PRODUCTNAME %VERSION"
+
+#. ofeoD
+#: desktop/inc/strings.hrc:152
+msgctxt "RID_DLG_UPDATE_BROWSERBASED"
+msgid "browser based update"
+msgstr "መቃኛን መሰረት ያደረገ ማሻሻያ"
+
+#. 4NJkE
+#: desktop/inc/strings.hrc:153
+msgctxt "RID_DLG_UPDATE_VERSION"
+msgid "Version"
+msgstr "እትም"
+
+#. JRSnS
+#: desktop/inc/strings.hrc:154
+msgctxt "RID_DLG_UPDATE_IGNORED_UPDATE"
+msgid "This update will be ignored.\n"
+msgstr "ይህ ማሻሻያ ይተዋል\n"
+
+#. Ea8Mi
+#: desktop/inc/strings.hrc:156
+msgctxt "STR_BOOTSTRAP_ERR_CANNOT_START"
+msgid "The application cannot be started. "
+msgstr "መተግበሪያውን ማስጀመር አልተቻለም "
+
+#. STFHr
+#: desktop/inc/strings.hrc:157
+msgctxt "STR_BOOTSTRAP_ERR_DIR_MISSING"
+msgid "The configuration directory \"$1\" could not be found."
+msgstr "የ ማዋቀሪያ ዳይሬክቶሪው \"$1\" አልተገኘም"
+
+#. bGWux
+#: desktop/inc/strings.hrc:158
+msgctxt "STR_BOOTSTRAP_ERR_PATH_INVALID"
+msgid "The installation path is invalid."
+msgstr "የ መግጠሚያው መንገድ ዋጋ የለውም"
+
+#. kdZLA
+#: desktop/inc/strings.hrc:159
+msgctxt "STR_BOOTSTRAP_ERR_INTERNAL"
+msgid "An internal error occurred."
+msgstr "የ ውስጥ ስህተት ተፈጥሯል"
+
+#. yGBza
+#: desktop/inc/strings.hrc:160
+msgctxt "STR_BOOTSTRAP_ERR_FILE_CORRUPT"
+msgid "The configuration file \"$1\" is corrupt."
+msgstr "የ ማዋቀሪያ ፋይሉ \"$1\" የተበላሸ ነው"
+
+#. CP9Qk
+#: desktop/inc/strings.hrc:161
+msgctxt "STR_BOOTSTRAP_ERR_FILE_MISSING"
+msgid "The configuration file \"$1\" was not found."
+msgstr "ማዋቀሪያ ፋይሉ \"$1\" አልተገኘም"
+
+#. maapb
+#: desktop/inc/strings.hrc:162
+msgctxt "STR_BOOTSTRAP_ERR_NO_SUPPORT"
+msgid "The configuration file \"$1\" does not support the current version."
+msgstr "ማዋቀሪያ ፋይሉ \"$1\" የአሁኑን እትም አይደግፍም"
+
+#. q2F59
+#: desktop/inc/strings.hrc:163
+msgctxt "STR_BOOTSTRAP_ERR_LANGUAGE_MISSING"
+msgid "The user interface language cannot be determined."
+msgstr "የ ተጠቃሚውን መስሪያ ቋንቋ ማወቅ አልተቻለም"
+
+#. UTKHa
+#: desktop/inc/strings.hrc:164
+msgctxt "STR_BOOTSTRAP_ERR_USERINSTALL_FAILED"
+msgid "User installation could not be completed. "
+msgstr "የተጠቃሚውን አገጣጠም መፈጸም አልተቻለም "
+
+#. dgxZP
+#: desktop/inc/strings.hrc:165
+msgctxt "STR_BOOTSTRAP_ERR_NO_CFG_SERVICE"
+msgid "The configuration service is not available."
+msgstr "የ ማዋቀሪያ ግልጋሎት አልተገኘም"
+
+#. wbj4W
+#: desktop/inc/strings.hrc:166
+msgctxt "STR_ASK_START_SETUP_MANUALLY"
+msgid "Start the setup application to repair the installation from the CD or the folder containing the installation packages."
+msgstr "የ መግጠሚያ መተግበሪያውን ያስጀምሩ አገጣጠሙን ከ CD ለ መጠገን ወይም የ ጥቅል መግጠሚያዎችን የያዘውን ፎልደር"
+
+#. d3or5
+#: desktop/inc/strings.hrc:167
+msgctxt "STR_CONFIG_ERR_ACCESS_GENERAL"
+msgid "A general error occurred while accessing your central configuration. "
+msgstr "ባጠቃላይ ስህተት ተፈጥሯል ማእከላዊ ማዋቀሪያው ጋር ለ መድረስ ሲሞከር "
+
+#. zBSDM
+#: desktop/inc/strings.hrc:168
+msgctxt "STR_LO_MUST_BE_RESTARTED"
+msgid "%PRODUCTNAME must unfortunately be manually restarted once after installation or update."
+msgstr "%PRODUCTNAME ከ ተገጠም ወይንም ከ ተሻሻለ በኋላ በ እጅ እንደገና ማስነሳት ያስፈልጋል"
+
+#. NBTfi
+#: desktop/inc/strings.hrc:169
+msgctxt "STR_QUERY_USERDATALOCKED"
+msgid ""
+"Either another instance of %PRODUCTNAME is accessing your personal settings or your personal settings are locked.\n"
+"Simultaneous access can lead to inconsistencies in your personal settings. Before continuing, you should make sure user '$u' closes %PRODUCTNAME on host '$h'.\n"
+"\n"
+"Do you really want to continue?"
+msgstr ""
+"የእርስዎን የግል ማሰናጃ %PRODUCTNAME ሌላ ሁኔታ እየተጠቀመበት ነው ወይም የእርስዎ የግል ማሰናጃ ተቆልፏል\n"
+"በአንድ ጊዜ በሁለት ሁኔታ የእርስዎን የግል ማሰናጃ ለመድረስ ሲሞከር ያለመረጋጋት ይፈጥራል በእርስዎ የግል ማሰናጃ ላይ፡ ስለዚህ እርግጠኛ ይሁኑ ከመቀጠልዎ በፊት ማንኛውም ተጠቃሚዎች በሙሉ '$u' መዝጋታቸውን %PRODUCTNAME on host '$h'.\n"
+"\n"
+"በእርግጥ መቀጠል ይፈልጋሉ?"
+
+#. EB6Yf
+#: desktop/inc/strings.hrc:170
+msgctxt "STR_TITLE_USERDATALOCKED"
+msgid "%PRODUCTNAME %PRODUCTVERSION"
+msgstr "%PRODUCTNAME %PRODUCTVERSION"
+
+#. GiCJZ
+#: desktop/inc/strings.hrc:171
+msgctxt "STR_ERR_PRINTDISABLED"
+msgid "Printing is disabled. No documents can be printed."
+msgstr "ማተሚያው ተሰናክሏል ፡ ምንም ሰነድ ማተም አይቻልም"
+
+#. VxBTE
+#: desktop/inc/strings.hrc:172
+msgctxt "STR_BOOTSTRAP_ERR_NO_PATHSET_SERVICE"
+msgid "The path manager is not available.\n"
+msgstr "የ መንገድ አስተዳዳሪ አልተገኘም\n"
+
+#. Cy4Wz
+#: desktop/inc/strings.hrc:173
+msgctxt "STR_BOOTSTRAP_ERR_NOTENOUGHDISKSPACE"
+msgid ""
+"%PRODUCTNAME user installation could not be completed due to insufficient free disk space. Please free more disc space at the following location and restart %PRODUCTNAME:\n"
+"\n"
+msgstr ""
+"%PRODUCTNAME የተጠቃሚ መግጠሚያ መፈጸም አልተቻለም: በቂ የሆነ ባዶ ቦታ በ ዲስኩ ላይ የለም: እባክዎን ተጨማሪ የ ዲስክ ባዶ ቦታ ነፃ ያድርጉ: ከሚከተለው ቦታ እና እንደገና ይጀምሩ %PRODUCTNAME:\n"
+"\n"
+
+#. 2o5XG
+#: desktop/inc/strings.hrc:174
+msgctxt "STR_BOOTSTRAP_ERR_NOACCESSRIGHTS"
+msgid ""
+"%PRODUCTNAME user installation could not be processed due to missing access rights. Please make sure that you have sufficient access rights for the following location and restart %PRODUCTNAME:\n"
+"\n"
+msgstr ""
+"%PRODUCTNAME የተጠቃሚ መግጠሚያ ማስኬድ አልተቻለም ፡ በቂ የሆነ የፍቃድ መብት ስለሚጎድል ፡ እባክዎን እርግጠኛ ይሁኑ በቂ የሆነ የፍቃድ መብት እንዳለዎት ለከሚከተለው ቦታ እና እንደገና ይጀምሩ %PRODUCTNAME:\n"
+"\n"
+
+#. uigQN
+#: desktop/inc/strings.hrc:176
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_1"
+msgid "Extension Software License Agreement of $NAME:"
+msgstr "የ ተጨማሪ ሶፍትዌር ፍቃድ ስምምነት ከ $NAME:"
+
+#. DEkAo
+#: desktop/inc/strings.hrc:177
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_2"
+msgid "Read the complete License Agreement displayed above. Accept the License Agreement by typing \"yes\" on the console then press the Return key. Type \"no\" to decline and to abort the extension setup."
+msgstr "ከላይ የሚታየውን ሙሉ የ ፍቃድ ስምምነት ያንብቡ: የ ፍቃድ ስምምነቱን ይቀበሉ \"አዎ\" በ መጻፍ እና በ ማስገባት: ወይንም ይጻፉ \"አይ\" የ ፍቃድ ስምምነቱን ላለመቀበል እና ከ ተጨማሪው መግጠሚያ ማሰናጃ ለ መውጣት"
+
+#. wANiC
+#: desktop/inc/strings.hrc:181
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_3"
+msgid "[Enter \"yes\" or \"no\"]:"
+msgstr "[ያስገቡ \"አዎ\" ወይም \"አይ \"]:"
+
+#. wEFn2
+#: desktop/inc/strings.hrc:182
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_4"
+msgid "Your input was not correct. Please enter \"yes\" or \"no\":"
+msgstr "ያስገቡት ትክክል አይደለም: እባክዎን ያስገቡ \"አዎ\" ወይም \"አይ\":"
+
+#. A9CdG
+#: desktop/inc/strings.hrc:183
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_YES"
+msgid "YES"
+msgstr "አዎ"
+
+#. HLETc
+#: desktop/inc/strings.hrc:184
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_Y"
+msgid "Y"
+msgstr "አዎ"
+
+#. SQ6jd
+#: desktop/inc/strings.hrc:185
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_NO"
+msgid "NO"
+msgstr "አይ"
+
+#. 6LgGA
+#: desktop/inc/strings.hrc:186
+msgctxt "RID_STR_UNOPKG_ACCEPT_LIC_N"
+msgid "N"
+msgstr "አይ"
+
+#. aCY73
+#: desktop/inc/strings.hrc:187
+msgctxt "RID_STR_CONCURRENTINSTANCE"
+msgid "unopkg cannot be started. The lock file indicates it is already running. If this does not apply, delete the lock file at:"
+msgstr "unopkg ማስጀመር አልተቻለም: የ መቆለፊያ ፋይል የሚያሳየው እየሰራ እንዳለ ነው: ይህ ካልተፈጸመ: የ መቆለፊያ ፋይሉን ያጥፉት በ:"
+
+#. MLhHo
+#: desktop/inc/strings.hrc:189
+msgctxt "RID_STR_UNOPKG_ERROR"
+msgid "ERROR: "
+msgstr "ስህተት : "
+
+#. wH3TZ
+msgctxt "stock"
+msgid "_Add"
+msgstr "_መጨመሪያ"
+
+#. S9dsC
+msgctxt "stock"
+msgid "_Apply"
+msgstr "_መፈጸሚያ"
+
+#. TMo6G
+msgctxt "stock"
+msgid "_Cancel"
+msgstr "_መሰረዣ"
+
+#. MRCkv
+msgctxt "stock"
+msgid "_Close"
+msgstr "_መዝጊያ"
+
+#. nvx5t
+msgctxt "stock"
+msgid "_Delete"
+msgstr "_ማጥፊያ"
+
+#. YspCj
+msgctxt "stock"
+msgid "_Edit"
+msgstr "_ማረሚያ"
+
+#. imQxr
+msgctxt "stock"
+msgid "_Help"
+msgstr "_እርዳታ"
+
+#. RbjyB
+msgctxt "stock"
+msgid "_New"
+msgstr "_አዲስ"
+
+#. dx2yy
+msgctxt "stock"
+msgid "_No"
+msgstr "_አይ"
+
+#. M9DsL
+msgctxt "stock"
+msgid "_OK"
+msgstr "_እሺ"
+
+#. VtJS9
+msgctxt "stock"
+msgid "_Remove"
+msgstr "_ማስወገጃ"
+
+#. C69Fy
+msgctxt "stock"
+msgid "_Reset"
+msgstr "_እንደ ነበር መመለሻ"
+
+#. mgpxh
+msgctxt "stock"
+msgid "_Yes"
+msgstr "_አዎ"
+
+#. Qcv5A
+#: desktop/uiconfig/ui/dependenciesdialog.ui:18
+msgctxt "dependenciesdialog|Dependencies"
+msgid "System dependencies check"
+msgstr "የስርአት ጥገኞችን መመርመሪያ"
+
+#. JNnsh
+#: desktop/uiconfig/ui/dependenciesdialog.ui:73
+msgctxt "dependenciesdialog|label1"
+msgid "The extension cannot be installed as the following system dependencies are not fulfilled:"
+msgstr "ተጨማሪዎችን መግጠም አይቻልም የሚቀጥሉት የስርአት ጥገኞች እስከሚሟሉ ድረስ:"
+
+#. FfYDj
+#: desktop/uiconfig/ui/extensionmanager.ui:8
+msgctxt "extensionmanager|ExtensionManagerDialog"
+msgid "Extension Manager"
+msgstr "የ ተጨማሪ አስተዳዳሪ"
+
+#. gjCkd
+#: desktop/uiconfig/ui/extensionmanager.ui:80
+msgctxt "extensionmanager|shared"
+msgid "Installed for all users"
+msgstr "ለሁሉም ተጠቃሚዎች ተገጥሟል"
+
+#. pnXoG
+#: desktop/uiconfig/ui/extensionmanager.ui:89
+msgctxt "extensionmanager|extended_tip|shared"
+msgid "Filter extensions available for all users of this computer."
+msgstr "የ ማጣሪያ ተጨማሪዎች ዝግጁ ናቸው ለ ሁሉም ተጠቃሚዎች በዚህ ኮምፒዩተር ውስጥ:"
+
+#. zhqZT
+#: desktop/uiconfig/ui/extensionmanager.ui:100
+msgctxt "extensionmanager|user"
+msgid "Installed for current user"
+msgstr "ለ አሁኑ ተጠቃሚ ተገጥሟል"
+
+#. QbHCi
+#: desktop/uiconfig/ui/extensionmanager.ui:109
+msgctxt "extensionmanager|extended_tip|user"
+msgid "Filter extensions only available for the currently logged in user."
+msgstr "የ ተጨማሪ ማጣሪያ ዝግጁ የሚሆነው አሁን ለ ገባው ተጠቃሚ ብቻ ነው:"
+
+#. 6wBVk
+#: desktop/uiconfig/ui/extensionmanager.ui:120
+msgctxt "extensionmanager|bundled"
+msgid "Bundled with %PRODUCTNAME"
+msgstr "ተጣምሯል ከ %PRODUCTNAME"
+
+#. nF4rD
+#: desktop/uiconfig/ui/extensionmanager.ui:129
+msgctxt "extensionmanager|extended_tip|bundled"
+msgid "Bundled extensions are installed by the system administrator using the operating system specific installer packages. These can not be installed, updated or removed here."
+msgstr "የ ተጣመሩ ተጨማሪዎች የሚገጠሙት በ ስርአት አስተዳዳሪ ነው: የ መስሪያ ስርአቱን የ ተወሰነ ጥቅል በ መጠቀም: እነዚህን መግጠም: ማሻሻል: ወይንም ማስወገድ አይቻልም:"
+
+#. T8BGR
+#: desktop/uiconfig/ui/extensionmanager.ui:144
+msgctxt "extensionmanager|label1"
+msgid "Display Extensions"
+msgstr "ተጨማሪዎችን ማሳያ"
+
+#. yTB9y
+#: desktop/uiconfig/ui/extensionmanager.ui:162
+msgctxt "extensionmanager|search"
+msgid "Search ..."
+msgstr "መፈለጊያ ..."
+
+#. BAVdg
+#: desktop/uiconfig/ui/extensionmanager.ui:191
+msgctxt "extensionmanager|extended_tip|extensions"
+msgid "Select the extension that you want to remove, enable, or disable. For some extensions, you can also open an Options dialog."
+msgstr "ይምረጡ ተጨማሪ እርስዎ ማስወገድ: ወይንም ማሰናከል የሚፈልጉትን: ለ አንዳንድ ተጨማሪዎች: እርስዎ መክፈት ይችላሉ የ ምርጫ ንግግር:"
+
+#. DLME5
+#: desktop/uiconfig/ui/extensionmanager.ui:213
+msgctxt "extensionmanager|optionsbtn"
+msgid "_Options"
+msgstr "_ምርጫዎች"
+
+#. DbuQS
+#: desktop/uiconfig/ui/extensionmanager.ui:220
+msgctxt "extensionmanager|extended_tip|optionsbtn"
+msgid "Select an installed extension, then click to open the Options dialog for the extension."
+msgstr "ይምረጡ የ ተገጠመ ተጨማሪ: እና ከዛ ይጫኑ ለ መክፈት የ ምርጫ ንግግር ለ ተጨማሪ:"
+
+#. ieiF4
+#: desktop/uiconfig/ui/extensionmanager.ui:232
+msgctxt "extensionmanager|updatebtn"
+msgid "Check for _Updates"
+msgstr "_ማሻሻያዎች መፈለጊያ"
+
+#. rirpA
+#: desktop/uiconfig/ui/extensionmanager.ui:239
+msgctxt "extensionmanager|extended_tip|updatebtn"
+msgid "Click to check for online updates of all installed extensions. To check for updates of the selected extension only, choose the Update command from the context menu. The check for availability of updates starts immediately."
+msgstr "ይጫኑ የ ማሻሻያ መፈለጊያ ለ ተገጠሙት ተጨማሪዎች በሙሉ: ለ ተመረጡት ተጨማሪዎች ብቻ ማሻሻያ ለ መፈለግ: ይምረጡ የ ማሻሻያ ትእዛዝ ከ አገባብ ዝርዝር ውስጥ: ዝግጁ ማሻሻያ መፈለግ ወዲያውኑ ይጀምራል:"
+
+#. GehiB
+#: desktop/uiconfig/ui/extensionmanager.ui:252
+msgctxt "extensionmanager|addbtn"
+msgid "_Add"
+msgstr "_መጨመሪያ"
+
+#. MuigK
+#: desktop/uiconfig/ui/extensionmanager.ui:261
+msgctxt "extensionmanager|extended_tip|addbtn"
+msgid "Click Add to add an extension."
+msgstr "ይጫኑ መጨመሪያ ተጨማሪ ለ መጨመር:"
+
+#. wNCAw
+#: desktop/uiconfig/ui/extensionmanager.ui:274
+msgctxt "extensionmanager|removebtn"
+msgid "_Remove"
+msgstr "_ማስወገጃ"
+
+#. AGoX7
+#: desktop/uiconfig/ui/extensionmanager.ui:281
+msgctxt "extensionmanager|extended_tip|removebtn"
+msgid "Select the extension that you want to remove, and then click Remove."
+msgstr "ይምረጡ ተጨማሪ እርስዎ ማስወገድ የሚፈልጉትን: እና ከዛ ይጫኑ ማስወገጃ:"
+
+#. qHMdq
+#: desktop/uiconfig/ui/extensionmanager.ui:294
+msgctxt "extensionmanager|enablebtn"
+msgid "_Enable"
+msgstr "_ማስቻያ"
+
+#. vz3Ti
+#: desktop/uiconfig/ui/extensionmanager.ui:324
+msgctxt "extensionmanager|progressft"
+msgid "Adding %EXTENSION_NAME"
+msgstr "በመጨመር ላይ %EXTENSION_NAME"
+
+#. A33SB
+#: desktop/uiconfig/ui/extensionmanager.ui:359
+msgctxt "extensionmanager|getextensions"
+msgid "Get more extensions online..."
+msgstr "ተጨማሪዎችን በመስመር ላይ ያግኙ..."
+
+#. FBvRd
+#: desktop/uiconfig/ui/extensionmanager.ui:367
+msgctxt "extensionmanager|extended_tip|getextensions"
+msgid "You can find a collection of extensions on the Web."
+msgstr "እርስዎ ማግኘት ይችላሉ የ ተጨማሪዎች ስብስብ በ ዌብ ላይ:"
+
+#. LFF2R
+#: desktop/uiconfig/ui/extensionmanager.ui:399
+msgctxt "extensionmanager|extended_tip|ExtensionManagerDialog"
+msgid "The Extension Manager adds, removes, disables, enables, and updates extensions."
+msgstr ""
+
+#. EGwkP
+#: desktop/uiconfig/ui/installforalldialog.ui:12
+msgctxt "installforalldialog|InstallForAllDialog"
+msgid "For whom do you want to install the extension?"
+msgstr "ተጨማሪዎችን መግጠም የሚፈልጉት ለማነው?"
+
+#. bFbLc
+#: desktop/uiconfig/ui/installforalldialog.ui:13
+msgctxt "installforalldialog|InstallForAllDialog"
+msgid "Make sure that no further users are working with the same %PRODUCTNAME, when installing an extension for all users in a multi user environment."
+msgstr "እርግጠኛ ይህኑ ሌላ ተጠቃሚ እንደማይሰራበት %PRODUCTNAME, ተጨማሪውን ለሁሉም ተጠቃሚዎች በሚገጥሙበት ጊዜ ለ በርካታ ተጠቃሚ አይነት"
+
+#. urmUy
+#: desktop/uiconfig/ui/installforalldialog.ui:24
+msgctxt "installforalldialog|no"
+msgid "_For all users"
+msgstr "_ለሁሉም ተጠቃሚዎች"
+
+#. nPnM4
+#: desktop/uiconfig/ui/installforalldialog.ui:38
+msgctxt "installforalldialog|yes"
+msgid "_Only for me"
+msgstr "_ለ እኔ ብቻ"
+
+#. feAcg
+#: desktop/uiconfig/ui/licensedialog.ui:8
+msgctxt "licensedialog|LicenseDialog"
+msgid "Extension Software License Agreement"
+msgstr "የ ተጨማሪ ሶፍትዌሮች ፍቃድ ስምምነት"
+
+#. Q6dKY
+#: desktop/uiconfig/ui/licensedialog.ui:24
+msgctxt "licensedialog|accept"
+msgid "Accept"
+msgstr "እቀበላለሁ"
+
+#. zXBFv
+#: desktop/uiconfig/ui/licensedialog.ui:39
+msgctxt "licensedialog|decline"
+msgid "Decline"
+msgstr "አልቀበልም"
+
+#. rvo9y
+#: desktop/uiconfig/ui/licensedialog.ui:70
+msgctxt "licensedialog|head"
+msgid "Please follow these steps to proceed with the installation of the extension:"
+msgstr "እባክዎን ተጨማሪዎቹን ለመግጠም የሚቀጥሉትን ደረጃዎች ይከተሉ"
+
+#. tEDSx
+#: desktop/uiconfig/ui/licensedialog.ui:92
+msgctxt "licensedialog|label2"
+msgid "1."
+msgstr "1."
+
+#. NyS5E
+#: desktop/uiconfig/ui/licensedialog.ui:105
+msgctxt "licensedialog|label3"
+msgid "2."
+msgstr "2."
+
+#. 5h4GZ
+#: desktop/uiconfig/ui/licensedialog.ui:143
+msgctxt "licensedialog|label4"
+msgid "Read the complete License Agreement. Use the scroll bar or the 'Scroll Down' button in this dialog to view the entire license text."
+msgstr "የ ፍቃድ ስምምነቱን በሙሉ ያንብቡ: የ መሸብለያ መደርደሪያውን ይጠቀሙ ወይንም 'ወደ ታች መሸብለያ' ቁልፍን ይጠቀሙ ጠቅላላ የ ፍቃድ ጽሁፉን ንግግር ለማየት"
+
+#. oyoCK
+#: desktop/uiconfig/ui/licensedialog.ui:160
+msgctxt "licensedialog|label5"
+msgid "Accept the License Agreement for the extension by pressing the 'Accept' button."
+msgstr "የ ፍቃድ ስምምነቱን ይቀበሉ ለ ተጨማሪዎች 'እቀበላለሁ' ቁልፍን በ መጫን"
+
+#. ydBcE
+#: desktop/uiconfig/ui/licensedialog.ui:173
+msgctxt "licensedialog|down"
+msgid "_Scroll Down"
+msgstr "ወደ ታች _መሸብለያ"
+
+#. x4PCF
+#: desktop/uiconfig/ui/showlicensedialog.ui:8
+msgctxt "showlicensedialog|extended_tip|ShowLicenseDialog"
+msgid "Read the license. Click the Scroll Down button to scroll down if necessary. Click Accept to continue the installation of the extension."
+msgstr "ፍቃዱን ያንብቡ: ይጫኑ መሸብለያውን ወደ ታች ለ መሸብለል አስፈላጊ ከሆነ: ይጫኑ እቀበላለሁ እና ለ መቀጠል ተጨማሪውን ለ መግጠም:"
+
+#. qquCs
+#: desktop/uiconfig/ui/showlicensedialog.ui:13
+msgctxt "showlicensedialog|ShowLicenseDialog"
+msgid "Extension Software License Agreement"
+msgstr "የ ተጨማሪ ሶፍትዌሮች ፍቃድ ስምምነት"
+
+#. GX3k2
+#: desktop/uiconfig/ui/updatedialog.ui:24
+msgctxt "updatedialog|UpdateDialog"
+msgid "Extension Update"
+msgstr "ተጨማሪዎች ማሻሻያ"
+
+#. DmHy5
+#: desktop/uiconfig/ui/updatedialog.ui:55
+msgctxt "updatedialog|INSTALL"
+msgid "_Install"
+msgstr "_መግጠሚያ"
+
+#. 3bJwo
+#: desktop/uiconfig/ui/updatedialog.ui:122
+msgctxt "updatedialog|UPDATE_LABEL"
+msgid "_Available extension updates"
+msgstr "_ዝግጁ ተጨማሪ ማሻሻያ"
+
+#. 3mtLC
+#: desktop/uiconfig/ui/updatedialog.ui:135
+msgctxt "updatedialog|UPDATE_CHECKING"
+msgid "Checking..."
+msgstr "በመመርመር ላይ..."
+
+#. WkYgi
+#: desktop/uiconfig/ui/updatedialog.ui:219
+msgctxt "updatedialog|UPDATE_ALL"
+msgid "_Show all updates"
+msgstr "ሁሉንም ማሻሻያዎች _ማሳያ"
+
+#. ihAhY
+#: desktop/uiconfig/ui/updatedialog.ui:228
+msgctxt "updatedialog|extended_tip|UPDATE_ALL"
+msgid "By default, only the downloadable extensions are shown in the dialog. Mark Show all Updates to see also other extensions and error messages."
+msgstr "በ ነባር: የሚወርዱ ተጨማሪዎች ብቻ ይታያሉ በ ንግግር ውስጥ: ምልክት ያድርጉ ሁሉንም ማሻሻያ ማሳያ ሌሎች ተጨማሪዎች እና የ ስህተት መልእክቶች ለ መመልከት:"
+
+#. BriDD
+#: desktop/uiconfig/ui/updatedialog.ui:257
+msgctxt "updatedialog|DESCRIPTION_LABEL"
+msgid "Description"
+msgstr "መግለጫ"
+
+#. 7DTtA
+#: desktop/uiconfig/ui/updatedialog.ui:276
+msgctxt "updatedialog|PUBLISHER_LABEL"
+msgid "Publisher:"
+msgstr "አታሚው:"
+
+#. iaD89
+#: desktop/uiconfig/ui/updatedialog.ui:287
+msgctxt "updatedialog|PUBLISHER_LINK"
+msgid "button"
+msgstr "ቁልፍ"
+
+#. kgLHP
+#: desktop/uiconfig/ui/updatedialog.ui:303
+msgctxt "updatedialog|RELEASE_NOTES_LABEL"
+msgid "What is new:"
+msgstr "ምን አዲስ ነገር አለ:"
+
+#. JqHGH
+#: desktop/uiconfig/ui/updatedialog.ui:314
+msgctxt "updatedialog|RELEASE_NOTES_LINK"
+msgid "Release notes"
+msgstr "የተለቀቁ ማስታወሻዎች"
+
+#. UEHCd
+#: desktop/uiconfig/ui/updatedialog.ui:352
+msgctxt "updatedialog|extended_tip|DESCRIPTIONS"
+msgid "While checking for updates, you see a progress indicator. Wait for some messages to show up in the dialog, or click Cancel to abort the update check."
+msgstr "ማሻሻያ በሚፈልግበት ጊዜ: ለ እርስዎ ሂደቱን መጠቆሚያ ይታያል: ትንሽ ይጠብቁ መልእክት አስኪታይ በ ንግግር ውስጥ: ወይንም ይጫኑ መሰረዣ ከ ማሻሻያ መፈለጊያው ለ መውጣት:"
+
+#. c5FG9
+#: desktop/uiconfig/ui/updatedialog.ui:389
+msgctxt "updatedialog|extended_tip|UpdateDialog"
+msgid "Click the Check for Updates button in the Extension Manager to check for online updates for all installed extensions. To check for online updates for only the selected extension, right-click to open the context menu, then choose Update."
+msgstr "ይጫኑ የ ማሻሻያ መፈለጊያ ቁልፍ በ ተጨማሪዎች አስተዳዳሪ ለ ተገጠሙት ተጨማሪዎች በሙሉ ማሻሻያ ለ መፈለግ በ መስመር ላይ: ለ ተመረጡት ተጨማሪዎች ብቻ ማሻሻያ ለ መፈለግ: በ ቀኝ-ይጫኑ ለ መክፈት የ አገባብ ዝርዝር እና ከዛ ይምረጡ ማሻሻያ:"
+
+#. YEhMN
+#: desktop/uiconfig/ui/updateinstalldialog.ui:8
+msgctxt "updateinstalldialog|UpdateInstallDialog"
+msgid "Download and Installation"
+msgstr "ማውረጃ እና መግጠሚያ"
+
+#. t9MoN
+#: desktop/uiconfig/ui/updateinstalldialog.ui:87
+msgctxt "updateinstalldialog|DOWNLOADING"
+msgid "Downloading extensions..."
+msgstr "ተጨማሪዎችን በማውረድ ላይ..."
+
+#. 3AFnH
+#: desktop/uiconfig/ui/updateinstalldialog.ui:125
+msgctxt "updateinstalldialog|RESULTS"
+msgid "Result"
+msgstr "ውጤት"
+
+#. Q4xyF
+#: desktop/uiconfig/ui/updateinstalldialog.ui:178
+msgctxt "updateinstalldialog|extended_tip|UpdateInstallDialog"
+msgid "Click the Check for Updates button in the Extension Manager to check for online updates for all installed extensions. To check for online updates for only the selected extension, right-click to open the context menu, then choose Update."
+msgstr "ይጫኑ የ ማሻሻያ መፈለጊያ ቁልፍ በ ተጨማሪዎች አስተዳዳሪ ለ ተገጠሙት ተጨማሪዎች በሙሉ ማሻሻያ ለ መፈለግ በ መስመር ላይ: ለ ተመረጡት ተጨማሪዎች ብቻ ማሻሻያ ለ መፈለግ: በ ቀኝ-ይጫኑ ለ መክፈት የ አገባብ ዝርዝር እና ከዛ ይምረጡ ማሻሻያ:"
+
+#. Kfhc4
+#: desktop/uiconfig/ui/updaterequireddialog.ui:8
+msgctxt "updaterequireddialog|UpdateRequiredDialog"
+msgid "Extension Update Required"
+msgstr "የ ተጨማሪ ማሻሻያ ያስፈልጋል"
+
+#. bp47k
+#: desktop/uiconfig/ui/updaterequireddialog.ui:27
+msgctxt "updaterequireddialog|check"
+msgid "Check for _Updates..."
+msgstr "_ማሻሻያዎች መፈለጊያ..."
+
+#. 9S2f3
+#: desktop/uiconfig/ui/updaterequireddialog.ui:43
+msgctxt "updaterequireddialog|disable"
+msgid "Disable all"
+msgstr "ሁሉንም ማሰናከያ"
+
+#. VYnoR
+#: desktop/uiconfig/ui/updaterequireddialog.ui:102
+msgctxt "updaterequireddialog|updatelabel"
+msgid "%PRODUCTNAME has been updated to a new version. Some installed %PRODUCTNAME extensions are not compatible with this version and need to be updated before they can be used."
+msgstr "%PRODUCTNAME ወደ አዲሱ እትም ተሻሽሏል: አንዳንዶቹ ተገጥመዋል %PRODUCTNAME ተጨማሪዎቹ ከዚህ እትም ጋር አይስማሙም: ሰለዚህ መሻሻል አለባቸው መጠቀም ከመጀመርዎ በፊት"
+
+#. FXDEw
+#: desktop/uiconfig/ui/updaterequireddialog.ui:153
+msgctxt "updaterequireddialog|progresslabel"
+msgid "Adding %EXTENSION_NAME"
+msgstr "በመጨመር ላይ %EXTENSION_NAME"

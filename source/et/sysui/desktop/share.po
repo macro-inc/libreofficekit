@@ -1,0 +1,611 @@
+#. extracted from sysui/desktop/share
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2016-07-26 17:08+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: Estonian <none>\n"
+"Language: et\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1469552895.000000\n"
+
+#. a9uCy
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document"
+msgstr "OpenOffice.org 1.0 tekstidokument"
+
+#. 9mfCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document Template"
+msgstr "OpenOffice.org 1.0 tekstidokumendi mall"
+
+#. hj5SQ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"master-document\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Master Document"
+msgstr "OpenOffice.org 1.0 põhidokument"
+
+#. 8tGE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"formula\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Formula"
+msgstr "OpenOffice.org 1.0 valem"
+
+#. iJFTG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation"
+msgstr "OpenOffice.org 1.0 esitlus"
+
+#. CA7gZ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation Template"
+msgstr "OpenOffice.org 1.0 esitluse mall"
+
+#. AuLrq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing"
+msgstr "OpenOffice.org 1.0 joonistus"
+
+#. sHiv9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing Template"
+msgstr "OpenOffice.org 1.0 joonistuse mall"
+
+#. rSDA2
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet"
+msgstr "OpenOffice.org 1.0 arvutustabel"
+
+#. iUGdT
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet Template"
+msgstr "OpenOffice.org 1.0 arvutustabeli mall"
+
+#. dup8a
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text\n"
+"LngText.text"
+msgid "OpenDocument Text"
+msgstr "OpenDocument-tekst"
+
+#. Tvbts
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Text (Flat XML)"
+msgstr "OpenDocument-tekst (lame XML)"
+
+#. 7rxHH
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-template\n"
+"LngText.text"
+msgid "OpenDocument Text Template"
+msgstr "OpenDocument-tekstimall"
+
+#. qGKKU
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document\n"
+"LngText.text"
+msgid "OpenDocument Master Document"
+msgstr "OpenDocument-põhidokument"
+
+#. LDcMd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document-template\n"
+"LngText.text"
+msgid "OpenDocument Master Document Template"
+msgstr "OpenDocument-põhidokumendi mall"
+
+#. xUvzk
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-formula\n"
+"LngText.text"
+msgid "OpenDocument Formula"
+msgstr "OpenDocument-valem"
+
+#. QaoV9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation\n"
+"LngText.text"
+msgid "OpenDocument Presentation"
+msgstr "OpenDocument-esitlus"
+
+#. 7KXDa
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Presentation (Flat XML)"
+msgstr "OpenDocument-esitlus (lame XML)"
+
+#. r5mkr
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-template\n"
+"LngText.text"
+msgid "OpenDocument Presentation Template"
+msgstr "OpenDocument-esitluse mall"
+
+#. ABKBq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing\n"
+"LngText.text"
+msgid "OpenDocument Drawing"
+msgstr "OpenDocument-joonistus"
+
+#. uAguG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Drawing (Flat XML)"
+msgstr "OpenDocument-joonistus (lame XML)"
+
+#. nbGeB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-template\n"
+"LngText.text"
+msgid "OpenDocument Drawing Template"
+msgstr "OpenDocument-joonistuse mall"
+
+#. ww4GY
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet"
+msgstr "OpenDocument-arvutustabel"
+
+#. U6S6A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet (Flat XML)"
+msgstr "OpenDocument-arvutustabel (lame XML)"
+
+#. GRcE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-template\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet Template"
+msgstr "OpenDocument-arvutustabeli mall"
+
+#. FBzW7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-database\n"
+"LngText.text"
+msgid "OpenDocument Database"
+msgstr "OpenDocument-andmebaas"
+
+#. PHjCX
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-web-template\n"
+"LngText.text"
+msgid "HTML Document Template"
+msgstr "HTML-dokumendi mall"
+
+#. z5v7A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"extension\n"
+"LngText.text"
+msgid "%PRODUCTNAME Extension"
+msgstr "%PRODUCTNAME'i laiendus"
+
+#. yfXFW
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Exceli töövihik"
+
+#. GFWsF
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPointi esitlus"
+
+#. sXwCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Wordi dokument"
+
+#. N9WPd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document2\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Wordi dokument"
+
+#. jtBEd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Exceli töövihik"
+
+#. YMdW5
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-template-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "Microsoft Exceli töövihiku mall"
+
+#. kg6D4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPointi esitlus"
+
+#. 7TjD7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-template-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "Microsoft PowerPointi esitluse mall"
+
+#. 9YtZo
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document-12\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Wordi dokument"
+
+#. PXrJC
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-template-12\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "Microsoft Wordi dokumendi mall"
+
+#. EENV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPointi esitlus"
+
+#. aBQW3
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-template\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "Microsoft PowerPointi esitluse mall"
+
+#. CTtV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Exceli töövihik"
+
+#. Dk7Bj
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-template\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "Microsoft Exceli töövihiku mall"
+
+#. So2PB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Wordi dokument"
+
+#. gHPAp
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-template\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "Microsoft Wordi dokumendi mall"
+
+#. rJW59
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-binary-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Exceli töövihik"
+
+#. Bpj3J
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "Create and edit text and images in letters, reports, documents and Web pages by using Writer."
+msgstr "Writer võimaldab luua ja redigeerida kirjade, aruannete, dokumentide ning veebilehtede teksti ja pilte."
+
+#. hnW8F
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "Create and edit presentations for slideshows, meeting and Web pages by using Impress."
+msgstr "Impress võimaldab luua ja redigeerida esitlusi slaidiseansside, koosolekute ning veebilehtede jaoks."
+
+#. YkHme
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "Create and edit drawings, flow charts, and logos by using Draw."
+msgstr "Draw võimaldab luua ja redigeerida joonistusi, vooskeeme ning logosid."
+
+#. US56A
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "Perform calculations, analyze information and manage lists in spreadsheets by using Calc."
+msgstr "Calc võimaldab arvutustabelite abiga teha arvutusi, analüüsida teavet ja hallata loendeid."
+
+#. xb7SC
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"math\n"
+"LngText.text"
+msgid "Create and edit scientific formulas and equations by using Math."
+msgstr "Math võimaldab luua ja redigeerida teaduslikke valemeid ning võrrandeid."
+
+#. mbYRJ
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"base\n"
+"LngText.text"
+msgid "Manage databases, create queries and reports to track and manage your information by using Base."
+msgstr "Base võimaldab kasutada andmebaase ja luua andmete jälgimiseks ning haldamiseks päringuid ja aruandeid."
+
+#. 8R6uw
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"startcenter\n"
+"LngText.text"
+msgid "The office productivity suite compatible to the open and standardized ODF document format. Supported by The Document Foundation."
+msgstr "Kontoritarkvara komplekt, mis ühildub avatud ja standardiseeritud ODF-dokumendivorminguga. Toetab Document Foundation."
+
+#. BhNQQ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "Word Processor"
+msgstr "Tekstitöötlus"
+
+#. zknFm
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "Presentation"
+msgstr "Esitlus"
+
+#. czB83
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "Spreadsheet"
+msgstr "Tabelarvutus"
+
+#. AXNAJ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"base\n"
+"LngText.text"
+msgid "Database Development"
+msgstr "Andmebaasihaldus"
+
+#. EkVbD
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"math\n"
+"LngText.text"
+msgid "Formula Editor"
+msgstr "Valemiredaktor"
+
+#. oDGKs
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "Drawing Program"
+msgstr "Skeemilooja"
+
+#. DdFuQ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"startcenter\n"
+"LngText.text"
+msgid "Office"
+msgstr "Kontoritöö"
+
+#. N3RXU
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"xsltfilter\n"
+"LngText.text"
+msgid "XSLT based filters"
+msgstr "XSLT-põhised filtrid"
+
+#. DE2Gk
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "New Document"
+msgstr "Uus dokument"
+
+#. Wz7Fu
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "New Presentation"
+msgstr "Uus esitlus"
+
+#. 7VLq2
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "New Spreadsheet"
+msgstr "Uus arvutustabel"
+
+#. UXCET
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"base\n"
+"LngText.text"
+msgid "New Database"
+msgstr "Uus andmebaas"
+
+#. FDPZi
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"math\n"
+"LngText.text"
+msgid "New Formula"
+msgstr "Uus valem"
+
+#. UQjBd
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "New Drawing"
+msgstr "Uus joonistus"

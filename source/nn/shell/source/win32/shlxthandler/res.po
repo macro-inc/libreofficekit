@@ -1,0 +1,350 @@
+#. extracted from shell/source/win32/shlxthandler/res
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2013-12-01 10:26+0000\n"
+"Last-Translator: Kolbjørn Stuestøl <kolbjoern@stuestoel.no>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: nn\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1385893580.000000\n"
+
+#. nMHZG
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TITLE%\n"
+"LngText.text"
+msgid "Title"
+msgstr "Tittel"
+
+#. 7QBxh
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TITLE_COLON%\n"
+"LngText.text"
+msgid "Title:"
+msgstr "Tittel:"
+
+#. UGL46
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUBJECT%\n"
+"LngText.text"
+msgid "Subject"
+msgstr "Emne"
+
+#. Rqom8
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUBJECT_COLON%\n"
+"LngText.text"
+msgid "Subject:"
+msgstr "Emne:"
+
+#. BbVSy
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%AUTHOR%\n"
+"LngText.text"
+msgid "Author"
+msgstr "Forfattar"
+
+#. 6eSDz
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%AUTHOR_COLON%\n"
+"LngText.text"
+msgid "Author:"
+msgstr "Forfattar:"
+
+#. nA6Zp
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%KEYWORDS%\n"
+"LngText.text"
+msgid "Keywords"
+msgstr "Nøkkelord"
+
+#. hJatc
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%KEYWORDS_COLON%\n"
+"LngText.text"
+msgid "Keywords:"
+msgstr "Nøkkelord:"
+
+#. NyeBb
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%COMMENTS%\n"
+"LngText.text"
+msgid "Comments"
+msgstr "Kommentarar"
+
+#. tN79v
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%COMMENTS_COLON%\n"
+"LngText.text"
+msgid "Comments:"
+msgstr "Kommentarar:"
+
+#. C7AUH
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PAGES%\n"
+"LngText.text"
+msgid "Pages"
+msgstr "Sider"
+
+#. vhAWA
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TABLES%\n"
+"LngText.text"
+msgid "Tables"
+msgstr "Tabellar"
+
+#. VNMuj
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%GRAPHICS%\n"
+"LngText.text"
+msgid "Images"
+msgstr "Bilete"
+
+#. WePDJ
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%OBJECTS%\n"
+"LngText.text"
+msgid "Objects"
+msgstr "Objekt"
+
+#. CXU2C
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%OLE_OBJECTS%\n"
+"LngText.text"
+msgid "OLE Objects"
+msgstr "OLE-objekt"
+
+#. zATfj
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PARAGRAPHS%\n"
+"LngText.text"
+msgid "Paragraphs"
+msgstr "Avsnitt"
+
+#. S4c4V
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%WORDS%\n"
+"LngText.text"
+msgid "Words"
+msgstr "Ord"
+
+#. D4Ywc
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%CHARACTERS%\n"
+"LngText.text"
+msgid "Characters"
+msgstr "Teikn"
+
+#. 8LRV5
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%ROWS%\n"
+"LngText.text"
+msgid "Lines"
+msgstr "Linjer"
+
+#. UhaXY
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%ORIGIN%\n"
+"LngText.text"
+msgid "Origin"
+msgstr "Opphav"
+
+#. eEVzH
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%VERSION%\n"
+"LngText.text"
+msgid "Version"
+msgstr "Versjon"
+
+#. CGpUh
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SHEETS%\n"
+"LngText.text"
+msgid "Sheets"
+msgstr "Ark"
+
+#. 2okgs
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%CELLS%\n"
+"LngText.text"
+msgid "Cells"
+msgstr "Celler"
+
+#. rgN97
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%STATISTICS_TITLE%\n"
+"LngText.text"
+msgid "Document Statistics"
+msgstr "Dokumentstatistikk"
+
+#. VsBfC
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SUMMARY_TITLE%\n"
+"LngText.text"
+msgid "Summary"
+msgstr "Samandrag"
+
+#. MiuQD
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PROPERTY%\n"
+"LngText.text"
+msgid "Property"
+msgstr "Eigenskap"
+
+#. mGZKg
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%PROPERTY_VALUE%\n"
+"LngText.text"
+msgid "Value"
+msgstr "Verdi"
+
+#. TCEEW
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%MODIFIED%\n"
+"LngText.text"
+msgid "Modified"
+msgstr "Endra"
+
+#. YYD9t
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%MODIFIED_COLON%\n"
+"LngText.text"
+msgid "Modified:"
+msgstr "Endra:"
+
+#. vBE2F
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DOCUMENT_NUMBER%\n"
+"LngText.text"
+msgid "Revision number"
+msgstr "Revisjonsnummer"
+
+#. FXXNk
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DOCUMENT_NUMBER_COLON%\n"
+"LngText.text"
+msgid "Revision number:"
+msgstr "Revisjonsnummer:"
+
+#. HdSaz
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%EDITING_TIME%\n"
+"LngText.text"
+msgid "Total editing time"
+msgstr "Total redigeringstid"
+
+#. snZkq
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%EDITING_TIME_COLON%\n"
+"LngText.text"
+msgid "Total editing time:"
+msgstr "Total redigeringstid:"
+
+#. AuQLP
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DESCRIPTION%\n"
+"LngText.text"
+msgid "Description"
+msgstr "Skildring"
+
+#. WESrR
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%DESCRIPTION_COLON%\n"
+"LngText.text"
+msgid "Description:"
+msgstr "Skildring:"
+
+#. RWroq
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%SIZE_COLON%\n"
+"LngText.text"
+msgid "Size:"
+msgstr "Storleik:"
+
+#. 3GFSY
+#: shlxthdl.ulf
+msgctxt ""
+"shlxthdl.ulf\n"
+"%TYPE_COLON%\n"
+"LngText.text"
+msgid "Type:"
+msgstr "Type:"

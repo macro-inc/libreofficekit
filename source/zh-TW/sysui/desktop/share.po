@@ -1,0 +1,611 @@
+#. extracted from sysui/desktop/share
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2019-07-11 18:38+0200\n"
+"PO-Revision-Date: 2018-01-25 09:01+0000\n"
+"Last-Translator: Cheng-Chia Tseng <pswo10680@gmail.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1516870900.000000\n"
+
+#. a9uCy
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document"
+msgstr "OpenOffice.org 1.0 文字文件"
+
+#. 9mfCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"text-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Text Document Template"
+msgstr "OpenOffice.org 1.0 文字文件範本"
+
+#. hj5SQ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"master-document\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Master Document"
+msgstr "OpenOffice.org 1.0 主控文件"
+
+#. 8tGE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"formula\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Formula"
+msgstr "OpenOffice.org 1.0 公式"
+
+#. iJFTG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation"
+msgstr "OpenOffice.org 1.0 簡報"
+
+#. CA7gZ
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"presentation-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Presentation Template"
+msgstr "OpenOffice.org 1.0 簡報範本"
+
+#. AuLrq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing"
+msgstr "OpenOffice.org 1.0 繪圖"
+
+#. sHiv9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"drawing-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Drawing Template"
+msgstr "OpenOffice.org 1.0 繪圖範本"
+
+#. rSDA2
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet"
+msgstr "OpenOffice.org 1.0 試算表"
+
+#. iUGdT
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"spreadsheet-template\n"
+"LngText.text"
+msgid "OpenOffice.org 1.0 Spreadsheet Template"
+msgstr "OpenOffice.org 1.0  試算表範本"
+
+#. dup8a
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text\n"
+"LngText.text"
+msgid "OpenDocument Text"
+msgstr "OpenDocument 文字"
+
+#. Tvbts
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Text (Flat XML)"
+msgstr "OpenDocument 文件 (Flat XML)"
+
+#. 7rxHH
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-text-template\n"
+"LngText.text"
+msgid "OpenDocument Text Template"
+msgstr "OpenDocument 文字範本"
+
+#. qGKKU
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document\n"
+"LngText.text"
+msgid "OpenDocument Master Document"
+msgstr "OpenDocument 主控文件"
+
+#. LDcMd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-master-document-template\n"
+"LngText.text"
+msgid "OpenDocument Master Document Template"
+msgstr "OpenDocument 主控文件範本"
+
+#. xUvzk
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-formula\n"
+"LngText.text"
+msgid "OpenDocument Formula"
+msgstr "OpenDocument 公式"
+
+#. QaoV9
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation\n"
+"LngText.text"
+msgid "OpenDocument Presentation"
+msgstr "OpenDocument 簡報"
+
+#. 7KXDa
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Presentation (Flat XML)"
+msgstr "OpenDocument 簡報 (Flat XML)"
+
+#. r5mkr
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-presentation-template\n"
+"LngText.text"
+msgid "OpenDocument Presentation Template"
+msgstr "OpenDocument 簡報範本"
+
+#. ABKBq
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing\n"
+"LngText.text"
+msgid "OpenDocument Drawing"
+msgstr "OpenDocument 繪圖"
+
+#. uAguG
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Drawing (Flat XML)"
+msgstr "OpenDocument 繪圖 (Flat XML)"
+
+#. nbGeB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-drawing-template\n"
+"LngText.text"
+msgid "OpenDocument Drawing Template"
+msgstr "OpenDocument 繪圖範本"
+
+#. ww4GY
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet"
+msgstr "OpenDocument 試算表"
+
+#. U6S6A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-flat-xml\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet (Flat XML)"
+msgstr "OpenDocument 試算表 (Flat XML)"
+
+#. GRcE4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-spreadsheet-template\n"
+"LngText.text"
+msgid "OpenDocument Spreadsheet Template"
+msgstr "OpenDocument 試算表範本"
+
+#. FBzW7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-database\n"
+"LngText.text"
+msgid "OpenDocument Database"
+msgstr "OpenDocument 資料庫"
+
+#. PHjCX
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"oasis-web-template\n"
+"LngText.text"
+msgid "HTML Document Template"
+msgstr "HTML 文件範本"
+
+#. z5v7A
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"extension\n"
+"LngText.text"
+msgid "%PRODUCTNAME Extension"
+msgstr "%PRODUCTNAME 擴充套件"
+
+#. yfXFW
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel 工作表"
+
+#. GFWsF
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint 簡報"
+
+#. sXwCV
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word 文件"
+
+#. N9WPd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document2\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word 文件"
+
+#. jtBEd
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel 工作表"
+
+#. YMdW5
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-template-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "Microsoft Excel 工作表範本"
+
+#. kg6D4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-presentation-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint 簡報"
+
+#. 7TjD7
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-powerpoint-template-12\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "Microsoft PowerPoint 簡報範本"
+
+#. 9YtZo
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-document-12\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word 文件"
+
+#. PXrJC
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-word-template-12\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "Microsoft Word 文件範本"
+
+#. EENV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-presentation\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint 簡報"
+
+#. aBQW3
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-presentationml-template\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation Template"
+msgstr "Microsoft PowerPoint 簡報範本"
+
+#. CTtV4
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-sheet\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel 工作表"
+
+#. Dk7Bj
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-spreadsheetml-template\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet Template"
+msgstr "Microsoft Excel 工作表範本"
+
+#. So2PB
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-document\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word 文件"
+
+#. gHPAp
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"openxmlformats-officedocument-wordprocessingml-template\n"
+"LngText.text"
+msgid "Microsoft Word Document Template"
+msgstr "Microsoft Word 文件範本"
+
+#. rJW59
+#: documents.ulf
+msgctxt ""
+"documents.ulf\n"
+"ms-excel-sheet-binary-12\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel 工作表"
+
+#. Bpj3J
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "Create and edit text and images in letters, reports, documents and Web pages by using Writer."
+msgstr "使用 Writer 可以製作與編輯書信、報告、文件和網頁中的文字和影像。"
+
+#. hnW8F
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "Create and edit presentations for slideshows, meeting and Web pages by using Impress."
+msgstr "使用 Impress 可建立與編輯用於投影片、會議和網頁的簡報。"
+
+#. YkHme
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "Create and edit drawings, flow charts, and logos by using Draw."
+msgstr "使用 Draw 可建立與編輯繪圖、流程圖以及標誌。"
+
+#. US56A
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "Perform calculations, analyze information and manage lists in spreadsheets by using Calc."
+msgstr "使用 Calc 可在試算表中執行計算、分析資訊與管理清單。"
+
+#. xb7SC
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"math\n"
+"LngText.text"
+msgid "Create and edit scientific formulas and equations by using Math."
+msgstr "使用 Math 可建立與編輯科學公式與方程式。"
+
+#. mbYRJ
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"base\n"
+"LngText.text"
+msgid "Manage databases, create queries and reports to track and manage your information by using Base."
+msgstr "使用 Base 來管理資料庫、建立查詢與報告，以追蹤及管理您的資訊。"
+
+#. 8R6uw
+#: launcher_comment.ulf
+msgctxt ""
+"launcher_comment.ulf\n"
+"startcenter\n"
+"LngText.text"
+msgid "The office productivity suite compatible to the open and standardized ODF document format. Supported by The Document Foundation."
+msgstr "本辦公生產力套裝軟體和開放且標準化的 ODF 文件格式相容，由文件基金會提供支援。"
+
+#. BhNQQ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "Word Processor"
+msgstr "文書處理器"
+
+#. zknFm
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "Presentation"
+msgstr "簡報"
+
+#. czB83
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "Spreadsheet"
+msgstr "試算表"
+
+#. AXNAJ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"base\n"
+"LngText.text"
+msgid "Database Development"
+msgstr "資料庫開發"
+
+#. EkVbD
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"math\n"
+"LngText.text"
+msgid "Formula Editor"
+msgstr "公式編輯器"
+
+#. oDGKs
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "Drawing Program"
+msgstr "繪圖程式"
+
+#. DdFuQ
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"startcenter\n"
+"LngText.text"
+msgid "Office"
+msgstr "辦公"
+
+#. N3RXU
+#: launcher_genericname.ulf
+msgctxt ""
+"launcher_genericname.ulf\n"
+"xsltfilter\n"
+"LngText.text"
+msgid "XSLT based filters"
+msgstr "基於 XSLT 的過濾器"
+
+#. DE2Gk
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"writer\n"
+"LngText.text"
+msgid "New Document"
+msgstr "新增文件"
+
+#. Wz7Fu
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"impress\n"
+"LngText.text"
+msgid "New Presentation"
+msgstr "新增簡報"
+
+#. 7VLq2
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"calc\n"
+"LngText.text"
+msgid "New Spreadsheet"
+msgstr "新增試算表"
+
+#. UXCET
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"base\n"
+"LngText.text"
+msgid "New Database"
+msgstr "新增資料庫"
+
+#. FDPZi
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"math\n"
+"LngText.text"
+msgid "New Formula"
+msgstr "新增公式"
+
+#. UQjBd
+#: launcher_unityquicklist.ulf
+msgctxt ""
+"launcher_unityquicklist.ulf\n"
+"draw\n"
+"LngText.text"
+msgid "New Drawing"
+msgstr "新增繪圖"

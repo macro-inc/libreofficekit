@@ -1,0 +1,2861 @@
+#. extracted from helpcontent2/source/text/shared
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-07-04 18:04+0200\n"
+"PO-Revision-Date: 2021-09-08 09:07+0000\n"
+"Last-Translator: Gábor Kelemen <kelemeng@gnome.hu>\n"
+"Language-Team: Hungarian <https://translations.documentfoundation.org/projects/libo_help-master/textshared/hu/>\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1542196888.000000\n"
+
+#. fcmzq
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Find Bar"
+msgstr ""
+
+#. ZBBdy
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"bm_id871641583188415\n"
+"help.text"
+msgid "<bookmark_value>Find toolbar</bookmark_value>"
+msgstr ""
+
+#. WXRY5
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id701641581066778\n"
+"help.text"
+msgid "<link href=\"/text/shared/find_toolbar.xhp\" name=\"Find Bar\">Find Bar</link>"
+msgstr ""
+
+#. X55wK
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id3147762\n"
+"help.text"
+msgid "The <menuitem>Find</menuitem> toolbar can be used to quickly search the contents of %PRODUCTNAME documents."
+msgstr ""
+
+#. wMCEY
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id211641581251728\n"
+"help.text"
+msgid "Use the shortcut <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode> + F</keycode> to quickly open the <menuitem>Find</menuitem> toolbar."
+msgstr ""
+
+#. DCYmX
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id991641581514302\n"
+"help.text"
+msgid "Find Text"
+msgstr ""
+
+#. 979Nt
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id921641581538352\n"
+"help.text"
+msgid "Enter the text to be searched in the document. Press <keycode>Enter</keycode> to perform the search."
+msgstr ""
+
+#. vYcEW
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id831641581895099\n"
+"help.text"
+msgid "Find Previous"
+msgstr ""
+
+#. e8qFg
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id11641581906556\n"
+"help.text"
+msgid "Moves the cursor and selects the previous match of the search text."
+msgstr ""
+
+#. t33RZ
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id851642423451259\n"
+"help.text"
+msgid "<image src=\"cmd/lc_upsearch.svg\" id=\"img_id171642423451259\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id261642423451259\">Find Previous Icon</alt></image>"
+msgstr ""
+
+#. Tu26F
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id351642423451259\n"
+"help.text"
+msgid "Find Previous Icon"
+msgstr ""
+
+#. CCfcg
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id941641581943416\n"
+"help.text"
+msgid "Find Next"
+msgstr ""
+
+#. gwMV9
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id261641581953287\n"
+"help.text"
+msgid "Moves the cursor and selects the next match of the search text."
+msgstr ""
+
+#. PUsAY
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id111642423456841\n"
+"help.text"
+msgid "<image src=\"cmd/lc_downsearch.svg\" id=\"img_id111642423456841\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111642423456841\">Find Next Icon</alt></image>"
+msgstr ""
+
+#. kuiD9
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id111642423456842\n"
+"help.text"
+msgid "Find Next Icon"
+msgstr ""
+
+#. 5nZqX
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id81641582044927\n"
+"help.text"
+msgid "Find All"
+msgstr ""
+
+#. DFtSe
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id181641582056429\n"
+"help.text"
+msgid "Highlights all matches in the document."
+msgstr ""
+
+#. xFTTt
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id631641582107024\n"
+"help.text"
+msgid "Match Case"
+msgstr ""
+
+#. 42qsF
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id461641582121199\n"
+"help.text"
+msgid "Choose this option to perform case-sensitive search."
+msgstr ""
+
+#. nhwRU
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id271641582528169\n"
+"help.text"
+msgid "Formatted Display"
+msgstr ""
+
+#. Cd89c
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id571641582522939\n"
+"help.text"
+msgid "Performs the search considering the formatted value in a cell."
+msgstr ""
+
+#. L8K8f
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"hd_id171641582176913\n"
+"help.text"
+msgid "Find and Replace"
+msgstr ""
+
+#. 8GXhw
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id761641582194558\n"
+"help.text"
+msgid "Opens the <link href=\"text/swriter/guide/finding.xhp\" name=\"Find_Replace\">Find and Replace</link> dialog, which provides more options for searching the document."
+msgstr ""
+
+#. rx3mH
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id171641582176913\n"
+"help.text"
+msgid "<image src=\"cmd/lc_searchdialog.svg\" id=\"img_id171641582176913\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171641582176913\">Find and Replace Icon</alt></image>"
+msgstr ""
+
+#. BUQcH
+#: find_toolbar.xhp
+msgctxt ""
+"find_toolbar.xhp\n"
+"par_id171641582176943\n"
+"help.text"
+msgid "Find and Replace Icon"
+msgstr ""
+
+#. DBz3U
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Fontwork"
+msgstr "Betűbűvész"
+
+#. EwzqM
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN1055A\n"
+"help.text"
+msgid "<link href=\"text/shared/fontwork_toolbar.xhp\">Fontwork</link>"
+msgstr "<link href=\"text/shared/fontwork_toolbar.xhp\">Betűbűvész</link>"
+
+#. GNY76
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN1056A\n"
+"help.text"
+msgid "The Fontwork toolbar opens when you select a Fontwork object."
+msgstr "Egy Betűbűvész-objektum kijelölésekor megnyílik a Betűbűvész eszköztár."
+
+#. 9xBxj
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN1056D\n"
+"help.text"
+msgid "Fontwork Gallery"
+msgstr "Betűbűvész-képtár"
+
+#. A6ecD
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id81646926301557\n"
+"help.text"
+msgid "<image src=\"cmd/lc_fontworkgalleryfloater.svg\" id=\"img_id311646926301559\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id331646926301560\">Icon Fontwork Gallery</alt></image>"
+msgstr ""
+
+#. zBxMN
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN10571\n"
+"help.text"
+msgid "Opens the Fontwork Gallery where you can select another preview. Click <emph>OK</emph> to apply the new set of properties to your Fontwork object."
+msgstr ""
+
+#. nG6ME
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN10588\n"
+"help.text"
+msgid "Fontwork Shape"
+msgstr "Betűbűvész - Alak"
+
+#. PgQM4
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id51646926964588\n"
+"help.text"
+msgid "<image src=\"cmd/lc_fontwork.svg\" id=\"img_id801646926964589\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761646926964590\">Icon Fontwork Shape</alt></image>"
+msgstr ""
+
+#. CTe3i
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN1058C\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens the Fontwork Shape toolbar. Click a shape to apply the shape to all selected Fontwork objects.</ahelp>"
+msgstr "<ahelp hid=\".\">Megnyitja a Betűbűvész - Alak eszköztárat. Kattintson ide, ha alkalmazni kívánja az alakot minden kijelölt Betűbűvész-objektumra.</ahelp>"
+
+#. HTZ3F
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105A6\n"
+"help.text"
+msgid "Fontwork Same Letter Heights"
+msgstr "Betűbűvész - Azonos karaktermagasság"
+
+#. gBD67
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id501646927155677\n"
+"help.text"
+msgid "<image src=\"cmd/lc_fontworksameletterheights.svg\" id=\"img_id41646927155678\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id141646927155679\">Icon Fontwork Same Letter Height</alt></image>"
+msgstr ""
+
+#. dyVEY
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105AA\n"
+"help.text"
+msgid "<ahelp hid=\".\">Switches the letter height of the selected Fontwork objects from normal to the same height for all objects.</ahelp>"
+msgstr "<ahelp hid=\".\">A kijelölt Betűbűvész-objektumok betűmagasságát normálról minden objektumhoz azonos magasságúra változtatja.</ahelp>"
+
+#. CoXnr
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105C1\n"
+"help.text"
+msgid "Fontwork Alignment"
+msgstr "Betűbűvész - Igazítás"
+
+#. dPegd
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id211646927242197\n"
+"help.text"
+msgid "<image src=\"cmd/lc_alignhorizontalcenter.svg\" id=\"img_id281646927242198\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id731646927242199\">Icon Fontwork Alignment</alt></image>"
+msgstr ""
+
+#. FvBdo
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105C5\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens the Fontwork Alignment window.</ahelp>"
+msgstr "<ahelp hid=\".\">Megnyitja a Betűbűvész - Igazítás ablakot.</ahelp>"
+
+#. mKkVN
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105DC\n"
+"help.text"
+msgid "Click to apply the alignment to the selected Fontwork objects."
+msgstr "Kattintson a kiválasztott Betűbűvész objektumok igazításának alkalmazásához."
+
+#. NSmjx
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN105F3\n"
+"help.text"
+msgid "Fontwork Character Spacing"
+msgstr "Betűbűvész - Karakterek távolsága"
+
+#. uMC4D
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id251646927506111\n"
+"help.text"
+msgid "<image src=\"cmd/lc_spacing.svg\" id=\"img_id441646927506112\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id821646927506113\">Icon Fontwork Character Spacing</alt></image>"
+msgstr ""
+
+#. WLvKk
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id791646928579114\n"
+"help.text"
+msgid "Select the character spacing values to apply to the Fontwork object."
+msgstr ""
+
+#. xERFF
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN10621\n"
+"help.text"
+msgid "<emph>Custom:</emph> Opens the Fontwork Character Spacing dialog where you can enter a new character spacing value."
+msgstr ""
+
+#. sgFfF
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_idN1063C\n"
+"help.text"
+msgid "<ahelp hid=\".\"><emph>Value:</emph> enter the Fontwork character spacing value.</ahelp>"
+msgstr ""
+
+#. 2aGeB
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"hd_id981646929182163\n"
+"help.text"
+msgid "Toggle Extrusion"
+msgstr ""
+
+#. FcnBM
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id611646929193237\n"
+"help.text"
+msgid "<image src=\"cmd/lc_extrusiontoggle.png\" id=\"img_id951646929193238\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id211646929193239\">Icon Toggle Extrusion</alt></image>"
+msgstr ""
+
+#. Dems2
+#: fontwork_toolbar.xhp
+msgctxt ""
+"fontwork_toolbar.xhp\n"
+"par_id191646929193241\n"
+"help.text"
+msgid "Switches the 3D effects on and off for the Fontwork objects."
+msgstr ""
+
+#. yEKhT
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"tit\n"
+"help.text"
+msgid "Help"
+msgstr "Súgó"
+
+#. C9KAH
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id3155364\n"
+"help.text"
+msgid "<link href=\"text/shared/main0108.xhp\" name=\"Help\">Help</link>"
+msgstr "<link href=\"text/shared/main0108.xhp\" name=\"Súgó\">Súgó</link>"
+
+#. 2BAjw
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id3153990\n"
+"help.text"
+msgid "<ahelp hid=\".uno:HelpMenu\">The Help menu allows you to start and control the $[officename] Help system.</ahelp>"
+msgstr "<ahelp hid=\".uno:HelpMenu\">A Súgó menü segítségével indítható a $[officename] súgója.</ahelp>"
+
+#. qpCaX
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id3147399\n"
+"help.text"
+msgid "$[officename] Help"
+msgstr "$[officename] Súgó"
+
+#. Bm7BG
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id3147576\n"
+"help.text"
+msgid "<ahelp hid=\".uno:HelpIndex\">Opens the main page of the $[officename] Help for the current application.</ahelp> You can scroll through the Help pages and you can search for index terms or any text."
+msgstr "<ahelp hid=\".uno:HelpIndex\">Megnyitja az aktuális alkalmazáshoz tartozó $[officename] Súgó főoldalát.</ahelp> Átlapozhatja a Súgó oldalait, kereshet a tárgymutatóban vagy a teljes szövegben."
+
+#. SPpw7
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_idN1064A\n"
+"help.text"
+msgid "<image id=\"img_id1619006\" src=\"cmd/sc_helpindex.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id1619006\">Icon Help</alt></image>"
+msgstr ""
+
+#. iPjUH
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_idN10667\n"
+"help.text"
+msgid "%PRODUCTNAME Help"
+msgstr "%PRODUCTNAME Súgó"
+
+#. bhHQM
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id230120170827187813\n"
+"help.text"
+msgid "User Guides"
+msgstr "Felhasználói kézikönyvek"
+
+#. iGDAE
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id230120170827189453\n"
+"help.text"
+msgid "<ahelp hid=\".uno:Documentation\">Opens the documentation page in the web browser, where users can download, read or purchase %PRODUCTNAME user guides, written by the community.</ahelp>"
+msgstr "<ahelp hid=\".uno:Documentation\">Megnyitja a dokumentáció oldalát az internetböngészőben, ahol a felhasználók letölthetik, elolvashatják vagy megvásárolhatják a %PRODUCTNAME közösség felhasználói útmutatóit.</ahelp>"
+
+#. APWDa
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id230120170827196253\n"
+"help.text"
+msgid "Get Help Online"
+msgstr "Online segítség"
+
+#. bRvuD
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id230120170827196850\n"
+"help.text"
+msgid "<ahelp hid=\".uno:QuestionAnswers\">Opens the community support page in the web browser.</ahelp> Use this page to ask questions on using %PRODUCTNAME. For professional support with service level agreement, refer to the <link href=\"https://www.documentfoundation.org/gethelp/support/\"><emph>page of professional %PRODUCTNAME support</emph></link>."
+msgstr "<ahelp hid=\".uno:QuestionAnswers\">Megnyitja a közösség támogató oldalát a webböngészőben.</ahelp> Használja az oldalt kérdések feltevésére a %PRODUCTNAME használatával kapcsolatban. A szolgáltatási szint megegyezésével kapcsolatos szakértői támogatásához forduljon a <link href=\"https://www.documentfoundation.org/gethelp/support/\"><emph>%PRODUCTNAME szakértői támogató oldalához.</emph></link>."
+
+#. mTBuv
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id2752763\n"
+"help.text"
+msgid "Send Feedback"
+msgstr "Hibabejelentés"
+
+#. BSzm2
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id443534340\n"
+"help.text"
+msgid "<ahelp hid=\".uno:SendFeedback\">Opens a feedback form in the web browser, where users can report software bugs.</ahelp>"
+msgstr "<ahelp hid=\".uno:SendFeedback\">Megnyit egy visszajelzési űrlapot a webböngészőben, ahol a felhasználók szoftveres hibákat jelenthetnek be.</ahelp>"
+
+#. s2hmB
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id230120170903409011\n"
+"help.text"
+msgid "<link href=\"text/shared/01/profile_safe_mode.xhp\">Restart in Safe Mode</link>"
+msgstr "<link href=\"text/shared/01/profile_safe_mode.xhp\">Újraindítás Tiszta lap módban</link>"
+
+#. JEuaK
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id281120160939285779\n"
+"help.text"
+msgid "<ahelp hid=\".uno:SafeMode\">Safe mode is a mode where %PRODUCTNAME temporarily starts with a fresh user profile and disables hardware acceleration. It helps to restore a non-working %PRODUCTNAME instance.  </ahelp>"
+msgstr "<ahelp hid=\".uno:SafeMode\">A Tiszta lap módban a %PRODUCTNAME ideiglenesen üres felhasználói profillal indul, és kikapcsolja a hardveres gyorsítást. Ez segíti a megsérült profilú %PRODUCTNAME példányok helyreállítását.</ahelp>"
+
+#. 4BvDS
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id561629934889067\n"
+"help.text"
+msgid "Get Involved"
+msgstr ""
+
+#. ZiLDo
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id501629934998665\n"
+"help.text"
+msgid "Opens the <link href=\"https://www.libreoffice.org/community/get-involved/\" name=\"get involved\">community Get Involved page</link> in the web browser. The page describe areas of interest where you can collaborate with the %PRODUCTNAME community."
+msgstr ""
+
+#. YrMYp
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id431629934866702\n"
+"help.text"
+msgid "Donate to %PRODUCTNAME"
+msgstr ""
+
+#. xoFgE
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id691629934873388\n"
+"help.text"
+msgid "%PRODUCTNAME is Free Software and is made available free of charge."
+msgstr ""
+
+#. GAMwn
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id651629934878405\n"
+"help.text"
+msgid "Your donation, which is purely optional, supports our worldwide community."
+msgstr ""
+
+#. gGbbH
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id611629934882669\n"
+"help.text"
+msgid "If you like the software, <link href=\"https://www.libreoffice.org/donate/\" name=\"donation\">please consider a donation</link>."
+msgstr ""
+
+#. sWFkG
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id4153881\n"
+"help.text"
+msgid "License Information"
+msgstr "Licencinformáció"
+
+#. NagBg
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id4144510\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowLicense\">Displays the <emph>Licensing and Legal information</emph> dialog.</ahelp>"
+msgstr "<ahelp hid=\".uno:ShowLicense\">Megjeleníti a <emph>Licencelési és jogi információ</emph> párbeszédablakot.</ahelp>"
+
+#. hzz6B
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id5153881\n"
+"help.text"
+msgid "%PRODUCTNAME Credits"
+msgstr "A %PRODUCTNAME készítői"
+
+#. 26xSB
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id5144510\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowLicense\">Displays the <emph>CREDITS.odt</emph> document which lists the names of individuals who have contributed to OpenOffice.org source code (and whose contributions were imported into %PRODUCTNAME) or %PRODUCTNAME since 2010-09-28.</ahelp>"
+msgstr ""
+
+#. F8BFu
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id2926419\n"
+"help.text"
+msgid "<link href=\"text/shared/01/online_update.xhp\">Check for Updates</link>"
+msgstr "<link href=\"text/shared/01/online_update.xhp\">Frissítések keresése</link>"
+
+#. XejZc
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id2783898\n"
+"help.text"
+msgid "<ahelp hid=\".\">Enable an Internet connection for %PRODUCTNAME. If you need a Proxy, check the %PRODUCTNAME Proxy settings in <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Internet</emph>. Then choose <emph>Check for Updates</emph> to check for the availability of a newer version of your office suite.</ahelp>"
+msgstr "<ahelp hid=\".\">Engedélyezze az internetkapcsolatot a %PRODUCTNAME-hoz. Ha proxyt használ, akkor ellenőrizze a %PRODUCTNAME proxybeállításait a<switchinline select=\"sys\"><caseinline select=\"MAC\"><emph> %PRODUCTNAME - Beállítások</emph></caseinline><defaultinline><emph>z Eszközök - Beállítások</emph></defaultinline></switchinline><emph> - Internet</emph> alatt. Ezután nyomja meg az <emph>Ellenőrzés</emph> gombot az irodai programcsomag újabb verziójának kereséséhez.</ahelp>"
+
+#. JCKb7
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"hd_id3153881\n"
+"help.text"
+msgid "About $[officename]"
+msgstr "A $[officename] névjegye"
+
+#. nSkgE
+#: main0108.xhp
+msgctxt ""
+"main0108.xhp\n"
+"par_id3144510\n"
+"help.text"
+msgid "<ahelp hid=\".uno:About\">Displays general program information such as version number and copyrights.</ahelp>"
+msgstr "<ahelp hid=\".uno:About\">Megjeleníti az általános programinformációkat, például a verziószámot és a szerzői jogi megjegyzéseket.</ahelp>"
+
+#. MT8bF
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"tit\n"
+"help.text"
+msgid "Standard Bar"
+msgstr "Standard eszköztár"
+
+#. Fa7DE
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"hd_id3154186\n"
+"help.text"
+msgid "<link href=\"text/shared/main0201.xhp\" name=\"Standard Bar\">Standard Bar</link>"
+msgstr "<link href=\"text/shared/main0201.xhp\" name=\"Standard eszköztár\">Standard eszköztár</link>"
+
+#. 7CoDc
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_id3145136\n"
+"help.text"
+msgid "<ahelp hid=\"RID_ENVTOOLBOX\">The <emph>Standard</emph> bar is available in every $[officename] application.</ahelp>"
+msgstr "<ahelp hid=\"RID_ENVTOOLBOX\">A <emph>Standard</emph> eszköztár mindegyik $[officename]-alkalmazásnak része.</ahelp>"
+
+#. 98hpw
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"hd_id3166460\n"
+"help.text"
+msgid "<link href=\"text/shared/01/01020000.xhp\" name=\"Open File\">Open File</link>"
+msgstr "<link href=\"text/shared/01/01020000.xhp\" name=\"Megnyitás\">Megnyitás</link>"
+
+#. qCdSB
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN10661\n"
+"help.text"
+msgid "<link href=\"text/shared/01/01070000.xhp\">Save As</link>"
+msgstr "<link href=\"text/shared/01/01070000.xhp\">Mentés másként</link>"
+
+#. 9WEoa
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN106A5\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06010000.xhp\">Spelling</link>"
+msgstr "<link href=\"text/shared/01/06010000.xhp\">Helyesírás-ellenőrzés</link>"
+
+#. ZVSLP
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN1086E\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Insert Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Diagram beszúrása</link>"
+
+#. MgdL8
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_id4964445\n"
+"help.text"
+msgid "Creates a chart in the current document."
+msgstr "Diagramot készít az aktuális dokumentumban."
+
+#. 9jAur
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN1088E\n"
+"help.text"
+msgid "<link href=\"text/scalc/01/12030100.xhp\">Sort Descending / Sort Ascending</link>"
+msgstr "<link href=\"text/scalc/01/12030100.xhp\">Csökkenő sorrend / Növekvő sorrend</link>"
+
+#. bzxXw
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN108B1\n"
+"help.text"
+msgid "Sorts the selection from the highest to the lowest value, or from the lowest to the highest value using the column that contains the cursor."
+msgstr "A kijelölt részt csökkenő vagy növekvő sorrendbe rendezi, a kurzort tartalmazó oszlop alapján."
+
+#. nBBsD
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN108BE\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Diagram</link>"
+
+#. mH28o
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN108EA\n"
+"help.text"
+msgid "Creates a chart in the current document."
+msgstr "Diagramot készít az aktuális dokumentumban."
+
+#. jr7Pf
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN108C4\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171200.xhp\" name=\"Display Grid\">Display Grid</link>"
+msgstr "<link href=\"text/shared/02/01171200.xhp\" name=\"Rács megjelenítése\">Rács megjelenítése</link>"
+
+#. JHY4h
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN108D7\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Diagram</link>"
+
+#. kzRJC
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN10976\n"
+"help.text"
+msgid "Creates a chart in the current document."
+msgstr "Diagramot készít az aktuális dokumentumban."
+
+#. DexEu
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN107D8\n"
+"help.text"
+msgid "<image id=\"img_id3153070\" src=\"cmd/sc_zoom.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153070\">Icon</alt></image>"
+msgstr ""
+
+#. wcCfo
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN107F5\n"
+"help.text"
+msgid "Zoom"
+msgstr "Nagyítás"
+
+#. zYZRw
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN10818\n"
+"help.text"
+msgid "What’s This?"
+msgstr ""
+
+#. UDDTK
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN1081E\n"
+"help.text"
+msgid "<ahelp hid=\".\">Enables extended help tips under the mouse pointer until the next click.</ahelp>"
+msgstr ""
+
+#. Hvhxs
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN10855\n"
+"help.text"
+msgid "<image id=\"img_id3174230\" src=\"cmd/sc_extendedhelp.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3174230\">Icon “What’s This?”</alt></image>"
+msgstr ""
+
+#. KPZBD
+#: main0201.xhp
+msgctxt ""
+"main0201.xhp\n"
+"par_idN10873\n"
+"help.text"
+msgid "What’s This?"
+msgstr ""
+
+#. Xtuxp
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table Bar"
+msgstr "Táblázat eszköztár"
+
+#. LQoEC
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3145587\n"
+"help.text"
+msgid "<link href=\"text/shared/main0204.xhp\" name=\"Table Bar\">Table Bar</link>"
+msgstr "<link href=\"text/shared/main0204.xhp\" name=\"Táblázat eszköztár\">Táblázat eszköztár</link>"
+
+#. WByv5
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id3154252\n"
+"help.text"
+msgid "<ahelp hid=\".\">The <emph>Table</emph> Bar contains functions you need when working with tables. It appears when you move the cursor into a table.</ahelp>"
+msgstr "<ahelp hid=\".\">A <emph>Táblázat </emph> eszköztár a táblázatok kezelésekor használt parancsokat tartalmazza. Akkor jelenik meg, amikor a kurzort egy táblázatba helyezi.</ahelp>"
+
+#. dw5H8
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id319945759\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05210100.xhp\" name=\"Area Style / Filling\">Area Style / Filling</link>"
+msgstr "<link href=\"text/shared/01/05210100.xhp\" name=\"Területstílus / Kitöltés\">Területstílus / Kitöltés</link>"
+
+#. 7DJKV
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147592\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05100100.xhp\" name=\"Merge Cells\">Merge Cells</link>"
+msgstr "<link href=\"text/shared/01/05100100.xhp\" name=\"Cellák egyesítése\">Cellák egyesítése</link>"
+
+#. 6Rajq
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147820\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05110500.xhp\" name=\"Delete Row\">Delete Row</link>"
+msgstr "<link href=\"text/swriter/01/05110500.xhp\" name=\"Sor törlése\">Sor törlése</link>"
+
+#. AmFfA
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3147231\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/05120500.xhp\" name=\"Delete Column\">Delete Column</link>"
+msgstr "<link href=\"text/swriter/01/05120500.xhp\" name=\"Oszlop törlése\">Oszlop törlése</link>"
+
+#. RhSva
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id3134447820\n"
+"help.text"
+msgid "Table Design"
+msgstr "Táblatervezés"
+
+#. BufED
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id16200812240344\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableDesign\">Opens the Table Design. Double-click a preview to format the table.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableDesign\">Megnyitja a Táblatervezést. Kattintson duplán egy előnézetre a táblázat formázásához.</ahelp>"
+
+#. P72mU
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id3153752\n"
+"help.text"
+msgid "<image id=\"img_id3147292\" src=\"cmd/sc_tabledesign.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147292\">Icon</alt></image>"
+msgstr ""
+
+#. hVE8L
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"par_id3156429\n"
+"help.text"
+msgid "Table Design"
+msgstr "Táblatervezés"
+
+#. BieMU
+#: main0204.xhp
+msgctxt ""
+"main0204.xhp\n"
+"hd_id947820\n"
+"help.text"
+msgid "<link href=\"text/simpress/01/05090000m.xhp\" name=\"Table Properties\">Table Properties</link>"
+msgstr "<link href=\"text/simpress/01/05090000m.xhp\" name=\"Táblázattulajdonságok\">Táblázattulajdonságok</link>"
+
+#. usfD4
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"tit\n"
+"help.text"
+msgid "Status Bar in $[officename] Basic Documents"
+msgstr "Állapotsor a $[officename] Basic-dokumentumokban"
+
+#. GaCPr
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"hd_id3148520\n"
+"help.text"
+msgid "<link href=\"text/shared/main0208.xhp\" name=\"Status Bar in $[officename] Basic Documents\">Status Bar in $[officename] Basic Documents</link>"
+msgstr "<link href=\"text/shared/main0208.xhp\" name=\"Állapotsor a $[officename] Basic-dokumentumokban\">Állapotsor a $[officename] Basic-dokumentumokban</link>"
+
+#. TMY8Z
+#: main0208.xhp
+msgctxt ""
+"main0208.xhp\n"
+"par_id3154136\n"
+"help.text"
+msgid "The <emph>Status</emph> Bar displays information about the current $[officename] Basic document."
+msgstr "Az <emph>Állapotsor</emph> az aktuális $[officename] Basic-dokumentummal kapcsolatos információkat jelenít meg."
+
+#. gDTEb
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table Data Bar"
+msgstr "Táblaadatok eszköztár"
+
+#. tijsh
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"hd_id3147102\n"
+"help.text"
+msgid "<link href=\"text/shared/main0212.xhp\" name=\"Table Data Bar\">Table Data Bar</link>"
+msgstr "<link href=\"text/shared/main0212.xhp\" name=\"Táblaadatok eszköztár\">Táblaadatok eszköztár</link>"
+
+#. 2HEsY
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3153394\n"
+"help.text"
+msgid "<ahelp hid=\".\">Use the Table Data bar to control the data view. </ahelp>"
+msgstr "<ahelp hid=\".\">A Táblaadatok eszköztár segítségével vezérelje az adatnézetet. </ahelp>"
+
+#. LyuDB
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3149346\n"
+"help.text"
+msgid "The filtered data view is active until you change or cancel the sorting or filtering criteria. If a filter is active, the <emph>Apply Filter</emph> icon on the <emph>Table Data</emph> bar is activated."
+msgstr "A szűrt adatnézet addig aktív, amíg nem módosítja vagy törli a rendezési vagy szűrési feltételeket. Ha egy szűrő aktív, akkor a <emph>Táblaadatok</emph> eszköztáron lévő <emph>Szűrő alkalmazása</emph> ikon aktiválásra kerül."
+
+#. CcwiY
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3147303\n"
+"help.text"
+msgid "<image id=\"img_id3153896\" src=\"cmd/sc_recsave.png\" width=\"0.222in\" height=\"0.222in\"><alt id=\"alt_id3153896\">Icon</alt></image>"
+msgstr "<image id=\"img_id3153896\" src=\"cmd/sc_recsave.png\" width=\"0.222in\" height=\"0.222in\"><alt id=\"alt_id3153896\">Ikon</alt></image>"
+
+#. fzc6F
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3153360\n"
+"help.text"
+msgid "Save Record"
+msgstr "Rekord mentése"
+
+#. 6ZrhE
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3145173\n"
+"help.text"
+msgid "<image id=\"img_id3154123\" src=\"cmd/sc_recundo.png\" width=\"0.222in\" height=\"0.222in\"><alt id=\"alt_id3154123\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154123\" src=\"cmd/sc_recundo.png\" width=\"0.222in\" height=\"0.222in\"><alt id=\"alt_id3154123\">Ikon</alt></image>"
+
+#. EzvWw
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_id3151382\n"
+"help.text"
+msgid "Undo: Data Input"
+msgstr "Visszavonás: Adatbevitel"
+
+#. fYxNc
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_idN10744\n"
+"help.text"
+msgid "<link href=\"text/shared/02/12070000.xhp\">Data to Text</link>"
+msgstr "<link href=\"text/shared/02/12070000.xhp\">Adatokat szöveggé</link>"
+
+#. WLT8r
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_idN10753\n"
+"help.text"
+msgid "<ahelp hid=\".\">Inserts all fields of the marked record into the current document at the cursor position.</ahelp>"
+msgstr "<ahelp hid=\".\">A megjelölt rekord összes mezőjét beszúrja az aktuális dokumentumba a kurzor pozíciójához.</ahelp>"
+
+#. 7e4xM
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_idN10780\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/mailmerge00.xhp\">Mail Merge</link>"
+msgstr "<link href=\"text/swriter/01/mailmerge00.xhp\">Körlevél</link>"
+
+#. DcDEf
+#: main0212.xhp
+msgctxt ""
+"main0212.xhp\n"
+"par_idN1078F\n"
+"help.text"
+msgid "<ahelp hid=\".\">Starts the Mail Merge Wizard to create form letters.</ahelp>"
+msgstr "<ahelp hid=\".\">Elindítja a Körlevéltündért körlevél létrehozásához.</ahelp>"
+
+#. 7wCKo
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"tit\n"
+"help.text"
+msgid "Form Navigation Bar"
+msgstr "Űrlapnavigáció eszköztár"
+
+#. cniHC
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"bm_id3157896\n"
+"help.text"
+msgid "<bookmark_value>toolbars; Form Navigation bar</bookmark_value><bookmark_value>Navigation bar;forms</bookmark_value><bookmark_value>sorting; data in forms</bookmark_value><bookmark_value>data; sorting in forms</bookmark_value><bookmark_value>forms;sorting data</bookmark_value>"
+msgstr "<bookmark_value>eszköztárak; Űrlapnavigáció eszköztár</bookmark_value><bookmark_value>Navigációs eszköztár;űrlapok</bookmark_value><bookmark_value>rendezés; űrlapok adatai</bookmark_value><bookmark_value>adatok; rendezés űrlapokon</bookmark_value><bookmark_value>űrlapok;adatok rendezése</bookmark_value>"
+
+#. kjAoz
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3157896\n"
+"help.text"
+msgid "<link href=\"text/shared/main0213.xhp\" name=\"Form Navigation Bar\">Form Navigation Bar</link>"
+msgstr "<link href=\"text/shared/main0213.xhp\" name=\"Űrlapnavigáció eszköztár\">Űrlapnavigáció eszköztár</link>"
+
+#. WUXQ3
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3154751\n"
+"help.text"
+msgid "The <emph>Form Navigation</emph> bar contains icons to edit a database table or to control the data view. The bar is displayed at the bottom of a document that contains fields that are linked to a database."
+msgstr "Az <emph>Űrlapnavigáció</emph> eszköztár adatbázistáblák szerkesztésére vagy adatnézetek vezérlésére szolgáló ikonokat tartalmaz. Ez az eszköztár annak a dokumentumnak az alján jelenik meg, amely adatbázishoz csatolt mezőket tartalmaz."
+
+#. GSUgn
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3157958\n"
+"help.text"
+msgid "You can use the <emph>Form Navigation</emph> bar to move within records as well as to insert and to delete records. If data is saved in a form, the changes are transferred to the database. The <emph>Form Navigation</emph> bar also contains sort, filter, and search functions for data records."
+msgstr "Az <emph>Űrlapnavigáció</emph> eszköztár segítségével mozoghat a rekordok között, illetve rekordokat szúrhat be és törölhet. Ha az adat egy űrlapban van mentve, akkor a módosítások átkerülnek az adatbázisra. Az <emph>Űrlapnavigáció</emph> eszköztár ezen felül adatrekord-rendező, -szűrő és -kereső funkciókat is tartalmaz."
+
+#. nLEDn
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_idN10717\n"
+"help.text"
+msgid "You can use the Navigation bar icon on the <link href=\"text/shared/02/01170000.xhp\">More Controls </link> bar to add a Navigation bar to a form."
+msgstr "A <link href=\"text/shared/02/01170000.xhp\">További vezérlőelemek</link> eszköztáron lévő Navigáció ikonnal hozzáadhatja a Navigáció eszköztárat az űrlaphoz."
+
+#. SBnTx
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3157910\n"
+"help.text"
+msgid "The Navigation bar is only visible for forms connected to a database. In the <link href=\"text/sdatabase/04030000.xhp\" name=\"Design view\">Design view</link> of a form, the Navigation bar is not available. See also <link href=\"text/shared/main0212.xhp\" name=\"Database Bar\">Table Data bar</link>."
+msgstr "A Navigáció eszköztár csak adatbázishoz csatolt űrlapok esetén látható. Az űrlap <link href=\"text/shared/explorer/database/04030000.xhp\" name=\"Tervezési nézetében\">Tervezési nézetében</link> a Navigáció eszköztár nem áll rendelkezésre. Lásd még: <link href=\"text/shared/main0212.xhp\" name=\"Adatbázis eszköztár\">Táblaadatok eszköztár</link>."
+
+#. tqTbR
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3153880\n"
+"help.text"
+msgid "You can control the view of data with the sorting and filtering functions. Original tables are not changed."
+msgstr "A szűrő és rendező funkciókkal vezérelheti az adatok megjelenését. Az eredeti táblák nem változnak."
+
+#. F2yBf
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3153062\n"
+"help.text"
+msgid "The current sort order or filter is saved with the current document. If a filter is set, the <emph>Apply Filter</emph> icon on the <emph>Navigation</emph> bar is activated. Sorting and filtering features in the document can also be configured in the <emph>Form Properties</emph> dialog. (Choose <emph>Form Properties - Data</emph> - properties <link href=\"text/shared/02/01170203.xhp\" name=\"Sort\"><emph>Sort</emph></link> and <link href=\"text/shared/02/01170203.xhp\" name=\"Filter\"><emph>Filter</emph></link>)."
+msgstr "Az aktuális rendezési sorrend vagy szűrő az aktuális dokumentummal együtt lesz mentve. Ha a szűrő be van állítva, akkor az <emph>Navigáció</emph> eszköztár <emph>Szűrő alkalmazása</emph> ikonja aktiválva van. A dokumentum rendezési és szűrési funkciói az <emph>Űrlaptulajdonságok</emph> párbeszédablakban is beállíthatók. (Válassza az <emph>Űrlap tulajdonságai - Adatok</emph> - tulajdonságok <link href=\"text/shared/02/01170203.xhp\" name=\"Rendezés\"><emph>Rendezés</emph></link> és a <link href=\"text/shared/02/01170203.xhp\" name=\"Szűrő\"><emph>Szűrő</emph></link> elemet)."
+
+#. XXEDY
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3149810\n"
+"help.text"
+msgid "If an SQL statement is the basis for a form (see <emph>Form Properties</emph> - tab <emph>Data</emph> - <link href=\"text/shared/02/01170203.xhp\" name=\"Data Source\"><emph>Data Source</emph></link>), then the filter and sort functions are only available when the SQL statement refers to only one table and is not written in the native SQL mode."
+msgstr "Ha egy SQL-utasítás az űrlap alapja (lásd <emph>Űrlaptulajdonságok</emph> - lap <emph>Adatok</emph> - <link href=\"text/shared/02/01170203.xhp\" name=\"Adatforrás\"><emph>Adatforrás</emph></link>), akkor a szűrési és rendezési funkciók csak akkor állnak rendelkezésre, ha az SQL-utasítás csak egy táblára hivatkozik, és nem natív SQL-módban íródott."
+
+#. Ck3Di
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3156448\n"
+"help.text"
+msgid "<link href=\"text/shared/02/12100200.xhp\" name=\"Find Record\">Find Record</link>"
+msgstr "<link href=\"text/shared/02/12100200.xhp\" name=\"Rekord keresése\">Rekord keresése</link>"
+
+#. daKA6
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3153192\n"
+"help.text"
+msgid "Absolute Record"
+msgstr "Abszolút rekord"
+
+#. j8vng
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3146922\n"
+"help.text"
+msgid "<ahelp hid=\".uno:AbsoluteRecord\">Shows the number of the current record. Enter a number to go to the corresponding record.</ahelp>"
+msgstr "<ahelp hid=\".uno:AbsoluteRecord\">Az aktuális rekord számát jeleníti meg. Egy számot beírva a megfelelő rekordra ugrik.</ahelp>"
+
+#. Ld8nZ
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3153573\n"
+"help.text"
+msgid "First Record"
+msgstr "Első rekord"
+
+#. 4VXqZ
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3154013\n"
+"help.text"
+msgid "<image id=\"img_id3150010\" src=\"cmd/lc_firstrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150010\">Icon First Record</alt></image>"
+msgstr ""
+
+#. VCqM6
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3155308\n"
+"help.text"
+msgid "<ahelp hid=\".uno:FirstRecord\">Takes you to the first record.</ahelp>"
+msgstr "<ahelp hid=\".uno:FirstRecord\">Odaugrik az első rekordra.</ahelp>"
+
+#. aNBTD
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3154792\n"
+"help.text"
+msgid "Previous Record"
+msgstr "Előző rekord"
+
+#. AgQb3
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3145647\n"
+"help.text"
+msgid "<image id=\"img_id3147394\" src=\"cmd/lc_prevrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147394\">Icon Previous Record</alt>                        </image>"
+msgstr ""
+
+#. gitqo
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3157846\n"
+"help.text"
+msgid "<ahelp hid=\".uno:PrevRecord\">Takes you to the previous record.</ahelp>"
+msgstr "<ahelp hid=\".uno:PrevRecord\">Odaugrik az előző rekordra.</ahelp>"
+
+#. AJswu
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3149121\n"
+"help.text"
+msgid "Next Record"
+msgstr "Következő rekord"
+
+#. ShvmR
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3146913\n"
+"help.text"
+msgid "<image id=\"img_id3150753\" src=\"cmd/lc_nextrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150753\">Icon Next Record</alt></image>"
+msgstr ""
+
+#. BJBj8
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3148914\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NextRecord\">Takes you to the next record.</ahelp>"
+msgstr "<ahelp hid=\".uno:NextRecord\">Odaugrik a következő rekordra.</ahelp>"
+
+#. 6dE4g
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3148997\n"
+"help.text"
+msgid "Last Record"
+msgstr "Utolsó rekord"
+
+#. up7uJ
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3155337\n"
+"help.text"
+msgid "<image id=\"img_id3163808\" src=\"cmd/lc_lastrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3163808\">Icon Last Record</alt></image>"
+msgstr ""
+
+#. 65BvC
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3151248\n"
+"help.text"
+msgid "<ahelp hid=\".uno:LastRecord\">Takes you to the last record.</ahelp>"
+msgstr "<ahelp hid=\".uno:LastRecord\">Odaugrik az utolsó rekordra.</ahelp>"
+
+#. aKiBF
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3149967\n"
+"help.text"
+msgid "New Record"
+msgstr "Új rekord"
+
+#. D8UvX
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3149735\n"
+"help.text"
+msgid "<image id=\"img_id3155578\" src=\"cmd/lc_newrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155578\">Icon New Record</alt></image>"
+msgstr ""
+
+#. e4GJo
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3148460\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NewRecord\">Creates a new record.</ahelp>"
+msgstr "<ahelp hid=\".uno:NewRecord\">Új rekordot készít.</ahelp>"
+
+#. xhXB3
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3145231\n"
+"help.text"
+msgid "Save Record"
+msgstr "Rekord mentése"
+
+#. aLCSc
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3150647\n"
+"help.text"
+msgid "<image id=\"img_id3150941\" src=\"cmd/lc_recsave.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150941\">Icon</alt></image>"
+msgstr ""
+
+#. Dbdf5
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3146808\n"
+"help.text"
+msgid "<ahelp hid=\".uno:RecSave\">Saves a new data entry. The change is registered in the database.</ahelp>"
+msgstr "<ahelp hid=\".uno:RecSave\">Új adatbejegyzés mentése. Ez a módosítás az adatbázisba kerül.</ahelp>"
+
+#. pc8vm
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3158446\n"
+"help.text"
+msgid "Undo: Data entry"
+msgstr "Visszavonás: Adatbevitel"
+
+#. AbFTp
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3166423\n"
+"help.text"
+msgid "<image id=\"img_id3156138\" src=\"cmd/lc_recundo.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156138\">Icon Undo Data Entry</alt></image>"
+msgstr ""
+
+#. GAZ7t
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3151276\n"
+"help.text"
+msgid "<ahelp hid=\".uno:RecUndo\">Allows you to undo a data entry.</ahelp>"
+msgstr "<ahelp hid=\".uno:RecUndo\">Lehetővé teszi a beírt adatok visszavonását.</ahelp>"
+
+#. BEGSZ
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3153659\n"
+"help.text"
+msgid "Delete Record"
+msgstr "Rekord törlése"
+
+#. QiWg2
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3145584\n"
+"help.text"
+msgid "<image id=\"img_id3166434\" src=\"cmd/lc_deleterecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3166434\">Icon Delete Record</alt></image>"
+msgstr ""
+
+#. noMmE
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id3148817\n"
+"help.text"
+msgid "<ahelp hid=\".uno:DeleteRecord\">Deletes a record. A query needs to be confirmed before deleting.</ahelp>"
+msgstr "<ahelp hid=\".uno:DeleteRecord\">Rekord töröl. A törlés előtt jóváhagyás szükséges.</ahelp>"
+
+#. oon6s
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id161647003427601\n"
+"help.text"
+msgid "Refresh Control"
+msgstr ""
+
+#. zuPjH
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id861647005853278\n"
+"help.text"
+msgid "<image src=\"cmd/lc_refreshformcontrol.svg\" id=\"img_id901647005853278\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id581647005853278\">Icon Refresh Control</alt></image>"
+msgstr ""
+
+#. 8RmLu
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"par_id811647005853278\n"
+"help.text"
+msgid "Refresh current control"
+msgstr ""
+
+#. BUNUA
+#: main0213.xhp
+msgctxt ""
+"main0213.xhp\n"
+"hd_id3148599\n"
+"help.text"
+msgid "<link href=\"text/shared/02/12100100.xhp\" name=\"Sort\">Sort</link>"
+msgstr "<link href=\"text/shared/02/12100100.xhp\" name=\"Rendezés\">Rendezés</link>"
+
+#. oSJoq
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"tit\n"
+"help.text"
+msgid "Query Design Bar"
+msgstr "Lekérdezéstervező eszköztár"
+
+#. pgVF2
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"hd_id3159176\n"
+"help.text"
+msgid "<link href=\"text/shared/main0214.xhp\" name=\"Query Design Bar\">Query Design Bar</link>"
+msgstr "<link href=\"text/shared/main0214.xhp\" name=\"Lekérdezéstervező eszköztár\">Lekérdezéstervező eszköztár</link>"
+
+#. YwUQD
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"par_id3150085\n"
+"help.text"
+msgid "<ahelp hid=\".\">When creating or editing an SQL query, use the icons in the <emph>Query Design</emph> Bar to control the display of data.</ahelp>"
+msgstr "<ahelp hid=\".\">SQL-lekérdezés létrehozásakor vagy szerkesztésekor az adatok megjelenítésének vezérléséhez használja a <emph>Lekérdezéstervező</emph> eszköztár ikonjait.</ahelp>"
+
+#. VXp6T
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"par_id3150276\n"
+"help.text"
+msgid "Depending on whether you have created the query or view in the <emph>Design</emph> or <emph>SQL</emph> tab page, the following icons appear:"
+msgstr "Attól függően, hogy a lekérdezést vagy nézetet a <emph>Tervezés</emph> vagy <emph>SQL</emph> lapon hozta létre, az alábbi ikonok jelennek meg:"
+
+#. KJCRF
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"hd_id3151384\n"
+"help.text"
+msgid "<link href=\"text/shared/02/14020100.xhp\" name=\"Add Tables\">Add Tables</link>"
+msgstr "<link href=\"text/shared/02/14020100.xhp\" name=\"Táblák hozzáadása\">Táblák hozzáadása</link>"
+
+#. FZFsy
+#: main0214.xhp
+msgctxt ""
+"main0214.xhp\n"
+"par_id3151041\n"
+"help.text"
+msgid "The following icon is on the <emph>SQL</emph> tab page:"
+msgstr "Az alábbi ikon található az <emph>SQL</emph> lapon:"
+
+#. uHP9A
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"tit\n"
+"help.text"
+msgid "Form Design Toolbar"
+msgstr "Űrlaptervező eszköztár"
+
+#. rtMHP
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3148520\n"
+"help.text"
+msgid "<link href=\"text/shared/main0226.xhp\" name=\"Form Design Toolbar\">Form Design Toolbar</link>"
+msgstr "<link href=\"text/shared/main0226.xhp\" name=\"Űrlaptervező eszköztár\">Űrlaptervező eszköztár</link>"
+
+#. r7rXm
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"par_id3155364\n"
+"help.text"
+msgid "The Form Design toolbar becomes visible as soon as you select a form object when working in the design mode."
+msgstr "Az Űrlaptervező eszköztár akkor lesz látható, amikor a tervező módban kiválaszt egy űrlapobjektumot."
+
+#. zfC9k
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3163802\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01170400.xhp\" name=\"Add Field\">Add Field</link>"
+msgstr "<link href=\"text/shared/02/01170400.xhp\" name=\"Mező hozzáadása\">Mező hozzáadása</link>"
+
+#. ibj9F
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3146815\n"
+"help.text"
+msgid "Automatic Control Focus"
+msgstr ""
+
+#. gg2Ag
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"par_id3150261\n"
+"help.text"
+msgid "<image id=\"img_id3149351\" src=\"cmd/sc_autocontrolfocus.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149351\">Icon</alt></image>"
+msgstr ""
+
+#. ZbBmL
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"par_id3109848\n"
+"help.text"
+msgid "<ahelp hid=\".uno:AutoControlFocus\">If <emph>Automatic Control Focus</emph> is activated, the first form control will be selected when you open the document. If the button is not activated, the text will be selected after opening. The <link href=\"text/shared/02/01170300.xhp\" name=\"Tab Order\">Tab Order</link> that you have specified determines which is the first form control.</ahelp>"
+msgstr ""
+
+#. pE5xB
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3150398\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171200.xhp\" name=\"Display Grid\">Display Grid</link>"
+msgstr "<link href=\"text/shared/02/01171200.xhp\" name=\"Rács megjelenítése\">Rács megjelenítése</link>"
+
+#. s84CM
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3148798\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171300.xhp\" name=\"Snap to Grid\">Snap to Grid</link>"
+msgstr "<link href=\"text/shared/02/01171300.xhp\" name=\"Rácshoz illesztés\">Rácshoz illesztés</link>"
+
+#. ph5uF
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"par_id3145419\n"
+"help.text"
+msgid "<ahelp hid=\".uno:GridUse\">Specifies that you can move objects only between grid points.</ahelp>"
+msgstr "<ahelp hid=\".uno:GridUse\">Megadja, hogy az objektumokat csak a rácspontra lehessen áthelyezni.</ahelp>"
+
+#. Z5NNA
+#: main0226.xhp
+msgctxt ""
+"main0226.xhp\n"
+"hd_id3148920\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01171400.xhp\" name=\"Helplines While Moving\">Helplines While Moving</link>"
+msgstr "<link href=\"text/shared/02/01171400.xhp\" name=\"Segédvonalak látszanak áthelyezéskor\">Segédvonalak látszanak áthelyezéskor</link>"
+
+#. 94V64
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit Points Bar"
+msgstr "Pontok szerkesztése eszköztár"
+
+#. VSwqX
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"bm_id3149987\n"
+"help.text"
+msgid "<bookmark_value>lines; editing points</bookmark_value><bookmark_value>curves; editing points</bookmark_value><bookmark_value>Edit Points bar</bookmark_value>"
+msgstr "<bookmark_value>vonalak; pontok szerkesztése</bookmark_value><bookmark_value>görbék; pontok szerkesztése</bookmark_value><bookmark_value>Pontok szerkesztése eszköztár</bookmark_value>"
+
+#. JUFAm
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3149987\n"
+"help.text"
+msgid "<link href=\"text/shared/main0227.xhp\" name=\"Edit Points Bar\">Edit Points Bar</link>"
+msgstr "<link href=\"text/shared/main0227.xhp\" name=\"Pontok szerkesztése eszköztár\">Pontok szerkesztése eszköztár</link>"
+
+#. N5vQq
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3150402\n"
+"help.text"
+msgid "The <emph>Edit Points </emph>Bar appears when you select a polygon object and click <emph>Edit Points</emph>."
+msgstr "Ha kijelöl egy sokszögobjektumot, és a <emph>Pontok szerkesztése</emph> ikonra kattint, megjelenik a <emph>Pontok szerkesztése</emph> eszköztár."
+
+#. SCdbw
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3144762\n"
+"help.text"
+msgid "The functions provided allow you to edit the points of a curve or an object converted to a curve. The following icons are available:"
+msgstr "A biztosított funkciók lehetővé teszik egy görbe vagy egy görbévé alakított objektum pontjainak szerkesztését. Az alábbi ikonok állnak rendelkezésre:"
+
+#. EBpiU
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3153105\n"
+"help.text"
+msgid "Edit Points"
+msgstr "Pontok szerkesztése"
+
+#. 2NY7B
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3159151\n"
+"help.text"
+msgid "The <link href=\"text/shared/01/05270000.xhp\" name=\"Edit Points\"><emph>Edit Points</emph></link> icon allows you to activate or deactivate the edit mode for Bézier objects. In the edit mode, individual points of the drawing object can be selected."
+msgstr "A <link href=\"text/shared/01/05270000.xhp\" name=\"Pontok szerkesztése\"><emph>Pontok szerkesztése</emph></link> ikon segítségével aktiválhatja vagy letilthatja a Bézier-objektumok szerkesztési módját. Szerkesztési módban kiválaszthatók a rajzobjektumok egyedi pontjai."
+
+#. 9CP8C
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3145366\n"
+"help.text"
+msgid "<image id=\"img_id3153951\" src=\"cmd/sc_toggleobjectbeziermode.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153951\">Icon</alt></image>"
+msgstr "<image id=\"img_id3153951\" src=\"cmd/sc_toggleobjectbeziermode.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153951\">Ikon</alt></image>"
+
+#. wNGCc
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3150105\n"
+"help.text"
+msgid "Edit Points"
+msgstr "Pontok szerkesztése"
+
+#. tj2MY
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3146976\n"
+"help.text"
+msgid "Move Points"
+msgstr "Pontok áthelyezése"
+
+#. FGTDm
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3147435\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierMove\">Activates a mode in which you can move points.</ahelp> The mouse pointer displays a small empty square when resting on a point. Drag that point to another location. The curve on both sides of the point follows the movement; the section of the curve between the next points changes shape."
+msgstr "<ahelp hid=\".uno:BezierMove\">A pontok áthelyezésére szolgáló módot kapcsolja be.</ahelp> Az egérmutató a ponton pihentetéskor megjelenít egy kis üres négyzetet. Húzza át a pontot egy másik helyre. A pont mindkét felén lévő görbe követi a mozgást; a következő pontok közötti görbeszakaszok alakja változik."
+
+#. aAAN6
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3149481\n"
+"help.text"
+msgid "Point at the curve between two points or within a closed curve and drag the mouse to shift the entire curve without distorting the form."
+msgstr "Az egész görbe áthelyezéséhez mutasson az egérrel a görbére két pont között vagy egy zárt görbébe, és húzza a görbét. Így nem torzítja el az alakzatot."
+
+#. 3TVgA
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3154096\n"
+"help.text"
+msgid "<image id=\"img_id3149377\" src=\"cmd/sc_beziermove.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149377\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149377\" src=\"cmd/sc_beziermove.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149377\">Ikon</alt></image>"
+
+#. BFM7Z
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3147397\n"
+"help.text"
+msgid "Move Points"
+msgstr "Pontok áthelyezése"
+
+#. bmQbX
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3150115\n"
+"help.text"
+msgid "Insert Points"
+msgstr "Pontok beszúrása"
+
+#. iDD7a
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3160478\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierInsert\">Activates the insert mode. This mode allows you to insert points.</ahelp> You can also move points, just as in the move mode. If, however, you click at the curve between two points and move the mouse a little while holding down the mouse button you insert a new point. The point is a smooth point, and the lines to the control points are parallel and remain so when moved."
+msgstr "<ahelp hid=\".uno:BezierInsert\">A beszúró módot kapcsolja be. Ebben a módban pontokat lehet beszúrni.</ahelp> A pontokat is mozgathatja, csakúgy, mint mozgatási módban. Ha rákattint egy két pont között levő görbére, és mozgatja az egeret egy kis ideig az egérgomb lenyomva tartása közben, akkor a rendszer beszúr egy új pontot. A pont egy sima pont, és a vezérlőpontok vonalai párhuzamosak és mozgatás közben is azok maradnak."
+
+#. xbFcA
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3157846\n"
+"help.text"
+msgid "If you wish to create a corner point you must first insert either a smooth or a symmetrical point which is then converted to a corner point by using <emph>Corner Point</emph>."
+msgstr "Ha egy sarokpontot kíván létrehozni, akkor először be kell illesztenie egy sima vagy egy szimmetrikus pontot, amely a <emph>Sarokpont</emph> segítségével később átalakításra kerül sarokponttá."
+
+#. wFzbF
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3153838\n"
+"help.text"
+msgid "<image id=\"img_id3146969\" src=\"cmd/sc_bezierinsert.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3146969\">Icon</alt></image>"
+msgstr "<image id=\"img_id3146969\" src=\"cmd/sc_bezierinsert.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3146969\">Ikon</alt></image>"
+
+#. Dfg35
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3153710\n"
+"help.text"
+msgid "Insert Points"
+msgstr "Pontok beszúrása"
+
+#. CcGFU
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3149020\n"
+"help.text"
+msgid "Delete Points"
+msgstr "Pontok törlése"
+
+#. EifkN
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3148917\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierDelete\">Use the <emph>Delete Points</emph> icon to delete one or several selected points. If you wish to select several points click the appropriate points while holding down the Shift key.</ahelp>"
+msgstr "<ahelp hid=\".uno:BezierDelete\">A <emph>Pontok törlése</emph> ikonnal lehet törölni egy vagy több kijelölt pontot. Több pontot úgy jelölhet ki egyszerre, hogy az egyes pontokra kattintás közben a Shift billentyűt lenyomva tartja.</ahelp>"
+
+#. tWtYC
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3153766\n"
+"help.text"
+msgid "First select the points to be deleted, and then click this icon, or press Del."
+msgstr "Először válassza ki a törölni kívánt pontokat, majd kattintson az ikonra, vagy nyomja meg a Del billentyűt."
+
+#. 7E9oE
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3147321\n"
+"help.text"
+msgid "<image id=\"img_id3146920\" src=\"cmd/sc_bezierdelete.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3146920\">Icon</alt></image>"
+msgstr "<image id=\"img_id3146920\" src=\"cmd/sc_bezierdelete.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3146920\">Ikon</alt></image>"
+
+#. 6i377
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3155961\n"
+"help.text"
+msgid "Delete Points"
+msgstr "Pontok törlése"
+
+#. DEFBD
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3147361\n"
+"help.text"
+msgid "Split Curve"
+msgstr "Görbe felosztása"
+
+#. xJMxs
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3151248\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierCutLine\">The<emph> Split Curve </emph>icon splits a curve. Select the point or points where you want to split the curve, then click the icon</ahelp>."
+msgstr "<ahelp hid=\".uno:BezierCutLine\">A <emph>Görbe felosztása</emph> ikon feloszt egy görbét. Kattintson a görbe azon pontjára, ahol ketté akarja osztani, majd kattintson az ikonra.</ahelp>"
+
+#. iVMWF
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3153788\n"
+"help.text"
+msgid "<image id=\"img_id3148489\" src=\"cmd/sc_beziercutline.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3148489\">Icon</alt></image>"
+msgstr "<image id=\"img_id3148489\" src=\"cmd/sc_beziercutline.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3148489\">Ikon</alt></image>"
+
+#. vmsiD
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3152581\n"
+"help.text"
+msgid "Split Curve"
+msgstr "Görbe felosztása"
+
+#. cBVZs
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3150345\n"
+"help.text"
+msgid "Convert To Curve"
+msgstr "Görbévé alakítás"
+
+#. DNKmR
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3148420\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierConvert\">Converts a curve into a straight line or converts a straight line into a curve.</ahelp> If you select a single point, the curve before the point will be converted. If two points are selected, the curve between both points will be converted. If you select more than two points, each time you click this icon, a different portion of the curve will be converted. If necessary, round points are converted into corner points and corner points are converted into round points."
+msgstr "<ahelp hid=\".uno:BezierConvert\">Egy görbét egyenes vonallá vagy egy egyenes vonalat görbévé alakít.</ahelp> Ha egyetlen pontot jelöl ki, akkor a pont előtti görbe kerül átalakításra. Ha két pontot jelöl ki, akkor a két pont közötti görbe kerül átalakításra. Ha kettőnél több pontot jelöl ki, akkor az adott ikonra kattintáskor a görbe egy másik része kerül átalakításra. Ha szükséges, akkor a kerekítési pontok sarokpontokká alakíthatók, a sarokpontok pedig kerekítési pontokká."
+
+#. 57eED
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3150304\n"
+"help.text"
+msgid "If a certain section of the curve is straight, the end points of the line have a maximum of one control point each. They cannot be modified to round points unless the straight line is converted back to a curve."
+msgstr "Ha a görbe egy adott része egyenes, akkor a vonal végpontja maximum egy vezérlőponttal rendelkezik. Ezek nem alakíthatók sarokponttá, hacsak az egyenes vonalat nem alakítja vissza görbévé."
+
+#. rrpRW
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3158212\n"
+"help.text"
+msgid "<image id=\"img_id3149036\" src=\"cmd/sc_bezierconvert.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149036\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149036\" src=\"cmd/sc_bezierconvert.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149036\">Ikon</alt></image>"
+
+#. PtsWF
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3158445\n"
+"help.text"
+msgid "Convert To Curve"
+msgstr "Görbévé alakítás"
+
+#. GJN2S
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3153199\n"
+"help.text"
+msgid "Corner Point"
+msgstr "Sarokpont"
+
+#. UmXZR
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3148460\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierEdge\">Converts the selected point or points into corner points.</ahelp> Corner points have two movable control points, which are independent from each other. A curved line, therefore, does not go straight through a corner point, but forms a corner."
+msgstr "<ahelp hid=\".uno:BezierEdge\">A kijelölt pontot vagy pontokat sarokpontokká alakítja.</ahelp> A sarokpontok két mozgatható vezérlőponttal rendelkeznek, amelyek egymástól függenek. A görbe vonal ezért nem lesz egyenes egy sarokpontnál, hanem sarkot alkot."
+
+#. xjYEG
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3154576\n"
+"help.text"
+msgid "<image id=\"img_id3154201\" src=\"cmd/sc_bezieredge.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154201\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154201\" src=\"cmd/sc_bezieredge.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154201\">Ikon</alt></image>"
+
+#. eLuKD
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3166429\n"
+"help.text"
+msgid "Corner Point"
+msgstr "Sarokpont"
+
+#. qvsQR
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3166436\n"
+"help.text"
+msgid "Smooth Transition"
+msgstr "Finom átmenet"
+
+#. LVrmB
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3155510\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierSmooth\">Converts a corner point or symmetrical point into a smooth point.</ahelp> Both control points of the corner point are aligned in parallel, and can only be moved simultaneously. The control points may differentiate in length, allowing you to vary the degree of curvature."
+msgstr "<ahelp hid=\".uno:BezierSmooth\">Egy sarok- vagy szimmetriapontot sima ponttá alakít.</ahelp> A sarokpont összes vezérlőpontja párhuzamosra van igazítva, és csak egyszerre mozgatható. A vezérlőpontok hossza különbözhet, ezekkel változtathatja a görbület mértékét."
+
+#. KCCis
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3148813\n"
+"help.text"
+msgid "<image id=\"img_id3151183\" src=\"cmd/sc_beziersmooth.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151183\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151183\" src=\"cmd/sc_beziersmooth.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151183\">Ikon</alt></image>"
+
+#. MLk9o
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3154258\n"
+"help.text"
+msgid "Smooth Transition"
+msgstr "Finom átmenet"
+
+#. Q9GqB
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3159622\n"
+"help.text"
+msgid "Symmetric Transition"
+msgstr "Szimmetrikus átmenet"
+
+#. fGgjS
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3155812\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierSymmetric\">This icon converts a corner point or a smooth point into a symmetrical point.</ahelp> Both control points of the corner point are aligned in parallel and have the same length. They can only be moved simultaneously and the degree of curvature is the same in both directions."
+msgstr "<ahelp hid=\".uno:BezierSymmetric\">Ez az ikon a sarokpontot vagy a sima pontot szimmetrikus ponttá alakítja.</ahelp> A sarokpont összes vezérlőpontja párhuzamosra van igazítva, és ugyanolyan hosszú. Csak egyszerre mozgathatók és a görbület mértéke minden irányban ugyanaz."
+
+#. 4obZh
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3153818\n"
+"help.text"
+msgid "<image id=\"img_id3159218\" src=\"cmd/sc_beziersymmetric.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3159218\">Icon</alt></image>"
+msgstr "<image id=\"img_id3159218\" src=\"cmd/sc_beziersymmetric.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3159218\">Ikon</alt></image>"
+
+#. 2Byoz
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3146866\n"
+"help.text"
+msgid "Symmetric Transition"
+msgstr "Szimmetrikus átmenet"
+
+#. DAS5H
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3146786\n"
+"help.text"
+msgid "Close Bézier"
+msgstr "Bézier-görbe bezárása"
+
+#. L7eHE
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3156032\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierClose\">Closes a line or a curve.</ahelp> A line is closed by connecting the last point with the first point, indicated by an enlarged square."
+msgstr "<ahelp hid=\".uno:BezierClose\">Lezár egy vonalat vagy ívet.</ahelp> Egy vonal úgy záródik, hogy az utolsó pont össze van kötve az elsővel, amelyet egy megnagyobbított négyzet jelöl."
+
+#. eJCFP
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3154344\n"
+"help.text"
+msgid "<image id=\"img_id3148607\" src=\"cmd/sc_bezierclose.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3148607\">Icon</alt></image>"
+msgstr "<image id=\"img_id3148607\" src=\"cmd/sc_bezierclose.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3148607\">Ikon</alt></image>"
+
+#. 29q2Q
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3147070\n"
+"help.text"
+msgid "Close Bézier"
+msgstr "Bézier-görbe bezárása"
+
+#. bGzsc
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"hd_id3156351\n"
+"help.text"
+msgid "Eliminate Points"
+msgstr "Pontok eltávolítása"
+
+#. FjTtf
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3149441\n"
+"help.text"
+msgid "<ahelp hid=\".uno:BezierEliminatePoints\">Marks the current point or the selected points for deletion.</ahelp> This happens in the event that the point is located on a straight line. If you convert a curve or a polygon with the <emph>Convert to Curve </emph>icon into a straight line or you change a curve with the mouse so that a point lies on the straight line, it is removed. The angle from which the point reduction is to take place <switchinline select=\"appl\"><caseinline select=\"DRAW\">can be set by choosing <link href=\"text/shared/optionen/01070300.xhp\" name=\"Drawing - Grid\"><emph>%PRODUCTNAME Draw - Grid</emph></link> in the Options dialog box</caseinline><caseinline select=\"IMPRESS\">can be set by choosing <link href=\"text/shared/optionen/01070300.xhp\" name=\"Presentation - Grid\"><emph>%PRODUCTNAME Impress - Grid</emph></link> in the Options dialog box</caseinline><defaultinline>is 15° by default.</defaultinline></switchinline>"
+msgstr "<ahelp hid=\".uno:BezierEliminatePoints\">Az aktuális vagy kiválasztott pontokat törlésre megjelöli.</ahelp> Ez akkor történik, amikor a pont egy egyenes vonalon található. Ha egy görbét vagy sokszöget alakít át a <emph>Görbévé alakítás</emph> ikon segítségével egyenes vonallá, vagy az egérrel változtat úgy egy görbét, hogy a pont egy egyenes vonalon fekszik, akkor eltávolításra kerül. A szög, amelytől a pontredukciót végezni kell <switchinline select=\"appl\"><caseinline select=\"DRAW\">a Beállítások párbeszédablak <link href=\"text/shared/optionen/01070300.xhp\" name=\"Rajzoló- Rács\"><emph>%PRODUCTNAME Draw - Rács</emph></link> panelén állítható be</caseinline><caseinline select=\"IMPRESS\">a Beállítások párbeszédablak <link href=\"text/shared/optionen/01070300.xhp\" name=\"Bemutató - Rács\"><emph>%PRODUCTNAME Impress - Rács</emph></link> panelén állítható be</caseinline><defaultinline>alapértelmezés szerint 15°.</defaultinline></switchinline>"
+
+#. ACe6t
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3148970\n"
+"help.text"
+msgid "<image id=\"img_id3155385\" src=\"cmd/sc_beziereliminatepoints.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155385\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155385\" src=\"cmd/sc_beziereliminatepoints.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155385\">Ikon</alt></image>"
+
+#. vHE4T
+#: main0227.xhp
+msgctxt ""
+"main0227.xhp\n"
+"par_id3152869\n"
+"help.text"
+msgid "Eliminate Points"
+msgstr "Pontok eltávolítása"
+
+#. 8AFz5
+#: main0400.xhp
+msgctxt ""
+"main0400.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "Billentyűparancsok"
+
+#. GQ7jZ
+#: main0400.xhp
+msgctxt ""
+"main0400.xhp\n"
+"hd_id3149495\n"
+"help.text"
+msgid "<link href=\"text/shared/main0400.xhp\" name=\"Shortcut Keys\">Shortcut Keys</link>"
+msgstr "<link href=\"text/shared/main0400.xhp\" name=\"Billentyűparancsok\">Billentyűparancsok</link>"
+
+#. WPGJg
+#: main0400.xhp
+msgctxt ""
+"main0400.xhp\n"
+"par_id3150040\n"
+"help.text"
+msgid "This section contains descriptions of frequently used shortcut keys in $[officename]."
+msgstr "Ez a szakasz a $[officename] gyakran használt billentyűparancsait mutatja be."
+
+#. 8Fk6L
+#: main0500.xhp
+msgctxt ""
+"main0500.xhp\n"
+"tit\n"
+"help.text"
+msgid "Glossaries"
+msgstr "Szószedetek"
+
+#. BG5LJ
+#: main0500.xhp
+msgctxt ""
+"main0500.xhp\n"
+"hd_id3156183\n"
+"help.text"
+msgid "<link href=\"text/shared/main0500.xhp\" name=\"Glossaries\">Glossaries</link>"
+msgstr "<link href=\"text/shared/main0500.xhp\" name=\"Szószedetek\">Szószedetek</link>"
+
+#. dziDW
+#: main0500.xhp
+msgctxt ""
+"main0500.xhp\n"
+"par_id3157898\n"
+"help.text"
+msgid "This section provides a general glossary of technical terms used in $[officename], along with a list of Internet terms."
+msgstr "Ez a szakasz a $[officename]-ban használt technikai kifejezések és internetes kifejezések általános szószedetét tartalmazza."
+
+#. vAUtX
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"tit\n"
+"help.text"
+msgid "Java Platform Support"
+msgstr "A Java platform támogatása"
+
+#. sAfDU
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"hd_id3153089\n"
+"help.text"
+msgid "<link href=\"text/shared/main0650.xhp\" name=\"Java Platform Support\">Java Platform Support</link>"
+msgstr "<link href=\"text/shared/main0650.xhp\" name=\"A Java platform támogatása\">A Java platform támogatása</link>"
+
+#. dPzDx
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id3152363\n"
+"help.text"
+msgid "$[officename] supports the Java platform for running applications and components based on the JavaBeans architecture."
+msgstr "A $[officename] támogatja a Java platformot alkalmazások és JavaBeans architektúrára épülő komponensek futtatására."
+
+#. Bwg5V
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id3154751\n"
+"help.text"
+msgid "For $[officename] to support the Java platform, you must install the Java 2 Runtime Environment software. When you installed $[officename], you automatically received the option to install these files if they were not yet installed. You can also install these files now if required."
+msgstr "Ahhoz, hogy a $[officename] támogassa a Java platformot, telepíteni kell a Java 2 Runtime Environment szoftvert. A $[officename] telepítésekor a rendszer automatikusan felajánlja ezeknek a fájloknak a telepítését, ha még nincsenek telepítve. Ha szükséges, ezeket a fájlokat most is telepítheti."
+
+#. wFYWg
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id3155338\n"
+"help.text"
+msgid "The Java platform support needs to be activated under $[officename] to run Java applications."
+msgstr "A Java platform támogatását be kell kapcsolni a $[officename] alatt a Java-alkalmazások futtatásához."
+
+#. KmhjC
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id3155892\n"
+"help.text"
+msgid "Enable Java platform support by choosing <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/java.xhp\" name=\"$[officename] - Advanced\"><emph>$[officename] - Advanced</emph></link>."
+msgstr "Engedélyezze a Java platform támogatását <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>a %PRODUCTNAME – Beállítások</emph></caseinline><defaultinline><emph>az Eszközök – Beállítások</emph></defaultinline></switchinline><emph> – </emph><link href=\"text/shared/optionen/javaxhp\" name=\"$[officename] – Speciális\"><emph>$[officename] – Speciális</emph></link> választásával."
+
+#. NcDL4
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id9116183\n"
+"help.text"
+msgid "Before you can use a JDBC driver, you need to add its class path. Choose <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - %PRODUCTNAME - Advanced, and click the Class Path button. After you add the path information, restart %PRODUCTNAME."
+msgstr "A JDBC-illesztőprogram használata előtt hozzá kell adni azt ezt megvalósító osztály elérési útját. Az <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Beállítások</caseinline><defaultinline>Eszközök - Beállítások</defaultinline></switchinline> - %PRODUCTNAME - Speciális panelen kattintson az Osztály útvonala gombra. Az útvonal-információk hozzáadása után indítsa újra a %PRODUCTNAME programot."
+
+#. ApwuB
+#: main0650.xhp
+msgctxt ""
+"main0650.xhp\n"
+"par_id3153822\n"
+"help.text"
+msgid "Your modifications at the <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - $[officename] - Advanced</emph> tab page will be used even if the Java Virtual Machine (JVM) has been started already. After any modifications to the ClassPath you must restart $[officename]. The same is true for modifications under <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Internet - Proxy</emph>. Only the boxes \"HTTP Proxy\" and \"FTP Proxy\" and their ports do not require a restart—they will be evaluated when you click <emph>OK</emph>."
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>A %PRODUCTNAME - Beállítások</emph></caseinline><defaultinline><emph>Az Eszközök - Beállítások</emph></defaultinline></switchinline><emph> - $[officename] - Speciális</emph> lapon megadott módosításokat akkor is használja a rendszer, ha a Java virtuális gép már el lett indítva. A ClassPath módosítása után újra kell indítania a $[officename] programot. Ugyanez igaz <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>a %PRODUCTNAME - Beállítások</emph></caseinline><defaultinline><emph>az Eszközök - Beállítások</emph></defaultinline></switchinline><emph> - Internet - Proxy</emph> alatti módosításokra is. Csak a „HTTP-proxy” és „FTP-proxy” mezők és ezek portjai nem igényelnek újraindítást. Ezek az <emph>OK</emph> gombra kattintáskor kiértékelődnek."
+
+#. rFknA
+#: main0800.xhp
+msgctxt ""
+"main0800.xhp\n"
+"tit\n"
+"help.text"
+msgid "$[officename] and the Internet"
+msgstr "A $[officename] és az internet"
+
+#. GCzks
+#: main0800.xhp
+msgctxt ""
+"main0800.xhp\n"
+"hd_id3153089\n"
+"help.text"
+msgid "<link href=\"text/shared/main0800.xhp\" name=\"$[officename] and the Internet\">$[officename] and the Internet</link>"
+msgstr "<link href=\"text/shared/main0800.xhp\" name=\"A $[officename] és az internet\">A $[officename] és az internet</link>"
+
+#. NUe4Y
+#: main0800.xhp
+msgctxt ""
+"main0800.xhp\n"
+"par_id3155150\n"
+"help.text"
+msgid "This section provides information on the subject of the Internet. An <link href=\"text/shared/00/00000002.xhp\" name=\"Internet glossary\">Internet glossary</link> explains the most important terms."
+msgstr "Ez a szakasz az internettel kapcsolatos információkkal szolgál. Egy <link href=\"text/shared/00/00000002.xhp\" name=\"internetes szószedet\">internetes szószedet</link> elmagyarázza a legfontosabb kifejezéseket."
+
+#. NJGJa
+#: need_help.xhp
+msgctxt ""
+"need_help.xhp\n"
+"tit\n"
+"help.text"
+msgid "We Need Your Help"
+msgstr "Szükségünk van a segítségére"
+
+#. Pw8Hr
+#: need_help.xhp
+msgctxt ""
+"need_help.xhp\n"
+"hd_id1000010\n"
+"help.text"
+msgid "This help page needs further work for correctness and completion. Please join the LibreOffice project and help us out to write the missing information. Visit our <link href=\"https://documentation.libreoffice.org/en/join-community/update-help-contents\"><emph>web page on writing Help contents</emph></link>."
+msgstr "Ez a súgó oldal további munkát igényel, hogy pontos és teljes legyen. Csatlakozzon a LibreOffice projekthez, és segítsen ki minket a hiányzó információk megírásával. Látogassa meg a <link href=\"https://documentation.libreoffice.org/en/join-community/update-help-contents\"><emph>súgótartalmak írásáról szóló weboldalunkat</emph></link>."
+
+#. fGrZx
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"tit\n"
+"help.text"
+msgid "Spacing"
+msgstr "Térköz"
+
+#. yQezt
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"hd_id411816022675979\n"
+"help.text"
+msgid "<link href=\"text/shared/submenu_spacing.xhp\">Spacing</link>"
+msgstr "<link href=\"text/shared/submenu_spacing.xhp\">Térköz</link>"
+
+#. 22dPh
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id398855439580084\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens a submenu where you can choose text spacing commands.</ahelp>"
+msgstr "<ahelp hid=\".\">Megnyit egy almenüt, amelyben szöveg térközével kapcsolatos parancsokat választhat.</ahelp>"
+
+#. 44Px9
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"hd_id3147573\n"
+"help.text"
+msgid "Increase Paragraph Spacing"
+msgstr "Bekezdés térközének növelése"
+
+#. zhqwZ
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id3150695\n"
+"help.text"
+msgid "Increases the paragraph spacing above the selected paragraph."
+msgstr "Növeli a kijelölt bekezdés feletti helykihagyást."
+
+#. zDRUC
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id261643820768225\n"
+"help.text"
+msgid "<image src=\"cmd/lc_paraspaceincrease.svg\" id=\"img_id901643820768226\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id831643820768227\">Icon Increase Paragraph Spacing</alt></image>"
+msgstr ""
+
+#. D2RsS
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id131643820768228\n"
+"help.text"
+msgid "Increase Paragraph Spacing"
+msgstr ""
+
+#. XCZUT
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"hd_id3147574\n"
+"help.text"
+msgid "Decrease Paragraph Spacing"
+msgstr "Bekezdés térközének csökkentése"
+
+#. EVYri
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id3150696\n"
+"help.text"
+msgid "Decreases the paragraph spacing above the selected paragraph."
+msgstr "Csökkenti a kijelölt bekezdés feletti helykihagyást."
+
+#. agf5h
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id791643820835491\n"
+"help.text"
+msgid "<image src=\"cmd/lc_paraspacedecrease.svg\" id=\"img_id391643820835492\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id551643820835493\">Icon Decrease Paragraph Spacing</alt></image>"
+msgstr ""
+
+#. DssS6
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id141643820835494\n"
+"help.text"
+msgid "Decrease Paragraph Spacing"
+msgstr ""
+
+#. EsHFP
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"hd_id3147575\n"
+"help.text"
+msgid "Increase Indent"
+msgstr "Behúzás növelése"
+
+#. BU6i9
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id3150697\n"
+"help.text"
+msgid "Increases the left indent of the current paragraph or cell content and sets it to the next default tab position. If several paragraphs are selected, the indentation of all selected paragraphs is increased."
+msgstr "Megnöveli az aktuális bekezdés vagy cellatartalom bal oldali behúzását, és beállítja a következő tabulátorpozícióra. Ha több bekezdés is ki van választva, akkor minden kijelölt bekezdés behúzása megnő."
+
+#. CFoDz
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id351643820903541\n"
+"help.text"
+msgid "<image src=\"cmd/lc_incrementindent.svg\" id=\"img_id161643820903542\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id981643820903543\">Icon Increase Indent</alt></image>"
+msgstr ""
+
+#. c7WUp
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id841643820903544\n"
+"help.text"
+msgid "Increase Indent"
+msgstr ""
+
+#. YA8bT
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"hd_id3147576\n"
+"help.text"
+msgid "Decrease Indent"
+msgstr "Behúzás csökkentése"
+
+#. aSrjB
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id3150698\n"
+"help.text"
+msgid "Decreases the left indent of the current paragraph or cell content and sets it to the previous default tab position. If several paragraphs are selected, the indentation of all selected paragraphs is decreased."
+msgstr ""
+
+#. XsV6q
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id191643820966566\n"
+"help.text"
+msgid "<image src=\"cmd/lc_decrementindent.svg\" id=\"img_id601643820966567\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id991643820966568\">Icon Decrease Indent</alt></image>"
+msgstr ""
+
+#. wVZXB
+#: submenu_spacing.xhp
+msgctxt ""
+"submenu_spacing.xhp\n"
+"par_id201643820966569\n"
+"help.text"
+msgid "Decrease Indent"
+msgstr ""
+
+#. MVHBc
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"tit\n"
+"help.text"
+msgid "Text"
+msgstr "Szöveg"
+
+#. pVEBz
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id411816022675978\n"
+"help.text"
+msgid "<link href=\"text/shared/submenu_text.xhp\">Text</link>"
+msgstr "<link href=\"text/shared/submenu_text.xhp\">Szöveg</link>"
+
+#. UdmfU
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id398855439580083\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens a submenu where you can choose text formatting commands.</ahelp>"
+msgstr "<ahelp hid=\".\">Megnyit egy almenüt, amelyben szöveg formázásával kapcsolatos parancsokat választhat.</ahelp>"
+
+#. JCTNH
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id893328657433073\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id0123200902243376\">Overline</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id0123200902243376\">Felülvonás</link>"
+
+#. U9h8v
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id281953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#overline\" markup=\"ignore\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#overline\" markup=\"ignore\"/>"
+
+#. NLNGF
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id773632078996899\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3163714\">Shadow</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3163714\">Árnyékolás</link>"
+
+#. hMRVP
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id873632078996899\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3147287\">Outline</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3147287\">Vázlat</link>"
+
+#. br5DC
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id207025326941609\n"
+"help.text"
+msgid "Wrap Text"
+msgstr "Szöveg tördelése"
+
+#. jBc2E
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id302484503842787\n"
+"help.text"
+msgid "<ahelp hid=\".\">Break text automatically at the right edges of the selected cells.</ahelp>"
+msgstr "<ahelp hid=\".\">Szöveg automatikus tördelése a kijelölt cellák jobb széleinél.</ahelp>"
+
+#. BqgSi
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id273587522269593\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0202.xhp#hd_id0122200903085320\">Increase Size</link>"
+msgstr "<link href=\"text/swriter/main0202.xhp#hd_id0122200903085320\">Méret növelése</link>"
+
+#. GTjCT
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id511910578827551\n"
+"help.text"
+msgid "<link href=\"text/swriter/main0202.xhp#hd_id012220090308532\">Decrease Size</link>"
+msgstr "<link href=\"text/swriter/main0202.xhp#hd_id012220090308532\">Méret csökkentése</link>"
+
+#. WApc3
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id373587522269593\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104143\">Increase Size</link>"
+msgstr "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104143\">Méret növelése</link>"
+
+#. AQANy
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id711910578827551\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104228\">Decrease Size</link>"
+msgstr "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104228\">Méret csökkentése</link>"
+
+#. uzDFv
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id473587522269593\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104143\">Increase Size</link>"
+msgstr "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104143\">Méret növelése</link>"
+
+#. GQ8Fj
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id611910578827551\n"
+"help.text"
+msgid "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104228\">Decrease Size</link>"
+msgstr "<link href=\"text/simpress/main0203.xhp#hd_id0122200903104228\">Méret csökkentése</link>"
+
+#. wSRdX
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id172462591626807\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">UPPERCASE</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">NAGYBETŰS</link>"
+
+#. sjNg6
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id381953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#uppercase\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#uppercase\"/>"
+
+#. FFVUb
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id935919548287354\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">lowercase</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">kisbetűs</link>"
+
+#. ijGEm
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id481953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#lowercase\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#lowercase\"/>"
+
+#. zGBE2
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3147143\n"
+"help.text"
+msgid "Cycle Case"
+msgstr "Betűváltás"
+
+#. TSJfn
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3152372\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChangeCaseRotateCase\">Cycles the case of the selected characters between Title Case, Sentence case, UPPERCASE and lowercase.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChangeCaseRotateCase\">A kijelölt karakterek kezdőbetűit átváltja Nagy Kezdőbetű - Mondatkezdőbetű - NAGYBETŰ - kisbetű között.</ahelp>"
+
+#. v24QT
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3147572\n"
+"help.text"
+msgid "Sentence case"
+msgstr "Kezdő nagybetű"
+
+#. v3Cr9
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3150694\n"
+"help.text"
+msgid "<ahelp hid=\".\">Changes the first letter of the selected characters to an uppercase character.</ahelp>"
+msgstr "<ahelp hid=\".\">A kijelölt karakterek első betűjét nagybetűsre cseréli.</ahelp>"
+
+#. JtsaD
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id640520497868661\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Capitalize Every Word</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Minden Szó Nagybetűs</link>"
+
+#. 3UGHA
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id581953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#capitalizeeveryword\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#capitalizeeveryword\"/>"
+
+#. Y9fn4
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3147521\n"
+"help.text"
+msgid "tOGGLE cASE"
+msgstr "fORDÍTVA"
+
+#. eb5K9
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3150623\n"
+"help.text"
+msgid "<ahelp hid=\".\">Toggles case of all selected characters.</ahelp>"
+msgstr "<ahelp hid=\".\">A kijelölt, kisbetűvel írt karaktereket nagybetűssé teszi és fordítva.</ahelp>"
+
+#. WNuFq
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id342778277179117\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Small capitals</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Kiskapitális</link>"
+
+#. K6tXB
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id681953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+
+#. VXJzA
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id442778277179117\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Small capitals</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Kiskapitális</link>"
+
+#. arEu2
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id781953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+
+#. KQxFn
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id542778277179117\n"
+"help.text"
+msgid "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Small capitals</link>"
+msgstr "<link href=\"text/shared/01/05020200.xhp#hd_id3149575\">Kiskapitális</link>"
+
+#. okCcu
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id881953548674188\n"
+"help.text"
+msgid "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+msgstr "<embedvar href=\"text/shared/01/05020200.xhp#smallcapitals\"/>"
+
+#. zo6cE
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3155392\n"
+"help.text"
+msgid "Half-width"
+msgstr "Félszélességű"
+
+#. SEpmw
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3147088\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChangeCaseToHalfWidth\">Changes the selected Asian characters to half-width characters.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChangeCaseToHalfWidth\">A kijelölt ázsiai karaktereket félszélességű karakterekre cseréli.</ahelp>"
+
+#. rA2DG
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3156113\n"
+"help.text"
+msgid "Full Width"
+msgstr "Teljes szélességű"
+
+#. Ep24G
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3154749\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChangeCaseToFullWidth\">Changes the selected Asian characters to full-width characters.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChangeCaseToFullWidth\">A kijelölt ázsiai karaktereket teljes szélességű karakterekre cseréli.</ahelp>"
+
+#. dZCcC
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3152996\n"
+"help.text"
+msgid "Hiragana"
+msgstr "Hiragana"
+
+#. AB6ta
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3156156\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChangeCaseToHiragana\">Changes the selected Asian characters to Hiragana characters.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChangeCaseToHiragana\">A kijelölt ázsiai karaktereket hiragana karakterekre cseréli.</ahelp>"
+
+#. LNQLS
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"hd_id3154173\n"
+"help.text"
+msgid "Katakana"
+msgstr "Katakana"
+
+#. QSxUp
+#: submenu_text.xhp
+msgctxt ""
+"submenu_text.xhp\n"
+"par_id3146137\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChangeCaseToKatakana\">Changes the selected Asian characters to Katakana characters.</ahelp>"
+msgstr "<ahelp hid=\".uno:ChangeCaseToKatakana\">A kijelölt ázsiai karaktereket katakana karakterekre cseréli.</ahelp>"

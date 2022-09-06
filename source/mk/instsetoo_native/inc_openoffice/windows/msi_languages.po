@@ -1,0 +1,5054 @@
+#. extracted from instsetoo_native/inc_openoffice/windows/msi_languages
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-03-21 12:32+0100\n"
+"PO-Revision-Date: 2018-11-12 12:02+0000\n"
+"Last-Translator: Anonymous Pootle User\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: mk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n==1 || n%10==1 ? 0 : 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1542024137.000000\n"
+
+#. tBfTE
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_1\n"
+"LngText.text"
+msgid "Advertising application"
+msgstr "Реклама на апликацијата"
+
+#. CHEun
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_2\n"
+"LngText.text"
+msgid "Allocating registry space"
+msgstr "Алоцирам празно место во регистарот"
+
+#. B6wJx
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_3\n"
+"LngText.text"
+msgid "Free space: [1]"
+msgstr "Слободен простор: [1]"
+
+#. TBKEi
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_4\n"
+"LngText.text"
+msgid "Searching for installed applications"
+msgstr "Пребарувам за инсталирани апликации"
+
+#. Ex3MU
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_5\n"
+"LngText.text"
+msgid "Property: [1], Signature: [2]"
+msgstr "Својство: [1], потпис: [2]"
+
+#. adESV
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_6\n"
+"LngText.text"
+msgid "Binding executables"
+msgstr "Врзувам извршни датотеки"
+
+#. NV59M
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_7\n"
+"LngText.text"
+msgid "File: [1]"
+msgstr "Датотека: [1]"
+
+#. Cfu64
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_8\n"
+"LngText.text"
+msgid "Creating IIS Virtual Roots..."
+msgstr "Креирам IIS-виртуелни корени..."
+
+#. oaPu2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_9\n"
+"LngText.text"
+msgid "Removing IIS Virtual Roots..."
+msgstr "Отстранувам IIS-виртуелни корени..."
+
+#. pQzsj
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_10\n"
+"LngText.text"
+msgid "Searching for qualifying products"
+msgstr "Барам соодветни производи"
+
+#. BPDsf
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_11\n"
+"LngText.text"
+msgid "Computing space requirements"
+msgstr "Пресметувам расположливо празно место"
+
+#. GkETA
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_12\n"
+"LngText.text"
+msgid "Computing space requirements"
+msgstr "Пресметувам расположливо празно место"
+
+#. B79jy
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_13\n"
+"LngText.text"
+msgid "Creating folders"
+msgstr "Креирам папки"
+
+#. xTTzj
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_14\n"
+"LngText.text"
+msgid "Folder: [1]"
+msgstr "Папка: [1]"
+
+#. v6Lo5
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_15\n"
+"LngText.text"
+msgid "Creating shortcuts"
+msgstr "Креирам кратенки"
+
+#. HwKWh
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_16\n"
+"LngText.text"
+msgid "Shortcut: [1]"
+msgstr "Кратенка: [1]"
+
+#. GeKVY
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_17\n"
+"LngText.text"
+msgid "Deleting services"
+msgstr "Бришам сервиси"
+
+#. WFKgC
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_18\n"
+"LngText.text"
+msgid "Service: [1]"
+msgstr "Сервис: [1]"
+
+#. DbLyC
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_19\n"
+"LngText.text"
+msgid "Creating duplicate files"
+msgstr "Креирам двојни датотеки"
+
+#. j8xgQ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_20\n"
+"LngText.text"
+msgid "File: [1],  Directory: [9],  Size: [6]"
+msgstr "Датотека: [1],  папка: [9],  големина: [6]"
+
+#. jzS2H
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_21\n"
+"LngText.text"
+msgid "Computing space requirements"
+msgstr "Пресметувам расположливо празно место"
+
+#. Bfgo2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_22\n"
+"LngText.text"
+msgid "Searching for related applications"
+msgstr "Барам слични апликации"
+
+#. aARc2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_23\n"
+"LngText.text"
+msgid "Found application"
+msgstr "Најдов апликација"
+
+#. G3SFJ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_24\n"
+"LngText.text"
+msgid "Generating script operations for action:"
+msgstr "Генерирам скриптни операции за дејство:"
+
+#. s75yx
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_25\n"
+"LngText.text"
+msgid "[1]"
+msgstr "[1]"
+
+#. cDFEG
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_26\n"
+"LngText.text"
+msgid "Copying files to the network"
+msgstr "Копирам датотеки на мрежата"
+
+#. GB7FF
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_27\n"
+"LngText.text"
+msgid "File: [1], Directory: [9], Size: [6]"
+msgstr "Датотека: [1], папка: [9], големина: [6]"
+
+#. GGoFs
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_28\n"
+"LngText.text"
+msgid "Copying new files"
+msgstr "Копирам нови датотеки"
+
+#. rbcHA
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_29\n"
+"LngText.text"
+msgid "File: [1],  Directory: [9],  Size: [6]"
+msgstr "Датотека: [1],  папка: [9],  големина: [6]"
+
+#. LF4Et
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_30\n"
+"LngText.text"
+msgid "Installing ODBC components"
+msgstr "Инсталирам ODBC-компоненти"
+
+#. WW3QQ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_31\n"
+"LngText.text"
+msgid "Installing new services"
+msgstr "Инсталирам нови сервиси"
+
+#. WRGjc
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_32\n"
+"LngText.text"
+msgid "Service: [2]"
+msgstr "Сервис: [2]"
+
+#. vZ6wb
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_33\n"
+"LngText.text"
+msgid "Installing system catalog"
+msgstr "Инсталирам системски каталог"
+
+#. oxrKY
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_34\n"
+"LngText.text"
+msgid "File: [1],  Dependencies: [2]"
+msgstr "Датотека: [1],  зависности: [2]"
+
+#. 2DWPL
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_35\n"
+"LngText.text"
+msgid "Validating install"
+msgstr "Потврдувам инсталација"
+
+#. BGXEt
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_36\n"
+"LngText.text"
+msgid "Evaluating launch conditions"
+msgstr "Проценувам услови за стартување"
+
+#. 5AK93
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_37\n"
+"LngText.text"
+msgid "Migrating feature states from related applications"
+msgstr "Ги префрлам состојбите на карактеристиките од слични апликации"
+
+#. Ls7DK
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_38\n"
+"LngText.text"
+msgid "Application: [1]"
+msgstr "Апликација: [1]"
+
+#. 2ZiCq
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_39\n"
+"LngText.text"
+msgid "Moving files"
+msgstr "Преместувам датотеки"
+
+#. FDfHk
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_40\n"
+"LngText.text"
+msgid "File: [1],  Directory: [9],  Size: [6]"
+msgstr "Датотека: [1],  папка: [9],  големина: [6]"
+
+#. gBdsq
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_41\n"
+"LngText.text"
+msgid "Patching files"
+msgstr "Закрпувам датотеки"
+
+#. zjUzy
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_42\n"
+"LngText.text"
+msgid "File: [1],  Directory: [2],  Size: [3]"
+msgstr "Датотека: [1],  папка: [2],  големина: [3]"
+
+#. 4z6Sr
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_43\n"
+"LngText.text"
+msgid "Updating component registration"
+msgstr "Ажурирам регистрација на компонентата"
+
+#. cryBo
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_44\n"
+"LngText.text"
+msgid "Publishing qualified components"
+msgstr "Објавувам квалификувани компоненти"
+
+#. PG64G
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_45\n"
+"LngText.text"
+msgid "Component ID: [1], Qualifier: [2]"
+msgstr "Ид. на компонентата: [1], квалификатор: [2]"
+
+#. 5UDAU
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_46\n"
+"LngText.text"
+msgid "Publishing product features"
+msgstr "Објавувам карактеристики на производот"
+
+#. R8Xuy
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_47\n"
+"LngText.text"
+msgid "Feature: [1]"
+msgstr "Карактеристика: [1]"
+
+#. jUrCF
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_48\n"
+"LngText.text"
+msgid "Publishing product information"
+msgstr "Објавувам информации за производот"
+
+#. Qi37u
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_49\n"
+"LngText.text"
+msgid "Registering class servers"
+msgstr "Регистрирам клaси сервери"
+
+#. SBCvZ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_50\n"
+"LngText.text"
+msgid "Class ID: [1]"
+msgstr "Ид. на класата: [1]"
+
+#. haeRK
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_51\n"
+"LngText.text"
+msgid "Registering COM+ Applications and Components"
+msgstr "Регистрирам COM+ апликации и компоненти"
+
+#. C88cP
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_52\n"
+"LngText.text"
+msgid "AppId: [1]{{, AppType: [2], Users: [3], RSN: [4]}}"
+msgstr "Ид. на апликацијата: [1]{{, Апл. тип: [2], корисници: [3], RSN: [4]}}"
+
+#. uheTH
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_53\n"
+"LngText.text"
+msgid "Registering extension servers"
+msgstr "Регистрирам сервери за екстензии"
+
+#. HD6QQ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_54\n"
+"LngText.text"
+msgid "Extension: [1]"
+msgstr "Екстензија: [1]"
+
+#. YmEb9
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_55\n"
+"LngText.text"
+msgid "Registering fonts"
+msgstr "Регистрирам фонтови"
+
+#. CK6Kq
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_56\n"
+"LngText.text"
+msgid "Font: [1]"
+msgstr "Фонт: [1]"
+
+#. 3vwAg
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_57\n"
+"LngText.text"
+msgid "Registering MIME info"
+msgstr "Регистрирам MIME-информации"
+
+#. X9enX
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_58\n"
+"LngText.text"
+msgid "MIME Content Type: [1], Extension: [2]"
+msgstr "MIME-тип на содржина: [1], наставка: [2]"
+
+#. CvWfG
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_59\n"
+"LngText.text"
+msgid "Registering product"
+msgstr "Регистрирам производ"
+
+#. WtwCe
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_60\n"
+"LngText.text"
+msgid "[1]"
+msgstr "[1]"
+
+#. vdvW2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_61\n"
+"LngText.text"
+msgid "Registering program identifiers"
+msgstr "Регистрирам ид. на програмата"
+
+#. AFmfn
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_62\n"
+"LngText.text"
+msgid "ProgID: [1]"
+msgstr "Ид. на програмата: [1]"
+
+#. TMjrn
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_63\n"
+"LngText.text"
+msgid "Registering type libraries"
+msgstr "Регистрирам библиотеки со типови"
+
+#. NCuAr
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_64\n"
+"LngText.text"
+msgid "LibID: [1]"
+msgstr "Ид. на библиотеката: [1]"
+
+#. X4YAE
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_65\n"
+"LngText.text"
+msgid "Registering user"
+msgstr "Регистрирам корисник"
+
+#. ZD2Y5
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_66\n"
+"LngText.text"
+msgid "[1]"
+msgstr "[1]"
+
+#. ctaJ5
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_67\n"
+"LngText.text"
+msgid "Removing duplicated files"
+msgstr "Отстранувам двојни датотеки"
+
+#. eBkz6
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_68\n"
+"LngText.text"
+msgid "File: [1], Directory: [9]"
+msgstr "Датотека: [1], папка: [9]"
+
+#. ELyVt
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_69\n"
+"LngText.text"
+msgid "Updating environment strings"
+msgstr "Ажурирам променливи на околина"
+
+#. 4xBWj
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_70\n"
+"LngText.text"
+msgid "Name: [1], Value: [2], Action [3]"
+msgstr "Име: [1], вредност: [2], дејство [3]"
+
+#. iqqet
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_71\n"
+"LngText.text"
+msgid "Removing applications"
+msgstr "Отстранувам апликации"
+
+#. 4dJF2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_72\n"
+"LngText.text"
+msgid "Application: [1], Command line: [2]"
+msgstr "Апликација: [1], командна линија: [2]"
+
+#. 8B5xT
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_73\n"
+"LngText.text"
+msgid "Removing files from previous installation"
+msgstr ""
+
+#. G7Cdp
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_74\n"
+"LngText.text"
+msgid "File: [1], Directory: [9]"
+msgstr "Датотека: [1], папка: [9]"
+
+#. 5AS3G
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_75\n"
+"LngText.text"
+msgid "Removing folders"
+msgstr "Отстранувам папки"
+
+#. LErXT
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_76\n"
+"LngText.text"
+msgid "Folder: [1]"
+msgstr "Папка: [1]"
+
+#. Cd2AK
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_77\n"
+"LngText.text"
+msgid "Removing INI file entries"
+msgstr "Отстранувам елементи во INI-датотеки"
+
+#. cuFzQ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_78\n"
+"LngText.text"
+msgid "File: [1],  Section: [2],  Key: [3], Value: [4]"
+msgstr "Датотека: [1],  дел: [2],  клуч: [3], вредност: [4]"
+
+#. 3RGHx
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_79\n"
+"LngText.text"
+msgid "Removing ODBC components"
+msgstr "Отстранувам ODBC-компоненти"
+
+#. K6Grt
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_80\n"
+"LngText.text"
+msgid "Removing system registry values"
+msgstr "Отстранувам вредности од системскиот регистар"
+
+#. 3hm3S
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_81\n"
+"LngText.text"
+msgid "Key: [1], Name: [2]"
+msgstr "Клуч: [1], име: [2]"
+
+#. bhXbK
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_82\n"
+"LngText.text"
+msgid "Removing shortcuts"
+msgstr "Отстранувам кратенки"
+
+#. kBFGD
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_83\n"
+"LngText.text"
+msgid "Shortcut: [1]"
+msgstr "Кратенка: [1]"
+
+#. A8hxh
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_84\n"
+"LngText.text"
+msgid "Searching for qualifying products"
+msgstr "Барам за соодветни производи"
+
+#. oDnBp
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_85\n"
+"LngText.text"
+msgid "Rolling back action:"
+msgstr "Враќам дејство назад:"
+
+#. KRvcf
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_86\n"
+"LngText.text"
+msgid "[1]"
+msgstr "[1]"
+
+#. ZiXCE
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_87\n"
+"LngText.text"
+msgid "Removing backup files"
+msgstr "Отстранувам привремени датотеки"
+
+#. y3t5N
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_88\n"
+"LngText.text"
+msgid "File: [1]"
+msgstr "Датотека: [1]"
+
+#. h9m6Z
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_93\n"
+"LngText.text"
+msgid "Initializing ODBC directories"
+msgstr "Иницијализирам папки за ODBC"
+
+#. KKcf7
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_94\n"
+"LngText.text"
+msgid "Starting services"
+msgstr "Стартувам сервиси"
+
+#. RBA7T
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_95\n"
+"LngText.text"
+msgid "Service: [1]"
+msgstr "Сервис: [1]"
+
+#. cK4wt
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_96\n"
+"LngText.text"
+msgid "Stopping services"
+msgstr "Запирам сервиси"
+
+#. DigFd
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_97\n"
+"LngText.text"
+msgid "Service: [1]"
+msgstr "Сервис: [1]"
+
+#. 5G9eN
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_98\n"
+"LngText.text"
+msgid "Removing moved files"
+msgstr "Отстранувам преместени датотеки"
+
+#. eaJ8D
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_99\n"
+"LngText.text"
+msgid "File: [1], Directory: [9]"
+msgstr "Датотека: [1], папка: [9]"
+
+#. nKyi3
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_100\n"
+"LngText.text"
+msgid "Unpublishing Qualified Components"
+msgstr "Одјавувам квалификувани компоненти"
+
+#. Fj4CE
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_101\n"
+"LngText.text"
+msgid "Component ID: [1], Qualifier: [2]"
+msgstr "Ид. на компонентата: [1], квалификатор: [2]"
+
+#. EE9Gk
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_102\n"
+"LngText.text"
+msgid "Unpublishing product features"
+msgstr "Одјавувам карактеристики на производот"
+
+#. 8YHS2
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_103\n"
+"LngText.text"
+msgid "Feature: [1]"
+msgstr "Карактеристика: [1]"
+
+#. hJvGe
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_104\n"
+"LngText.text"
+msgid "Unpublishing product information"
+msgstr "Одјавувам информации на производот"
+
+#. Nr5ET
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_105\n"
+"LngText.text"
+msgid "Unregister class servers"
+msgstr "Дерегистрирам класи сервери"
+
+#. MHDqB
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_106\n"
+"LngText.text"
+msgid "Class ID: [1]"
+msgstr "Ид. на класата: [1]"
+
+#. FFDdD
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_107\n"
+"LngText.text"
+msgid "Unregistering COM+ Applications and Components"
+msgstr "Дерегистрирам COM+ апликации и компоненти"
+
+#. fD6ta
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_108\n"
+"LngText.text"
+msgid "AppId: [1]{{, AppType: [2]}}"
+msgstr "Ид. на апликацијата: [1]{{, Апл. тип: [2]}}"
+
+#. pwfZN
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_109\n"
+"LngText.text"
+msgid "Unregistering extension servers"
+msgstr "Дерегистрирам сервери за екстензии"
+
+#. xWBce
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_110\n"
+"LngText.text"
+msgid "Extension: [1]"
+msgstr "Екстензија: [1]"
+
+#. DPuFZ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_111\n"
+"LngText.text"
+msgid "Unregistering fonts"
+msgstr "Дерегистрирам фонтови"
+
+#. 5rATm
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_112\n"
+"LngText.text"
+msgid "Font: [1]"
+msgstr "Фонт: [1]"
+
+#. 6rdig
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_113\n"
+"LngText.text"
+msgid "Unregistering MIME info"
+msgstr "Дерегистрирам MIME-информации"
+
+#. BPxD7
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_114\n"
+"LngText.text"
+msgid "MIME Content Type: [1], Extension: [2]"
+msgstr "MIME-тип на содржина: [1], наставка: [2]"
+
+#. DceMG
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_115\n"
+"LngText.text"
+msgid "Unregistering program identifiers"
+msgstr "Дерегистрирам ид. на програмите"
+
+#. azYBq
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_116\n"
+"LngText.text"
+msgid "ProgID: [1]"
+msgstr "Ид. на програмата: [1]"
+
+#. mFnav
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_117\n"
+"LngText.text"
+msgid "Unregistering type libraries"
+msgstr "Дерегистрирам библиотеки со типови"
+
+#. rL3Ao
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_118\n"
+"LngText.text"
+msgid "LibID: [1]"
+msgstr "Ид. на библиотеката: [1]"
+
+#. GHGDX
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_119\n"
+"LngText.text"
+msgid "Updating environment strings"
+msgstr "Ажурирам променливи на околина"
+
+#. VkdEw
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_120\n"
+"LngText.text"
+msgid "Name: [1], Value: [2], Action [3]"
+msgstr "Име: [1], вредност: [2], дејство [3]"
+
+#. kXa3f
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_121\n"
+"LngText.text"
+msgid "Writing INI file values"
+msgstr "Запишувам вредности во INI-датотека"
+
+#. zXBEs
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_122\n"
+"LngText.text"
+msgid "File: [1],  Section: [2],  Key: [3], Value: [4]"
+msgstr "Датотека: [1],  дел: [2],  клуч: [3], вредност: [4]"
+
+#. e6UkZ
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_123\n"
+"LngText.text"
+msgid "Writing system registry values"
+msgstr "Запишувам вредности во системскиот регистар"
+
+#. MpBFH
+#: ActionTe.ulf
+msgctxt ""
+"ActionTe.ulf\n"
+"OOO_ACTIONTEXT_124\n"
+"LngText.text"
+msgid "Key: [1], Name: [2], Value: [3]"
+msgstr "Клуч: [1], име: [2], вредност: [3]"
+
+#. 8xyYY
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_3\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. 7mnKX
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_5\n"
+"LngText.text"
+msgid "&Look in:"
+msgstr "&Барај во:"
+
+#. w5WG7
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_6\n"
+"LngText.text"
+msgid "Browse to the destination folder."
+msgstr "Барајте до одредишната папка."
+
+#. FrjD4
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_7\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Change Current Destination Folder"
+msgstr ""
+
+#. 6cCLG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_9\n"
+"LngText.text"
+msgid "Create new folder|"
+msgstr "Креирај нова папка|"
+
+#. DVAWB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_10\n"
+"LngText.text"
+msgid "OK"
+msgstr "Во ред"
+
+#. B8hF9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_12\n"
+"LngText.text"
+msgid "&Folder name:"
+msgstr "Име на &папката:"
+
+#. yQEAY
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_13\n"
+"LngText.text"
+msgid "Up one level|"
+msgstr "Едно ниво нагоре|"
+
+#. sGZLU
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_14\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. qGF5j
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_17\n"
+"LngText.text"
+msgid "&Change..."
+msgstr "&Промени..."
+
+#. xU4Fr
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_18\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. 24KMD
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_19\n"
+"LngText.text"
+msgid "Specify a network location for the server image of the product."
+msgstr "Одредува мрежна локација на серверот за слики на производот."
+
+#. NdeD8
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_20\n"
+"LngText.text"
+msgid "Enter the network location or click Change to browse to a location. Click Install to create a server image of [ProductName] at the specified network location or click Cancel to exit the wizard."
+msgstr "Внесете ја мрежната локација или кликнете Промени за да барате локација.  Кликнете Инсталирај за да креирате серверска слика на [ProductName] на одредена мрежна локација или кликнете Откажи за да излезете од волшебникот."
+
+#. U7sr3
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_21\n"
+"LngText.text"
+msgid "{&MSSansBold8}Network Location"
+msgstr "{&MSSansBold8}Мрежна локација"
+
+#. FsBUg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_22\n"
+"LngText.text"
+msgid "&Install"
+msgstr "&Инсталирај"
+
+#. FDxCc
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_23\n"
+"LngText.text"
+msgid "&Network location:"
+msgstr "&Мрежна локација:"
+
+#. dXe9C
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_24\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. NBCnQ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_25\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. cvmU9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_26\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. JzeGq
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_27\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Welcome to the Installation Wizard for [ProductName]"
+msgstr ""
+
+#. 9Zq7E
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_28\n"
+"LngText.text"
+msgid "The Installation Wizard will create a server image of [ProductName] at a specified network location. To continue, click Next."
+msgstr "Волшебникот за инсталирање ќе креира серверска слика на [ProductName] на одредена мрежна локација. За да продолжите, кликнете Следно."
+
+#. 9bAbP
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_29\n"
+"LngText.text"
+msgid "&No"
+msgstr "&Не"
+
+#. nkGKB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_30\n"
+"LngText.text"
+msgid "Are you sure you want to cancel [ProductName] installation?"
+msgstr "Дали навистина сакате да ја откажете инсталацијата на [ProductName]?"
+
+#. ZQcSE
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_31\n"
+"LngText.text"
+msgid "&Yes"
+msgstr "&Да"
+
+#. 9A9e8
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_32\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. nXGc8
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_35\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. RDDi2
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_36\n"
+"LngText.text"
+msgid "{\\DialogDefault}{80}"
+msgstr ""
+
+#. acbEy
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_37\n"
+"LngText.text"
+msgid "&Organization:"
+msgstr "&Организација:"
+
+#. AdQkD
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_38\n"
+"LngText.text"
+msgid "Please enter your information."
+msgstr "Внесете ги вашите информации."
+
+#. sD2L9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_39\n"
+"LngText.text"
+msgid "Install this application for:"
+msgstr "Инсталирај ја оваа апликација за:"
+
+#. 7ZdtP
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_40\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}User Information"
+msgstr ""
+
+#. 3cLPR
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_41\n"
+"LngText.text"
+msgid "{\\DialogDefault}{50}"
+msgstr ""
+
+#. QLsAy
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_42\n"
+"LngText.text"
+msgid "&User Name:"
+msgstr "&Корисничко име:"
+
+#. 62QZa
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_43\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. x5jEA
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_46\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. Vw7qG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_49\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. jagos
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_50\n"
+"LngText.text"
+msgid "&Change..."
+msgstr "&Промени..."
+
+#. kBVJV
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_51\n"
+"LngText.text"
+msgid "&Space"
+msgstr "&Празно место"
+
+#. aBiAM
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_52\n"
+"LngText.text"
+msgid "Select the program features you want installed."
+msgstr "Изберете ги карактеристиките на програмата што сакате да ги инсталирате."
+
+#. Y4ci6
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_53\n"
+"LngText.text"
+msgid "Click on an icon in the list below to change how a feature is installed."
+msgstr "За да измените како ќе се инсталира карактеристиката, кликнете на икона во долната листа."
+
+#. w5AqN
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_54\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Custom Setup"
+msgstr ""
+
+#. AnSJQ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_55\n"
+"LngText.text"
+msgid "Feature Description:"
+msgstr "Опис на карактеристики:"
+
+#. GsBZN
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_56\n"
+"LngText.text"
+msgid "&Help"
+msgstr "&Помош"
+
+#. CHHQJ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_57\n"
+"LngText.text"
+msgid "Install to:"
+msgstr "Инсталирај во:"
+
+#. WcE8h
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_58\n"
+"LngText.text"
+msgid "Multiline description of the currently selected item"
+msgstr "Опис на тековно избраниот елемент во повеќе редови"
+
+#. Mfmxu
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_59\n"
+"LngText.text"
+msgid "<selected feature path>"
+msgstr "<патека на избраната карактеристика>"
+
+#. yPciQ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_60\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. w8u5K
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_61\n"
+"LngText.text"
+msgid "Feature size"
+msgstr "Големина на карактеристика"
+
+#. 6VdJ4
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_64\n"
+"LngText.text"
+msgid "Custom Setup allows you to selectively install program features."
+msgstr "Сопствената инсталација Ви дозволува да изберете кои карактеристики на програмите да ги инсталирате."
+
+#. NgAfY
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_65\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Custom Setup Tips"
+msgstr ""
+
+#. 2sY6N
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_66\n"
+"LngText.text"
+msgid "Will not be installed."
+msgstr "Нема да се инсталира."
+
+#. FAbBF
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_67\n"
+"LngText.text"
+msgid "Will be installed on first use. (Available only if the feature supports this option.)"
+msgstr "Ќе се инсталира при прва употреба. (Достапно е само ако карактеристиката ја поддржува оваа опција.)"
+
+#. N5QGm
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_68\n"
+"LngText.text"
+msgid "This install state means the feature..."
+msgstr "Оваа состојба на инсталирање значи дека карактеристиката..."
+
+#. avGdu
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_69\n"
+"LngText.text"
+msgid "Will be completely installed to the local hard drive."
+msgstr "Ќе биде целосно инсталирана на локалниот диск."
+
+#. vqQkB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_70\n"
+"LngText.text"
+msgid "The icon next to the feature name indicates the install state of the feature. Click the icon to drop down the install state menu for each feature."
+msgstr "Иконата веднаш до името на карактеристиката означува во каква состојба се наоѓа инсталирањето. За да се појави мени за секоја од состојбите на инсталирање, кликнете на иконата."
+
+#. nABcc
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_71\n"
+"LngText.text"
+msgid "Will be installed to run from the network. (Available only if the feature supports this option.)"
+msgstr "Ќе се инсталира да работи од мрежа. (Достапно е само ако карактеристиката ја поддржува оваа опција.)"
+
+#. CB9Ew
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_72\n"
+"LngText.text"
+msgid "OK"
+msgstr "Во ред"
+
+#. JoCqE
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_73\n"
+"LngText.text"
+msgid "Will have some subfeatures installed to the local hard drive. (Available only if the feature has subfeatures.)"
+msgstr "Ќе има инсталирано некои поткарактеристики на локалниот диск. (Достапно е само ако карактеристиката има поткарактеристики.)"
+
+#. 8EqWR
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_84\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. 8ebDJ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_87\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. UiECK
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_88\n"
+"LngText.text"
+msgid "&Change..."
+msgstr "&Промени..."
+
+#. Cb4MG
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_89\n"
+"LngText.text"
+msgid "Click Next to install to this folder, or click Change to install to a different folder."
+msgstr "Кликнете Следно за да инсталирате во оваа папка, или кликнете Промени за да инсталирате во друга папка."
+
+#. WQfEU
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_90\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Destination Folder"
+msgstr ""
+
+#. RgRB4
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_91\n"
+"LngText.text"
+msgid "[INSTALLDIR]"
+msgstr "[INSTALLDIR]"
+
+#. zuiHv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_92\n"
+"LngText.text"
+msgid "Install [ProductName] to:"
+msgstr "Инсталирај [ProductName] во:"
+
+#. v9tFT
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_93\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. ESR8Q
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_96\n"
+"LngText.text"
+msgid "The disk space required for the installation of the selected features."
+msgstr "Потребно празно место на дискот за инсталирање на избраните карактеристики."
+
+#. Gb3dX
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_97\n"
+"LngText.text"
+msgid "The highlighted volumes do not have enough disk space available for the currently selected features. You can remove files from the highlighted volumes, choose to install less features onto local drives, or select different destination drives."
+msgstr "Избраните партиции немаат доволно празно место за тековно избраните карактеристики. Можете да отстраните датотеки од избраните партиции, да изберете помалку карактеристики за инсталирање на дискот или да изберете друг одредишен уред."
+
+#. 6sUCB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_98\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Disk Space Requirements"
+msgstr ""
+
+#. ZairS
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_100\n"
+"LngText.text"
+msgid "OK"
+msgstr "Во ред"
+
+#. qU2qs
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_103\n"
+"LngText.text"
+msgid "Some files that need to be updated are currently in use."
+msgstr "Некои датотеки што треба да се ажурираат се тековно во употреба."
+
+#. A8Gkz
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_104\n"
+"LngText.text"
+msgid "The following applications are using files that need to be updated by this setup. Close these applications and click Retry to continue."
+msgstr "Следниве апликации користат датотеки што треба да се ажурираат со оваа инсталација. Затворете ги овие апликации и кликнете Повторно за да продолжите."
+
+#. Fr3kC
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_105\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Files in Use"
+msgstr ""
+
+#. EjFBo
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_106\n"
+"LngText.text"
+msgid "&Exit"
+msgstr "&Излез"
+
+#. 9dh9B
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_107\n"
+"LngText.text"
+msgid "&Ignore"
+msgstr "&Игнорирај"
+
+#. BLBA4
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_108\n"
+"LngText.text"
+msgid "&Retry"
+msgstr "&Повторно"
+
+#. hiJJD
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_111\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. eEEjF
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_113\n"
+"LngText.text"
+msgid "&Look in:"
+msgstr "&Барај во:"
+
+#. Buuv5
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_114\n"
+"LngText.text"
+msgid "Browse to the destination folder."
+msgstr "Барајте до одредишната папка."
+
+#. CNjbv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_115\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Change Current Destination Folder"
+msgstr ""
+
+#. vQeGg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_117\n"
+"LngText.text"
+msgid "Create New Folder|"
+msgstr "Креирај нова папка|"
+
+#. mnAFC
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_118\n"
+"LngText.text"
+msgid "OK"
+msgstr "Во ред"
+
+#. SjgH9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_120\n"
+"LngText.text"
+msgid "&Folder name:"
+msgstr "Име на &папката:"
+
+#. aDXFg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_121\n"
+"LngText.text"
+msgid "Up One Level|"
+msgstr "Едно ниво нагоре|"
+
+#. iKCGV
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_122\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. Md3NN
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_123\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. sFyBK
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_124\n"
+"LngText.text"
+msgid "Build contributed in collaboration with the community by [Manufacturer]. For credits, see: https://www.documentfoundation.org"
+msgstr ""
+
+#. tLGPm
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_125\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. GiosA
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_126\n"
+"LngText.text"
+msgid "{&DialogHeading}Welcome to the Installation Wizard for [ProductName]"
+msgstr ""
+
+#. wJD2b
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_127\n"
+"LngText.text"
+msgid "The Installation Wizard will install [ProductName] on your computer. To continue, click Next."
+msgstr "Волшебникот за инсталирање ќе го инсталира [ProductName] на вашиот компјутер. За да продолжите, кликнете Следно."
+
+#. 7ENF5
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_128\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. QpmsW
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_131\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. NXHtk
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_132\n"
+"LngText.text"
+msgid "Please read the following license agreement carefully."
+msgstr "Внимателно прочитајте го договорот за лиценца."
+
+#. bTxvE
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_133\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}License Agreement"
+msgstr ""
+
+#. VmMs5
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_134\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. u4kep
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_135\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. QdNDB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_138\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. DjCGz
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_139\n"
+"LngText.text"
+msgid "Modify, repair, or remove the program."
+msgstr "Изменете ја, поправете ја или отстранете ја програмата."
+
+#. d7dZD
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_140\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Program Maintenance"
+msgstr ""
+
+#. w9y7B
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_141\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. nxx6Q
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_143\n"
+"LngText.text"
+msgid "Change which program features are installed. This option displays the Custom Selection dialog in which you can change the way features are installed."
+msgstr "Изменете кои карактеристики на програмата се инсталирани. Оваа опција го прикажува дијалогот за сопствен избор, во кој можете да го менувате начинот на инсталирање на карактеристиките."
+
+#. asaNV
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_144\n"
+"LngText.text"
+msgid "Repair installation errors in the program. This option fixes missing or corrupt files, shortcuts, and registry entries."
+msgstr "Поправете грешки при инсталација на програмата. Оваа опција ги поправа исчезнатите или оштетените датотеки, кратенки и елементи во регистарот."
+
+#. wqLBv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_145\n"
+"LngText.text"
+msgid "Remove [ProductName] from your computer."
+msgstr "Отстранете го [ProductName] од вашиот компјутер."
+
+#. qCuEL
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_146\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. k5Zb8
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_147\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. CoQtN
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_148\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. 8goFR
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_149\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Welcome to the Installation Wizard for [ProductName]"
+msgstr ""
+
+#. A8B4y
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_150\n"
+"LngText.text"
+msgid "The Installation Wizard will allow you to modify, repair, or remove [ProductName]. To continue, click Next."
+msgstr "Волшебникот за инсталирање ќе ви дозволи да го измените, да го поправите или да го отстраните [ProductName]. За да продолжите, кликнете Следно."
+
+#. HFHZY
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_153\n"
+"LngText.text"
+msgid "Disk space required for the installation exceeds available disk space."
+msgstr "Потребниот простор за инсталацијата го надминува расположливиот простор на дискот."
+
+#. 6HE5N
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_154\n"
+"LngText.text"
+msgid "The highlighted volumes do not have enough disk space available for the currently selected features. You can remove files from the highlighted volumes, choose to install less features onto local drives, or select different destination drives."
+msgstr "Избраните партиции немаат доволно празно место за тековно избраните карактеристики. Можете да отстраните датотеки од избраните партиции, да изберете помалку карактеристики за инсталирање на дискот или да изберете друг одредишен уред."
+
+#. kJvPh
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_155\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Out of Disk Space"
+msgstr ""
+
+#. 4BEms
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_156\n"
+"LngText.text"
+msgid "{120}{70}{70}{70}{70}"
+msgstr "{120}{70}{70}{70}{70}"
+
+#. vEdLD
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_157\n"
+"LngText.text"
+msgid "OK"
+msgstr "Во ред"
+
+#. DeVCK
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_158\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. LPhBF
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_159\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. BpG2B
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_160\n"
+"LngText.text"
+msgid "&Update >"
+msgstr "&Ажурирај >"
+
+#. 5Gm46
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_161\n"
+"LngText.text"
+msgid "{&DialogHeading}Welcome to the Patch for [ProductName]"
+msgstr ""
+
+#. wFLhj
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_162\n"
+"LngText.text"
+msgid "The Installation Wizard will install the Patch for [ProductName] on your computer. To continue, click Update."
+msgstr "Волшебникот за инсталирање ќе ја инсталира закрпата за [ProductName] на вашиот компјутер. За да продолжите, кликнете Ажурирај."
+
+#. RWU5F
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_163\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. F8CCC
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_166\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. vMkh5
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_167\n"
+"LngText.text"
+msgid "The wizard is ready to begin installation."
+msgstr "Волшебникот е подготвен да ја почне инсталацијата."
+
+#. XDfGL
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_168\n"
+"LngText.text"
+msgid "Click Install to begin the installation."
+msgstr "Кликнете на Инсталирај за да почне инсталацијата."
+
+#. BxJmA
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_169\n"
+"LngText.text"
+msgid "If you want to review or change any of your installation settings, click Back. Click Cancel to exit the wizard."
+msgstr "Ако сакате да прегледате или да измените кое и да е поставување на Вашата инсталација, кликнете Назад. За излез од волшебникот, кликнете Откажи."
+
+#. tGr9B
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_170\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Ready to Modify the Program"
+msgstr ""
+
+#. a9B5F
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_171\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Ready to Repair the Program"
+msgstr ""
+
+#. 9e9VQ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_172\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Ready to Install the Program"
+msgstr ""
+
+#. y8BGp
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_173\n"
+"LngText.text"
+msgid "&Install"
+msgstr "&Инсталирај"
+
+#. ExMxM
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_174\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. dfBGp
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_177\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. C6u3A
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_178\n"
+"LngText.text"
+msgid "You have chosen to remove the program from your system."
+msgstr "Избравте отстранување на програмата од Вашиот систем."
+
+#. FxWU4
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_179\n"
+"LngText.text"
+msgid "Click Remove to remove [ProductName] from your computer. After removal, this program will no longer be available for use."
+msgstr "Кликнете Отстрани за отстранување на [ProductName] од Вашиот компјутер. По отстранувањето, оваа програма веќе нема да биде достапна за употреба."
+
+#. 8DNv6
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_180\n"
+"LngText.text"
+msgid "If you want to review or change any settings, click Back."
+msgstr "Ако сакате да прегледате или да измените кои било поставувања, кликнете Назад."
+
+#. DgUgU
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_181\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Remove the Program"
+msgstr ""
+
+#. x4Thh
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_182\n"
+"LngText.text"
+msgid "&Remove"
+msgstr "&Отстрани"
+
+#. nQEWg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_183\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. fEhDQ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_184\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. eZgPN
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_185\n"
+"LngText.text"
+msgid "&Finish"
+msgstr "&Заврши"
+
+#. LGBn9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_186\n"
+"LngText.text"
+msgid "Your system has not been modified. To complete installation at another time, please run setup again."
+msgstr "Вашиот систем не беше изменет. За да ја завршите инсталацијата другпат, вклучете ја инсталацијата за програмата повторно."
+
+#. 6eqB6
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_187\n"
+"LngText.text"
+msgid "Click Finish to exit the wizard."
+msgstr "Кликнете Заврши за излез од волшебникот."
+
+#. qvUER
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_188\n"
+"LngText.text"
+msgid "You can either keep any existing installed elements on your system to continue this installation at a later time or you can restore your system to its original state prior to the installation."
+msgstr "Можете да ги зачувате сите постојни инсталирани елементи на Вашиот систем за да ја продолжите инсталацијата подоцна, или пак Вашиот систем можете да го вратите во состојба пред инсталацијата."
+
+#. tCBSv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_189\n"
+"LngText.text"
+msgid "Click Restore or Continue Later to exit the wizard."
+msgstr "Кликнете Врати или Продолжи подоцна за излез од волшебникот."
+
+#. EFyDT
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_190\n"
+"LngText.text"
+msgid "{&DialogHeading}Installation Wizard Completed"
+msgstr ""
+
+#. 3yQtG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_191\n"
+"LngText.text"
+msgid "The wizard was interrupted before [ProductName] could be completely installed."
+msgstr "Волшебникот беше прекинат пред да биде комплетно инсталиран [ProductName]."
+
+#. fqKzK
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_192\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. 6A92U
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_193\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. eZD7L
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_197\n"
+"LngText.text"
+msgid "&Finish"
+msgstr "&Заврши"
+
+#. QGZLT
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_198\n"
+"LngText.text"
+msgid "{&DialogHeading}Installation Wizard Completed"
+msgstr ""
+
+#. HXdXy
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_199\n"
+"LngText.text"
+msgid "The Installation Wizard has successfully installed [ProductName]. Click Finish to exit the wizard."
+msgstr "Волшебникот за инсталирање успешно го инсталира [ProductName]. Кликнете Заврши, за излез од волшебникот."
+
+#. jYN9T
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_200\n"
+"LngText.text"
+msgid "The Installation Wizard has successfully uninstalled [ProductName]. Click Finish to exit the wizard."
+msgstr "Волшебникот за инсталирање успешно го деинсталира [ProductName]. Кликнете Заврши за излез од волшебникот."
+
+#. bL7cn
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_204\n"
+"LngText.text"
+msgid "&Abort"
+msgstr "&Прекини"
+
+#. EEzac
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_205\n"
+"LngText.text"
+msgid "&Cancel"
+msgstr "&Откажи"
+
+#. D6Bgs
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_207\n"
+"LngText.text"
+msgid "&Ignore"
+msgstr "&Игнорирај"
+
+#. n8Dw2
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_208\n"
+"LngText.text"
+msgid "&No"
+msgstr "&Не"
+
+#. 5gmJX
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_209\n"
+"LngText.text"
+msgid "&OK"
+msgstr "&Во ред"
+
+#. wQfcS
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_210\n"
+"LngText.text"
+msgid "&Retry"
+msgstr "&Повторно"
+
+#. DNgah
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_211\n"
+"LngText.text"
+msgid "&Yes"
+msgstr "&Да"
+
+#. nq9vM
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_214\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. 7RMTN
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_215\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. ogHGJ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_216\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. AKDNL
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_217\n"
+"LngText.text"
+msgid "{&DialogHeading}Welcome to the Installation Wizard for [ProductName]"
+msgstr ""
+
+#. GYEbK
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_218\n"
+"LngText.text"
+msgid "[ProductName] Setup is preparing the Installation Wizard which will guide you through the program setup process. Please wait."
+msgstr "Инсталацијата на [ProductName] го подготвува волшебникот за инсталирање што ќе ве води низ процесот на инсталирање на програмата. Ве молам почекајте."
+
+#. ryhy8
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_219\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. khupb
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_220\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. ZEGaj
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_221\n"
+"LngText.text"
+msgid "&Finish"
+msgstr "&Заврши"
+
+#. SrinA
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_222\n"
+"LngText.text"
+msgid "Your system has not been modified. To install this program at a later time, please run the installation again."
+msgstr "Вашиот систем не беше изменет. За да ја инсталирате програмата другпат, вклучете ја инсталацијата за програмата повторно."
+
+#. YUipC
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_223\n"
+"LngText.text"
+msgid "Click Finish to exit the wizard."
+msgstr "Кликнете Заврши за излез од волшебникот."
+
+#. DnpKK
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_224\n"
+"LngText.text"
+msgid "You can either keep any existing installed elements on your system to continue this installation at a later time or you can restore your system to its original state prior to the installation."
+msgstr "Можете да ги зачувате сите постојни инсталирани елементи на Вашиот систем за да ја продолжите инсталацијата подоцна, или пак Вашиот систем можете да го вратите во состојба пред инсталацијата."
+
+#. GwDLG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_225\n"
+"LngText.text"
+msgid "Click Restore or Continue Later to exit the wizard."
+msgstr "Кликнете Врати или Продолжи подоцна за излез од волшебникот."
+
+#. bV4co
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_226\n"
+"LngText.text"
+msgid "{&DialogHeading}Installation Wizard Completed"
+msgstr ""
+
+#. fCUfv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_227\n"
+"LngText.text"
+msgid "The wizard was interrupted before [ProductName] could be completely installed."
+msgstr "Волшебникот беше прекинат пред да биде комплетно инсталиран [ProductName]."
+
+#. CAs7p
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_228\n"
+"LngText.text"
+msgid "Progress done"
+msgstr "Инсталирањето заврши"
+
+#. nqDdG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_230\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. TqEAe
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_233\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. DaXgT
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_234\n"
+"LngText.text"
+msgid "The program features you selected are being installed."
+msgstr "Карактеристиките на програмата што ги избравте се инсталираат."
+
+#. S2Nsa
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_235\n"
+"LngText.text"
+msgid "The program features you selected are being uninstalled."
+msgstr "Карактеристиките на програмата што ги избравте се деинсталираат."
+
+#. 93Mgi
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_236\n"
+"LngText.text"
+msgid "Please wait while the Installation Wizard installs [ProductName]. This may take several minutes."
+msgstr "Почекајте додека волшебникот за инсталирање го инсталира [ProductName]. Ова може да одземе неколку минути."
+
+#. UEXDT
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_237\n"
+"LngText.text"
+msgid "Please wait while the Installation Wizard uninstalls [ProductName]. This may take several minutes."
+msgstr "Почекајте додека волшебникот за инсталирање го деинсталира [ProductName]. Ова може да одземе неколку минути."
+
+#. nPNkd
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_238\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Installing [ProductName]"
+msgstr ""
+
+#. hwEMZ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_239\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Uninstalling [ProductName]"
+msgstr ""
+
+#. XuEFu
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_240\n"
+"LngText.text"
+msgid "Sec."
+msgstr "сек."
+
+#. yevqc
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_241\n"
+"LngText.text"
+msgid "Status:"
+msgstr "Статус:"
+
+#. SGeR9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_242\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. oBDGq
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_244\n"
+"LngText.text"
+msgid "Estimated time remaining:"
+msgstr "Проценето преостанато време:"
+
+#. cDaEJ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_245\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. pkkrD
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_246\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. dFqxM
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_247\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. nFwFq
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_248\n"
+"LngText.text"
+msgid "The Installation Wizard will complete the installation of [ProductName] on your computer. To continue, click Next."
+msgstr "Волшебникот за инсталирање ќе ја комплетира инсталацијата на [ProductName] на Вашиот компјутер. За да продолжите, кликнете Следно."
+
+#. sGq9T
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_249\n"
+"LngText.text"
+msgid "The Installation Wizard will complete the suspended installation of [ProductName] on your computer. To continue, click Next."
+msgstr "Волшебникот за инсталирање ќе ја доврши прекинатата инсталација на [ProductName] на Вашиот компјутер. За да продолжите, кликнете Следно."
+
+#. mff5H
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_250\n"
+"LngText.text"
+msgid "{&DialogHeading}Resuming the Installation Wizard for [ProductName]"
+msgstr ""
+
+#. ryZBv
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_251\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. mh4Pd
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_254\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. FeYpb
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_255\n"
+"LngText.text"
+msgid "[ProductName] will be installed with the default components, including user interface languages and spelling dictionaries matching your current language settings."
+msgstr ""
+
+#. LWzoJ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_256\n"
+"LngText.text"
+msgid "Choose which program features you want installed and where they will be installed. For example you can select user interface languages and spelling dictionaries."
+msgstr ""
+
+#. jcXxh
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_257\n"
+"LngText.text"
+msgid "Choose the setup type that best suits your needs."
+msgstr "Изберете го типот на инсталација што најмногу одговара на Вашите потреби."
+
+#. kjm6y
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_258\n"
+"LngText.text"
+msgid "Please select a setup type."
+msgstr "Изберете тип на инсталација."
+
+#. Gy4EE
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_259\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Setup Type"
+msgstr ""
+
+#. kv6GZ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_260\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. mXLvW
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_262\n"
+"LngText.text"
+msgid "< &Back"
+msgstr "< &Назад"
+
+#. v4dTZ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_265\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. SGa96
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_266\n"
+"LngText.text"
+msgid "&Next >"
+msgstr "&Следно >"
+
+#. FDmsJ
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_269\n"
+"LngText.text"
+msgid "Repair or remove the program."
+msgstr "Поправање или отстранување на програмата."
+
+#. d8DqG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_270\n"
+"LngText.text"
+msgid "&Microsoft Word Documents"
+msgstr "Документи од Microsoft Word"
+
+#. 3XAYG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_271\n"
+"LngText.text"
+msgid "Microsoft &Excel Spreadsheets"
+msgstr "Табеларни пресметки од Microsoft &Excel"
+
+#. 5hGB9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_272\n"
+"LngText.text"
+msgid "Microsoft Po&werPoint Presentations"
+msgstr "Презентации од Microsoft Po&werPoint"
+
+#. pRq2A
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_273\n"
+"LngText.text"
+msgid "Microsoft &Visio Documents"
+msgstr ""
+
+#. EdtKg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_274\n"
+"LngText.text"
+msgid "Set [DEFINEDPRODUCT] to be the default application for Microsoft Office file types."
+msgstr "Постави [DEFINEDPRODUCT] да биде преддефинирана апликација за ови типови на датотеки."
+
+#. BYWZ6
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_275\n"
+"LngText.text"
+msgid "[ProductName] can be set as the default application to open Microsoft Office file types. This means, for instance, that if you double click on one of these files, [ProductName] will open it, not the program that opens it now."
+msgstr "[ProductName] може да биде конфигуриран како стандардна апликација за отворање на следните типови датотеки. Ова значи дека ако кликнете двапати на некоја од овие датотеки, таа ќе биде отворена од [ProductName], а не од апликацијата што сега ја отвора."
+
+#. xMzmY
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_278\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}File Type"
+msgstr ""
+
+#. gjEzM
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_300\n"
+"LngText.text"
+msgid "A version of [DEFINEDPRODUCT] [DEFINEDVERSION] was found by the [ProductName] Installation Wizard. This version will be updated."
+msgstr "Верзијата на [DEFINEDPRODUCT] [DEFINEDVERSION] беше најдена од волшебникот за инсталирање на [ProductName]. Оваа верзија ќе биде ажурирана."
+
+#. Dc9GW
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_301\n"
+"LngText.text"
+msgid "The destination folder specified below does not contain a [DEFINEDPRODUCT] [DEFINEDVERSION] version."
+msgstr "Одредишната папката наведена подолу не содржи верзија на [DEFINEDPRODUCT] [DEFINEDVERSION]."
+
+#. Kv9ED
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_302\n"
+"LngText.text"
+msgid "A newer [DEFINEDPRODUCT] [DEFINEDVERSION] has been found."
+msgstr "Беше пронајден понов [DEFINEDPRODUCT] [DEFINEDVERSION]."
+
+#. F5CbH
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_303\n"
+"LngText.text"
+msgid "The version specified in the folder below cannot be updated."
+msgstr "Верзијата наведена во папката подолу не може да биде ажурирана."
+
+#. 5B3xC
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_304\n"
+"LngText.text"
+msgid "Check the destination folder."
+msgstr "Проверете ја одредишната папка."
+
+#. 5VLAA
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_305\n"
+"LngText.text"
+msgid "To continue, click Next."
+msgstr "За да продолжите, кликнете "
+
+#. E5kBg
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_306\n"
+"LngText.text"
+msgid "To select a different version, click Change. Otherwise click Cancel to abort the Installation Wizard."
+msgstr ""
+
+#. LFZCF
+#: Control.ulf
+#, fuzzy
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_307\n"
+"LngText.text"
+msgid "To select a different folder, click Change."
+msgstr "За да изберете друга папка, кликнете "
+
+#. VganB
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_308\n"
+"LngText.text"
+msgid "Install [ProductName] to:"
+msgstr "Инсталирај [ProductName] во:"
+
+#. PmFh2
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_309\n"
+"LngText.text"
+msgid "If you are just trying out [ProductName], you probably don't want this to happen, so leave the boxes unchecked."
+msgstr "Ако само го тестирате [ProductName], ова не е препорачливо, така што оставете ги полињата необележани."
+
+#. R6e9P
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_317\n"
+"LngText.text"
+msgid "No languages have been selected for installation. Click OK, then select one or more languages for installation."
+msgstr ""
+
+#. D6uEq
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_318\n"
+"LngText.text"
+msgid "No applications have been selected for installation. Click OK, then select one or more applications for installation."
+msgstr ""
+
+#. QEN5N
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_319\n"
+"LngText.text"
+msgid "Create a shortcut on desktop"
+msgstr ""
+
+#. cjkES
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_321\n"
+"LngText.text"
+msgid "Load [ProductName] during system start-up"
+msgstr ""
+
+#. BCN8y
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_322\n"
+"LngText.text"
+msgid "Some files that need to be updated are currently in use."
+msgstr "Некои датотеки што треба да се ажурираат се тековно во употреба."
+
+#. t27nK
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_323\n"
+"LngText.text"
+msgid "The following applications are using files that need to be updated by this setup. You can let Installation Wizard close them and attempt to restart them, or reboot the system later to complete the setup."
+msgstr ""
+
+#. qDAnG
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_324\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Files in Use"
+msgstr ""
+
+#. giWW4
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_325\n"
+"LngText.text"
+msgid "Cancel"
+msgstr "Откажи"
+
+#. QE6Bs
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_326\n"
+"LngText.text"
+msgid "OK"
+msgstr "Во ред"
+
+#. hRCs9
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_327\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Attention!"
+msgstr ""
+
+#. 5eE5R
+#: Control.ulf
+msgctxt ""
+"Control.ulf\n"
+"OOO_CONTROL_328\n"
+"LngText.text"
+msgid "The [ProductName] Help must be installed in the same directory as the program."
+msgstr ""
+
+#. jeyr7
+#: CustomAc.ulf
+msgctxt ""
+"CustomAc.ulf\n"
+"OOO_CUSTOMACTION_1\n"
+"LngText.text"
+msgid "A newer version of [ProductName] was found. To install an older version, the newer version needs to be removed first."
+msgstr "Беше пронајдена понова верзија на [ProductName]. За да инсталирате постара верзија, потребно е прво да ја отстраните поновата верзија."
+
+#. SjyhM
+#: CustomAc.ulf
+msgctxt ""
+"CustomAc.ulf\n"
+"OOO_CUSTOMACTION_2\n"
+"LngText.text"
+msgid "The same version of this product is already installed."
+msgstr "Истата верзија на овој производ е веќе инсталирана."
+
+#. xCCKB
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_1\n"
+"LngText.text"
+msgid "{{Fatal error: }}"
+msgstr "{{Фатална грешка: }}"
+
+#. 9XH6r
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_2\n"
+"LngText.text"
+msgid "Error [1]."
+msgstr "Грешка [1]."
+
+#. z5Dfb
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_3\n"
+"LngText.text"
+msgid "Warning [1]."
+msgstr "Предупредување [1]."
+
+#. UpPzE
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_4\n"
+"LngText.text"
+msgid "Info [1]."
+msgstr "Инфо. [1]."
+
+#. zJDLP
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_5\n"
+"LngText.text"
+msgid "Internal Error [1]. [2]{, [3]}{, [4]}"
+msgstr "Внатрешна грешка [1]. [2]{, [3]}{, [4]}"
+
+#. WabjJ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_6\n"
+"LngText.text"
+msgid "{{Disk full: }}"
+msgstr "{{Дискот е полн: }}"
+
+#. CGr6b
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_7\n"
+"LngText.text"
+msgid "Action [Time]: [1]. [2]"
+msgstr "Дејство [Time]: [1]. [2]"
+
+#. 9YYAk
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_8\n"
+"LngText.text"
+msgid "[ProductName]"
+msgstr "[ProductName]"
+
+#. rtN8R
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_9\n"
+"LngText.text"
+msgid "{[2]}{, [3]}{, [4]}"
+msgstr "{[2]}{, [3]}{, [4]}"
+
+#. myEAA
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_10\n"
+"LngText.text"
+msgid "Message type: [1], Argument: [2]"
+msgstr "Тип на порака: [1], аргумент: [2]"
+
+#. uhHpF
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_11\n"
+"LngText.text"
+msgid "=== Logging started: [Date]  [Time] ==="
+msgstr "=== Евиденцијата почна на: [Date]  [Time] ==="
+
+#. KmRsd
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_12\n"
+"LngText.text"
+msgid "=== Logging stopped: [Date]  [Time] ==="
+msgstr "=== Евиденцијата заврши на: [Date]  [Time] ==="
+
+#. FjrMW
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_13\n"
+"LngText.text"
+msgid "Action start [Time]: [1]."
+msgstr "Почеток на дејство [Time]: [1]."
+
+#. 5EEUh
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_14\n"
+"LngText.text"
+msgid "Action ended [Time]: [1]. Return value [2]."
+msgstr "Крај на дејство [Time]: [1]. Повратна вредност [2]."
+
+#. hJFdr
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_15\n"
+"LngText.text"
+msgid "Time remaining: {[1] minutes }{[2] seconds}"
+msgstr "Преостанато време: {[1] минути }{[2] секунди}"
+
+#. MVEGn
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_16\n"
+"LngText.text"
+msgid "Out of memory. Shut down other applications before retrying."
+msgstr "Нема меморија. Исклучете ги другите апликации пред да се обидете повторно."
+
+#. zFmaa
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_17\n"
+"LngText.text"
+msgid "Installer is no longer responding."
+msgstr "Инсталацијата веќе не враќа одговор."
+
+#. sTwJ2
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_18\n"
+"LngText.text"
+msgid "Installer terminated prematurely."
+msgstr "Инсталацијата се прекина предвремено."
+
+#. ucF5A
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_19\n"
+"LngText.text"
+msgid "Please wait while Windows configures [ProductName]"
+msgstr "Почекајте додека Windows го конфигурира [ProductName]"
+
+#. bzY5o
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_20\n"
+"LngText.text"
+msgid "Gathering required information..."
+msgstr "Ги собирам бараните информации..."
+
+#. 5Fs2g
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_21\n"
+"LngText.text"
+msgid "Removing older versions of this application"
+msgstr "Отстранувам постари верзии од оваа апликација"
+
+#. USAge
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_22\n"
+"LngText.text"
+msgid "Preparing to remove older versions of this application"
+msgstr "Се подготвувам за отстранување постари верзии од оваа апликација"
+
+#. gnzzz
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_23\n"
+"LngText.text"
+msgid "{[ProductName] }Setup completed successfully."
+msgstr "{[ProductName] }Инсталацијата заврши успешно."
+
+#. 5BrkY
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_24\n"
+"LngText.text"
+msgid "{[ProductName] }Setup failed."
+msgstr "{[ProductName] }Инсталацијата не успеа."
+
+#. yCcM6
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_25\n"
+"LngText.text"
+msgid "Error reading from file: [2]. {{ System error [3].}}  Verify that the file exists and that you can access it."
+msgstr "Грешка при читање од датотека: [2]. {{ Системска грешка [3].}}  Потврдете дека датотеката постои и дека можете да ѝ пристапите."
+
+#. 68Tuw
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_26\n"
+"LngText.text"
+msgid "Cannot create the file [3].  A directory with this name already exists.  Cancel the installation and try installing to a different location."
+msgstr "Не можам да ја креирам датотеката [3].  Веќе постои папка со вакво име.  Откажете ја инсталацијата и обидете се да инсталирате на друга локација."
+
+#. azxrB
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_27\n"
+"LngText.text"
+msgid "Please insert the disk: [2]"
+msgstr "Вметнете го дискот: [2]"
+
+#. EUfwF
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_28\n"
+"LngText.text"
+msgid "The installer has insufficient privileges to access this directory: [2].  The installation cannot continue.  Log on as an administrator or contact your system administrator."
+msgstr "Инсталацијата нема доволно дозволи за да пристапи кон папката: [2].  Инсталацијата не може да продолжи.  Најавете се како администратор или контактирајте со вашиот системски администратор."
+
+#. FBYxG
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_29\n"
+"LngText.text"
+msgid "Error writing to file [2].  Verify that you have access to that directory."
+msgstr "Грешка при запишување во датотеката [2]. Потврдете дека имате пристап до папката."
+
+#. UbSyL
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_30\n"
+"LngText.text"
+msgid "Error reading from file [2].  Verify that the file exists and that you can access it."
+msgstr "Грешка при читањето од датотеката [2].  Потврдете дека датотеката постои и дека имате пристап до неа."
+
+#. AB6YZ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_31\n"
+"LngText.text"
+msgid "Another application has exclusive access to the file [2].  Please shut down all other applications, then click Retry."
+msgstr "Друга апликација има ексклузивен пристап до датотеката [2]. Исклучете ги сите други апликации, потоа кликнете Повторно."
+
+#. cBCXk
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_32\n"
+"LngText.text"
+msgid "There is not enough disk space to install the file [2].  Free some disk space and click Retry, or click Cancel to exit."
+msgstr "Нема доволно место на дискот за инсталирање на датотеката  [2].  Ослободете место на дискот и кликнете Повторно или кликнете Откажи за да излезете."
+
+#. BTono
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_33\n"
+"LngText.text"
+msgid "Source file not found: [2].  Verify that the file exists and that you can access it."
+msgstr "Изворната датотека не е најдена: [2].  Потврдете дека датотеката постои и дека имате пристап до неа."
+
+#. eTECb
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_34\n"
+"LngText.text"
+msgid "Error reading from file: [3]. {{ System error [2].}}  Verify that the file exists and that you can access it."
+msgstr "Грешка при читањето од датотеката: [3]. {{ Системска грешка [2].}} [3]. Потврдете дека датотеката постои и дека имате пристап до неа."
+
+#. eHTZD
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_35\n"
+"LngText.text"
+msgid "Error writing to file: [3]. {{ System error [2].}}  Verify that you have access to that directory."
+msgstr "Грешка при запишување во датотеката [3]. {{ Системска грешка [2].}}  Потврдете дека датотеката постои и дека имате пристап до неа."
+
+#. f7AGu
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_36\n"
+"LngText.text"
+msgid "Source file not found{{(cabinet)}}: [2].  Verify that the file exists and that you can access it."
+msgstr "Изворната датотека не е најдена{{(cabinet)}}: [2].  Потврдете дека датотеката постои и дека имате пристап до неа."
+
+#. rdcGb
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_37\n"
+"LngText.text"
+msgid "Cannot create the directory [2].  A file with this name already exists.  Please rename or remove the file and click Retry, or click Cancel to exit."
+msgstr "Не можам да ја креирам папката [2].  Датотека со вакво име веќе постои.  Преименувајте ја или отстранете ја датотеката и кликнете Повторно или кликнете Откажи за да излезете."
+
+#. oCgqE
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_38\n"
+"LngText.text"
+msgid "The volume [2] is currently unavailable.  Please select another."
+msgstr "Партицијата [2] е тековно недостапна.  Изберете друга."
+
+#. p8BUw
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_39\n"
+"LngText.text"
+msgid "The specified path [2] is unavailable."
+msgstr "Наведената патека [2] е недостапна."
+
+#. WRSZ8
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_40\n"
+"LngText.text"
+msgid "Unable to write to the specified folder [2]."
+msgstr "Не може да запише во наведената папка [2]."
+
+#. bcJXd
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_41\n"
+"LngText.text"
+msgid "A network error occurred while attempting to read from the file [2]"
+msgstr "Се појави грешка во мрежата при обидот за читање од датотеката [2]."
+
+#. LEUou
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_42\n"
+"LngText.text"
+msgid "An error occurred while attempting to create the directory [2]"
+msgstr "Се појави грешка при обидот за креирање на именикот [2]"
+
+#. r7jLo
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_43\n"
+"LngText.text"
+msgid "A network error occurred while attempting to create the directory [2]"
+msgstr "Се појави грешка во мрежата при обидот за креирање на именикот [2]"
+
+#. stYdV
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_44\n"
+"LngText.text"
+msgid "A network error occurred while attempting to open the source file cabinet [2]."
+msgstr "Се појави грешка во мрежата при обидот за отворање на изворниот пакет [2]."
+
+#. usiDM
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_45\n"
+"LngText.text"
+msgid "The specified path is too long [2]."
+msgstr "Наведената патека е предолга [2]."
+
+#. p5MdE
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_46\n"
+"LngText.text"
+msgid "The Installer has insufficient privileges to modify the file [2]."
+msgstr "Инсталацијата нема доволно дозволи да ја измени датотеката [2]."
+
+#. V5Kzx
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_47\n"
+"LngText.text"
+msgid "A portion of the path [2] exceeds the length allowed by the system."
+msgstr "Делот од патеката [2] ја надминува должината дозволена од системот."
+
+#. aXaGC
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_48\n"
+"LngText.text"
+msgid "The path [2] contains words that are not valid in folders."
+msgstr "Патеката [2] содржи зборови што не се валидни за папки."
+
+#. sWX9V
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_49\n"
+"LngText.text"
+msgid "The path [2] contains an invalid character."
+msgstr "Патеката [2] содржи невалиден знак."
+
+#. tGkEp
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_50\n"
+"LngText.text"
+msgid "[2] is not a valid short file name."
+msgstr "[2] не е валидно кратко име на датотеката."
+
+#. ZHAnX
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_51\n"
+"LngText.text"
+msgid "Error getting file security: [3] GetLastError: [2]"
+msgstr "Грешка во преземањето на безбедноста на датотека: [3] ПоследнаГрешка: [2]"
+
+#. JFako
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_52\n"
+"LngText.text"
+msgid "Invalid Drive: [2]"
+msgstr "Невалиден уред: [2]"
+
+#. KrRDX
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_53\n"
+"LngText.text"
+msgid "Error applying patch to file [2].  It has probably been updated by other means, and can no longer be modified by this patch.  For more information contact your patch vendor.  {{System Error: [3]}}"
+msgstr "Грешка при применувањето на закрпата врз датотеката [2].  Веројатно е веќе ажурирана поинаку и веќе не може да биде менувана од оваа закрпа. За повеќе информации контактирајте со вашиот снабдувач со закрпи.  {{System Error: [3]}}"
+
+#. 5A7BV
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_54\n"
+"LngText.text"
+msgid "Could not create key [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Не можам да го креирам клучот [2]. {{ System error [3].}}  Потврдете дека имате доволно пристап до тој клуч или контактирајте со вашиот персонал за поддршка."
+
+#. JZi8n
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_55\n"
+"LngText.text"
+msgid "Could not open key: [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Не можам да го отворам клучот: [2]. {{ System error [3].}}  Потврдете дека имате доволно пристап до тој клуч или контактирајте со вашиот персонал за поддршка."
+
+#. eAhfo
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_56\n"
+"LngText.text"
+msgid "Could not delete value [2] from key [3]. {{ System error [4].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Не можам да ја избришам вредноста [2] од клучот [3]. {{ System error [4].}}  Потврдете дека имате доволно пристап до тој клуч или контактирајте со вашиот персонал за поддршка."
+
+#. Mgice
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_57\n"
+"LngText.text"
+msgid "Could not delete key [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Не можам да го избришам клучот [2]. {{ System error [3].}}  Потврдете дека имате доволно пристап до тој клуч или контактирајте со вашиот персонал за поддршка."
+
+#. e8pbi
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_58\n"
+"LngText.text"
+msgid "Could not read value [2] from key [3]. {{ System error [4].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Не можам да ја прочитам вредноста [2] од клучот [3]. {{ System error [4].}}  Потврдете дека имате доволно пристап до тој клуч или контактирајте со вашиот персонал за поддршка."
+
+#. rAGhL
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_59\n"
+"LngText.text"
+msgid "Could not write value [2] to key [3]. {{ System error [4].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Не можам да ја запишам вредноста [2] во клучот [3]. {{ System error [4].}}  Потврдете дека имате доволно пристап до тој клуч или контактирајте со вашиот персонал за поддршка."
+
+#. AfbrT
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_60\n"
+"LngText.text"
+msgid "Could not get value names for key [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Не можам да ги земам имињата на вредностите за клучот [2]. {{ System error [3].}}  Потврдете дека имате доволно пристап до тој клуч или контактирајте со вашиот персонал за поддршка."
+
+#. Hm5Sz
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_61\n"
+"LngText.text"
+msgid "Could not get sub key names for key [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Не можам да ги земам имињата на потклучевите за клучот [2]. {{ System error [3].}}  Потврдете дека имате доволно пристап до тој клуч или контактирајте со вашиот персонал за поддршка."
+
+#. tcEko
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_62\n"
+"LngText.text"
+msgid "Could not read security information for key [2]. {{ System error [3].}}  Verify that you have sufficient access to that key, or contact your support personnel."
+msgstr "Не можам да ја прочитам информацијата за безбедност за клучот [2]. {{ System error [3].}}  Потврдете дека имате доволно пристап до тој клуч или контактирајте со вашиот персонал за поддршка."
+
+#. AVTnB
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_63\n"
+"LngText.text"
+msgid "Could not increase the available registry space. [2] KB of free registry space is required for the installation of this application."
+msgstr "Не можам да го зголемам расположливиот простор на регистарот. [2] KB од слободниот простор на регистарот се потребни за инсталацијата на оваа апликација."
+
+#. yjQqT
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_64\n"
+"LngText.text"
+msgid "Another installation is in progress. You must complete that installation before continuing this one."
+msgstr "Друга инсталација е во тек. Мора да ја довршите инсталацијата пред да ја продолжите оваа."
+
+#. sDFYT
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_65\n"
+"LngText.text"
+msgid "Error accessing secured data. Please make sure the Windows Installer is configured properly and try the installation again."
+msgstr "Грешка при пристапување до заштитените податоци. Осигурете се дека вашиот Windows Installer е конфигуриран правилно и обидете се повторно со инсталацијата."
+
+#. 5AEAp
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_66\n"
+"LngText.text"
+msgid "User [2] has previously initiated an installation for product [3].  That user will need to run that installation again before using that product.  Your current installation will now continue."
+msgstr "Корисникот [2] претходно ја иницирал инсталацијата за производот [3].  Тој корисник ќе треба повторно да ја стартува инсталацијата пред употреба на тој производ.  Вашата тековна инсталација ќе продолжи."
+
+#. jsFda
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_67\n"
+"LngText.text"
+msgid "User [2] has previously initiated an installation for product [3].  That user will need to run that installation again before using that product."
+msgstr "Корисникот [2] претходно ја иницирал инсталацијата за производот [3].  Тој корисник ќе треба повторно да ја стартува инсталацијата пред употреба на тој производ."
+
+#. 4y8CN
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_68\n"
+"LngText.text"
+msgid "Out of disk space -- Volume: '[2]'; required space: [3] KB; available space: [4] KB.  Free some disk space and retry."
+msgstr "Нема празно место на дискот -- Партиција: „[2]“; потребно празно место: [3] KB; расположливо празно место: [4] KB.  Ослободете празно место на дискот и обидете се повторно."
+
+#. jeRkA
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_69\n"
+"LngText.text"
+msgid "Are you sure you want to cancel?"
+msgstr "Дали навистина сакате да откажете?"
+
+#. E4bTn
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_70\n"
+"LngText.text"
+msgid "The file [2][3] is being held in use {by the following process: Name: [4], ID: [5], Window Title: [6]}.  Close that application and retry."
+msgstr "Датотеката [2][3] е задржана во употреба {од следниов процес: Име [4]. ID [5], Наслов на прозорецот [6]}. Затворете ја таа апликација и пробајте повторно."
+
+#. oF3Fv
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_71\n"
+"LngText.text"
+msgid "The product [2] is already installed, preventing the installation of this product.  The two products are incompatible."
+msgstr "Производот [2] е веќе инсталиран и ја оневозможува инсталацијата за овој производ.  Двата производа не одговараат."
+
+#. s2orj
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_72\n"
+"LngText.text"
+msgid "Out of disk space -- Volume: [2]; required space: [3] KB; available space: [4] KB.  If rollback is disabled, enough space is available. Click Cancel to quit, Retry to check available disk space again, or Ignore to continue without rollback."
+msgstr "Нема слободно место на дискот -- Партиција: [2]; потребно слободно место: [3] KB; расположливо празно место: [4] KB.  Ако е враќањето назад оневозможено, има доволно празно место. Кликнете Откажи за излез, Повторно за проверка на расположливиот празен простор на дискот уште еднаш или Игнорирај за да продолжите без враќање назад."
+
+#. MCwyq
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_73\n"
+"LngText.text"
+msgid "Could not access network location [2]."
+msgstr "Не можам да пристапам на мрежната локација [2]."
+
+#. ELP3i
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_74\n"
+"LngText.text"
+msgid "The following applications should be closed before continuing the installation:"
+msgstr "Следниве апликации треба да се исклучат пред да ја продолжите инсталацијата:"
+
+#. Bad4A
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_75\n"
+"LngText.text"
+msgid "Could not find any previously installed compliant products on the machine for installing this product."
+msgstr "Не можам да пронајдам ниеден од претходно инсталираните соодветни производи на машината за инсталирање на производот."
+
+#. 7BqEv
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_76\n"
+"LngText.text"
+msgid "The key [2] is not valid.  Verify that you entered the correct key."
+msgstr "Клучот [2] не е валиден.  Потврдете дека сте го внесле правилниот клуч."
+
+#. YqEBF
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_77\n"
+"LngText.text"
+msgid "The installer must restart your system before configuration of [2] can continue.  Click Yes to restart now or No if you plan to restart later."
+msgstr "Пред да може да продолжи конфигурацијата на [2], програмата за инсталирање мора да го рестартира вашиот систем. Кликнете Да за да го рестартирате сега или Не ако планирате да го рестартирате подоцна."
+
+#. veLrG
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_78\n"
+"LngText.text"
+msgid "You must restart your system for the configuration changes made to [2] to take effect. Click Yes to restart now or No if you plan to restart later."
+msgstr "Мора да го рестартирате Вашиот систем за направените измени во конфигурацијата на [2] да имаат ефект. Кликнете Да за да го рестартирате сега или Не ако планирате да го рестартирате подоцна."
+
+#. s3W2C
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_79\n"
+"LngText.text"
+msgid "An installation for [2] is currently suspended.  You must undo the changes made by that installation to continue.  Do you want to undo those changes?"
+msgstr "Инсталацијата за [2] е моментално прекината.  Мора да ги отповикате измените направени од таа инсталација за да продолжите.  Дали сакате да ги отповикате тие измени?"
+
+#. q6oVY
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_80\n"
+"LngText.text"
+msgid "A previous installation for this product is in progress.  You must undo the changes made by that installation to continue.  Do you want to undo those changes?"
+msgstr "Претходна инсталација за овој производ е во тек.  Мора да ги отповикате промените направени од таа инсталација за да продолжите. Дали сакате да ги отповикате тие измени?"
+
+#. DnEz6
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_81\n"
+"LngText.text"
+msgid "No valid source could be found for product [2].  The Windows Installer cannot continue."
+msgstr "Не може да се најде валиден извор за производот [2].  Windows Installer не може да продолжи."
+
+#. yJVAH
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_82\n"
+"LngText.text"
+msgid "Installation operation completed successfully."
+msgstr "Операцијата за инсталација заврши успешно."
+
+#. kWcs2
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_83\n"
+"LngText.text"
+msgid "Installation operation failed."
+msgstr "Операцијата за инсталација не успеа."
+
+#. NGB3n
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_84\n"
+"LngText.text"
+msgid "Product: [2] -- [3]"
+msgstr "Производ: [2] -- [3]"
+
+#. S2uCJ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_85\n"
+"LngText.text"
+msgid "You may either restore your computer to its previous state or continue the installation later. Would you like to restore?"
+msgstr "Можете или да го вратите Вашиот компјутер во претходната состојба или да ја продолжите инсталацијата подоцна. Дали сакате да го вратите?"
+
+#. nbuxg
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_86\n"
+"LngText.text"
+msgid "An error occurred while writing installation information to disk.  Check to make sure enough disk space is available, and click Retry, or Cancel to end the installation."
+msgstr "Се појави грешка при запишување на информација за инсталација на дискот.  Проверете за да се осигурите дека има доволно празно место на дискот и кликнете Повторно или за крај на инсталацијата кликнете Откажи."
+
+#. RrjwL
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_87\n"
+"LngText.text"
+msgid "One or more of the files required to restore your computer to its previous state could not be found.  Restoration will not be possible."
+msgstr "Една или повеќе од датотеките што се потребни за враќање на Вашиот компјутер во претходната состојба не може да бидат пронајдени.  Обновувањето нема да биде можно."
+
+#. 2GGnJ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_88\n"
+"LngText.text"
+msgid "[2] cannot install one of its required products. Contact your technical support group.  {{System Error: [3].}}"
+msgstr "[2] не може да инсталира еден од потребните производи. Контактирајте со вашата група за техничка поддршка.  {{System Error: [3].}}"
+
+#. FAFxM
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_89\n"
+"LngText.text"
+msgid "The older version of [2] cannot be removed.  Contact your technical support group.  {{System Error [3].}}"
+msgstr "Постарата верзија на [2] не може да биде отстранета. Контактирајте со вашата група за техничка поддршка.  {{System Error: [3].}}"
+
+#. bqsp7
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_90\n"
+"LngText.text"
+msgid "The path [2] is not valid.  Please specify a valid path."
+msgstr "Патеката [2] не е валидна.  Зададете валидна патека."
+
+#. BdQrc
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_91\n"
+"LngText.text"
+msgid "Out of memory. Shut down other applications before retrying."
+msgstr "Нема меморија. Исклучете ги другите апликации пред да се обидете повторно."
+
+#. 3yp9Y
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_92\n"
+"LngText.text"
+msgid "There is no disk in drive [2]. Please insert one and click Retry, or click Cancel to go back to the previously selected volume."
+msgstr "Нема диск во уредот [2]. Внесете диск и кликнете Повторно или кликнете Откажи за да се вратите на претходно избраната партиција."
+
+#. TnfBJ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_93\n"
+"LngText.text"
+msgid "There is no disk in drive [2]. Please insert one and click Retry, or click Cancel to return to the browse dialog and select a different volume."
+msgstr "Нема диск во уредот [2]. Внесете диск и кликнете Повторно или кликнете Откажи за да се вратите во дијалогот за прелистување и изберете друга партиција."
+
+#. ESgwj
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_94\n"
+"LngText.text"
+msgid "The folder [2] does not exist.  Please enter a path to an existing folder."
+msgstr "Папката [2] не постои.  Внесете патека кон постојна папка."
+
+#. p7SAc
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_95\n"
+"LngText.text"
+msgid "You have insufficient privileges to read this folder."
+msgstr "Немате доволно дозволи за читање на оваа папка."
+
+#. e7ts6
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_96\n"
+"LngText.text"
+msgid "A valid destination folder for the installation could not be determined."
+msgstr "Не можеше да биде определена валидна одредишна папка за инсталација."
+
+#. ZFVRn
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_97\n"
+"LngText.text"
+msgid "Error attempting to read from the source installation database: [2]."
+msgstr "Грешка при обидот за читање од базата на податоци за изворната инсталација: [2]."
+
+#. BGgm9
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_98\n"
+"LngText.text"
+msgid "Scheduling reboot operation: Renaming file [2] to [3]. Must reboot to complete operation."
+msgstr "Ќе извршам операција за рестартирање: Преименување на датотеката [2] во [3]. Мора да се рестартира за да се доврши операцијата."
+
+#. mtjE3
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_99\n"
+"LngText.text"
+msgid "Scheduling reboot operation: Deleting file [2]. Must reboot to complete operation."
+msgstr "Ќе извршам операција за рестартирање: Бришење на датотеката [2]. Мора да се рестартира за да се доврши операцијата."
+
+#. iEw33
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_100\n"
+"LngText.text"
+msgid "Module [2] failed to register.  HRESULT [3].  Contact your support personnel."
+msgstr "Модулот [2] не успеа да се регистрира.  HRESULT [3].  Контактирајте со вашиот персонал за поддршка."
+
+#. bECVQ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_101\n"
+"LngText.text"
+msgid "Module [2] failed to unregister.  HRESULT [3].  Contact your support personnel."
+msgstr "Модулот [2] не успеа да се дерегистрира.  HRESULT [3].  Контактирајте со вашиот персонал за поддршка."
+
+#. FWg3S
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_102\n"
+"LngText.text"
+msgid "Failed to cache package [2]. Error: [3]. Contact your support personnel."
+msgstr "Не успеав да го кеширам пакетот [2]. Грешка [3]. Контактирајте со вашиот персонал за поддршка."
+
+#. bKEyX
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_103\n"
+"LngText.text"
+msgid "Could not register font [2].  Verify that you have sufficient permissions to install fonts, and that the system supports this font."
+msgstr "Не можев да го регистрирам фонтот [2].  Потврдете дека имате доволно дозволи за инсталирање фонтови и дека системот го поддржува овој фонт."
+
+#. G7bAP
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_104\n"
+"LngText.text"
+msgid "Could not unregister font [2]. Verify that you have sufficient permissions to remove fonts."
+msgstr "Не можев да го дерегистрирам фонтот [2]. Потврдете дека имате доволно дозволи за отстранување фонтови."
+
+#. LmRtG
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_105\n"
+"LngText.text"
+msgid "Could not create shortcut [2]. Verify that the destination folder exists and that you can access it."
+msgstr "Не можам да ја креирам кратенката [2]. Потврдете дека одредишната папка постои и дека може да пристапите до неа."
+
+#. QXqrx
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_106\n"
+"LngText.text"
+msgid "Could not remove shortcut [2]. Verify that the shortcut file exists and that you can access it."
+msgstr "Не можам да ја отстранам кратенката [2]. Потврдете дека датотеката со кратенка постои и дека можете да пристапите до неа."
+
+#. 3MqnE
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_107\n"
+"LngText.text"
+msgid "Could not register type library for file [2].  Contact your support personnel."
+msgstr "Не можам да ја регистрирам библиотеката со типови за датотеката [2].  Контактирајте со вашиот персонал за поддршка."
+
+#. jCuE6
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_108\n"
+"LngText.text"
+msgid "Could not unregister type library for file [2].  Contact your support personnel."
+msgstr "Не можам да ја дерегистрирам библиотеката со типови за датотеката [2].  Контактирајте со вашиот персонал за поддршка."
+
+#. 4pspZ
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_109\n"
+"LngText.text"
+msgid "Could not update the INI file [2][3].  Verify that the file exists and that you can access it."
+msgstr "Не можам да ја ажурирам INI-датотеката [2][3].  Потврдете дека датотеката постои и дека може да пристапите до неа."
+
+#. dkhNT
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_110\n"
+"LngText.text"
+msgid "Could not schedule file [2] to replace file [3] on reboot.  Verify that you have write permissions to file [3]."
+msgstr "Не можам да закажам датотеката [2] да ја замени датотеката [3] при рестартирање.  Потврдете дека имате дозволи за запишување во датотеката [3]."
+
+#. DDg6R
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_111\n"
+"LngText.text"
+msgid "Error removing ODBC driver manager, ODBC error [2]: [3]. Contact your support personnel."
+msgstr "Грешка при отстранување на менаџерот на ODBC-управувачи, ODBC-грешка [2]: [3]. Контактирајте со вашиот персонал за поддршка."
+
+#. FBn6s
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_112\n"
+"LngText.text"
+msgid "Error installing ODBC driver manager, ODBC error [2]: [3]. Contact your support personnel."
+msgstr "Грешка при инсталирање на менаџерот на ODBC-управувачи, ODBC-грешка [2]: [3]. Контактирајте со вашиот персонал за поддршка."
+
+#. ebBpH
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_113\n"
+"LngText.text"
+msgid "Error removing ODBC driver [4], ODBC error [2]: [3]. Verify that you have sufficient privileges to remove ODBC drivers."
+msgstr "Грешка при отстранување на ODBC-управувачот [4], ODBC-грешка [2]: [3]. Потврдете дека имате доволно дозволи за отстранување на ODBC-управувачи."
+
+#. wWeik
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_114\n"
+"LngText.text"
+msgid "Error installing ODBC driver [4], ODBC error [2]: [3]. Verify that the file [4] exists and that you can access it."
+msgstr "Грешка при инсталирање на ODBC-управувачот [4], ODBC-грешка [2]: [3]. Потврдете дека датотеката [4] постои и дека можете да пристапите до неа."
+
+#. X7EWG
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_115\n"
+"LngText.text"
+msgid "Error configuring ODBC data source [4], ODBC error [2]: [3]. Verify that the file [4] exists and that you can access it."
+msgstr "Грешка при конфигурирањето на ODBC-изворот на податоци [4], ODBC-грешка [2]: [3]. Потврдете дека датотеката [4] постои и дека можете да пристапите до неа."
+
+#. 6UdPx
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_116\n"
+"LngText.text"
+msgid "Service [2] ([3]) failed to start.  Verify that you have sufficient privileges to start system services."
+msgstr "Сервисот [2] ([3]) не успеа да се стартува.  Потврдете дека имате доволно дозволи за стартување системски сервиси."
+
+#. qEDkf
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_117\n"
+"LngText.text"
+msgid "Service [2] ([3]) could not be stopped.  Verify that you have sufficient privileges to stop system services."
+msgstr "Сервисот [2] ([3]) не може да биде запрен.  Потврдете дека имате доволно дозволи за запирање системски сервиси."
+
+#. R8sJN
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_118\n"
+"LngText.text"
+msgid "Service [2] ([3]) could not be deleted.  Verify that you have sufficient privileges to remove system services."
+msgstr "Сервисот [2] ([3]) не може да се избрише.  Потврдете дека имате доволно дозволи за отстранување системски сервиси."
+
+#. 8vYFt
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_119\n"
+"LngText.text"
+msgid "Service [2] ([3]) could not be installed.  Verify that you have sufficient privileges to install system services."
+msgstr "Сервисот [2] ([3]) не може да се инсталира.  Потврдете дека имате доволно дозволи за инсталирање системски сервиси."
+
+#. TFWVv
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_120\n"
+"LngText.text"
+msgid "Could not update environment variable [2].  Verify that you have sufficient privileges to modify environment variables."
+msgstr "Не можам да ја ажурирам променливата на околина [2].  Потврдете дека имате доволно дозволи за менување на променливите на околина."
+
+#. pMovX
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_121\n"
+"LngText.text"
+msgid "You do not have sufficient privileges to complete this installation for all users of the machine.  Log on as an administrator and then retry this installation."
+msgstr "Немате доволно дозволи за да ја завршите оваа инсталација за сите корисници на машината. Најавете се како администратор и стартувајте ја инсталацијата повторно."
+
+#. HdDZA
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_122\n"
+"LngText.text"
+msgid "Could not set file security for file [3]. Error: [2].  Verify that you have sufficient privileges to modify the security permissions for this file."
+msgstr "Не можам да поставам безбедност за датотеката [3]. Грешка: [2].  Потврдете дека имате доволно дозволи за менување на безбедносните дозволи за оваа датотека."
+
+#. GtDXr
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_123\n"
+"LngText.text"
+msgid "Component Services (COM+ 1.0) are not installed on this computer.  This installation requires Component Services in order to complete successfully.  Component Services are available on Windows 2000."
+msgstr "Сервисите за компоненти (COM+ 1.0) не се инсталирани на овој компјутер.  Оваа инсталација бара Сервиси за компоненти за да заврши успешно.  Сервисите за компоненти се достапни на Windows 2000."
+
+#. 7AFuq
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_124\n"
+"LngText.text"
+msgid "Error registering COM+ application.  Contact your support personnel for more information."
+msgstr "Грешка при регистрирање на COM+ апликација.  За повеќе информации, контактирајте со вашиот персонал за поддршка."
+
+#. yU8as
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_125\n"
+"LngText.text"
+msgid "Error unregistering COM+ application.  Contact your support personnel for more information."
+msgstr "Грешка при дерегистрирање на COM+ апликација.  За повеќе информации, контактирајте со вашиот персонал за поддршка."
+
+#. ewJEY
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_126\n"
+"LngText.text"
+msgid "The description for service '[2]' ([3]) could not be changed."
+msgstr "Описот за сервисот „[2]“ ([3]) не можеше да биде променет."
+
+#. BypXi
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_127\n"
+"LngText.text"
+msgid "The Windows Installer service cannot update the system file [2] because the file is protected by Windows.  You may need to update your operating system for this program to work correctly. {{Package version: [3], OS Protected version: [4]}}"
+msgstr "Сервисот Windows Installer не може да ја ажурира системската датотека [2], бидејќи датотеката е заштитена од Windows.  Можеби ќе треба да го ажурирате вашиот оперативен систем за да оваа програма да работи правилно. {{Package version: [3], OS Protected version: [4]}}"
+
+#. BQQSh
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_128\n"
+"LngText.text"
+msgid "The Windows Installer service cannot update the protected Windows file [2]. {{Package version: [3], OS Protected version: [4], SFP Error: [5]}}"
+msgstr "Сервисот Windows Installer не може да ја ажурира заштитената датотека [2] од Windows. {{Package version: [3], OS Protected version: [4], SFP Error: [5]}}"
+
+#. PAdiR
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_129\n"
+"LngText.text"
+msgid "This setup requires Internet Information Server 4.0 or higher for configuring IIS Virtual Roots. Please make sure that you have IIS 4.0 or higher."
+msgstr "Оваа конфигурација бара Internet Information Server 4.0 или понов за конфигурирање на IIS-виртуелни корени. Осигурете се дека имате IIS 4.0 или понов."
+
+#. zyh9D
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_130\n"
+"LngText.text"
+msgid "This setup requires Administrator privileges for configuring IIS Virtual Roots."
+msgstr "Оваа конфигурација бара администраторски дозволи за конфигурирање на IIS-виртуелни корени."
+
+#. egG4o
+#: Error.ulf
+msgctxt ""
+"Error.ulf\n"
+"OOO_ERROR_131\n"
+"LngText.text"
+msgid "Installing a pre-requisite [2] failed. You might need to manually install it from Microsoft site to be able to run the product.[3]"
+msgstr ""
+
+#. oeCq9
+#: LaunchCo.ulf
+msgctxt ""
+"LaunchCo.ulf\n"
+"OOO_LAUNCH_1\n"
+"LngText.text"
+msgid "The Installation Wizard cannot be run properly because you are logged in as a user without sufficient administrator rights for this system."
+msgstr "Волшебникот за инсталирање не може да биде стартуван правилно затоа што сте најавени како корисник без доволни администраторски привилегии за овој систем."
+
+#. CmjDD
+#: LaunchCo.ulf
+msgctxt ""
+"LaunchCo.ulf\n"
+"OOO_LAUNCH_2\n"
+"LngText.text"
+msgid "[ProductName] cannot be installed on this Windows version. [WindowsMinVersionText] or newer is required."
+msgstr ""
+
+#. FDDBP
+#: LaunchCo.ulf
+msgctxt ""
+"LaunchCo.ulf\n"
+"OOO_LAUNCH_3\n"
+"LngText.text"
+msgid "To install [ProductName] on Windows 8.1, at least April 2014 update rollup (MS KB 2919355) must be installed."
+msgstr ""
+
+#. 9rCtE
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_ARPCONTACTTEMPLATE\n"
+"LngText.text"
+msgid "LibreOffice Community"
+msgstr ""
+
+#. 7dQku
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_ARPHELPLINKTEMPLATE\n"
+"LngText.text"
+msgid "https://www.libreoffice.org/get-help"
+msgstr ""
+
+#. bR9FC
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_ARPURLINFOABOUTTEMPLATE\n"
+"LngText.text"
+msgid "https://www.libreoffice.org/"
+msgstr ""
+
+#. qAVKA
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_ARPURLUPDATEINFOTEMPLATE\n"
+"LngText.text"
+msgid "https://www.libreoffice.org/download"
+msgstr ""
+
+#. kSGwn
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_NEW_DISPLAY_NAME\n"
+"LngText.text"
+msgid "~New"
+msgstr "~Нов"
+
+#. YyAaD
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_EDIT\n"
+"LngText.text"
+msgid "~Edit"
+msgstr "Ур~еди"
+
+#. GVrFd
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_WORD_DOCUMENT\n"
+"LngText.text"
+msgid "Microsoft Word Document"
+msgstr "Microsoft Word-документ"
+
+#. PX5sA
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_WORD_TEMPLATE\n"
+"LngText.text"
+msgid "Microsoft Word Template"
+msgstr "Microsoft Word-образец"
+
+#. 6EgWK
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_EXCEL_WORKSHEET\n"
+"LngText.text"
+msgid "Microsoft Excel Worksheet"
+msgstr "Microsoft Excel-работен лист"
+
+#. sz9Ca
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_EXCEL_TEMPLATE\n"
+"LngText.text"
+msgid "Microsoft Excel Template"
+msgstr "Microsoft Excel-образец"
+
+#. nE65f
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_POWERPOINT_PRESENTATION\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Presentation"
+msgstr "Microsoft PowerPoint-презентација"
+
+#. qrDB4
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_POWERPOINT_TEMPLATE\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Template"
+msgstr "Microsoft PowerPoint-образец"
+
+#. AKnre
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_MS_POWERPOINT_SHOW\n"
+"LngText.text"
+msgid "Microsoft PowerPoint Show"
+msgstr "Microsoft PowerPoint-шоу"
+
+#. UGGXo
+#: Property.ulf
+msgctxt ""
+"Property.ulf\n"
+"OOO_STR_INSTALLATION_WIZARD\n"
+"LngText.text"
+msgid "Installation Wizard"
+msgstr "Волшебник за инсталација"
+
+#. 6Mr3P
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_1\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}&Modify"
+msgstr ""
+
+#. AGLAj
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_2\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Re&pair"
+msgstr ""
+
+#. wCZDY
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_3\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}&Remove"
+msgstr ""
+
+#. GGfjA
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_4\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}&Typical"
+msgstr ""
+
+#. e8DR4
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_5\n"
+"LngText.text"
+msgid "{&DialogDefaultBold}Cu&stom"
+msgstr ""
+
+#. WaaRd
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_6\n"
+"LngText.text"
+msgid "I &do not accept the terms in the license agreement"
+msgstr "&Не ги прифаќам условите во договорот за лиценца"
+
+#. uqyYS
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_7\n"
+"LngText.text"
+msgid "I &accept the terms in the license agreement"
+msgstr "Ги &прифаќам условите во договорот за лиценца"
+
+#. TUuwd
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_8\n"
+"LngText.text"
+msgid "&Anyone who uses this computer (all users)"
+msgstr "&Секој што го користи овој компјутер (сите корисници)"
+
+#. 8ymTL
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_9\n"
+"LngText.text"
+msgid "Only for &me ([USERNAME])"
+msgstr "Само за &мене ([USERNAME])"
+
+#. FDe7x
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_10\n"
+"LngText.text"
+msgid "&Close the applications and attempt to restart them."
+msgstr ""
+
+#. T4DzH
+#: RadioBut.ulf
+msgctxt ""
+"RadioBut.ulf\n"
+"OOO_RADIOBUTTON_11\n"
+"LngText.text"
+msgid "&Do not close applications. A reboot will be required to complete the setup."
+msgstr ""
+
+#. 94ZFb
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_1\n"
+"LngText.text"
+msgid "bytes"
+msgstr "бајти"
+
+#. jEifK
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_2\n"
+"LngText.text"
+msgid "GB"
+msgstr "GB"
+
+#. VwUAL
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_3\n"
+"LngText.text"
+msgid "KB"
+msgstr "KB"
+
+#. vgAjF
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_4\n"
+"LngText.text"
+msgid "MB"
+msgstr "MB"
+
+#. r9k3a
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_5\n"
+"LngText.text"
+msgid "This feature will not be available."
+msgstr "Оваа карактеристика нема да биде достапна."
+
+#. r3Efh
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_6\n"
+"LngText.text"
+msgid "This feature will be installed when required."
+msgstr "Оваа карактеристика ќе биде инсталирана кога ќе биде потребна."
+
+#. 26Mpo
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_7\n"
+"LngText.text"
+msgid "This feature, and all subfeatures, will be installed to run from the CD."
+msgstr "Оваа карактеристика и сите поткарактеристики ќе се инсталираат за да работат од ЦД."
+
+#. bCeK7
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_8\n"
+"LngText.text"
+msgid "This feature, and all subfeatures, will be installed on local hard drive."
+msgstr "Оваа карактеристика и сите поткарактеристики ќе се инсталираат на локалниот диск."
+
+#. pDASu
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_9\n"
+"LngText.text"
+msgid "This feature, and all subfeatures, will be installed to run from the network."
+msgstr "Оваа карактеристика и сите поткарактеристики ќе се инсталираат за да работат од мрежа."
+
+#. TxGgr
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_10\n"
+"LngText.text"
+msgid "This feature will be installed to run from CD."
+msgstr "Оваа карактеристика ќе се инсталира за да работи од ЦД."
+
+#. GT8NC
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_11\n"
+"LngText.text"
+msgid "This feature will be installed on local hard drive."
+msgstr "Оваа карактеристика ќе се инсталира на локалниот диск."
+
+#. AUGeW
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_12\n"
+"LngText.text"
+msgid "This feature will be installed to run from network."
+msgstr "Оваа карактеристика ќе се инсталира за да работи од мрежа."
+
+#. 8CXdg
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_13\n"
+"LngText.text"
+msgid "Fldr|New Folder"
+msgstr "Fldr|Нова папка"
+
+#. 9V38D
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_14\n"
+"LngText.text"
+msgid "This feature will remain uninstalled."
+msgstr "Оваа карактеристика нема да се инсталира."
+
+#. 9qKMG
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_15\n"
+"LngText.text"
+msgid "This feature will be set to be installed when required."
+msgstr "Оваа карактеристика ќе се конфигурира за да биде инсталирана кога ќе биде потребна."
+
+#. o9isw
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_16\n"
+"LngText.text"
+msgid "This feature will be installed to run from CD."
+msgstr "Оваа карактеристика ќе се инсталира за да работи од ЦД."
+
+#. DzJTi
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_17\n"
+"LngText.text"
+msgid "This feature will be installed on the local hard drive."
+msgstr "Оваа карактеристика ќе биде инсталирана на локалниот диск."
+
+#. cyGEM
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_18\n"
+"LngText.text"
+msgid "This feature will be installed to run from the network."
+msgstr "Оваа карактеристика ќе биде инсталирана да работи од мрежа."
+
+#. Qz6jp
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_19\n"
+"LngText.text"
+msgid "This feature will become unavailable."
+msgstr "Оваа карактеристика ќе стане недостапна."
+
+#. EjtVV
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_20\n"
+"LngText.text"
+msgid "Will be installed when required."
+msgstr "Ќе биде инсталирана кога ќе биде потребна."
+
+#. BVwPN
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_21\n"
+"LngText.text"
+msgid "This feature will be available to run from CD."
+msgstr "Оваа карактеристика ќе биде достапна за работа од ЦД."
+
+#. yejCc
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_22\n"
+"LngText.text"
+msgid "This feature will be installed on your local hard drive."
+msgstr "Оваа карактеристика ќе биде инсталирана на Вашиот локален диск."
+
+#. NUAL8
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_23\n"
+"LngText.text"
+msgid "This feature will be available to run from the network."
+msgstr "Оваа карактеристика ќе биде достапна за работа од мрежа."
+
+#. KLMrs
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_24\n"
+"LngText.text"
+msgid "This feature will be uninstalled completely, and you won't be able to run it from CD."
+msgstr "Оваа карактеристика ќе биде комплетно деинсталирана и нема да може да работи од ЦД."
+
+#. ATGde
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_25\n"
+"LngText.text"
+msgid "This feature was run from the CD but will be set to be installed when required."
+msgstr "Оваа карактеристика беше активирана од ЦД, но ќе биде конфигурирана за да биде инсталирана кога ќе биде потребна."
+
+#. Ce3o2
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_26\n"
+"LngText.text"
+msgid "This feature will continue to be run from the CD"
+msgstr "Оваа карактеристика ќе продолжи да работи од ЦД"
+
+#. vtfBk
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_27\n"
+"LngText.text"
+msgid "This feature was run from the CD but will be installed on the local hard drive."
+msgstr "Оваа карактеристика беше активирана од ЦД, но ќе биде инсталирана на локалниот диск."
+
+#. NTbAF
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_28\n"
+"LngText.text"
+msgid "This feature frees up [1] on your hard drive."
+msgstr "Оваа карактеристика ослободува [1] на вашиот диск."
+
+#. oJ7mG
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_29\n"
+"LngText.text"
+msgid "This feature requires [1] on your hard drive."
+msgstr "Оваа карактеристика бара [1] на вашиот диск."
+
+#. FBJDk
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_30\n"
+"LngText.text"
+msgid "Compiling cost for this feature..."
+msgstr "Пресметувам трошок за оваа карактеристика..."
+
+#. ELDvk
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_31\n"
+"LngText.text"
+msgid "This feature will be completely removed."
+msgstr "Оваа карактеристика ќе биде комплетно отстранета."
+
+#. xdW8B
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_32\n"
+"LngText.text"
+msgid "This feature will be removed from your local hard drive but will be set to be installed when required."
+msgstr "Оваа карактеристика ќе биде отстранета од Вашиот локален диск, но ќе биде конфигурирана за да биде инсталирана кога ќе биде потребна."
+
+#. MgAtM
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_33\n"
+"LngText.text"
+msgid "This feature will be removed from your local hard drive but will still be available to run from CD."
+msgstr "Оваа карактеристика ќе биде отстранета од Вашиот локален диск, но сѐ уште ќе биде достапна да работи од ЦД."
+
+#. cwcP2
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_34\n"
+"LngText.text"
+msgid "This feature will remain on your local hard drive."
+msgstr "Оваа карактеристика ќе остане на Вашиот локален диск."
+
+#. VMpij
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_35\n"
+"LngText.text"
+msgid "This feature will be removed from your local hard drive, but will be still available to run from the network."
+msgstr "Оваа карактеристика ќе биде отстранета од вашиот локален диск, но сѐ уште ќе биде достапна да работи од мрежа."
+
+#. ryj7R
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_36\n"
+"LngText.text"
+msgid "This feature will be uninstalled completely, and you won't be able to run it from the network."
+msgstr "Оваа карактеристика ќе биде деинсталирана комплетно и нема да може да работи од мрежата."
+
+#. ZGYT7
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_37\n"
+"LngText.text"
+msgid "This feature was run from the network but will be installed when required."
+msgstr "Оваа карактеристика беше активирана од мрежа, но ќе биде инсталирана кога ќе биде потребна."
+
+#. fDT9F
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_38\n"
+"LngText.text"
+msgid "This feature was run from the network but will be installed on the local hard drive."
+msgstr "Оваа карактеристика беше активирана од мрежа, но ќе биде инсталирана на локалниот диск."
+
+#. bMoyv
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_39\n"
+"LngText.text"
+msgid "This feature will continue to be run from the network"
+msgstr "Оваа карактеристика ќе продолжи да работи од мрежа."
+
+#. hVVmF
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_40\n"
+"LngText.text"
+msgid "This feature frees up [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures free up [4] on your hard drive."
+msgstr "Оваа карактеристика ослободува [1] на вашиот диск. Има избрано [2] од [3] поткарактеристики. Поткарактеристиките ослободуваат [4] на вашиот диск."
+
+#. kQxfM
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_41\n"
+"LngText.text"
+msgid "This feature frees up [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures require [4] on your hard drive."
+msgstr "Оваа карактеристика ослободува [1] на вашиот диск. Има избрано [2] од [3] поткарактеристики. Поткарактеристиките имаат потреба од [4] на вашиот диск."
+
+#. 8N7Ea
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_42\n"
+"LngText.text"
+msgid "This feature requires [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures free up [4] on your hard drive."
+msgstr "Оваа карактеристика бара [1] на вашиот диск. Има избрано [2] од [3] поткарактеристики. Поткарактеристиките ослободуваат [4] на вашиот диск."
+
+#. LTMBw
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_43\n"
+"LngText.text"
+msgid "This feature requires [1] on your hard drive. It has [2] of [3] subfeatures selected. The subfeatures require [4] on your hard drive."
+msgstr "Оваа карактеристика бара [1] на вашиот диск. Има избрано [2] од [3] поткарактеристики. Поткарактеристиките бараат [4] на вашиот диск."
+
+#. vmZfv
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_44\n"
+"LngText.text"
+msgid "Time remaining: {[1] min }[2] sec"
+msgstr "Преостанато време: {[1] мин }[2] сек"
+
+#. uFPAD
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_45\n"
+"LngText.text"
+msgid "Available"
+msgstr "Достапно"
+
+#. DnBYF
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_46\n"
+"LngText.text"
+msgid "Differences"
+msgstr "Разлики"
+
+#. DLqGc
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_47\n"
+"LngText.text"
+msgid "Required"
+msgstr "Потребно"
+
+#. KqFNu
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_48\n"
+"LngText.text"
+msgid "Disk Size"
+msgstr "Големина на дискот"
+
+#. 8WAqc
+#: UIText.ulf
+msgctxt ""
+"UIText.ulf\n"
+"OOO_UITEXT_49\n"
+"LngText.text"
+msgid "Volume"
+msgstr "Партиција"

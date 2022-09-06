@@ -1,0 +1,107 @@
+#. extracted from extras/source/gallery/share
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2021-04-27 17:02+0200\n"
+"PO-Revision-Date: 2020-08-28 12:35+0000\n"
+"Last-Translator: 김주현 <kjh000121@gmail.com>\n"
+"Language-Team: Korean <https://weblate.documentfoundation.org/projects/libo_ui-master/extrassourcegalleryshare/ko/>\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1521395041.000000\n"
+
+#. oG3Mq
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"arrows\n"
+"LngText.text"
+msgid "Arrows"
+msgstr "화살표"
+
+#. byokD
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"backgrounds\n"
+"LngText.text"
+msgid "Backgrounds"
+msgstr "배경"
+
+#. fVCP9
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"bullets\n"
+"LngText.text"
+msgid "Bullets"
+msgstr ""
+
+#. kuNKS
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"bpmn\n"
+"LngText.text"
+msgid "BPMN"
+msgstr "비즈니스 프로세스 모델링"
+
+#. arWXh
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"diagrams\n"
+"LngText.text"
+msgid "Diagrams"
+msgstr "다이아그램"
+
+#. yKmgV
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"flowchart\n"
+"LngText.text"
+msgid "Flow chart"
+msgstr "플로우 차트"
+
+#. YSm8F
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"icons\n"
+"LngText.text"
+msgid "Icons"
+msgstr "아이콘"
+
+#. PCCbZ
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"network\n"
+"LngText.text"
+msgid "Network"
+msgstr "네트워크"
+
+#. YAZe6
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"shapes\n"
+"LngText.text"
+msgid "Shapes"
+msgstr "도형"
+
+#. FVHrw
+#: gallery_names.ulf
+msgctxt ""
+"gallery_names.ulf\n"
+"sounds\n"
+"LngText.text"
+msgid "Sounds"
+msgstr "소리"

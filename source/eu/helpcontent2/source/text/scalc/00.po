@@ -1,0 +1,2186 @@
+#. extracted from helpcontent2/source/text/scalc/00
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-03-21 12:31+0100\n"
+"PO-Revision-Date: 2022-05-03 12:47+0000\n"
+"Last-Translator: Asier Sarasua Garmendia <asiersar@yahoo.com>\n"
+"Language-Team: Basque <https://translations.documentfoundation.org/projects/libo_help-master/textscalc00/eu/>\n"
+"Language: eu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.11.2\n"
+"X-POOTLE-MTIME: 1556007652.000000\n"
+
+#. E9tti
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"tit\n"
+"help.text"
+msgid "To access this function..."
+msgstr "Funtzio honetara heltzeko..."
+
+#. hrbEg
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"hd_id3155535\n"
+"help.text"
+msgid "<variable id=\"wie\">To access this function...</variable>"
+msgstr "<variable id=\"wie\">Funtzio hau atzitzeko...</variable>"
+
+#. Ern4w
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_idN1056E\n"
+"help.text"
+msgid "<variable id=\"moreontop\">More explanations on top of this page.</variable>"
+msgstr "<variable id=\"moreontop\">Azalpen gehiago orriaren goialdean.</variable>"
+
+#. yS9p2
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_idN105AF\n"
+"help.text"
+msgid "<variable id=\"optional\">In the %PRODUCTNAME Calc functions, parameters marked as \"optional\" can be left out only when no parameter follows. For example, in a function with four parameters, where the last two parameters are marked as \"optional\", you can leave out parameter 4 or parameters 3 and 4, but you cannot leave out parameter 3 alone.</variable>"
+msgstr "<variable id=\"optional\">%PRODUCTNAME Calc-eko funtzioetan, \"aukerakoa\" marka daukaten parametroak alde batera utz daitezke ondoren parametrorik ez dagoenean soilik. Adibidez, lau parametro dituen funtzio batean, funtzio horietako azken biek \"aukerakoa\" marka badaukate, 4. parametroa edo 3. eta 4. parametroa alde batera utz ditzakezu, baina ezin duzu alde batera utzi 3. parametroa bakarrik.</variable>"
+
+#. wbSXk
+#: 00000004.xhp
+msgctxt ""
+"00000004.xhp\n"
+"par_id9751884\n"
+"help.text"
+msgid "<variable id=\"codes\">Codes greater than 127 may depend on your system's character mapping (for example iso-8859-1, iso-8859-2, Windows-1252, Windows-1250), and hence may not be portable.</variable>"
+msgstr "<variable id=\"codes\">127 kode baino gehiagokoak sistemaren karaktere-mapaketaren araberakoak izango dira (iso-8859-1, iso-8859-2, Windows-1252, Windows-1250 esate baterako), eta beraz baliteke eramangarria ez izatea.</variable>"
+
+#. Cjh6J
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"tit\n"
+"help.text"
+msgid "Edit Menu"
+msgstr "Editatu menua"
+
+#. 7dQzw
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"hd_id3147303\n"
+"help.text"
+msgid "Edit Menu"
+msgstr "Editatu menua"
+
+#. Q5BbF
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3155555\n"
+"help.text"
+msgid "<variable id=\"kopffuss\">Choose <emph>Insert - Headers and Footers</emph>.</variable>"
+msgstr "<variable id=\"kopffuss\">Aukeratu <emph>Txertatu - Goiburukoak eta orri-oinak</emph></variable>."
+
+#. LCgfV
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3159233\n"
+"help.text"
+msgid "<variable id=\"bkopfzeile\">Choose <emph>Insert - Headers and Footers - Header and Footer</emph> tabs.</variable>"
+msgstr "<variable id=\"bkopfzeile\">Aukeratu <emph>Txertatu - Goiburukoak eta orri-oinak - Goiburukoa eta orri-oina</emph> fitxak.</variable>"
+
+#. swD6H
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3150443\n"
+"help.text"
+msgid "<variable id=\"bausfullen\">Choose <emph>Sheet - Fill Cells</emph>.</variable>"
+msgstr "<variable id=\"bausfullen\">Aukeratu <emph>Orria - Bete gelaxkak</emph>.</variable>"
+
+#. GBRFt
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3143267\n"
+"help.text"
+msgid "<variable id=\"bausunten\">Choose <emph>Sheet - Fill Cells - Down</emph>.</variable>"
+msgstr "<variable id=\"bausunten\">Aukeratu <emph>Orria - Bete gelaxkak - Behera</emph>.</variable>"
+
+#. kFrPz
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3153880\n"
+"help.text"
+msgid "<variable id=\"bausrechts\">Choose <emph>Sheet - Fill Cells - Right</emph>.</variable>"
+msgstr "<variable id=\"bausrechts\">Aukeratu <emph>Orria - Bete gelaxkak - Eskuinera</emph>.</variable>"
+
+#. dq3T2
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3151245\n"
+"help.text"
+msgid "<variable id=\"bausoben\">Choose <emph>Sheet - Fill Cells - Up</emph>.</variable>"
+msgstr "<variable id=\"bausoben\">Aukeratu <emph>Orria - Bete gelaxkak - Gora</emph>.</variable>"
+
+#. oGY7v
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3145068\n"
+"help.text"
+msgid "<variable id=\"bauslinks\">Choose <emph>Sheet - Fill Cells - Left</emph>.</variable>"
+msgstr "<variable id=\"bauslinks\">Aukeratu <emph>Orria - Bete gelaxkak - Ezkerrera</emph>.</variable>"
+
+#. HoCxK
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3150400\n"
+"help.text"
+msgid "<variable id=\"baustab\">Choose <emph>Sheet - Fill Cells - Sheets</emph>.</variable>"
+msgstr "<variable id=\"baustab\">Aukeratu <emph>Orria - Bete gelaxkak - Orriak</emph>.</variable>"
+
+#. AxSYV
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3154910\n"
+"help.text"
+msgid "<variable id=\"bausreihe\">Choose <emph>Sheet - Fill Cells - Series</emph>.</variable>"
+msgstr "<variable id=\"bausreihe\">Aukeratu <emph>Orria - Bete gelaxkak - Serieak</emph>.</variable>"
+
+#. FtVof
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3154123\n"
+"help.text"
+msgid "Choose <emph>Sheet - Clear Cells</emph>."
+msgstr "Aukeratu <emph>Orria - Garbitu gelaxkak</emph>."
+
+#. xKoco
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3145785\n"
+"help.text"
+msgid "Backspace"
+msgstr "Atzerako tekla"
+
+#. UPt9p
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3150011\n"
+"help.text"
+msgid "<variable id=\"bzelo\">Choose <emph>Sheet - Delete Cells</emph>.</variable>"
+msgstr "<variable id=\"bzelo\">Aukeratu <emph>Orria - Ezabatu gelaxkak</emph>.</variable>"
+
+#. DAEkd
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3153951\n"
+"help.text"
+msgid "Choose <emph>Sheet - Delete Sheet</emph>."
+msgstr "Aukeratu <emph>Orria - Ezabatu orria</emph>."
+
+#. yzwWD
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3155306\n"
+"help.text"
+msgid "Open context menu for a sheet tab."
+msgstr "Ireki orri-fitxa baten laster-menua."
+
+#. GcsVC
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3146119\n"
+"help.text"
+msgid "Choose <emph>Sheet - Move or Copy Sheet</emph>."
+msgstr "Aukeratu <emph>Orria - Mugitu edo kopiatu orria</emph>."
+
+#. 6KzK9
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id3148645\n"
+"help.text"
+msgid "Open context menu for a sheet tab."
+msgstr "Ireki orri-fitxa baten laster-menua."
+
+#. tVKSX
+#: 00000402.xhp
+msgctxt ""
+"00000402.xhp\n"
+"par_id831619443265443\n"
+"help.text"
+msgid "Choose <menuitem>Edit - Cell Protection</menuitem> to activate sheet protection with current cell protection settings."
+msgstr "Aukeratu <menuitem>Editatu - Gelaxka-babesa</menuitem> orriaren babesa aktibatzeko uneko gelaxka-babesaren ezarpenekin."
+
+#. cjzea
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"tit\n"
+"help.text"
+msgid "View Menu"
+msgstr "Ikusi menua"
+
+#. LUDxu
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"hd_id3145673\n"
+"help.text"
+msgid "View Menu"
+msgstr "Ikusi menua"
+
+#. 7gCYV
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3150275\n"
+"help.text"
+msgid "<variable id=\"aspze\">Choose <emph>View - Column & Row Headers</emph>.</variable>"
+msgstr "<variable id=\"aspze\">Aukeratu <emph>Ikusi - Zutabeen eta errenkaden goiburukoak</emph>.</variable>"
+
+#. SFTEA
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3154514\n"
+"help.text"
+msgid "<variable id=\"awehe\">Choose <emph>View - Value Highlighting</emph>.</variable>"
+msgstr "<variable id=\"awehe\">Aukeratu <emph>Ikusi - Nabarmendu balioak</emph>.</variable>"
+
+#. QGcfY
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3148947\n"
+"help.text"
+msgid "<variable id=\"rechenleiste\">Choose <emph>View - Formula Bar</emph> or <emph>View - Toolbars - Formula Bar</emph>.</variable>"
+msgstr "<variable id=\"rechenleiste\">Aukeratu <emph>Ikusi - Formula-barra</emph> edo <emph>Ikusi - Tresna-barrak - Formula-barra</emph>.</variable>"
+
+#. G6udN
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3148663\n"
+"help.text"
+msgid "<variable id=\"seumvo\">Choose <emph>View - Page Break</emph>.</variable>"
+msgstr "<variable id=\"seumvo\">Aukeratu <emph>Ikusi - Orrialde-jauzia</emph>.</variable>"
+
+#. YeaFw
+#: 00000403.xhp
+msgctxt ""
+"00000403.xhp\n"
+"par_id3155383\n"
+"help.text"
+msgid "<variable id=\"functionlist\">Choose <menuitem>View - Function List</menuitem>.</variable>"
+msgstr "<variable id=\"functionlist\">Aukeratu <menuitem>Ikusi - Funtzio-zerrenda</menuitem>.</variable>"
+
+#. yDXA6
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Menu"
+msgstr "Txertatu menua"
+
+#. Xgxd9
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"hd_id3149346\n"
+"help.text"
+msgid "Insert Menu"
+msgstr "Txertatu menua"
+
+#. eWEMR
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149784\n"
+"help.text"
+msgid "Choose <menuitem>Sheet - Insert Cells</menuitem>."
+msgstr "Aukeratu <menuitem>Orria - Txertatu gelaxkak</menuitem>."
+
+#. pybbE
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154514\n"
+"help.text"
+msgid "Choose <menuitem>View - Toolbars</menuitem> and select the <emph>Insert Cells</emph> toolbar:"
+msgstr "Aukeratu <menuitem>Ikusi - Tresna-barrak</menuitem> eta hautatu <emph>Txertatu gelaxkak</emph> tresna-barra:"
+
+#. 7HGeD
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149656\n"
+"help.text"
+msgid "<image id=\"img_id3154365\" src=\"cmd/sc_inscellsctrl.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154365\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154365\" src=\"cmd/sc_inscellsctrl.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154365\">Ikonoa</alt></image>"
+
+#. u7DxG
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3151041\n"
+"help.text"
+msgid "Insert Cells"
+msgstr "Txertatu gelaxkak"
+
+#. pyGF9
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145273\n"
+"help.text"
+msgid "<image id=\"img_id3145364\" src=\"cmd/sc_insertcellsdown.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145364\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145364\" src=\"cmd/sc_insertcellsdown.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145364\">Ikonoa</alt></image>"
+
+#. JxBEy
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3146985\n"
+"help.text"
+msgid "Insert Cells Down"
+msgstr "Txertatu gelaxkak beherantz"
+
+#. AsUut
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3144766\n"
+"help.text"
+msgid "<image id=\"img_id3154942\" src=\"cmd/sc_insertcellsright.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154942\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154942\" src=\"cmd/sc_insertcellsright.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154942\">Ikonoa</alt></image>"
+
+#. UG7vC
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145646\n"
+"help.text"
+msgid "Insert Cells Right"
+msgstr "Txertatu gelaxkak eskuinerantz"
+
+#. qXcRR
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153838\n"
+"help.text"
+msgid "<image id=\"img_id3153710\" src=\"cmd/sc_insertrows.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153710\">Icon</alt></image>"
+msgstr "<image id=\"img_id3153710\" src=\"cmd/sc_insertrows.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153710\">Ikonoa</alt></image>"
+
+#. J53kc
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150324\n"
+"help.text"
+msgid "Insert Rows"
+msgstr "Txertatu errenkadak"
+
+#. iFECG
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147363\n"
+"help.text"
+msgid "<image id=\"img_id3145232\" src=\"cmd/sc_insertcolumns.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145232\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145232\" src=\"cmd/sc_insertcolumns.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145232\">Ikonoa</alt></image>"
+
+#. aS2eE
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155334\n"
+"help.text"
+msgid "Insert Columns"
+msgstr "Txertatu zutabeak"
+
+#. A8jev
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149033\n"
+"help.text"
+msgid "<variable id=\"eitab\">Choose <menuitem>Sheet - Insert Sheet</menuitem>.</variable>"
+msgstr "<variable id=\"eitab\">Aukeratu <menuitem>Orria - Txertatu orria</menuitem>.</variable>"
+
+#. HjKoP
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_idN1082F\n"
+"help.text"
+msgid "<variable id=\"eitabfile\">Choose <menuitem>Sheet - Insert Sheet from File</menuitem>.</variable>"
+msgstr "<variable id=\"eitabfile\">Aukeratu <menuitem>Orria - Txertatu orria fitxategitik</menuitem>.</variable>"
+
+#. hfGrg
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155115\n"
+"help.text"
+msgid "Choose <menuitem>Insert - Function</menuitem>."
+msgstr "Aukeratu <menuitem>Txertatu - Funtzioa</menuitem>."
+
+#. anHWr
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3152582\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">⌘</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
+
+#. AVMZC
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153269\n"
+"help.text"
+msgid "On the <emph>Formula</emph> bar, click"
+msgstr "<emph>Formula</emph> barran, sakatu"
+
+#. HZ9Dn
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150515\n"
+"help.text"
+msgid "<image id=\"img_id3150884\" src=\"sw/res/sc20556.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3150884\">Icon</alt></image>"
+msgstr "<image id=\"img_id3150884\" src=\"sw/res/sc20556.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3150884\">Ikonoa</alt></image>"
+
+#. PpQHU
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154370\n"
+"help.text"
+msgid "Function Wizard"
+msgstr "Funtzioen morroia"
+
+#. CfMjV
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3156288\n"
+"help.text"
+msgid "<variable id=\"eikada\"><emph>Insert - Function</emph> - Category <emph>Database</emph></variable>"
+msgstr "<variable id=\"eikada\"><emph>Txertatu - Funtzioa</emph> - <emph>Datu-basea</emph> kategoria</variable>"
+
+#. zMMAD
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3155809\n"
+"help.text"
+msgid "<variable id=\"eikadaze\"><emph>Insert - Function</emph> - Category <emph>Date & Time</emph></variable>"
+msgstr "<variable id=\"eikadaze\"><emph>Txertatu - Funtzioa</emph> - <emph>Data eta ordua</emph> kategoria.</variable>"
+
+#. zhLHE
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3151334\n"
+"help.text"
+msgid "<variable id=\"eikafi\"><emph>Insert - Function</emph> - Category <emph>Financial</emph></variable>"
+msgstr "<variable id=\"eikafi\"><emph>Txertatu - Funtzioa</emph> - <emph>Finantzak</emph> kategoria</variable>"
+
+#. KZ5EL
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3159222\n"
+"help.text"
+msgid "<variable id=\"eikain\"><emph>Insert - Function</emph> - Category <emph>Information</emph></variable>"
+msgstr "<variable id=\"eikain\"><emph>Txertatu - Funtzioa</emph> - <emph>Informazioa</emph> kategoria</variable>"
+
+#. hEWDH
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3159173\n"
+"help.text"
+msgid "<variable id=\"logical\"><emph>Insert - Function</emph> - Category <emph>Logical</emph></variable>"
+msgstr "<variable id=\"logical\"><emph>>Txertatu - Funtzioa</emph> - Kategoria <emph>Logikoa</emph></variable>"
+
+#. FqeXh
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153914\n"
+"help.text"
+msgid "<variable id=\"eikama\"><emph>Insert - Function</emph> - Category <emph>Mathematical</emph></variable>"
+msgstr "<variable id=\"eikama\"><emph>Txertatu - Funtzioa</emph> - <emph>Matematikoak</emph> kategoria</variable>"
+
+#. BLmAP
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3150109\n"
+"help.text"
+msgid "<variable id=\"eikamatrix\"><emph>Insert - Function</emph> - Category <emph>Array</emph></variable>"
+msgstr "<variable id=\"eikamatrix\"><emph>Txertatu - Funtzioa</emph> - <emph>Matrizea</emph> kategoria</variable>"
+
+#. TPE9C
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3157978\n"
+"help.text"
+msgid "<variable id=\"eikasta\"><emph>Insert - Function</emph> - Category <emph>Statistical</emph></variable>"
+msgstr "<variable id=\"eikasta\"><emph>Txertatu - Funtzioa</emph> - <emph>Estatistikoak</emph> kategoria</variable>"
+
+#. RQSAQ
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3156016\n"
+"help.text"
+msgid "<variable id=\"eikatext\"><emph>Insert - Function</emph> - Category <emph>Text</emph></variable>"
+msgstr "<variable id=\"eikatext\"><emph>Txertatu - Funtzioa</emph> - <emph>Testua</emph> kategoria</variable>"
+
+#. NBdkR
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3147075\n"
+"help.text"
+msgid "<variable id=\"efefft\"><emph>Insert - Function</emph> - Category <emph>Spreadsheet</emph></variable>"
+msgstr "<variable id=\"efefft\"><emph>Txertatu - Funtzioa</emph> - <emph>Kalkulu-orria</emph> kategoria</variable>"
+
+#. hY4RC
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154618\n"
+"help.text"
+msgid "<variable id=\"addin\"><emph>Insert - Function</emph> - Category <emph>Add-In</emph></variable>"
+msgstr "<variable id=\"addin\"><emph>Txertatu - Funtzioa</emph> - <emph>Osagarria</emph> kategoria</variable>"
+
+#. Hu4Ut
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3154059\n"
+"help.text"
+msgid "<variable id=\"addinana\"><emph>Insert - Function</emph> - Category <emph>Add-In</emph></variable>"
+msgstr "<variable id=\"addinana\"><emph>Txertatu - Funtzioa</emph> - <emph>Osagarria</emph> kategoria</variable>"
+
+#. UQGrR
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153250\n"
+"help.text"
+msgid "<variable id=\"einamen\">Choose <menuitem>Insert - Named Range or Expression</menuitem>.</variable>"
+msgstr "<variable id=\"einamen\">Aukeratu <menuitem>Txertatu - Izendun barrutia edo adierazpena</menuitem>.</variable>"
+
+#. mQLYV
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3146776\n"
+"help.text"
+msgid "<variable id=\"eiextdata\">Choose <menuitem>Sheet - External Links</menuitem>.</variable>"
+msgstr "<variable id=\"eiextdata\">Aukeratu <menuitem>Orria - Kanpoko estekak</menuitem>.</variable>"
+
+#. ECgNS
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3143222\n"
+"help.text"
+msgid "Choose <menuitem>Sheet - Named Ranges and Expressions - Define</menuitem>."
+msgstr "Aukeratu <menuitem>Orria - Izendun barrutiak eta adierazpenak - Definitu</menuitem>."
+
+#. GM3WX
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3149385\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">⌘</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3"
+
+#. 9p3Gg
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3145214\n"
+"help.text"
+msgid "<variable id=\"einaei\">Choose <menuitem>Sheet - Named Ranges and Expressions - Insert</menuitem>.</variable>"
+msgstr "<variable id=\"einaei\">Aukeratu <menuitem>Orria - Izendun barrutiak eta adierazpenak - Txertatu</menuitem>.</variable>"
+
+#. LGQgh
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153558\n"
+"help.text"
+msgid "<variable id=\"einaueb\">Choose <menuitem>Sheet - Named Ranges and Expressions - Create</menuitem>.</variable>"
+msgstr "<variable id=\"einaueb\">Aukeratu <menuitem>Orria - Izendun barrutiak eta adierazpenak - Sortu</menuitem>.</variable>"
+
+#. ptGPX
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
+"par_id3153483\n"
+"help.text"
+msgid "<variable id=\"einabesch\">Choose <menuitem>Sheet - Named Ranges and Expressions - Labels</menuitem>.</variable>"
+msgstr "<variable id=\"einabesch\">Aukeratu <menuitem>Orria - Izendun barrutiak eta adierazpenak - Etiketak</menuitem>.</variable>"
+
+#. p2LBA
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"tit\n"
+"help.text"
+msgid "Format Menu"
+msgstr "Formatua menua"
+
+#. CJHhP
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"hd_id3150769\n"
+"help.text"
+msgid "Format Menu"
+msgstr "Formatua menua"
+
+#. TmWCz
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154685\n"
+"help.text"
+msgid "Choose <menuitem>Format - Cells</menuitem>."
+msgstr "Aukeratu <menuitem>Formatua - Gelaxkak</menuitem>."
+
+#. DEPHV
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id61593556839601\n"
+"help.text"
+msgid "Press <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+1</keycode>."
+msgstr "Sakatu <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>⌘</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+1</keycode>."
+
+#. HR2kd
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153194\n"
+"help.text"
+msgid "<variable id=\"fozelstz\">Choose <emph>Format - Cells - Cell Protection</emph> tab.</variable>"
+msgstr "<variable id=\"fozelstz\">Aukeratu <emph>Formatua - Gelaxkak - Gelaxka-babesa</emph> fitxa.</variable>"
+
+#. 5HBGD
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155854\n"
+"help.text"
+msgid "<variable id=\"fozei\">Choose <emph>Format - Rows</emph>.</variable>"
+msgstr "<variable id=\"fozei\">Aukeratu <emph>Formatua - Errenkadak</emph>.</variable>"
+
+#. c9XNu
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150012\n"
+"help.text"
+msgid "<variable id=\"fozeiophoe\">Choose <emph>Format - Rows - Optimal Height</emph>.</variable>"
+msgstr "<variable id=\"fozeiophoe\">Aukeratu <emph>Formatua - Errenkadak - Altuera optimoa</emph>.</variable>"
+
+#. ZMLTM
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148645\n"
+"help.text"
+msgid "Choose <emph>Format - Rows - Hide</emph>."
+msgstr "Aukeratu <emph>Formatua - Errenkadak - Ezkutatu</emph>."
+
+#. Ky3bX
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153728\n"
+"help.text"
+msgid "Choose <emph>Format - Columns - Hide</emph>."
+msgstr "Aukeratu <emph>Formatua - Zutabeak - Ezkutatu</emph>."
+
+#. LbHeW
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3151114\n"
+"help.text"
+msgid "Choose <emph>Sheet - Hide Sheet</emph>."
+msgstr "Aukeratu <emph>Orria - Ezabatu orria</emph>."
+
+#. dGUoz
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3148576\n"
+"help.text"
+msgid "Choose <emph>Format - Rows - Show</emph>."
+msgstr "Aukeratu <emph>Formatua - Errenkadak - Erakutsi</emph>."
+
+#. FxHfR
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156286\n"
+"help.text"
+msgid "Choose <emph>Format - Columns - Show</emph>."
+msgstr "Aukeratu <emph>Formatua - Zutabeak - Erakutsi</emph>."
+
+#. 9hBja
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3145645\n"
+"help.text"
+msgid "<variable id=\"fospa\">Choose <emph>Format - Columns</emph>.</variable>"
+msgstr "<variable id=\"fospa\">Aukeratu <emph>Formatua - Zutabeak</emph>.</variable>"
+
+#. R24Eg
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3145252\n"
+"help.text"
+msgid "Choose <emph>Format - Columns - Optimal Width</emph>."
+msgstr "Aukeratu <emph>Formatua - Zutabeak - Zabalera optimoa</emph>."
+
+#. RzL7Z
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3146971\n"
+"help.text"
+msgid "Double-click right column separator in column headers."
+msgstr "Zutabe-goiburukoan, egin klik bikoitza eskuineko zutabe-bereizlean."
+
+#. kDwZF
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3147362\n"
+"help.text"
+msgid "<variable id=\"fot\">Choose <emph>Sheet</emph>.</variable>"
+msgstr "<variable id=\"fot\">Aukeratu <emph>Orria</emph>.</variable>"
+
+#. LBhtC
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3163805\n"
+"help.text"
+msgid "<variable id=\"fotu\">Choose <emph>Sheet - Rename Sheet</emph>.</variable>"
+msgstr "<variable id=\"fotu\">Aukeratu <emph>Orria - Aldatu izena orriari</emph>.</variable>"
+
+#. dCE4r
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155333\n"
+"help.text"
+msgid "<variable id=\"fotenb\">Choose <emph>Sheet - Show Sheet</emph>.</variable>"
+msgstr "<variable id=\"fotenb\">Aukeratu <emph>Orria - Erakutsi orria</emph>.</variable>"
+
+#. bJzNC
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_idN1077A\n"
+"help.text"
+msgid "<variable id=\"foste\">Choose <emph>Format - Page</emph>.</variable>"
+msgstr "<variable id=\"foste\">Aukeratu <emph>Formatua - Orrialdea</emph>.</variable>"
+
+#. KrDGC
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155508\n"
+"help.text"
+msgid "<variable id=\"fostel\">Choose <emph>Format - Page - Sheet</emph> tab.</variable>"
+msgstr "<variable id=\"fostel\">Aukeratu <emph>Formatua - Orrialdea - Orria</emph> fitxa.</variable>"
+
+#. CqGPT
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3150883\n"
+"help.text"
+msgid "<variable id=\"fodrbe\">Choose <emph>Format - Print Ranges</emph>.</variable>"
+msgstr "<variable id=\"fodrbe\">Aukeratu <emph>Formatua - Inprimatze-tarteak</emph>.</variable>"
+
+#. 8mFPE
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156448\n"
+"help.text"
+msgid "<variable id=\"fodrfe\">Choose <emph>Format - Print Ranges - Define</emph>.</variable>"
+msgstr "<variable id=\"fodrfe\">Aukeratu <emph>Formatua - Inprimatze-tarteak - Definitu</emph>.</variable>"
+
+#. BneiE
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3156290\n"
+"help.text"
+msgid "<variable id=\"fodrhin\">Choose <emph>Format - Print Ranges - Add</emph>.</variable>"
+msgstr "<variable id=\"fodrhin\">Aukeratu <emph>Formatua - Inprimatze-tarteak - Gehitu</emph>.</variable>"
+
+#. KgEb2
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3155812\n"
+"help.text"
+msgid "<variable id=\"fodbah\">Choose <emph>Format - Print Ranges - Clear</emph>.</variable>"
+msgstr "<variable id=\"fodbah\">Aukeratu <emph>Formatua - Inprimatze-tarteak - Garbitu</emph>.</variable>"
+
+#. n6cmd
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153307\n"
+"help.text"
+msgid "<variable id=\"fodbbe\">Choose <emph>Format - Print Ranges - Edit</emph>.</variable>"
+msgstr "<variable id=\"fodbbe\">Aukeratu <emph>Formatua - Inprimatze-tarteak - Editatu</emph>.</variable>"
+
+#. gWWhE
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3153916\n"
+"help.text"
+msgid "Choose <emph>Format - AutoFormat Styles</emph>."
+msgstr "Aukeratu <emph>Formatua - Autoformatu-estiloak</emph>."
+
+#. ABeaN
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154532\n"
+"help.text"
+msgid "On the <emph>Tools</emph> bar, click"
+msgstr "<emph>Tresnak</emph> barran, sakatu"
+
+#. RRjPc
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3149332\n"
+"help.text"
+msgid "<image id=\"img_id3156020\" src=\"cmd/sc_autoformat.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156020\">AutoFormat Styles Icon</alt></image>"
+msgstr "<image id=\"img_id3156020\" src=\"cmd/sc_autoformat.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156020\">Autoformatu-estiloak ikonoa</alt></image>"
+
+#. RBF2g
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154060\n"
+"help.text"
+msgid "AutoFormat"
+msgstr "Formatu automatikoa"
+
+#. d2VYa
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154618\n"
+"help.text"
+msgid "<variable id=\"bedingte\">Choose <emph>Format - Conditional</emph>.</variable>"
+msgstr "<variable id=\"bedingte\">Aukeratu <emph>Formatua - Baldintzapekoa</emph>.</variable>"
+
+#. aFWLc
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"tit\n"
+"help.text"
+msgid "Tools Menu"
+msgstr "Tresnak menua"
+
+#. kaV4j
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"hd_id3147264\n"
+"help.text"
+msgid "Tools Menu"
+msgstr "Tresnak menua"
+
+#. YGCDR
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3150541\n"
+"help.text"
+msgid "<variable id=\"exdektv\">Choose <emph>Tools - Detective</emph>.</variable>"
+msgstr "<variable id=\"exdektv\">Aukeratu <emph>Tresnak - Detektibea</emph>.</variable>"
+
+#. dPH3j
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153194\n"
+"help.text"
+msgid "Choose <emph>Tools - Detective - Trace Precedents</emph>."
+msgstr "Aukeratu <emph>Tresnak - Detektibea - Aurrekoen aztarnari jarraitu</emph>."
+
+#. q3pmU
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3150447\n"
+"help.text"
+msgid "Shift+F9"
+msgstr "⇧+F9"
+
+#. Mn26m
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154123\n"
+"help.text"
+msgid "<variable id=\"silbentrennungc\">Menu <emph>Tools - Language - Hyphenation</emph>.</variable>"
+msgstr "<variable id=\"silbentrennungc\"><emph>Tresnak - Hizkuntza - Hitz-zatiketa</emph> menua.</variable>"
+
+#. kGGCG
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3145785\n"
+"help.text"
+msgid "<variable id=\"exdvore\">Choose <emph>Tools - Detective - Remove Precedents</emph>.</variable>"
+msgstr "<variable id=\"exdvore\">Aukeratu <emph>Tresnak - Detektibea - Kendu aurrekoak</emph>.</variable>"
+
+#. iXoyD
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3155411\n"
+"help.text"
+msgid "Choose <emph>Tools - Detective - Trace Dependents</emph>."
+msgstr "Aukeratu <emph>Tresnak - Detektibea - Jarraitu mendekoen aztarnari</emph>."
+
+#. hXmKJ
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153363\n"
+"help.text"
+msgid "Shift+F5"
+msgstr "⇧+F5"
+
+#. f6Azg
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3146984\n"
+"help.text"
+msgid "<variable id=\"exdszne\">Choose <emph>Tools - Detective - Remove Dependents</emph>.</variable>"
+msgstr "<variable id=\"exdszne\">Aukeratu <emph>Tresnak - Detektibea - Kendu mendekoak</emph>.</variable>"
+
+#. kYsC6
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154014\n"
+"help.text"
+msgid "<variable id=\"exdase\">Choose <emph>Tools - Detective - Remove All Traces</emph>.</variable>"
+msgstr "<variable id=\"exdase\">Aukeratu <emph>Tresnak - Detektibea - Kendu aztarna guztiak</emph>.</variable>"
+
+#. bvGMB
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153188\n"
+"help.text"
+msgid "<variable id=\"exdszfe\">Choose <emph>Tools - Detective - Trace Error</emph>.</variable>"
+msgstr "<variable id=\"exdszfe\">Aukeratu <emph>Tresnak - Detektibea - Jarraitu errorearen aztarnari</emph>.</variable>"
+
+#. eps9h
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3149410\n"
+"help.text"
+msgid "<variable id=\"fuellmodus\">Choose <emph>Tools - Detective - Fill Mode</emph>.</variable>"
+msgstr "<variable id=\"fuellmodus\">Aukeratu <emph>Tresnak - Detektibea - Betetzeko modua</emph>.</variable>"
+
+#. PFGqZ
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3156284\n"
+"help.text"
+msgid "<variable id=\"dateneinkreisen\">Choose <emph>Tools - Detective - Mark Invalid Data</emph>.</variable>"
+msgstr "<variable id=\"dateneinkreisen\">Aukeratu <emph>Tresnak - Detektibea - Markatu baliogabeko datuak</emph>.</variable>"
+
+#. vVZWK
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3153159\n"
+"help.text"
+msgid "<variable id=\"spurenaktualisieren\">Choose <emph>Tools - Detective - Refresh Traces</emph>.</variable>"
+msgstr "<variable id=\"spurenaktualisieren\">Aukeratu <emph>Tresnak - Detektibea - Freskatu aztarnak</emph>.</variable>"
+
+#. kPsK3
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3147397\n"
+"help.text"
+msgid "<variable id=\"automatisch\">Choose <emph>Tools - Detective - AutoRefresh</emph>.</variable>"
+msgstr "<variable id=\"automatisch\">Aukeratu <emph>Tresnak - Detektibea - Freskatu automatikoki</emph>.</variable>"
+
+#. 9Jzv6
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154018\n"
+"help.text"
+msgid "<variable id=\"exzws\">Choose <emph>Tools - Goal Seek</emph>.</variable>"
+msgstr "<variable id=\"exzws\">Aukeratu <emph>Tresnak - Xede-bilaketa</emph>.</variable>"
+
+#. fLN9D
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3269142\n"
+"help.text"
+msgid "<variable id=\"solver\">Choose <emph>Tools - Solver</emph>.</variable>"
+msgstr "<variable id=\"solver\">Aukeratu <emph>Tresnak - Ebazlea</emph>.</variable>"
+
+#. 8onpF
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id8554338\n"
+"help.text"
+msgid "<variable id=\"solver_options\">Choose <emph>Tools - Solver</emph>, click <emph>Options</emph> button.</variable>"
+msgstr "<variable id=\"solver_options\">Aukeratu <emph>Tresnak - Ebazlea</emph>, sakatu <emph>Aukerak</emph> botoia.</variable>"
+
+#. nATsE
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3156277\n"
+"help.text"
+msgid "<variable id=\"exsze\">Choose <emph>Tools - Scenarios</emph>.</variable>"
+msgstr "<variable id=\"exsze\">Aukeratu <emph>Tresnak - Agertokiak</emph>.</variable>"
+
+#. YELPK
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id971647297529392\n"
+"help.text"
+msgid "<variable id=\"tools_forms\">Choose <emph>Tools - Forms</emph>.</variable>"
+msgstr "<variable id=\"tools_forms\">Aukeratu <emph>Tresnak ▸ Inprimakiak</emph>.</variable>"
+
+#. QLPxD
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id371647273694433\n"
+"help.text"
+msgid "<variable id=\"share_spreadsheet\">Choose <menuitem>Tools - Share Spreadsheet</menuitem></variable>"
+msgstr "<variable id=\"share_spreadsheet\">Aukeratu <menuitem>Tresnak - Partekatu kalkulu-orria</menuitem></variable>"
+
+#. uHRwy
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3149020\n"
+"help.text"
+msgid "<variable id=\"protect_sheet\">Choose <emph>Tools - Protect Sheet</emph>.</variable>"
+msgstr "<variable id=\"protect_sheet\">Aukeratu <emph>Tresnak - Babestu orria</emph>.</variable>"
+
+#. tKszw
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3154256\n"
+"help.text"
+msgid "<variable id=\"protect_spreadsheet\">Choose <emph>Tools - Protect Spreadsheet Structure</emph>.</variable>"
+msgstr "<variable id=\"protect_spreadsheet\">Aukeratu <emph>Tresnak - Babestu kalkulu-orriaren egitura</emph>.</variable>"
+
+#. WXFLf
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3146919\n"
+"help.text"
+msgid "Choose <emph>Data - Calculate - Recalculate</emph>."
+msgstr "Aukeratu <emph>Datuak - Kalkulatu - Birkalkulatu</emph>."
+
+#. CwoaA
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3149257\n"
+"help.text"
+msgid "Press <keycode>F9</keycode>"
+msgstr "Sakatu <keycode>F9</keycode>"
+
+#. EA2vV
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3146919a\n"
+"help.text"
+msgid "Choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - %PRODUCTNAME Calc - Formula</emph>."
+msgstr "Aukeratu <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Hobespenak</emph></caseinline><defaultinline><emph>Tresnak - Aukerak</emph></defaultinline></switchinline><emph> - %PRODUCTNAME Calc - Formula</emph>."
+
+#. CAGQA
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id891645217179561\n"
+"help.text"
+msgid "Choose <menuitem>Data - Calculate - Recalculate hard</menuitem>."
+msgstr "Aukeratu <menuitem>Datuak - Kalkulatu - Birkalkulatu baldintzarik gabe</menuitem>."
+
+#. e6kAE
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id21645217233263\n"
+"help.text"
+msgid "Press <keycode>Shift</keycode>+<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>+<keycode>F9</keycode>"
+msgstr "Sakatu <keycode>⇧</keycode>+<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>⌘</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>+<keycode>F9</keycode>"
+
+#. soEE4
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id31645223233125\n"
+"help.text"
+msgid "Select a formula cell or a formula cell range and choose <menuitem>Data - Calculate - Formula to values</menuitem>"
+msgstr "Hautatu formula-gelaxka bat edo formula-gelaxken barruti bat eta aukeratu <menuitem>Datuak - Kalkulatu - Formula baliora</menuitem>"
+
+#. YmRzU
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3150941\n"
+"help.text"
+msgid "<variable id=\"exatmb\">Choose <emph>Data - Calculate - AutoCalculate</emph>.</variable>"
+msgstr "<variable id=\"exatmb\">Aukeratu <emph>Datuak - Kalkulatu - Kalkulatu automatikoki</emph>.</variable>"
+
+#. tazcD
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id3151276\n"
+"help.text"
+msgid "<variable id=\"autoeingabe\">Choose <emph>Tools - AutoInput</emph>.</variable>"
+msgstr "<variable id=\"autoeingabe\">Aukeratu <emph>Tresnak - Sarrera automatikoa</emph>.</variable>"
+
+#. FfMAN
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"tit\n"
+"help.text"
+msgid "Window Menu"
+msgstr "Leihoa menua"
+
+#. mu4fa
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"hd_id3155628\n"
+"help.text"
+msgid "Window Menu"
+msgstr "Leihoa menua"
+
+#. ry53A
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3147335\n"
+"help.text"
+msgid "<variable id=\"fete\">Choose <menuitem>View - Split Window</menuitem>.</variable>"
+msgstr "<variable id=\"fete\">Aukeratu <menuitem>Ikusi - Zatitu leihoa</menuitem>.</variable>"
+
+#. dr9Aq
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id3153663\n"
+"help.text"
+msgid "<variable id=\"fefix\">Choose <menuitem>View - Freeze Rows and Columns</menuitem>.</variable>"
+msgstr "<variable id=\"fefix\">Aukeratu <menuitem>Ikusi - Finkatu errenkada eeta zutabeak</menuitem>.</variable>"
+
+#. DrJ2d
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id631612313719480\n"
+"help.text"
+msgid "<variable id=\"freezefirstcol\">Choose <menuitem>View - Freeze Cells - Freeze First Column</menuitem></variable>"
+msgstr "<variable id=\"freezefirstcol\">Aukeratu <menuitem>Ikusi - Finkatu gelaxkak - Finkatu lehen zutabea</menuitem></variable>"
+
+#. 5YHvr
+#: 00000407.xhp
+msgctxt ""
+"00000407.xhp\n"
+"par_id251612313725513\n"
+"help.text"
+msgid "<variable id=\"freezefirstrow\">Choose <menuitem>View - Freeze Cells - Freeze First Row</menuitem></variable>"
+msgstr "<variable id=\"freezefirstrow\">Aukeratu <menuitem>Ikusi - Finkatu gelaxkak - Finkatu lehen errenkada</menuitem></variable>"
+
+#. BkQfX
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"tit\n"
+"help.text"
+msgid "Data Menu"
+msgstr "Datuak menua"
+
+#. YxNCy
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"hd_id3145136\n"
+"help.text"
+msgid "Data Menu"
+msgstr "Datuak menua"
+
+#. MMjvu
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id8366954\n"
+"help.text"
+msgid "<variable id=\"text2columns\">Choose <emph>Data - Text to Columns</emph>.</variable>"
+msgstr "<variable id=\"text2columns\">Aukeratu <emph>Datuak - Testua zutabetan</emph>.</variable>"
+
+#. RBCHZ
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3147399\n"
+"help.text"
+msgid "<variable id=\"dbrbf\">Choose <emph>Data - Define Range</emph>.</variable>"
+msgstr "<variable id=\"dbrbf\">Aukeratu <emph>Datuak - Definitu barrutia</emph>.</variable>"
+
+#. 8aB3C
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3145345\n"
+"help.text"
+msgid "<variable id=\"dbrba\">Choose <emph>Data - Select Range</emph>.</variable>"
+msgstr "<variable id=\"dbrba\">Aukeratu <emph>Datuak - Hautatu barrutia</emph>.</variable>"
+
+#. 8eaL8
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150443\n"
+"help.text"
+msgid "<variable id=\"dnsrt\">Choose <emph>Data - Sort...</emph>.</variable>"
+msgstr "<variable id=\"dnsrt\">Aukeratu <emph>Datuak - Ordenatu...</emph>.</variable>"
+
+#. rscQf
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id641584647437810\n"
+"help.text"
+msgid "<variable id=\"datasortascending\">Choose <menuitem>Data - Sort Ascending</menuitem></variable>"
+msgstr "<variable id=\"datasortascending\">Aukeratu <menuitem>Datuak - Ordenatu gorantz</menuitem></variable>"
+
+#. GHhdg
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id711584647447316\n"
+"help.text"
+msgid "<variable id=\"datasortdescending\">Choose <menuitem>Data - Sort Descending</menuitem></variable>"
+msgstr "<variable id=\"datasortdescending\">Aukeratu <menuitem>Datuak - Ordenatu beherantz</menuitem></variable>"
+
+#. oEATB
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3148491\n"
+"help.text"
+msgid "Choose <emph>Data - Sort - Sort Criteria</emph> tab."
+msgstr "Aukeratu <emph>Datuak - Ordenatu - Ordenatzeko irizpideak</emph> fitxa."
+
+#. SG8FW
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3154516\n"
+"help.text"
+msgid "<variable id=\"onthestandardbar\">On <emph>Standard</emph> bar, click</variable>"
+msgstr "<variable id=\"onthestandardbar\"><emph>Estandarra</emph> barran, sakatu</variable>"
+
+#. GDBeV
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3148663\n"
+"help.text"
+msgid "<image id=\"img_id3150543\" src=\"cmd/sc_sortup.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150543\">Icon Sort Ascending</alt></image>"
+msgstr "<image id=\"img_id3150543\" src=\"cmd/sc_sortup.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150543\">Ordenatu gorantz ikonoa</alt></image>"
+
+#. vv2Zk
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150767\n"
+"help.text"
+msgid "Sort Ascending"
+msgstr "Ordenatu gorantz"
+
+#. QXzES
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153969\n"
+"help.text"
+msgid "<image id=\"img_id3125863\" src=\"cmd/sc_sortdown.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3125863\">Icon Sort Descending</alt></image>"
+msgstr "<image id=\"img_id3125863\" src=\"cmd/sc_sortdown.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3125863\">Ordenatu beherantz ikonoa</alt></image>"
+
+#. AHMAB
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3145364\n"
+"help.text"
+msgid "Sort Descending"
+msgstr "Ordenatu beherantz"
+
+#. C3DzW
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3146984\n"
+"help.text"
+msgid "<variable id=\"dnstot\">Choose <emph>Data - Sort - Options</emph> tab.</variable>"
+msgstr "<variable id=\"dnstot\">Aukeratu <emph>Datuak - Ordenatu - Aukerak</emph> fitxa.</variable>"
+
+#. KsX3d
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155308\n"
+"help.text"
+msgid "<variable id=\"dnftr\">Choose <emph>Data - More Filters</emph>.</variable>"
+msgstr "<variable id=\"dnftr\">Aukeratu <emph>Datuak - Iragazki gehiago</emph>.</variable>"
+
+#. GeDGj
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3148646\n"
+"help.text"
+msgid "Choose <emph>Data - AutoFilter</emph>."
+msgstr "Aukeratu <emph>Datuak - Iragazki automatikoa</emph>."
+
+#. QwBAG
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3151113\n"
+"help.text"
+msgid "On <emph>Tools</emph> bar or <emph>Table Data</emph> bar, click"
+msgstr "<emph>Tresnak</emph> barran edo <emph>Taula-datuak</emph> barran, sakatu"
+
+#. WEeFA
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3145799\n"
+"help.text"
+msgid "<image id=\"img_id3149413\" src=\"cmd/sc_datafilterautofilter.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149413\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149413\" src=\"cmd/sc_datafilterautofilter.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149413\">Ikonoa</alt></image>"
+
+#. dwkEN
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3149401\n"
+"help.text"
+msgid "AutoFilter"
+msgstr "Iragazki automatikoa"
+
+#. MLpCL
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3156278\n"
+"help.text"
+msgid "<variable id=\"dnfspz\">Choose <emph>Data - More Filters - Advanced Filter...</emph> .</variable>"
+msgstr "<variable id=\"dnfspz\">Aukeratu <emph>Datuak - Iragazki gehiago - Iragazki aurreratua...</emph>.</variable>"
+
+#. PEeec
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153764\n"
+"help.text"
+msgid "Choose <emph>Data - More Filters - Standard Filter... - Options</emph> label."
+msgstr "Aukeratu <emph>Datuak - Iragazki gehiago - Iragazki estandarra... - Aukerak</emph> etiketa."
+
+#. rEgAn
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155444\n"
+"help.text"
+msgid "Choose <emph>Data - More Filters - Advanced Filter... - Options</emph> label."
+msgstr "Aukeratu <emph>Datuak - Iragazki gehiago - Iragazki aurreratua... - Aukerak</emph> etiketa."
+
+#. pcYQb
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3156382\n"
+"help.text"
+msgid "Choose <emph>Data - More Filters - Reset Filter</emph>."
+msgstr "Aukeratu <emph>Datuak - Iragazki gehiago - Berrezarri iragazkia</emph>."
+
+#. c524g
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155961\n"
+"help.text"
+msgid "On <emph>Table Data</emph> bar, click <emph>Reset Filter/Sort</emph>."
+msgstr "<emph>Taula-datuak</emph> barran, sakatu <emph>Berrezarri iragazkia/ordena</emph>."
+
+#. MpJRw
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3148485\n"
+"help.text"
+msgid "<image id=\"img_id3145792\" src=\"cmd/sc_removefilter.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145792\">Icon</alt></image>"
+msgstr "<image id=\"img_id3145792\" src=\"cmd/sc_removefilter.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3145792\">Ikonoa</alt></image>"
+
+#. B9xjy
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3149207\n"
+"help.text"
+msgid "Reset Filter/Sort"
+msgstr "Berrezarri iragazkia/ordena"
+
+#. eqxFL
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3152778\n"
+"help.text"
+msgid "<variable id=\"dnaftas\">Choose <emph>Data - More Filter - Hide AutoFilter</emph>.</variable>"
+msgstr "<variable id=\"dnaftas\">Aukeratu <emph>Datuak - Iragazki gehiago - Ezkutatu iragazki automatikoa</emph>.</variable>"
+
+#. aoNDF
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3166424\n"
+"help.text"
+msgid "<variable id=\"dntegs\">Choose <emph>Data - Subtotals</emph>.</variable>"
+msgstr "<variable id=\"dntegs\">Aukeratu <emph>Datuak - Subtotalak</emph>.</variable>"
+
+#. 4GWVS
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3154574\n"
+"help.text"
+msgid "<variable id=\"dntezd\">Choose <emph>Data - Subtotals - 1st, 2nd, 3rd Group</emph> tabs.</variable>"
+msgstr "<variable id=\"dntezd\">Aukeratu <emph>Datuak - Subtotalak - 1., 2., 3. taldea</emph> fitxak.</variable>"
+
+#. rU3dk
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3151277\n"
+"help.text"
+msgid "<variable id=\"dntopi\">Choose <emph>Data - Subtotals - Options</emph> tab.</variable>"
+msgstr "<variable id=\"dntopi\">Aukeratu <emph>Datuak - Subtotalak - Aukerak</emph> fitxa.</variable>"
+
+#. UUjAm
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3145133\n"
+"help.text"
+msgid "<variable id=\"datengueltig\">Choose <emph>Data - Validity</emph>.</variable>"
+msgstr "<variable id=\"datengueltig\">Aukeratu <emph>Datuak - Baliozkotasuna</emph>.</variable>"
+
+#. zEawg
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3152992\n"
+"help.text"
+msgid "<variable id=\"datengueltigwerte\">Menu <emph>Data - Validity - Criteria</emph> tab.</variable>"
+msgstr "<variable id=\"datengueltigwerte\">Menua <emph>Datuak - Baliozkotasuna - Irizpideak</emph> fitxa.</variable>"
+
+#. bfJfv
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150367\n"
+"help.text"
+msgid "<variable id=\"datengueltigeingabe\">Choose <emph>Data - Validity - Input Help</emph> tab.</variable>"
+msgstr "<variable id=\"datengueltigeingabe\">Aukeratu <emph>Datuak - Baliozkotasuna - Sarreraren laguntza</emph> fitxa.</variable>"
+
+#. JHPw4
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3154486\n"
+"help.text"
+msgid "<variable id=\"datengueltigfehler\">Choose <emph>Data - Validity - Error Alert</emph> tab.</variable>"
+msgstr "<variable id=\"datengueltigfehler\">Aukeratu <emph>Datuak - Baliozkotasuna - Errore-mezua</emph> fitxa.</variable>"
+
+#. dmwsV
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3146978\n"
+"help.text"
+msgid "<variable id=\"dnmfo\">Choose <emph>Data - Multiple Operations</emph>.</variable>"
+msgstr "<variable id=\"dnmfo\">Aukeratu <emph>Datuak0 - Eragiketa anizkoitzak</emph>.</variable>"
+
+#. iZdCu
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155809\n"
+"help.text"
+msgid "<variable id=\"dnksd\">Choose <emph>Data - Consolidate</emph>.</variable>"
+msgstr "<variable id=\"dnksd\">Choose <emph>Datuak - Kontsolidatu</emph>.</variable>"
+
+#. mQYW6
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3148701\n"
+"help.text"
+msgid "<variable id=\"dngld\">Choose <emph>Data - Group and Outline</emph>.</variable>"
+msgstr "<variable id=\"dngld\">Aukeratu <emph>Datuak - Taldea eta eskema</emph>.</variable>"
+
+#. 7AiJR
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153815\n"
+"help.text"
+msgid "<variable id=\"dngda\">Choose <emph>Data - Group and Outline - Hide Details</emph>.</variable>"
+msgstr "<variable id=\"dngda\">Aukeratu <emph>Datuak - Taldea eta eskema - Ezkutatu xehetasunak</emph>.</variable>"
+
+#. A6P9g
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3159223\n"
+"help.text"
+msgid "<variable id=\"dngde\">Choose <emph>Data - Group and Outline - Show Details</emph>.</variable>"
+msgstr "<variable id=\"dngde\">Aukeratu <emph>Datuak - Taldea eta eskema - Erakutsi xehetasunak</emph>.</variable>"
+
+#. ntpHG
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3146870\n"
+"help.text"
+msgid "Choose <emph>Data - Group and Outline - Group</emph>."
+msgstr "Aukeratu <emph>Datuak - Taldea eta eskema - Elkartu</emph>."
+
+#. AoaeW
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3144507\n"
+"help.text"
+msgid "F12"
+msgstr "F12"
+
+#. J93iw
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3144772\n"
+"help.text"
+msgid "On <emph>Tools</emph> bar, click"
+msgstr "<emph>Tresnak</emph> barran, egin klik"
+
+#. KsK5g
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3149438\n"
+"help.text"
+msgid "<image id=\"img_id3153287\" src=\"cmd/sc_group.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153287\">Icon</alt></image>"
+msgstr "<image id=\"img_id3153287\" src=\"cmd/sc_group.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153287\">Ikonoa</alt></image>"
+
+#. vxBx5
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150214\n"
+"help.text"
+msgid "Group"
+msgstr "Elkartu"
+
+#. A26D7
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3146781\n"
+"help.text"
+msgid "Choose <emph>Data - Group and Outline - Ungroup</emph>."
+msgstr "Aukeratu <emph>Datuak - Taldea eta eskema - Banandu</emph>."
+
+#. svWUT
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150892\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">⌘</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12"
+
+#. JNLDc
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155097\n"
+"help.text"
+msgid "On <emph>Tools</emph> bar, click"
+msgstr "<emph>Tresnak</emph> barran, egin klik"
+
+#. TpnTL
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150048\n"
+"help.text"
+msgid "<image id=\"img_id3155914\" src=\"cmd/sc_ungroup.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155914\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155914\" src=\"cmd/sc_ungroup.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155914\">Ikonoa</alt></image>"
+
+#. D5tBT
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153555\n"
+"help.text"
+msgid "Ungroup"
+msgstr "Banandu"
+
+#. RwmQ6
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153008\n"
+"help.text"
+msgid "<variable id=\"dnglagl\">Choose <emph>Data - Group and Outline - AutoOutline</emph>.</variable>"
+msgstr "<variable id=\"dnglagl\">Aukeratu <emph>Datuak - Taldea eta eskema - Eskema automatikoa</emph>.</variable>"
+
+#. HhK9D
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3154709\n"
+"help.text"
+msgid "<variable id=\"dnglef\">Choose <emph>Data - Group and Outline - Remove Outline</emph>.</variable>"
+msgstr "<variable id=\"dnglef\">Aukeratu <emph>Datuak - Taldea eta eskema - Kendu eskema</emph>.</variable>"
+
+#. jHNnB
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id1774346\n"
+"help.text"
+msgid "<variable id=\"dngdrill\">Choose <emph>Data - Group and Outline - Show Details</emph> (for some pivot tables).</variable>"
+msgstr "<variable id=\"dngdrill\">Aukeratu <emph>Datuak - Taldea eta eskema - Erakutsi xehetasunak</emph> (taula dinamiko batzuentzako).</variable>"
+
+#. MQZ6A
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3155759\n"
+"help.text"
+msgid "<variable id=\"dndtpt\">Choose <emph>Data - Pivot Table</emph>.</variable>"
+msgstr "<variable id=\"dndtpt\">Aukeratu <emph>Datuak - Taula dinamikoa</emph>.</variable>"
+
+#. TAn4b
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3154625\n"
+"help.text"
+msgid "<variable id=\"dndpa\">Choose <emph>Insert - Pivot Table</emph>.</variable>"
+msgstr "<variable id=\"dndpa\">Aukeratu <emph>Txertatu - Taula dinamikoa</emph>.</variable>"
+
+#. 6GiyL
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3147558\n"
+"help.text"
+msgid "<variable id=\"dndq\">Choose <emph>Insert - Pivot Table</emph>, in the <emph>Select Source</emph> dialog choose the option <emph>Data source registered in $[officename]</emph>.</variable>"
+msgstr "<variable id=\"dndq\">Aukeratu <emph>Txertatu - Taula dinamikoa</emph>, eta hautatu <emph>$[officename] aplikazioan erregistratutako datu-iturburua</emph> <emph>Hautatu iturburua</emph> elkarrizketa-koadroan.</variable>"
+
+#. qP8SA
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153297\n"
+"help.text"
+msgid "Choose <emph>Insert - Pivot Table</emph>, in the <emph>Select Source</emph> dialog choose the option <emph>Current selection</emph>."
+msgstr "Hautatu <emph>Txertatu - Taula dinamikoa</emph>, eta aukeratu <emph>Uneko hautapena</emph>, <emph>Hautatu iturburua</emph> elkarrizketa-koadroan."
+
+#. GACGc
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3145118\n"
+"help.text"
+msgid "Choose <emph>Insert - Pivot Table</emph>, in the <emph>Select Source</emph> dialog choose the option <emph>Data source registered in $[officename]</emph>, click <emph>OK</emph> to see <emph>Select Data Source</emph> dialog."
+msgstr "Aukeratu <emph>Txertatu - Taula dinamikoa</emph>, eta hautatu <emph>$[officename] aplikazioan erregistratutako datu-iturburua</emph> <emph>Hautatu Iturburua</emph> elkarrizketa-koadroan. <emph>Hautatu datu-iturburua</emph> elkarrizketa-koadroa ikusteko, egin klik <emph>Ados</emph> botoian."
+
+#. yTKVJ
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3153294\n"
+"help.text"
+msgid "<variable id=\"dndpak\">Choose <emph>Data - Pivot Table - Refresh</emph>.</variable>"
+msgstr "<variable id=\"dndpak\">Aukeratu <emph>Datuak - Taula dinamikoa - Freskatu</emph>.</variable>"
+
+#. QeUt7
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3151344\n"
+"help.text"
+msgid "<variable id=\"dndploe\">Choose <emph>Data - Pivot Table - Delete</emph>.</variable>"
+msgstr "<variable id=\"dndploe\">Aukeratu <emph>Datuak - Taula dinamikoa - Ezabatu</emph>.</variable>"
+
+#. nX3fD
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_id3150397\n"
+"help.text"
+msgid "<variable id=\"dndakt\">Choose <emph>Data - Refresh Range</emph>.</variable>"
+msgstr "<variable id=\"dndakt\">Aukeratu <emph>Datuak - Freskatu barrutia</emph>.</variable>"
+
+#. xpDxc
+#: 00000412.xhp
+msgctxt ""
+"00000412.xhp\n"
+"par_idN10B8F\n"
+"help.text"
+msgid "<variable id=\"grouping\">Choose <emph>Data - Group and Outline - Group</emph>.</variable>"
+msgstr "<variable id=\"grouping\">Aukeratu <emph>Datuak - Taldea eta eskema - Elkartu</emph>.</variable>"
+
+#. mAfT6
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"tit\n"
+"help.text"
+msgid "Available since release"
+msgstr "Erabilgarri bertsio honetatik aurrera:"
+
+#. FSRQP
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551701041690\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 3.3."
+msgstr "Funtzio hau %PRODUCTNAME 3.3 bertsiotik dago erabilgarri."
+
+#. f7Pu4
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041690\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 3.4."
+msgstr "Funtzio hau %PRODUCTNAME 3.4 bertsiotik dago erabilgarri."
+
+#. ctCQZ
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041635\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 3.5."
+msgstr "Funtzio hau %PRODUCTNAME 3.5 bertsiotik dago erabilgarri."
+
+#. s2cEc
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041636\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 3.6."
+msgstr "Funtzio hau %PRODUCTNAME 3.6 bertsiotik dago erabilgarri."
+
+#. VJxhP
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041640\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 4.0."
+msgstr "Funtzio hau %PRODUCTNAME 4.0 bertsiotik dago erabilgarri."
+
+#. CBpb7
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041641\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 4.1."
+msgstr "Funtzio hau %PRODUCTNAME 4.1 bertsiotik dago erabilgarri."
+
+#. 2cFVC
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041642\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 4.2."
+msgstr "Funtzio hau %PRODUCTNAME 4.2 bertsiotik dago erabilgarri."
+
+#. iV7XA
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041643\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 4.3."
+msgstr "Funtzio hau %PRODUCTNAME 4.3 bertsiotik dago erabilgarri."
+
+#. ZwQHj
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041644\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 4.4."
+msgstr "Funtzio hau %PRODUCTNAME 4.4 bertsiotik dago erabilgarri."
+
+#. jcAXr
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041650\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 5.0."
+msgstr "Funtzio hau %PRODUCTNAME 5.0 bertsiotik dago erabilgarri."
+
+#. zV2VV
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041651\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 5.1."
+msgstr "Funtzio hau %PRODUCTNAME 5.1 bertsiotik dago erabilgarri."
+
+#. DJsbg
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041652\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 5.2."
+msgstr "Funtzio hau %PRODUCTNAME 5.2 bertsiotik dago erabilgarri."
+
+#. UBjho
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041653\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 5.3."
+msgstr "Funtzio hau %PRODUCTNAME 5.3 bertsiotik dago erabilgarri."
+
+#. oGbPE
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041654\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 5.4."
+msgstr "Funtzio hau %PRODUCTNAME 5.4 bertsiotik dago erabilgarri."
+
+#. 75SZe
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041660\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 6.0."
+msgstr "Funtzio hau %PRODUCTNAME 6.0 bertsiotik dago erabilgarri."
+
+#. qEaTq
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041661\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 6.1."
+msgstr "Funtzio hau %PRODUCTNAME 6.1 bertsiotik dago erabilgarri."
+
+#. WpAdt
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041662\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 6.2."
+msgstr "Funtzio hau %PRODUCTNAME 6.2 bertsiotik dago erabilgarri."
+
+#. FyJfT
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041663\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 6.3."
+msgstr "Funtzio hau %PRODUCTNAME 6.3 bertsiotik dago erabilgarri."
+
+#. 3TzRz
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041664\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 6.4."
+msgstr "Funtzio hau %PRODUCTNAME 6.4 bertsiotik dago erabilgarri."
+
+#. DWBCQ
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041665\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 7.0."
+msgstr "Funtzio hau %PRODUCTNAME 7.0 bertsiotik dago erabilgarri."
+
+#. 3FGD2
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041666\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 7.1."
+msgstr "Funtzio hau %PRODUCTNAME 7.1 bertsiotik aurrera dago erabilgarri."
+
+#. jGT89
+#: avail_release.xhp
+msgctxt ""
+"avail_release.xhp\n"
+"par_id651551401041667\n"
+"help.text"
+msgid "This function is available since %PRODUCTNAME 7.2."
+msgstr "Funtzio hau %PRODUCTNAME 7.2 bertsiotik dago erabilgarri."
+
+#. LSPBz
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"tit\n"
+"help.text"
+msgid "Sheet Menu"
+msgstr "'Orria' menua"
+
+#. PjDuc
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"hd_id160220162108024368\n"
+"help.text"
+msgid "Sheet Menu"
+msgstr "'Orria' menua"
+
+#. 6Xr4C
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id160220162106567373\n"
+"help.text"
+msgid "<variable id=\"insert_rows_above\">Choose <emph>Sheet - Insert Rows - Rows Above</emph>.</variable>"
+msgstr "<variable id=\"insert_rows_above\">Aukeratu <emph>Orria - Txertatu errenkadak - Errenkadak gainean</emph>.</variable>"
+
+#. pXitE
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id160220162109048207\n"
+"help.text"
+msgid "<variable id=\"insert_rows_below\">Choose <emph>Sheet - Insert Rows - Rows Below</emph>.</variable>"
+msgstr "<variable id=\"insert_rows_below\">Aukeratu <emph>Orria - Txertatu errenkadak - Errenkadak azpian</emph>.</variable>"
+
+#. uBtCP
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id160220162107055028\n"
+"help.text"
+msgid "<variable id=\"insert_columns_left\">Choose <emph>Sheet - Insert Columns - Columns Before</emph>.</variable>"
+msgstr "<variable id=\"insert_columns_left\">Aukeratu <emph>Orria - Txertatu zutabeak - Zutabeak aurrean</emph>.</variable>"
+
+#. qQg7B
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id160220162109126013\n"
+"help.text"
+msgid "<variable id=\"insert_columns_right\">Choose <emph>Sheet - Insert Columns - Columns After</emph>.</variable>"
+msgstr "<variable id=\"insert_columns_right\">Aukeratu <emph>Orria - Txertatu zutabeak - Zutabeak atzean</emph>.</variable>"
+
+#. GiD3z
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3149095\n"
+"help.text"
+msgid "<variable id=\"insert_page_break\">Choose <emph>Sheet - Insert Page Break</emph>.</variable>"
+msgstr "<variable id=\"insert_page_break\">Aukeratu <emph>Orria - Txertatu orrialde-jauzia</emph>.</variable>"
+
+#. VeJdv
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3149398\n"
+"help.text"
+msgid "<variable id=\"insert_page_break_row\">Choose <emph>Sheet - Insert Page Break - Row Break</emph>.</variable>"
+msgstr "<variable id=\"insert_page_break_row\">Aukeratu <emph>Orria - Txertatu orrialde-jauzia - Errenkada-jauzia</emph>.</variable>"
+
+#. 3Cc3c
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3150084\n"
+"help.text"
+msgid "<variable id=\"insert_page_break_column\">Choose <emph>Sheet - Insert Page Break - Column Break</emph>.</variable>"
+msgstr "<variable id=\"insert_page_break_column\">Aukeratu <emph>Orria - Txertatu orrialde-jauzia - Zutabe-jauzia</emph>.</variable>"
+
+#. i3nrt
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3153093\n"
+"help.text"
+msgid "<variable id=\"delete_page_break\">Choose <emph>Sheet - Delete Page Break</emph>.</variable>"
+msgstr "<variable id=\"delete_page_break\">Aukeratu <emph>Orria - Ezabatu orrialde-jauzia</emph>.</variable>"
+
+#. NTjp2
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3153191\n"
+"help.text"
+msgid "<variable id=\"delete_page_break_row\">Choose <emph>Sheet - Delete Page Break - Row Break</emph>.</variable>"
+msgstr "<variable id=\"delete_page_break_row\">Aukeratu <emph>Orria - Ezabatu orrialde-jauzia - Errenkada-jauzia</emph>.</variable>"
+
+#. vP5dr
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id3145645\n"
+"help.text"
+msgid "<variable id=\"delete_page_break_column\">Choose <emph>Sheet - Delete Page Break - Column Break</emph>.</variable>"
+msgstr "<variable id=\"delete_page_break_column\">Aukeratu <emph>Orria - Ezabatu orrialde-jauzia - Zutabe-jauzia</emph>.</variable>"
+
+#. PGEHP
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id281631903136031\n"
+"help.text"
+msgid "<variable id=\"edit_comment\">Choose <menuitem>Sheet - Cell Comments - Edit Comment</menuitem></variable>"
+msgstr "<variable id=\"edit_comment\">Aukeratu <menuitem>Orria - Gelaxka-iruzkinak - Editatu iruzkina</menuitem></variable>"
+
+#. rrCWM
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id641631903140705\n"
+"help.text"
+msgid "<variable id=\"hide_comment\">Choose <menuitem>Sheet - Cell Comments - Hide Comment</menuitem></variable>"
+msgstr "<variable id=\"hide_comment\">Aukeratu <menuitem>Orria - Gelaxka-iruzkinak - Ezkutatu iruzkina</menuitem></variable>"
+
+#. YvB6F
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id611631903144777\n"
+"help.text"
+msgid "<variable id=\"show_comment\">Choose <menuitem>Sheet - Cell Comments - Show Comment</menuitem></variable>"
+msgstr "<variable id=\"show_comment\">Aukeratu <menuitem>Orria - Gelaxka-iruzkinak - Erakutsi iruzkina</menuitem></variable>"
+
+#. F4BHH
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id961631903149304\n"
+"help.text"
+msgid "<variable id=\"delete_comment\">Choose <menuitem>Sheet - Cell Comments - Delete Comment</menuitem></variable>"
+msgstr "<variable id=\"delete_comment\">Aukeratu <menuitem>Orria - Gelaxka-iruzkinak - Ezabatu iruzkina</menuitem></variable>"
+
+#. NVNhS
+#: sheet_menu.xhp
+msgctxt ""
+"sheet_menu.xhp\n"
+"par_id471631903160977\n"
+"help.text"
+msgid "<variable id=\"delete_all_comments\">Choose <menuitem>Sheet - Cell Comments - Delete All Comments</menuitem></variable>"
+msgstr "<variable id=\"delete_all_comments\">Aukeratu <menuitem>Orria - Gelaxka-iruzkinak - Ezabatu iruzkin guztiak</menuitem></variable>"

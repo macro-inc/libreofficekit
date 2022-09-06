@@ -1,0 +1,296 @@
+#. extracted from helpcontent2/source/text/shared/menu
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-03-21 12:31+0100\n"
+"PO-Revision-Date: 2021-10-04 18:05+0000\n"
+"Last-Translator: 锁琨珑 <suokunlong@126.com>\n"
+"Language-Team: Chinese (Simplified) <https://translations.documentfoundation.org/projects/libo_help-master/textsharedmenu/zh_Hans/>\n"
+"Language: zh-CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1552977892.000000\n"
+
+#. rxCQJ
+#: forms.xhp
+msgctxt ""
+"forms.xhp\n"
+"tit\n"
+"help.text"
+msgid "Forms submenu"
+msgstr ""
+
+#. EHLP3
+#: forms.xhp
+msgctxt ""
+"forms.xhp\n"
+"hd_id491647289210348\n"
+"help.text"
+msgid "<variable id=\"h1\"><link href=\"text/shared/menu/forms.xhp\" name=\"Forms Submenu\">Forms Submenu</link></variable>"
+msgstr ""
+
+#. EEMss
+#: insert_chart.xhp
+msgctxt ""
+"insert_chart.xhp\n"
+"tit\n"
+"help.text"
+msgid "Chart"
+msgstr "图表"
+
+#. 7XEBK
+#: insert_chart.xhp
+msgctxt ""
+"insert_chart.xhp\n"
+"hd_id030420160945436725\n"
+"help.text"
+msgid "<link href=\"text/shared/menu/insert_chart.xhp\">Chart</link>"
+msgstr "<link href=\"text/shared/menu/insert_chart.xhp\">图表</link>"
+
+#. UMRau
+#: insert_chart.xhp
+msgctxt ""
+"insert_chart.xhp\n"
+"par_id030420160947559665\n"
+"help.text"
+msgid "<ahelp hid=\".\">Inserts a chart based on data from a cell or table range or with default data.</ahelp>"
+msgstr "<ahelp hid=\".\">基于单元格、表格区域、默认数据插入图表。</ahelp>"
+
+#. kbBmz
+#: insert_form_control.xhp
+msgctxt ""
+"insert_form_control.xhp\n"
+"tit\n"
+"help.text"
+msgid "Form Control Menu"
+msgstr "表单菜单"
+
+#. fxAGy
+#: insert_form_control.xhp
+msgctxt ""
+"insert_form_control.xhp\n"
+"hd_id030720160611303537\n"
+"help.text"
+msgid "<link href=\"text/shared/menu/insert_form_control.xhp\">Form Control</link>"
+msgstr "<link href=\"text/shared/menu/insert_form_control.xhp\">表单控件</link>"
+
+#. exnvH
+#: insert_form_control.xhp
+msgctxt ""
+"insert_form_control.xhp\n"
+"par_id03072016061205929\n"
+"help.text"
+msgid "<ahelp hid=\".\">This submenu contains form controls like a textbox, checkbox, option button, and listbox that can be inserted into the document.</ahelp>"
+msgstr "<ahelp hid=\".\">这个子菜单包含了可插入到文档中的表单控件，比如文本框、复选框、单选按钮、列表框等。</ahelp>"
+
+#. qHWBR
+#: insert_shape.xhp
+msgctxt ""
+"insert_shape.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shape"
+msgstr "形状"
+
+#. MHwAt
+#: insert_shape.xhp
+msgctxt ""
+"insert_shape.xhp\n"
+"hd_id030420161043484643\n"
+"help.text"
+msgid "<link href=\"text/shared/menu/insert_shape.xhp\">Shape</link>"
+msgstr "<link href=\"text/shared/menu/insert_shape.xhp\">形状</link>"
+
+#. 9QTsN
+#: insert_shape.xhp
+msgctxt ""
+"insert_shape.xhp\n"
+"par_id030420161051456436\n"
+"help.text"
+msgid "<ahelp hid=\".\">This submenu contains common shapes like a line, circle, triangle, and square, or a symbol shape like a smiley face, heart, and flower that can be inserted into the document.</ahelp>"
+msgstr "<ahelp hid=\".\">这个子菜单包含了可插入到文档的通用形状，比如: 线条、圆圈、三角形、长方形；或者类似符号的形状，比如: 笑脸、心形、花朵等。</ahelp>"
+
+#. Um3uD
+#: insert_shape.xhp
+msgctxt ""
+"insert_shape.xhp\n"
+"par_id030720160629548185\n"
+"help.text"
+msgid "Line"
+msgstr "线条"
+
+#. nsXTj
+#: insert_shape.xhp
+msgctxt ""
+"insert_shape.xhp\n"
+"par_id030720160640091844\n"
+"help.text"
+msgid "<ahelp hid=\".\">This submenu contains straight, freeform, curved and polygon line shapes.</ahelp>"
+msgstr "<ahelp hid=\".\">这个子菜单包含了直线、自由线、曲线、多边形等形状。</ahelp>"
+
+#. Q9cD2
+#: insert_shape.xhp
+msgctxt ""
+"insert_shape.xhp\n"
+"hd_id030720160823321429\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01140000.xhp#line_title\">Line</link>"
+msgstr "<link href=\"text/shared/02/01140000.xhp#line_title\">线条</link>"
+
+#. HzFM7
+#: insert_shape.xhp
+msgctxt ""
+"insert_shape.xhp\n"
+"par_id030720160629546864\n"
+"help.text"
+msgid "Basic"
+msgstr "基本"
+
+#. 8CEvF
+#: insert_shape.xhp
+msgctxt ""
+"insert_shape.xhp\n"
+"par_id030720160644597415\n"
+"help.text"
+msgid "This submenu contains basic shapes like rectangles, circles, triangles, pentagon, hexagon, octagon, cylinder, and cube."
+msgstr "这个子菜单包含三角形、圆形、长方形、五角形、六边形、八边形、圆柱形、立方体等基本形状。"
+
+#. WjrBE
+#: insert_shape.xhp
+msgctxt ""
+"insert_shape.xhp\n"
+"par_id030720160629547675\n"
+"help.text"
+msgid "Symbol"
+msgstr "符号"
+
+#. GCKeF
+#: insert_shape.xhp
+msgctxt ""
+"insert_shape.xhp\n"
+"par_id030720160644595417\n"
+"help.text"
+msgid "This submenu contains symbols shapes like smiley face, heart, sun, moon, flower, puzzle, beveled shapes, and brackets."
+msgstr "这个子菜单包含笑脸、心形、太阳、月亮、鲜花、迷宫、斜面等符号形状，以及括号。"
+
+#. et6tw
+#: save_image.xhp
+msgctxt ""
+"save_image.xhp\n"
+"tit\n"
+"help.text"
+msgid "Save Image"
+msgstr "保存图像"
+
+#. sn5hM
+#: save_image.xhp
+msgctxt ""
+"save_image.xhp\n"
+"bm_id561566144886972\n"
+"help.text"
+msgid "<bookmark_value>page;save background image</bookmark_value>        <bookmark_value>slide;save background image</bookmark_value>        <bookmark_value>page background image;save</bookmark_value>        <bookmark_value>slide background image;save</bookmark_value>"
+msgstr "<bookmark_value>页面;保存背景图像</bookmark_value>        <bookmark_value>幻灯片;保存背景图像</bookmark_value>        <bookmark_value>页面背景图像;保存</bookmark_value>        <bookmark_value>幻灯片背景图像;保存</bookmark_value>"
+
+#. vT85b
+#: save_image.xhp
+msgctxt ""
+"save_image.xhp\n"
+"hd_id881566143431255\n"
+"help.text"
+msgid "<link href=\"text/shared/menu/save_image.xhp\" name=\"savebackgroundimage\">Save Background Image</link>"
+msgstr "<link href=\"text/shared/menu/save_image.xhp\" name=\"savebackgroundimage\"> 保存背景图像</link>"
+
+#. qWmcs
+#: save_image.xhp
+msgctxt ""
+"save_image.xhp\n"
+"par_id121566143431256\n"
+"help.text"
+msgid "<variable id=\"variable name\"><ahelp hid=\".uno:SaveBackground\">Saves the background image of the current <switchinline select=\"appl\"><caseinline select=\"IMPRESS\">slide</caseinline><defaultinline>page</defaultinline></switchinline>.</ahelp></variable>"
+msgstr "<variable id=\"variable name\"><ahelp hid=\".uno:SaveBackground\">保存当前 <switchinline select=\"appl\"><caseinline select=\"IMPRESS\">幻灯片</caseinline><defaultinline>页面</defaultinline></switchinline>中的背景图像。</ahelp></variable>"
+
+#. Y5Mt5
+#: save_image.xhp
+msgctxt ""
+"save_image.xhp\n"
+"par_id91566150694760\n"
+"help.text"
+msgid "Choose <switchinline select=\"appl\"><caseinline select=\"IMPRESS\"><menuitem>Slide</menuitem></caseinline><defaultinline><menuitem>Page</menuitem></defaultinline></switchinline> - <menuitem>Save Background Image</menuitem>."
+msgstr "选择 <switchinline select=\"appl\"><caseinline select=\"IMPRESS\"><menuitem>幻灯片</menuitem></caseinline><defaultinline><menuitem>页面</menuitem></defaultinline></switchinline> - <menuitem>保存背景图像</menuitem>。"
+
+#. V2Dps
+#: save_image.xhp
+msgctxt ""
+"save_image.xhp\n"
+"par_id291566144541584\n"
+"help.text"
+msgid "Opens the <emph>Export Image</emph> dialog to save the background image of the current <switchinline select=\"appl\"><caseinline select=\"IMPRESS\">slide</caseinline><defaultinline>page</defaultinline></switchinline>. Select the image file format in the Filter box, enter a file name for the image and click <emph>Save</emph>."
+msgstr "这将打开 <emph>导出图像</emph> 对话框， 以保存当前 <switchinline select=\"appl\"><caseinline select=\"IMPRESS\">幻灯片</caseinline><defaultinline>页面</defaultinline></switchinline>中的背景图像。在文件格式下拉列表中选择您要保存的图像格式，输入文件名，然后单击 <emph>保存</emph>。"
+
+#. LJVBr
+#: save_image.xhp
+msgctxt ""
+"save_image.xhp\n"
+"par_id841566144548379\n"
+"help.text"
+msgid "Depending on the file format chosen, a dialog appears to set the image format properties."
+msgstr "之后，取决于您选择的图像文件格式，可能会出现一个对话框以允许您设置图像的属性。"
+
+#. QZF9R
+#: set_image_background.xhp
+msgctxt ""
+"set_image_background.xhp\n"
+"tit\n"
+"help.text"
+msgid "Set Image Background"
+msgstr "设置背景图像"
+
+#. Pyf3s
+#: set_image_background.xhp
+msgctxt ""
+"set_image_background.xhp\n"
+"bm_id561566144886972\n"
+"help.text"
+msgid "<bookmark_value>page;set background image</bookmark_value><bookmark_value>slide;set background image</bookmark_value><bookmark_value>page background image;set</bookmark_value><bookmark_value>slide background image;set</bookmark_value>"
+msgstr "<bookmark_value>页面;设置背景图像</bookmark_value><bookmark_value>幻灯片;设置背景图像</bookmark_value><bookmark_value>页面背景图像;设置</bookmark_value><bookmark_value>幻灯片背景图像;设置</bookmark_value>"
+
+#. GYiBH
+#: set_image_background.xhp
+msgctxt ""
+"set_image_background.xhp\n"
+"hd_id881566143431255\n"
+"help.text"
+msgid "<link href=\"text/shared/menu/set_image_background.xhp\" name=\"setbackgroundimage\">Set Background Image</link>"
+msgstr "<link href=\"text/shared/menu/set_image_background.xhp\" name=\"setbackgroundimage\">设置背景图像</link>"
+
+#. B8FvH
+#: set_image_background.xhp
+msgctxt ""
+"set_image_background.xhp\n"
+"par_id121566143431256\n"
+"help.text"
+msgid "<variable id=\"setimagebackground\"><ahelp hid=\".uno:SelectBackground\">Set the image background of the <switchinline select=\"appl\"><caseinline select=\"IMPRESS\">slide</caseinline><defaultinline>page</defaultinline></switchinline>.</ahelp></variable>"
+msgstr "<variable id=\"setimagebackground\"><ahelp hid=\".uno:SelectBackground\">设置<switchinline select=\"appl\"><caseinline select=\"IMPRESS\">幻灯片</caseinline><defaultinline>页面</defaultinline></switchinline>的背景图像。</ahelp></variable>"
+
+#. j4B9R
+#: set_image_background.xhp
+msgctxt ""
+"set_image_background.xhp\n"
+"par_id91566150694760\n"
+"help.text"
+msgid "Choose <switchinline select=\"appl\"><caseinline select=\"IMPRESS\"><menuitem>Slide</menuitem></caseinline><defaultinline><menuitem>Page</menuitem></defaultinline></switchinline> - <menuitem>Set Background Image</menuitem>."
+msgstr "选择<switchinline select=\"appl\"><caseinline select=\"IMPRESS\"><menuitem>幻灯片</menuitem></caseinline><defaultinline><menuitem>页面</menuitem></defaultinline></switchinline> - <menuitem>设置背景图像</menuitem>。"
+
+#. DU4B8
+#: set_image_background.xhp
+msgctxt ""
+"set_image_background.xhp\n"
+"par_id291566144541584\n"
+"help.text"
+msgid "Opens the <emph>Set Image Background</emph> dialog to set the background image of the current <switchinline select=\"appl\"><caseinline select=\"IMPRESS\">slide</caseinline><defaultinline>page</defaultinline></switchinline>. Select image file and press Open."
+msgstr "这将打开<emph>设置背景图像</emph>对话框，以设置当前<switchinline select=\"appl\"><caseinline select=\"IMPRESS\">幻灯片</caseinline><defaultinline>页面</defaultinline></switchinline>的背景图像。选择一个图像文件，然后点击“打开”。"

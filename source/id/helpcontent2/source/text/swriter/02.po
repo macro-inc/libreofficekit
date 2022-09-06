@@ -1,0 +1,4175 @@
+#. extracted from helpcontent2/source/text/swriter/02
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2022-05-10 20:16+0200\n"
+"PO-Revision-Date: 2022-08-22 14:04+0000\n"
+"Last-Translator: darklinux <taufanlinux@gmail.com>\n"
+"Language-Team: Indonesian <https://translations.documentfoundation.org/projects/libo_help-master/textswriter02/id/>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: Weblate 4.12.2\n"
+"X-POOTLE-MTIME: 1550994264.000000\n"
+
+#. sqxGb
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Toggle Ordered List"
+msgstr "senarai jungkit berurutan"
+
+#. z8hCm
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"hd_id3150220\n"
+"help.text"
+msgid "<variable id=\"numberingh1\"><link href=\"text/swriter/02/02110000.xhp\" name=\"Numbering on/off\">Toggle Ordered List</link></variable>"
+msgstr "<variable id=\"numberingh1\"><link href=\"text/swriter/02/02110000.xhp\" name=\"Numbering on/off\">Jungkit Sinarai Terurut</link></variable>"
+
+#. ABQAW
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3150240\n"
+"help.text"
+msgid "<ahelp hid=\".uno:DefaultNumbering\">Adds or removes numbering from the selected paragraphs.</ahelp>"
+msgstr "<ahelp hid=\".uno:DefaultNumbering\">Tambahkan atau buang penomoran dari paragraf yang terpilih.</ahelp>"
+
+#. yGcX6
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id221649422095688\n"
+"help.text"
+msgid "To define the numbering format, choose <emph>Format - Bullets and Numbering</emph>. To display the <emph>Bullets and Numbering</emph> Bar, choose <emph>View - Toolbars - Bullets and Numbering</emph>."
+msgstr "Untuk menentukan format penomoran, pilih <emph>Format - Poin dan Penomoran</emph>. Untuk menampilkan Bilah <emph>Poin dan Penomoran</emph>, pilih <emph>Tampilkan - Bilah - Poin dan Penomoran</emph>."
+
+#. 8MND6
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3150952\n"
+"help.text"
+msgid "Some of the bullets and numbering options are not available when working in the <link href=\"text/swriter/01/03120000.xhp\" name=\"Web Layout\">Web Layout</link>."
+msgstr "Beberapa opsi bulatan dan penomoran tidak tersedia ketika bekerja dalam <link href=\"text/swriter/01/03120000.xhp\" name=\"Tataletak Web\">Tataletak Web</link>."
+
+#. dwn77
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3150502\n"
+"help.text"
+msgid "<image id=\"img_id3150508\" src=\"cmd/lc_defaultnumbering.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150508\">Toggle Ordered List Icon</alt></image>"
+msgstr "<image id=\"img_id3150508\" src=\"cmd/lc_defaultnumbering.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150508\">Jungkit Sinarai Ikon Terurut</alt></image>"
+
+#. yYfzC
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3147525\n"
+"help.text"
+msgid "Toggle Ordered List"
+msgstr "Jungkit Sinarai Terurut"
+
+#. fVWig
+#: 02110000.xhp
+msgctxt ""
+"02110000.xhp\n"
+"par_id3147549\n"
+"help.text"
+msgid "<link href=\"text/shared/01/06050000.xhp\" name=\"Bullets and Numbering\">Bullets and Numbering</link>"
+msgstr "<link href=\"text/shared/01/06050000.xhp\" name=\"Bulatan dan Penomoran\">Bulatan dan Penomoran</link>"
+
+#. vCvMN
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Link Frames"
+msgstr "Tautkan Bingkai"
+
+#. YvD8B
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"hd_id3148869\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/03210000.xhp\" name=\"Link\">Link Frames</link>"
+msgstr "<link href=\"text/swriter/02/03210000.xhp\" name=\"Link\">Tautan Bingkai</link>"
+
+#. HhxBu
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id3149873\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ChainFrames\" visibility=\"visible\">Links the selected frame to the next frame.</ahelp> The text automatically flows from one frame to another."
+msgstr "<ahelp hid=\".uno:ChainFrames\" visibility=\"visible\">Taut ke bingkai yang dipilih ke bingkai berikutnya.</ahelp> Teks otomatis mengalir dari satu bingkai ke bingkai berikutnya."
+
+#. tVMCL
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id721613395973296\n"
+"help.text"
+msgid "Choose <menuitem>Format - Frame and Object - Link Frames</menuitem>."
+msgstr "Pilih <menuitem>Format - Bingkai dan Objek - Tautan Bingkai</menuitem>."
+
+#. VTeFM
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id531613396047070\n"
+"help.text"
+msgid "On the <emph>Format</emph> bar, click the <emph>Link Frames</emph> icon."
+msgstr "Pada <emph>bilah</emph> Format, klik <emph>ikon</emph> Tautan Bingkai."
+
+#. BA5Cn
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id3145244\n"
+"help.text"
+msgid "<image src=\"cmd/sc_chainframes.png\" id=\"img_id3148771\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148771\">Icon Link Frames</alt></image>"
+msgstr "<image src=\"cmd/sc_chainframes.png\" id=\"img_id3148771\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148771\">Bingkai Tautan Ikon</alt></image>"
+
+#. kcF9p
+#: 03210000.xhp
+msgctxt ""
+"03210000.xhp\n"
+"par_id3149288\n"
+"help.text"
+msgid "Link Frames"
+msgstr "Menautkan Bingkai"
+
+#. 4BWgB
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Unlink Frames"
+msgstr "Memutuskan Taut Bingkai"
+
+#. mBvuA
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"bm_id3151188\n"
+"help.text"
+msgid "<bookmark_value>frames;unlinking</bookmark_value><bookmark_value>unlinking frames</bookmark_value>"
+msgstr "<bookmark_value>bingkai;melepas taut</bookmark_value><bookmark_value>melepas taut bingkai</bookmark_value>"
+
+#. bzyeh
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"hd_id3151188\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/03220000.xhp\" name=\"Unlink Frames\">Unlink Frames</link>"
+msgstr "<link href=\"text/swriter/02/03220000.xhp\" name=\"Melepas Taut Bingkai\">Melepas Taut Bingkai</link>"
+
+#. DMdUB
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"par_id3145412\n"
+"help.text"
+msgid "<ahelp hid=\".uno:UnhainFrames\">Breaks the link between two frames.</ahelp> You can only break the link that extends from the selected frame to the target frame."
+msgstr "<ahelp hid=\".uno:UnhainFrames\">Hapus taut antara dua bingkai.</ahelp> Taut hanya bisa dihapus jika menghubungkan bingkai yang dipilih ke bingkai sasaran."
+
+#. eDuj2
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"par_id3155903\n"
+"help.text"
+msgid "<image id=\"img_id3149687\" src=\"cmd/sc_unhainframes.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3149687\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149687\" src=\"cmd/sc_unhainframes.png\" width=\"5.64mm\" height=\"5.64mm\"><alt id=\"alt_id3149687\">Ikon</alt></image>"
+
+#. 9CrhG
+#: 03220000.xhp
+msgctxt ""
+"03220000.xhp\n"
+"par_id3155628\n"
+"help.text"
+msgid "Unlink Frames"
+msgstr "Memutuskan Taut Bingkai"
+
+#. ytwBC
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Rows"
+msgstr "Sisipkan Baris"
+
+#. agDLU
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"bm_id3154838\n"
+"help.text"
+msgid "<bookmark_value>tables; inserting rows</bookmark_value><bookmark_value>rows; inserting in tables, using icon</bookmark_value>"
+msgstr "<bookmark_value>tabel; menyisipkan baris</bookmark_value><bookmark_value>baris; menyisipkan dalam tabel, menggunakan ikon</bookmark_value>"
+
+#. m6B7t
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"hd_id3154838\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04090000.xhp\" name=\"Insert Rows\">Insert Rows</link>"
+msgstr "<link href=\"text/swriter/02/04090000.xhp\" name=\"Sisip Baris\">Sisip Baris</link>"
+
+#. 46DLZ
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"par_id3147407\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertRows\">Inserts one or more rows in the table, below the selection. You can insert more than one row by opening the dialog (choose <emph>Table - Insert - Rows</emph>), or by selecting more than one row before clicking the icon.</ahelp> The second method inserts rows of the same height as the originally selected rows."
+msgstr "<ahelp hid=\".uno:InsertRows\">Sisip baris dalam tabel pada posisi di bawah baris yang dipilih. Untuk menyisipkan lebih dari satu baris, buka dialog (pilih <emph>Tabel - Sisip - Baris</emph>), atau dengan memilih lebih dari satu baris sebelum mengklik ikon.</ahelp> Cara kedua akan menyisipkan baris dengan jumlah yang sama dengan banyak baris yang dipilih."
+
+#. xNXBv
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"par_id3151180\n"
+"help.text"
+msgid "<image id=\"img_id3151189\" src=\"cmd/sc_insertrows.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151189\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151189\" src=\"cmd/sc_insertrows.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151189\">Ikon</alt></image>"
+
+#. cUehP
+#: 04090000.xhp
+msgctxt ""
+"04090000.xhp\n"
+"par_id3149670\n"
+"help.text"
+msgid "Insert Row"
+msgstr "Sisip Baris"
+
+#. SDTyQ
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Column"
+msgstr "Sisipkan Kolom"
+
+#. FQEcy
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"bm_id3152899\n"
+"help.text"
+msgid "<bookmark_value>tables; inserting columns in</bookmark_value><bookmark_value>columns; inserting in tables</bookmark_value>"
+msgstr "<bookmark_value>tabel; menyisipkan kolom dalam</bookmark_value><bookmark_value>kolom; menyisipkan dalam tabel</bookmark_value>"
+
+#. iyrEC
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"hd_id3152899\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04100000.xhp\" name=\"Insert Column\">Insert Column</link>"
+msgstr "<link href=\"text/swriter/02/04100000.xhp\" name=\"Sisip Kolom\">Sisip Kolom</link>"
+
+#. K7GFa
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"par_id3145078\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertColumns\">Inserts one or more columns into the table, after the selection. You can insert several columns at the same time by opening the dialog (choose <emph>Table - Insert - Columns</emph>), or by selecting several columns before clicking the icon.</ahelp> If the latter method is used, the columns inserted will have the same relative width as the selected columns."
+msgstr "<ahelp hid=\".uno:InsertColumns\">Sisipkan satu atau lebih kolom dalam tabel, setelah diseleksi. Anda dapat menyisipkan beberapa kolom dalam satu waktu dengan membuka dialog (pilih <emph>Tabel - Sisip - Kolom</emph>), atau dengan memilih beberapa kolom sebelum mengklik ikon.</ahelp> Jika menggunakan metode kedua, kolom yang disisipikan akan memiliki lebar yang sama dengan kolom yang dipilih."
+
+#. BVL59
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"par_id3149691\n"
+"help.text"
+msgid "<image id=\"img_id3155174\" src=\"cmd/sc_insertcolumns.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155174\">Icon</alt></image>"
+msgstr "<image id=\"img_id3155174\" src=\"cmd/sc_insertcolumns.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155174\">Ikon</alt></image>"
+
+#. NGX9F
+#: 04100000.xhp
+msgctxt ""
+"04100000.xhp\n"
+"par_id3149669\n"
+"help.text"
+msgid "Insert Column"
+msgstr "Sisip Kolom"
+
+#. V8cm8
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table: Fixed"
+msgstr "Tabel: Tetap"
+
+#. vdSmC
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"hd_id3151187\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04220000.xhp\" name=\"Table: Fixed\">Table: Fixed</link>"
+msgstr "<link href=\"text/swriter/02/04220000.xhp\" name=\"Tabel: Tetap\">Tabel: Tetap</link>"
+
+#. ACJtt
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"par_id3151174\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableModeFix\" visibility=\"visible\">If this mode is active, changes to a line and/or column affect only the neighboring lines or columns in question.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableModeFix\" visibility=\"visible\">Jika mode ini aktif, perubahan pada satu baris dan/atau kolom hanya mempengaruhi baris atau kolom terdekat.</ahelp>"
+
+#. ds3eW
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"par_id3155896\n"
+"help.text"
+msgid "<image src=\"cmd/sc_tablemodefix.png\" id=\"img_id3155903\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155903\">Icon Table: Fixed</alt></image>"
+msgstr "<image src=\"cmd/sc_tablemodefix.png\" id=\"img_id3155903\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155903\">Tabel Ikon: Tetap</alt></image>"
+
+#. aRzgG
+#: 04220000.xhp
+msgctxt ""
+"04220000.xhp\n"
+"par_id3155066\n"
+"help.text"
+msgid "Table: Fixed"
+msgstr "Tabel: Tetap"
+
+#. feUuF
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table: Fixed, Proportional"
+msgstr "Tabel: Tetap, Proporsional"
+
+#. 8aBeG
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"hd_id3147169\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04230000.xhp\" name=\"Table: Fixed, Proportional\">Table: Fixed, Proportional</link>"
+msgstr "<link href=\"text/swriter/02/04230000.xhp\" name=\"Tabel: Tetap, Proporsional\">Tabel: Tetap, Proporsional</link>"
+
+#. TXCTY
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"par_id3145246\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableModeFixProp\" visibility=\"visible\">If this mode is active, changes to the line and/or column affect the entire table.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableModeFixProp\" visibility=\"visible\">Apabila mode ini aktif, perubahan pada garis dan/atau kolom akan mempengaruhi keseluruhan tabel.</ahelp>"
+
+#. f7A4m
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"par_id3145087\n"
+"help.text"
+msgid "<image src=\"cmd/sc_tablemodefixprop.png\" id=\"img_id3156378\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156378\">Icon Table: Fixed, Proportional</alt></image>"
+msgstr "<image src=\"cmd/sc_tablemodefixprop.png\" id=\"img_id3156378\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156378\">Tabel Ikon: Tetap, Proporsional</alt></image>"
+
+#. nSBPn
+#: 04230000.xhp
+msgctxt ""
+"04230000.xhp\n"
+"par_id3149497\n"
+"help.text"
+msgid "Table: Fixed, Proportional"
+msgstr "Tabel: Tetap, Proporsional"
+
+#. 9JRZE
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Table: Variable"
+msgstr "Tabel: Variabel"
+
+#. NFEkc
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"hd_id3154501\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04240000.xhp\" name=\"Table: Variable\">Table: Variable</link>"
+msgstr "<link href=\"text/swriter/02/04240000.xhp\" name=\"Tabel: Variabel\">Tabel: Variabel</link>"
+
+#. GKKgd
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"par_id3151182\n"
+"help.text"
+msgid "<ahelp hid=\".uno:TableModeVariable\" visibility=\"visible\">If this mode is active, changes to a line and/or column affect the size of the table.</ahelp>"
+msgstr "<ahelp hid=\".uno:TableModeVariable\" visibility=\"visible\">Jika mode ini aktif, perubahan pada suatu garis dan/atau kolom mempengaruhi ukuran tabel.</ahelp>"
+
+#. 5oPk9
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"par_id3145415\n"
+"help.text"
+msgid "<image src=\"cmd/sc_tablemodevariable.png\" id=\"img_id3156375\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156375\">Icon Table: Variable</alt></image>"
+msgstr "<image src=\"cmd/sc_tablemodevariable.png\" id=\"img_id3156375\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156375\">Tabel Ikon: Variabel</alt></image>"
+
+#. 6EZas
+#: 04240000.xhp
+msgctxt ""
+"04240000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "Table: Variable"
+msgstr "Tabel: Variabel"
+
+#. 27FsC
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Sum"
+msgstr "Sum (Jumlah)"
+
+#. qLF6H
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"hd_id3143232\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/04250000.xhp\" name=\"Sum\">Sum</link>"
+msgstr "<link href=\"text/swriter/02/04250000.xhp\" name=\"Sum (Jumlah)\">Sum (Jumlah)</link>"
+
+#. BycTx
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3146899\n"
+"help.text"
+msgid "<ahelp hid=\".uno:AutoSum\">Activates the sum function. Note that the cursor must be in the cell where you want the sum to appear.</ahelp>"
+msgstr "<ahelp hid=\".uno:AutoSum\">Mengaktifkan fungsi menjumlah. Ingatlah untuk meletakkan kursor pada sel di mana Anda hendak hasil jumlah muncul.</ahelp>"
+
+#. Rv2Fi
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3154504\n"
+"help.text"
+msgid "%PRODUCTNAME recognizes the cell range for the sum function as long as the cells are filled with numbers. Prior to entering the data, you must choose <menuitem>Table - Number Recognition</menuitem> to enable this feature."
+msgstr "%PRODUCTNAME mengenali rentang sel untuk fungsi penjumlahan selama sel berisi angka. Sebelum memasukkan data, Anda harus memilih <menuitem>Tabel - Pengenalan angka</menuitem> untuk menyalakan fitur ini."
+
+#. CmiXF
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3148771\n"
+"help.text"
+msgid "Click <emph>Apply</emph> to accept the sum formula as it appears in the entry line."
+msgstr "Klik <emph>Pakai</emph> untuk menerima rumus penjumlahan sebagaimana tercantum pada baris isian."
+
+#. HnsKB
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3145418\n"
+"help.text"
+msgid "<image id=\"img_id3147512\" src=\"cmd/sc_autosum.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147512\">Icon</alt></image>"
+msgstr "<image id=\"img_id3147512\" src=\"cmd/sc_autosum.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147512\">Ikon</alt></image>"
+
+#. ZiCky
+#: 04250000.xhp
+msgctxt ""
+"04250000.xhp\n"
+"par_id3150750\n"
+"help.text"
+msgid "Sum"
+msgstr "Sum (Jumlah)"
+
+#. GqFYN
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "No List"
+msgstr "Tanpa Daftar"
+
+#. wCBAJ
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"hd_id3145822\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06040000.xhp\" name=\"Numbering Off\">No List</link>"
+msgstr "<link href=\"text/swriter/02/06040000.xhp\" name=\"Numbering Off\">Tanpa Daftar</link>"
+
+#. MPBzT
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3154505\n"
+"help.text"
+msgid "<ahelp hid=\".uno:RemoveBullets\" visibility=\"visible\">Removes numbering or bullets and list indenting for the current paragraph or selected paragraphs.</ahelp>"
+msgstr "<ahelp hid=\".uno:RemoveBullets\" visibility=\"visible\">Buang penomoran atau bulatan dan indentasi daftar untuk paragraf saat ini atau paragraf terpilih.</ahelp>"
+
+#. LDHCy
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3151177\n"
+"help.text"
+msgid "<image src=\"cmd/lc_removebullets.png\" id=\"img_id3145083\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145083\">Icon No List</alt></image>"
+msgstr "<image src=\"cmd/lc_removebullets.png\" id=\"img_id3145083\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145083\">Ikon Tanpa Daftar</alt></image>"
+
+#. iNFhx
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "No List"
+msgstr "Tanpa Daftar"
+
+#. 5FX23
+#: 06040000.xhp
+msgctxt ""
+"06040000.xhp\n"
+"par_id811614270889392\n"
+"help.text"
+msgid "To preserve indenting, but remove bullet or number, place cursor at the beginning of the paragraph and press <keycode>Backspace</keycode>."
+msgstr "Untuk membuat bulatan atau nomor, tetapi mempertahankan indentasi, tempatkan kursor di awal paragraf dan tekan <keycode>Backspace</keycode>."
+
+#. ARLxg
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Demote Outline Level with Subpoints"
+msgstr "Turunkan Level Outline dengan Subpoin"
+
+#. MDWt6
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"hd_id3145826\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06070000.xhp\" name=\"Demote One Level With Subpoints\">Demote Outline Level with Subpoints</link>"
+msgstr "<link href=\"text/swriter/02/06070000.xhp\" name=\"Demote One Level With Subpoints\">Turunkan Level Outline dengan Subpoin</link>"
+
+#. eFSaF
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3145241\n"
+"help.text"
+msgid "<ahelp hid=\".uno:DecrementSubLevels\">Demotes the list of a list paragraph where the cursor is located and its subpoints to the next list level.</ahelp> Multiple list paragraphs can be selected. Demotes the outline level of a chapter heading where the cursor is located and all its subheadings to the next outline level. This command is active only when the cursor is positioned in a list paragraph or a chapter heading."
+msgstr "<ahelp hid=\".uno:DecrementSubLevels\">Menurunkan daftar paragraf daftar tempat kursor berada dan subpoinnya ke tingkat daftar berikutnya.</ahelp> Beberapa paragraf daftar dapat dipilih. Menurunkan tingkat kerangka judul bab tempat kursor berada dan semua subjudulnya ke tingkat kerangka berikutnya. Perintah ini hanya aktif ketika kursor diposisikan dalam paragraf daftar atau judul bab."
+
+#. EH6kY
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3145084\n"
+"help.text"
+msgid "<image id=\"img_id3156376\" src=\"cmd/sc_decrementsublevels.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156376\">Icon Demote Outline Level with Subpoints</alt></image>"
+msgstr "<image id=\"img_id3156376\" src=\"cmd/sc_decrementsublevels.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156376\">Ikon Turunkan Level Outline dengan Subpoin</alt></image>"
+
+#. gUUUN
+#: 06070000.xhp
+msgctxt ""
+"06070000.xhp\n"
+"par_id3145088\n"
+"help.text"
+msgid "Demote Outline Level With Subpoints"
+msgstr "Turunkan Level Outline dengan Subpoin"
+
+#. kG3Fb
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Promote Outline Level With Subpoints"
+msgstr "Naikkan Level Outline dengan Subpoin"
+
+#. fWXrs
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"hd_id3154507\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06080000.xhp\" name=\"Promote One Level With Subpoints\">Promote Outline Level With Subpoints</link>"
+msgstr "<link href=\"text/swriter/02/06080000.xhp\" name=\"Promote One Level With Subpoints\">Naikkan Level Outline dengan Subpoin</link>"
+
+#. KkHwc
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3151189\n"
+"help.text"
+msgid "<ahelp hid=\".uno:IncrementSubLevels\">Promotes the list level of a list paragraph where the cursor is located and its subpoints to the next list level.</ahelp> Multiple list paragraphs can be selected. Promotes the outline level of a chapter heading where the cursor is located and all its subheadings to the next outline level. This command is active only when the cursor is positioned in a list paragraph or chapter heading."
+msgstr "<ahelp hid=\".uno:IncrementSubLevels\">Mempromosikan tingkat daftar paragraf daftar tempat kursor berada dan subpoinnya ke tingkat daftar berikutnya.</ahelp> Beberapa paragraf daftar dapat dipilih. Mempromosikan tingkat kerangka judul bab di mana kursor berada dan semua subjudulnya ke tingkat kerangka berikutnya. Perintah ini hanya aktif ketika kursor diposisikan dalam paragraf daftar atau judul bab."
+
+#. 98iKX
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3145410\n"
+"help.text"
+msgid "<image id=\"img_id3145421\" src=\"cmd/sc_incrementsublevels.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145421\">Icon Promote Outline Level With Subpoints</alt></image>"
+msgstr "<image id=\"img_id3145421\" src=\"cmd/sc_incrementsublevels.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145421\">Ikon Naikkan Level Outline dengan Subpoin</alt></image>"
+
+#. BEMRR
+#: 06080000.xhp
+msgctxt ""
+"06080000.xhp\n"
+"par_id3145417\n"
+"help.text"
+msgid "Promote Outline Level With Subpoints"
+msgstr "Naikkan Level Outline dengan Subpoin"
+
+#. jPBGz
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Unnumbered Entry"
+msgstr "Sisip Entri Tak Bernomor"
+
+#. dFea2
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"hd_id3154505\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06090000.xhp\" name=\"Insert Unnumbered Entry\">Insert Unnumbered Entry</link>"
+msgstr "<link href=\"text/swriter/02/06090000.xhp\" name=\"Sisip Entri Tak Bernomor\">Sisip Entri Tak Bernomor</link>"
+
+#. WX5QJ
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"par_id3148775\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertNeutralParagraph\">Inserts a paragraph without numbering. The existing numbering will not be affected.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertNeutralParagraph\">Menyisipkan paragraf tanpa penomoran. Penomoran yang telah ada tidak akan berubah.</ahelp>"
+
+#. L9LqK
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"par_id3156377\n"
+"help.text"
+msgid "<image id=\"img_id3156384\" src=\"cmd/sc_insertneutralparagraph.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156384\">Icon</alt></image>"
+msgstr "<image id=\"img_id3156384\" src=\"cmd/sc_insertneutralparagraph.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3156384\">Ikon</alt></image>"
+
+#. Ut87w
+#: 06090000.xhp
+msgctxt ""
+"06090000.xhp\n"
+"par_id3156381\n"
+"help.text"
+msgid "Insert Unnumbered Entry"
+msgstr "Sisip Entri Tak Bernomor"
+
+#. D97qQ
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Move Item Up with Subpoints"
+msgstr "Pindahkan Item ke Atas dengan Subpoin"
+
+#. 5eUkr
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"hd_id3147174\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06120000.xhp\" name=\"Move Up with Subpoints\">Move Item Up with Subpoints</link>"
+msgstr "<link href=\"text/swriter/02/06120000.xhp\" name=\"Move Up with Subpoints\">Pindahkan Item ke Atas dengan Subpoin</link>"
+
+#. tHDTp
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"par_id3148768\n"
+"help.text"
+msgid "<ahelp hid=\".uno:MoveUpSubItems\" visibility=\"visible\">Moves a list paragraph where the cursor is located and its subpoints to before the previous list paragraph with the same list level. Moves a chapter heading where the cursor is located and all its subheadings and text to before the previous heading at the same outline level.</ahelp> You can also select and move more than one list paragraph or chapter heading. This command is only active when the cursor is positioned within a list paragraph or chapter heading."
+msgstr "<ahelp hid=\".uno:MoveUpSubItems\" visibility=\"visible\">Memindahkan paragraf daftar tempat kursor berada dan subpoinnya ke sebelum paragraf daftar sebelumnya dengan tingkat daftar yang sama. Memindahkan judul bab tempat kursor berada dan semua subjudul serta teksnya ke sebelum judul sebelumnya pada tingkat kerangka yang sama.</ahelp> Anda juga dapat memilih dan memindahkan lebih dari satu paragraf daftar atau judul bab. Perintah ini hanya aktif ketika kursor diposisikan di dalam paragraf daftar atau judul bab."
+
+#. KVXUP
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"par_id3145083\n"
+"help.text"
+msgid "<image src=\"cmd/sc_moveupsubitems.svg\" id=\"img_id3156375\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156375\">Icon Move Up with Subpoints</alt></image>"
+msgstr "<image src=\"cmd/sc_moveupsubitems.svg\" id=\"img_id3156375\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156375\">Ikon Pindahkan Item ke Atas dengan Subpoin</alt></image>"
+
+#. SRDNE
+#: 06120000.xhp
+msgctxt ""
+"06120000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "Move Item Up with Subpoints"
+msgstr "Pindahkan Item ke Atas dengan Subpoin"
+
+#. 9tvuo
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Move Item Down with Subpoints"
+msgstr "Pindahkan Item ke Bawah dengan Subpoin"
+
+#. hdGbN
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"hd_id3154501\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06130000.xhp\" name=\"Move Down with Subpoints\">Move Item Down with Subpoints</link>"
+msgstr "<link href=\"text/swriter/02/06130000.xhp\" name=\"Move Down with Subpoints\">Pindahkan Item ke Bawah dengan Subpoin</link>"
+
+#. nLCpV
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"par_id3148770\n"
+"help.text"
+msgid "<ahelp hid=\".uno:MoveDownSubItems\" visibility=\"visible\">Moves a list paragraph where the cursor is located and its subpoints to after the following list paragraph with the same list level. Moves a chapter heading where the cursor is located and all its subheadings and text to after the following heading at the same outline level.</ahelp> You can also select and move more than one list paragraph or chapter heading. This command is only active when the cursor is positioned in a list paragraph or chapter heading."
+msgstr "<ahelp hid=\".uno:MoveDownSubItems\" visibility=\"visible\">Memindahkan paragraf daftar tempat kursor berada dan subpoinnya setelah paragraf daftar berikut dengan tingkat daftar yang sama. Memindahkan judul bab tempat kursor berada dan semua subjudul serta teksnya ke setelah judul berikut pada tingkat kerangka yang sama.</ahelp> Anda juga dapat memilih dan memindahkan lebih dari satu paragraf daftar atau judul bab. Perintah ini hanya aktif ketika kursor diposisikan dalam paragraf daftar atau judul bab."
+
+#. JX6PL
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"par_id3145086\n"
+"help.text"
+msgid "<image src=\"cmd/sc_movedownsubitems.svg\" id=\"img_id3156377\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156377\">Icon Move Down with Subpoints</alt></image>"
+msgstr "<image src=\"cmd/sc_movedownsubitems.svg\" id=\"img_id3156377\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156377\">Ikon Pindahkan ke Bawah dengan Subpoin</alt></image>"
+
+#. PE4NZ
+#: 06130000.xhp
+msgctxt ""
+"06130000.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "Move Item Down with Subpoints"
+msgstr "Pindahkan Item ke Bawah dengan Subpoin"
+
+#. vLXu5
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Restart Numbering"
+msgstr "Mulai Ulang Penomoran"
+
+#. 6KxFj
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"hd_id3147171\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/06140000.xhp\" name=\"Restart Numbering\">Restart Numbering</link>"
+msgstr "<link href=\"text/swriter/02/06140000.xhp\" name=\"Mulai Ulang Penomoran\">Mulai Ulang Penomoran</link>"
+
+#. iwJHH
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id3145249\n"
+"help.text"
+msgid "<ahelp hid=\".uno:NumberingStart\" visibility=\"visible\">Restarts list numbering from 1.</ahelp> This command is only active when the cursor is positioned within a list."
+msgstr "<ahelp hid=\".uno:NumberingStart\" visibility=\"visible\">Mulai ulang daftar penomoran dari 1.</ahelp> Perintah ini hanya aktif ketika kursor diposisikan dalam sebuah daftar."
+
+#. 89Xm9
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id631616370838434\n"
+"help.text"
+msgid "Choose <menuitem>Format - Lists - Restart Numbering</menuitem>."
+msgstr "Pilih <menuitem>Format - Daftar - Mulai Ulang Penomoran</menuitem>."
+
+#. fh5aw
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id31616370717930\n"
+"help.text"
+msgid "Place cursor in a list paragraph, right-click and choose <menuitem>List - Restart Numbering</menuitem>."
+msgstr "Tempatkan kursor di sebuah paragraf daftar, klik kanan dan pilih <menuitem>Daftar - Mulai Ulang Penomoran</menuitem>."
+
+#. RgibL
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id351616370727010\n"
+"help.text"
+msgid "On <link href=\"text/shared/01/06050000.xhp\" name=\"BulletsNumbering\"><emph>Bullets and Numbering</emph></link> bar, click"
+msgstr "Pada bilah <link href=\"text/shared/01/06050000.xhp\" name=\"BulletsNumbering\"><emph>Bulatan dan Penomoran</emph></link>, klik"
+
+#. SLjuC
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id3145082\n"
+"help.text"
+msgid "<image src=\"cmd/sc_numberingstart.png\" id=\"img_id3145089\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145089\">Icon Restart Numbering</alt></image>"
+msgstr "<image src=\"cmd/sc_numberingstart.png\" id=\"img_id3145089\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145089\">Ikon Memulai Ulang Penomoran</alt></image>"
+
+#. dPfnv
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id3145086\n"
+"help.text"
+msgid "Restart Numbering"
+msgstr "Mulai Ulang Penomoran"
+
+#. DmEY6
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id761616370463787\n"
+"help.text"
+msgid "To remove the numbering restart, apply the command again in the paragraph where the numbering was restarted."
+msgstr "Untuk menghapus restart penomoran, terapkan perintah lagi di paragraf di mana penomoran dimulai ulang."
+
+#. 4Y7KE
+#: 06140000.xhp
+msgctxt ""
+"06140000.xhp\n"
+"par_id261616371203225\n"
+"help.text"
+msgid "To restart numbering with a number greater than 1, right-click in the paragraph where you want to restart numbering, choose <menuitem>Paragraph - Paragraph - </menuitem><link href=\"text/swriter/01/05030800.xhp\" name=\"Numbering_link\">Outline & List</link> tab, select <menuitem>Restart numbering at this paragraph</menuitem> and enter the start number in <menuitem>Start with</menuitem>."
+msgstr "Untuk memulai ulang penomoran dengan angka lebih besar dari 1, klik kanan pada paragraf tempat Anda ingin memulai ulang penomoran, pilih <menuitem>Paragraph - Paragraph - </menuitem><link href=\"text/swriter/01/05030800.xhp\" name=\"Numbering_link\">Garis Besar & Daftar</link> tab, pilih <menuitem>Mulai ulang penomoran pada paragraf ini</menuitem> dan masukkan nomor awal di <menuitem>Mulai dengan</menuitem>."
+
+#. qCdhk
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page Number"
+msgstr "Nomor Halaman"
+
+#. WJ2wq
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"hd_id3145241\n"
+"help.text"
+msgid "Page Number"
+msgstr "Nomor Halaman"
+
+#. JTxYv
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3151184\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StatePageNumber\">The current page number is displayed in this field of the status bar. A click opens \"Go to Page\", with which you can navigate in the document. A right-click shows all bookmarks in the document. Click a bookmark to position the text cursor at the bookmark location.</ahelp>"
+msgstr "<ahelp hid=\".uno:StatePageNumber\">Nomor halaman ini ditampilkan pada ruas di bilah status. Klik membuka \"Ke Halaman\", yang dengannya Anda dapat menavigasi dokumen. Klik kanan menampilkan semua markah yang ada dalam dokumen. Klik suatu markah untuk memindah kursor ke lokasi markah.</ahelp>"
+
+#. BinAk
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3145078\n"
+"help.text"
+msgid "The displayed page (x) and the total number of pages (y) are shown in the form <emph>Page x/y</emph> When you scroll through a document with the mouse, the page number is displayed when you release the mouse button. When you scroll using the right scrollbar, the page numbers are displayed as a Help tip. The page numbering format of the status bar and scrollbar is identical."
+msgstr "Halaman yang tampil (x) dan total jumlah halaman (y) ditampilkan pada form <emph>Halaman x/y</emph> Jika dokumen digulung (scroll) dengan mouse, nomor halaman hanya berubah setelah tombol mouse dilepas. Jika dokumen digulung dengan bilah gulir, nomor halaman akan muncul sebagai petunjuk bantuan (help tip). Format penomoran halaman di bilah status sama dengan format di bilah gulir."
+
+#. B89AK
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3145417\n"
+"help.text"
+msgid "You can turn the <link href=\"text/swriter/01/02110000.xhp\" name=\"Navigator\">Navigator</link> display on or off by double-clicking the<emph> Page Number </emph>field."
+msgstr "Tampilan <link href=\"text/swriter/01/02110000.xhp\" name=\"Navigator\">Navigator</link> bisa diaktifkan atau dimatikan dengan mengklik-ganda field <emph> Nomor Halaman.</emph>"
+
+#. 7CeFv
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3149806\n"
+"help.text"
+msgid "To go to a specific page, enter the page number in the <emph>Page</emph> spin button in the Navigator and then press Enter."
+msgstr "Untuk menuju halaman tertentu, isikan nomor halaman pada tombol putar (spin button) <emph>Halaman</emph> pada Navigator lalu tekan Enter."
+
+#. NptAB
+#: 08010000.xhp
+msgctxt ""
+"08010000.xhp\n"
+"par_id3149095\n"
+"help.text"
+msgid "By pressing the shortcut keys Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F5, you switch to entering a page number. When you press Enter, the cursor moves to the selected page."
+msgstr "Dengan menekan tombol cepat (short cut key) Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Perintah</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F5, anda berganti cara memasukkan nomor halaman. Jika Enter ditekan, kursor berpindah ke halaman yang dipilih."
+
+#. xw7kE
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Combined Display"
+msgstr "Tampilan Kombinasi."
+
+#. gh6CG
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"hd_id3151186\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/08080000.xhp\" name=\"Combined Display\">Combined Display</link>"
+msgstr "<link href=\"text/swriter/02/08080000.xhp\" name=\"Tampilan Kombinasi\">Tampilan Kombinasi</link>"
+
+#. RRcoi
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3151172\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StatusBarFunc\" visibility=\"visible\">Displays current information about the active document.</ahelp>"
+msgstr "<ahelp hid=\".uno:StatusBarFunc\" visibility=\"visible\">Menampilkan informasi terkini tentang dokumen yang sedang aktif.</ahelp>"
+
+#. YJiwS
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3156375\n"
+"help.text"
+msgid "When the cursor is in a named section, the section name appears. When the cursor is in a table, the name of the table cell appears. The size of the object is shown when you edit frames or drawing objects."
+msgstr "Jika kursor berada pada seksi (section) yang mempunyai nama, nama seksi akan tampil. Jika kursor berada pada tabel, nama sel akan muncul. Ukuran objek akan tampak jika anda menyunting bingkai atau objek gambar."
+
+#. Ef5m2
+#: 08080000.xhp
+msgctxt ""
+"08080000.xhp\n"
+"par_id3145416\n"
+"help.text"
+msgid "When the cursor is positioned within text, you can double-click this field to open the <link href=\"text/swriter/01/04090000.xhp\" name=\"Fields\"><emph>Fields</emph></link> dialog. In this dialog, you can define a field to be inserted in your document at the current cursor position. When the cursor is positioned in a table, a double-click in this field will call the <emph>Table Format</emph> dialog. Depending on the object selected, you can call up a dialog to edit a section, a graphic object, a floating frame, an OLE object, direct numbering or the position and size of a drawing object."
+msgstr "Jika kursor berada di dalam teks, field ini bisa diklik-ganda untuk membuka kotak dialog <link href=\"text/swriter/01/04090000.xhp\" name=\"Field\"><emph>Field</emph></link>. Pada dialog ini, anda bisa mendefinisikan field yang hendak disisipkan ke dokumen pada posisi kursor. Jika kursor berada pada tabel, mengklik-ganda field ini akan membuka dialog <emph>Format Tabel</emph>. Sesuai objek yang dipilih, pada dialog anda dapat menyunting seksi, objek grafik, bingkai mengambang, objek OLE, penomoran langsung atau perubahan posisi dan ukuran objek gambar."
+
+#. kdhmw
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Perbesar"
+
+#. B6knG
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"hd_id3151173\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10010000.xhp\" name=\"Zoom In\">Zoom In</link>"
+msgstr "<link href=\"text/swriter/02/10010000.xhp\" name=\"Perbesar\">Perbesar</link>"
+
+#. B6oDo
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"par_id3163866\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ZoomPlus\" visibility=\"visible\">Zooms in to get a close-up view of the document.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomPlus\" visibility=\"visible\">Perbesar (zoom in) untuk menampilkan dokumen lebih dekat.</ahelp>"
+
+#. Lkcqa
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"par_id3154572\n"
+"help.text"
+msgid "<image src=\"cmd/sc_zoomin.svg\" id=\"img_id3155895\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155895\">Icon Zoom In</alt></image>"
+msgstr "<image src=\"cmd/sc_zoomin.svg\" id=\"img_id3155895\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155895\">Ikon Memperbesar</alt></image>"
+
+#. pBveG
+#: 10010000.xhp
+msgctxt ""
+"10010000.xhp\n"
+"par_id3155892\n"
+"help.text"
+msgid "Zoom In"
+msgstr "Perbesar"
+
+#. LrnbF
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Zoom Out"
+msgstr "Perkecil"
+
+#. 3mGCU
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"hd_id3149870\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10020000.xhp\" name=\"Zoom Out\">Zoom Out</link>"
+msgstr "<link href=\"text/swriter/02/10020000.xhp\" name=\"Perkecil\">Perkecil</link>"
+
+#. FPsvN
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"par_id3147401\n"
+"help.text"
+msgid "<ahelp hid=\".\">Zooms out to see more of the document at a reduced size.</ahelp>"
+msgstr "<ahelp hid=\".\">Perkecil (zoom out) untuk menampilkan dokumen dengan ukuran diperkecil.</ahelp>"
+
+#. MGnnw
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"par_id3148775\n"
+"help.text"
+msgid "<image id=\"img_id3150764\" src=\"cmd/sc_zoomout.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150764\">Zoom Out Icon</alt></image>"
+msgstr "<image id=\"img_id3150764\" src=\"cmd/sc_zoomout.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150764\">Ikon Perkecil</alt></image>"
+
+#. k3fKF
+#: 10020000.xhp
+msgctxt ""
+"10020000.xhp\n"
+"par_id3156410\n"
+"help.text"
+msgid "Zoom Out"
+msgstr "Perkecil"
+
+#. 4jEhf
+#: 10030000.xhp
+msgctxt ""
+"10030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Preview Zoom"
+msgstr "Perbesaran Pratampil"
+
+#. LNQGR
+#: 10030000.xhp
+msgctxt ""
+"10030000.xhp\n"
+"hd_id3147175\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10030000.xhp\" name=\"Preview Zoom\">Preview Zoom</link>"
+msgstr "<link href=\"text/swriter/02/10030000.xhp\" name=\"Teropong Pratampil\">Teropong Pratampil</link>"
+
+#. zWNEA
+#: 10030000.xhp
+msgctxt ""
+"10030000.xhp\n"
+"par_id3145244\n"
+"help.text"
+msgid "<ahelp hid=\"HID_PVIEW_ZOOM_LB\">Determines the zoom level of the print preview.</ahelp>"
+msgstr "<ahelp hid=\"HID_PVIEW_ZOOM_LB\">Menentukan tingkat perbesaran dari pratampil cetak.</ahelp>"
+
+#. FCDCs
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Single Page Preview"
+msgstr "Pratinjau Halaman Tunggal"
+
+#. LqErf
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"hd_id691649976425993\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10040000.xhp\" name=\"Single Page Preview\">Single Page Preview</link>"
+msgstr "<link href=\"text/swriter/02/10040000.xhp\" name=\"Pratinjau Halaman Tunggal\">Pratinjau Halaman Tunggal</link>"
+
+#. 8ttBs
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"par_id801649977112401\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowSinglePage\" visibility=\"visible\">Displays one page at a time in the Print Preview window.</ahelp>"
+msgstr "<ahelp hid=\".uno:ShowSinglePage\" visibility=\"visible\">Menampilkan halaman satu per satu di jendela Print Preview.</ahelp>"
+
+#. iwFVN
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"par_id331649976674083\n"
+"help.text"
+msgid "<image src=\"cmd/sc_showsinglepage.svg\" id=\"img_id921649976674083\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id861649976674083\">Single Page Preview Icon</alt></image>"
+msgstr "<image src=\"cmd/sc_showsinglepage.svg\" id=\"img_id92164976674083\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8616499766674083\">Ikon Pratinjau Laman Tunggal</alt></image>"
+
+#. TgK95
+#: 10040000.xhp
+msgctxt ""
+"10040000.xhp\n"
+"par_id161649976674083\n"
+"help.text"
+msgid "Single Page Preview"
+msgstr "Pratinjau Halaman Tunggal"
+
+#. KSNCT
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Two Pages Preview"
+msgstr "Pratampil Dua Halaman"
+
+#. 2Fm6C
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"hd_id3145822\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10050000.xhp\" name=\"Two Pages Preview\">Two Pages Preview</link>"
+msgstr "<link href=\"text/swriter/02/10050000.xhp\" name=\"Two Pages Preview\">Pratinjau Halaman Ganda</link>"
+
+#. JbPBQ
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3154504\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShowTwoPages\" visibility=\"visible\">Displays two pages in the Print Preview window.</ahelp> Uneven numbers will always appear on the right side, even numbers on the left."
+msgstr "<ahelp hid=\".uno:ShowTwoPages\" visibility=\"visible\">Menampilkan dua halaman sekaligus pada jendela Pratampil Cetak.</ahelp> Halaman ganjil selalu berada di sebelah kanan, halaman genap di sebelah kiri."
+
+#. 5xzpi
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3149292\n"
+"help.text"
+msgid "<image src=\"cmd/sc_showtwopages.png\" id=\"img_id3151170\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151170\">Icon Two Pages Preview</alt></image>"
+msgstr "<image src=\"cmd/sc_showtwopages.png\" id=\"img_id3151170\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151170\">Ikon Pratinjau Dua Halaman</alt></image>"
+
+#. tb5KW
+#: 10050000.xhp
+msgctxt ""
+"10050000.xhp\n"
+"par_id3151168\n"
+"help.text"
+msgid "Two Pages Preview"
+msgstr "Pratampil Dua Halaman"
+
+#. exrVU
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Multiple Pages Preview"
+msgstr "Pratampil Halaman Multi"
+
+#. Fusb6
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id3147171\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10070000.xhp\" name=\"Page Preview: Multiple Pages\">Multiple Pages Preview</link>"
+msgstr "<link href=\"text/swriter/02/10070000.xhp\" name=\"Page Preview: Multiple Pages\">Pratinjau Beberapa Halaman</link>"
+
+#. NhuBC
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3148771\n"
+"help.text"
+msgid "<ahelp hid=\".uno:PreviewZoom\">Defines the number of pages displayed on screen. Click the arrow next to the icon to open a grid to select the number of pages to be displayed as rows and columns in the preview.</ahelp>"
+msgstr "<ahelp hid=\".uno:PreviewZoom\">Menentukan jumlah halaman yang ditampilkan di layar. Klik panah di sebelah ikon untuk membuka grid agar dapat memilih jumlah halaman berdasarkan jumlah baris dan kolom pada pratampil.</ahelp>"
+
+#. TDxzR
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3152738\n"
+"help.text"
+msgid "<image id=\"img_id3152744\" src=\"cmd/sc_showmultiplepages.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152744\">Icon Multiple Pages Preview</alt></image>"
+msgstr "<image id=\"img_id3152744\" src=\"cmd/sc_showmultiplepages.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152744\">Pratinjau Beberapa Halaman Ikon</alt></image>"
+
+#. zUeSr
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149805\n"
+"help.text"
+msgid "Multiple Pages Preview"
+msgstr "Pratampil Halaman Multi"
+
+#. 68LCW
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3154573\n"
+"help.text"
+msgid "After clicking the <menuitem>Multiple Pages Preview</menuitem> icon,  move the mouse over the desired number of rows and columns."
+msgstr "Setelah mengklik ikon <menuitem>Multiple Pages Preview</menuitem>, gerakkan mouse ke jumlah baris dan kolom yang diinginkan."
+
+#. W4FH2
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id121649340192450\n"
+"help.text"
+msgid "More Options"
+msgstr "Lebih banyak pilihan"
+
+#. ACeQB
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149822\n"
+"help.text"
+msgid "You can also choose settings by clicking <menuitem>More Options</menuitem> to open a new dialog, then use the two spin buttons to set the number of pages to be displayed."
+msgstr "Anda juga dapat memilih setelan dengan mengeklik <menuitem>Opsi Lainnya</menuitem> untuk membuka dialog baru, lalu gunakan dua tombol putar untuk menyetel jumlah halaman yang akan ditampilkan."
+
+#. F9TJ2
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id3149695\n"
+"help.text"
+msgid "Rows"
+msgstr "Baris"
+
+#. Bt9Yt
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149483\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/rows\">Defines the number of rows of pages.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/rows\">Mendefinisikan banyaknya baris semua halaman.</ahelp>"
+
+#. D3EDZ
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"hd_id3143274\n"
+"help.text"
+msgid "Columns"
+msgstr "Kolom"
+
+#. 6HkQB
+#: 10070000.xhp
+msgctxt ""
+"10070000.xhp\n"
+"par_id3149102\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/cols\">Defines the number of pages shown in columns.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/previewzoomdialog/cols\">Menentukan jumlah halaman yang tampil dalam kolom.</ahelp>"
+
+#. fn4C8
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Book preview"
+msgstr "Pratampil buku"
+
+#. q8XNf
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"bm_id9658192\n"
+"help.text"
+msgid "<bookmark_value>previews;book preview</bookmark_value><bookmark_value>book previews</bookmark_value>"
+msgstr "<bookmark_value>pratampil;pratampil buku</bookmark_value><bookmark_value>pratampil buku</bookmark_value>"
+
+#. 68CcD
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN10548\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10080000.xhp\">Book preview</link>"
+msgstr "<link href=\"text/swriter/02/10080000.xhp\">Pratampil buku</link>"
+
+#. eQo67
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN1054C\n"
+"help.text"
+msgid "<ahelp hid=\".\">Select to display the first page on the right side in the print preview.</ahelp> If not selected, the first page is displayed on the left side of the preview."
+msgstr "<ahelp hid=\".\">Pilih untuk menampilkan halaman pertama di sisi kanan dalam pratinjau cetak.</ahelp> Bila tidak dipilih, halaman pertama ditampilkan di sisi kiri pratinjau."
+
+#. sJbRH
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN10635\n"
+"help.text"
+msgid "<image id=\"img_id8750572\" src=\"cmd/sc_showbookview.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8750572\">book preview icon</alt></image>"
+msgstr "<image id=\"img_id8750572\" src=\"cmd/sc_showbookview.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id8750572\">ikon pratinjau buku</alt></image>"
+
+#. PDgVj
+#: 10080000.xhp
+msgctxt ""
+"10080000.xhp\n"
+"par_idN10614\n"
+"help.text"
+msgid "Book Preview"
+msgstr "Pratampil Buku"
+
+#. EyfbL
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Print page view"
+msgstr "Tilik halaman cetak"
+
+#. syMoC
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"hd_id3152895\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/10090000.xhp\" name=\"Print page view\">Print page view</link>"
+msgstr "<link href=\"text/swriter/02/10090000.xhp\" name=\"Tilik halaman cetak\">Tilik halaman cetak</link>"
+
+#. zBqRk
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"par_id3149811\n"
+"help.text"
+msgid "<image id=\"img_id3154575\" src=\"cmd/sc_printpagepreview.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3154575\">Icon</alt></image>"
+msgstr "<image id=\"img_id3154575\" src=\"cmd/sc_printpagepreview.png\" width=\"0.1665in\" height=\"0.1665in\"><alt id=\"alt_id3154575\">Ikon</alt></image>"
+
+#. 9Wz63
+#: 10090000.xhp
+msgctxt ""
+"10090000.xhp\n"
+"par_id3154568\n"
+"help.text"
+msgid "Print page view"
+msgstr "Tilik halaman cetak"
+
+#. n6W25
+#: 14010000.xhp
+msgctxt ""
+"14010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cell Reference"
+msgstr "Referensi Sel"
+
+#. XPfpr
+#: 14010000.xhp
+msgctxt ""
+"14010000.xhp\n"
+"hd_id3143228\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14010000.xhp\" name=\"Cell Reference\">Cell Reference</link>"
+msgstr "<link href=\"text/swriter/02/14010000.xhp\" name=\"Referensi Sel\">Referensi Sel</link>"
+
+#. 44pDz
+#: 14010000.xhp
+msgctxt ""
+"14010000.xhp\n"
+"par_id3149052\n"
+"help.text"
+msgid "Displays the position of the cell cursor in a table."
+msgstr "Menampilkan posisi kursor sel di dalam tabel."
+
+#. AGA9L
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formula"
+msgstr "Rumus"
+
+#. utFBz
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"bm_id3149687\n"
+"help.text"
+msgid "<bookmark_value>formulas; in text documents</bookmark_value><bookmark_value>operators; in table formulas</bookmark_value><bookmark_value>statistical functions in tables</bookmark_value><bookmark_value>mathematical functions in tables</bookmark_value><bookmark_value>trigonometric functions in tables</bookmark_value><bookmark_value>pages;number of pages in table formulas</bookmark_value><bookmark_value>variables;document properties in table formulas</bookmark_value><bookmark_value>arithmetical operators in formulas</bookmark_value>"
+msgstr "<bookmark_value>rumus; dalam dokumen teks</bookmark_value><bookmark_value>operator; dalam rumus tabel</bookmark_value><bookmark_value>fungsi statistik dalam tabel</bookmark_value><bookmark_value>fungsi matematika dalam tabel</bookmark_value><bookmark_value>fungsi trigonometri dalam tabel</bookmark_value><bookmark_value>halaman;jumlah halaman dalam tabel rumus</bookmark_value><bookmark_value>variabel;properti dokumen dalam rumus tabel</bookmark_value><bookmark_value>operator aritmatika dalam rumus</bookmark_value>"
+
+#. piUZw
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3149687\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14020000.xhp\" name=\"Formula\">Formula</link>"
+msgstr "<link href=\"text/swriter/02/14020000.xhp\" name=\"Rumus\">Rumus</link>"
+
+#. fMazZ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3143270\n"
+"help.text"
+msgid "<ahelp hid=\".\">Opens a submenu, from which you can insert a formula into the cell of a table.</ahelp> Place the cursor in a cell in the table or at the position in the document where you want the result to appear. Click the<emph> Formula </emph>icon and choose the desired formula from the submenu."
+msgstr "<ahelp hid=\".\">Membuka submenu dimana Anda bisa menyisipkan rumus ke dalam sel sebuah tabel.</ahelp> Taruh kursor pada suatu sel dalam tabel atau pada suatu tempat dalam dokumen dimana Anda menginginkan hasil muncul. Klik ikon <emph> Rumus </emph>dan pilih rumus yang diinginkan pada submenu."
+
+#. 5x7iX
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149096\n"
+"help.text"
+msgid "The formula appears in the input line. To specify a range of cells in a table, select the desired cells with the mouse. The corresponding cell references also appear in the input line. Enter additional parameters, as necessary, and click <emph>Apply</emph> to confirm your entry. You can also enter the formula directly if you know the appropriate syntax. This is necessary, for example, in the <link href=\"text/swriter/01/04090000.xhp\" name=\"Insert Fields\"><emph>Insert Fields</emph></link> and <emph>Edit Fields</emph> dialogs."
+msgstr "Rumus itu muncul pada baris input. Untuk menentukan sebuah rentang sel pada tabel, pilih sel yang dikehendaki dengan tetikus. Rujukan sel yang sesuai juga muncul pada baris masukan. Masukkan parameter tambahan jika diperlukan dan klik <emph>Pakai</emph> untuk konfirmasi data yang dimasukkan. Anda juga bisa langsung memasukkan rumus jika Anda tahu sintaksnya. Hal ini diperlukan misalnya pada kotak dialog <link href=\"text/swriter/01/04090000.xhp\" name=\"Insert Fields\"><emph>Sisip Ruas</emph></link> dan <emph>Sunting Ruas</emph>."
+
+#. fdG9Y
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id621599564033048\n"
+"help.text"
+msgid "With the cursor in a table, press <keycode>F2</keycode>"
+msgstr "Dengan kursor dalam tabel, tekan <keycode>F2</keycode>"
+
+#. NdBeD
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id101599562003431\n"
+"help.text"
+msgid "In the Table toolbar, press the <emph>Formula</emph> icon."
+msgstr "Di Tabel toolbar, tekan ikon <emph>Formula</emph>."
+
+#. cgzyx
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155142\n"
+"help.text"
+msgid "<image id=\"img_id3155148\" src=\"sw/res/sc20556.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155148\">Formula icon in Table toolbar</alt></image>"
+msgstr "<image id=\"img_id3155148\" src=\"sw/res/sc20556.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155148\">Ikon rumus di Tabel Toolbar</alt></image>"
+
+#. DbZyc
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150113\n"
+"help.text"
+msgid "Formula"
+msgstr "Rumus"
+
+#. D5MDw
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3150691\n"
+"help.text"
+msgid "Summary of Formula Options"
+msgstr "Ringkasan Opsi Formula"
+
+#. FcD7J
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3155858\n"
+"help.text"
+msgid "Basic Calculation Functions"
+msgstr "Fungsi Penghitungan Dasar"
+
+#. E8BRA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id221599495805480\n"
+"help.text"
+msgid "Operation"
+msgstr "Operasi"
+
+#. 7KcQ9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id641599495805481\n"
+"help.text"
+msgid "Name"
+msgstr "Nama"
+
+#. QywKU
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id121599495851064\n"
+"help.text"
+msgid "Example"
+msgstr "Contoh"
+
+#. 6VYWD
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149565\n"
+"help.text"
+msgid "Addition"
+msgstr "Menambah"
+
+#. 4pWsP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149831\n"
+"help.text"
+msgid "Calculates the total."
+msgstr "Menghitung jumlah."
+
+#. Kf7eZ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149845\n"
+"help.text"
+msgid "Example: <A1> + 8"
+msgstr "Contoh: <A1> + 8"
+
+#. WGAhC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3156097\n"
+"help.text"
+msgid "Subtraction"
+msgstr "Mengurang"
+
+#. a987K
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153122\n"
+"help.text"
+msgid "Calculates the difference"
+msgstr "Menghitung perbandingan (pengurangan)."
+
+#. c9tdv
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153135\n"
+"help.text"
+msgid "Example: 10 - <B5>"
+msgstr "Contoh: 10 - <B5>"
+
+#. 5fyhv
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149646\n"
+"help.text"
+msgid "Multiplication"
+msgstr "Mengali"
+
+#. 2HTL5
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154038\n"
+"help.text"
+msgid "MUL or *"
+msgstr "MUL atau *"
+
+#. CC9kx
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149965\n"
+"help.text"
+msgid "Calculates the product."
+msgstr "Melakukan perkalian."
+
+#. exGsd
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149603\n"
+"help.text"
+msgid "Example: 7 MUL 9"
+msgstr "Contoh: 7 MUL 9"
+
+#. DWCXA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145096\n"
+"help.text"
+msgid "Division"
+msgstr "Membagi"
+
+#. 6M5Fq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149570\n"
+"help.text"
+msgid "DIV or /"
+msgstr "DIV atau /"
+
+#. i3XD4
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149592\n"
+"help.text"
+msgid "Calculates the quotient"
+msgstr "Menghitung pembagian."
+
+#. BDWhH
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3156243\n"
+"help.text"
+msgid "Example: 100 DIV 15"
+msgstr "Contoh: 100 DIV 15"
+
+#. DdgLa
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3156260\n"
+"help.text"
+msgid "Basic Functions in the Submenu"
+msgstr "Fungsi Dasar di Submenu"
+
+#. xt4uW
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id121599495989098\n"
+"help.text"
+msgid "Function"
+msgstr "Fungsi"
+
+#. T7Ybo
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id901599495989100\n"
+"help.text"
+msgid "Name"
+msgstr "Nama"
+
+#. 2fE5r
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id501599496006870\n"
+"help.text"
+msgid "Example"
+msgstr "Contoh"
+
+#. KwSwL
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145185\n"
+"help.text"
+msgid "Sum"
+msgstr "Sum (Jumlah)"
+
+#. QD5ax
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155335\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sum\">Calculates the sum of the selected cells.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sum\">Menghitung jumlah dari sel-sel yang dipilih.</ahelp>"
+
+#. 6AdeA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154411\n"
+"help.text"
+msgid "Example: SUM <A2:C2> displays the sum of the values in cells A2 to C2"
+msgstr "Contoh: SUM <A2:C2> menampilkan hasil jumlah nilai dari sel A2 sampai C2"
+
+#. uru7Q
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153381\n"
+"help.text"
+msgid "Round"
+msgstr "Pembulatan"
+
+#. 4a69n
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145621\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/round\">Rounds a number to the specified decimal places.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/round\">Membulatkan suatu bilangan ke tempat desimal yang dinyatakan.</ahelp>"
+
+#. jhoL9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154862\n"
+"help.text"
+msgid "Example: 15.678 ROUND 2 displays 15.68"
+msgstr "Contoh: 15.678 ROUND 2 menghasilkan 15.68"
+
+#. FkYje
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148687\n"
+"help.text"
+msgid "Percent"
+msgstr "Persen"
+
+#. Ni2B5
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155953\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/phd\">Calculates a percentage</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/phd\">Menghitung suatu persentase</ahelp>"
+
+#. gefrq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149991\n"
+"help.text"
+msgid "Example: 10 + 15 PHD displays 10.15"
+msgstr "Contoh: 10 + 15 PHD menghasilkan 10.15"
+
+#. KeGBA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153016\n"
+"help.text"
+msgid "Square Root"
+msgstr "Akar"
+
+#. XCbNu
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153062\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sqrt\">Calculates the square root.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sqrt\">Menghitung akar kuadrat.</ahelp>"
+
+#. zWVCq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153882\n"
+"help.text"
+msgid "Example: SQRT 25 displays 5.00"
+msgstr "Contoh: SQRT 25 menghasilkan 5.00"
+
+#. yjTqm
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153909\n"
+"help.text"
+msgid "Power"
+msgstr "Pangkat"
+
+#. wFRf4
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149768\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/pow\">Calculates the power of a number.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/pow\">Menghitung pangkat dari suatu bilangan.</ahelp>"
+
+#. DyLAy
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149789\n"
+"help.text"
+msgid "Example: 2 POW 8 displays 256.00"
+msgstr "Contoh: 2 POW 8 menghasilkan 256.00"
+
+#. eCu3h
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3150216\n"
+"help.text"
+msgid "Operators"
+msgstr "Operator"
+
+#. GzXyF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150244\n"
+"help.text"
+msgid "<ahelp hid=\".\">You can insert various operators in your formula.</ahelp> Choose from the following functions:"
+msgstr "<ahelp hid=\".\">Anda dapat menyisipkan berbagai operator dalam rumus Anda.</ahelp> Pilih dari fungsi-fungsi berikut:"
+
+#. uCpNp
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id61599496064739\n"
+"help.text"
+msgid "Operator"
+msgstr "Operator"
+
+#. HCUeF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id611599496064740\n"
+"help.text"
+msgid "Name"
+msgstr "Nama"
+
+#. CNZiw
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id461599496082741\n"
+"help.text"
+msgid "Example"
+msgstr "Contoh"
+
+#. kN6pM
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150316\n"
+"help.text"
+msgid "List Separator"
+msgstr "Pemisah Daftar"
+
+#. 4BmKs
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150339\n"
+"help.text"
+msgid "|"
+msgstr "|"
+
+#. qw66D
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153099\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/|\">Separates the elements in a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/|\">Memisahkan elemen-elemen dalam suatu daftar.</ahelp>"
+
+#. ufXPA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155817\n"
+"help.text"
+msgid "Example of using a list:"
+msgstr "Contoh penggunaan daftar:"
+
+#. 78gH2
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155830\n"
+"help.text"
+msgid "MIN 10|20|50|<C6>|<A2:B6>|20"
+msgstr "MIN 10|20|50|<C6>|<A2:B6>|20"
+
+#. Fob4h
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147012\n"
+"help.text"
+msgid "Equal"
+msgstr "Sama Dengan"
+
+#. mVqP4
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147034\n"
+"help.text"
+msgid "EQ or =="
+msgstr "EQ atau =="
+
+#. WcTEB
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150936\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/eq\">Checks if selected values are equal.</ahelp> If they are unequal, the result is zero, otherwise 1 (true) appears."
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/eq\">Memeriksa apakah nilai-nilai yang dipilih sama.</ahelp> Bila mereka tidak sama, hasilnya nol, jika sebaliknya muncul 1 (true)."
+
+#. uiG9q
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150961\n"
+"help.text"
+msgid "Example: <A1> EQ 2 displays 1, if the content of A1 equals 2."
+msgstr "Contoh: <A1> EQ 2 menampilkan 1, apabila isi dari A1 sama dengan 2."
+
+#. b2AXc
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154370\n"
+"help.text"
+msgid "Not Equal"
+msgstr "Tidak Sama Dengan"
+
+#. jsDQ8
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150503\n"
+"help.text"
+msgid "NEQ or !="
+msgstr "NEQ atau !="
+
+#. rMcNe
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150526\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/neq\">Tests for inequality between selected values.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/neq\">Menguji ketidaksamaan antara nilai-nilai yang dipilih.</ahelp>"
+
+#. CvHCo
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147524\n"
+"help.text"
+msgid "Example: <A1> NEQ 2 displays 0 (wrong), if the content of A1 equals 2."
+msgstr "Contoh: <A1> NEQ 2 menampilkan 0 (salah), apabila isi dari A1 sama dengan 2."
+
+#. FuXYL
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147553\n"
+"help.text"
+msgid "Less than or Equal"
+msgstr "Kecil Dari atau Sama Dengan"
+
+#. m6G89
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153622\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/leq\">Tests for values less than or equal to a specified value.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/leq\">Menguji apakah nilai-nilai kurang dari atau sama dengan nilai yang dinyatakan.</ahelp>"
+
+#. LK5oF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151280\n"
+"help.text"
+msgid "Example: <A1> LEQ 2 displays 1 (true), if the content of A1 is less than or equal to 2."
+msgstr "Contoh: <A1> LEQ 2 menampilkan 1 (benar), apabila isi dari A1 kurang dari atau sama dengan 2."
+
+#. 24FA3
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153729\n"
+"help.text"
+msgid "Greater than or Equal"
+msgstr "Besar dari atau Sama Dengan"
+
+#. 88BXS
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148876\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/geq\">Tests for values greater than or equal to a specified value</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/geq\">Menguji apakah nilai-nilai lebih dari atau sama dengan nilai yang dinyatakan</ahelp>"
+
+#. AUqyH
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148898\n"
+"help.text"
+msgid "Example: <A1> GEQ 2 displays 1 (true), if the content of A1 is greater than or equal to 2."
+msgstr "Contoh: <A1> GEQ 2 menampilkan 1 (benar), apabila isi dari A1 lebih besar atau sama dengan 2."
+
+#. zEADu
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150836\n"
+"help.text"
+msgid "Less"
+msgstr "Kurang Dari"
+
+#. KuMFP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155411\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/l\">Tests for values less than a specified value</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/l\">Menguji apakah nilai-nilai kurang dari nilai yang dinyatakan</ahelp>"
+
+#. LhvAi
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155433\n"
+"help.text"
+msgid "Example: <A1> L 2 displays 1 (true), if the content of A1 is less than 2."
+msgstr "Contoh: <A1> L 2 menampilkan 1 (benar), apabila isi dari A1 lebih kecil dari 2."
+
+#. R7RyE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150720\n"
+"help.text"
+msgid "Greater"
+msgstr "Besar Dari"
+
+#. RDYj2
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147310\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/g\">Tests for values greater than a specified value</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/g\">Menguji apakah nilai-nilai lebih dari nilai yang dinyatakan</ahelp>"
+
+#. zTrEM
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147333\n"
+"help.text"
+msgid "Example: <A1> G 2 displays 1 (true), if the content of A1 is greater than 2."
+msgstr "Contoh: <A1> G 2 menampilkan 1 (benar), apabila isi dari A1 lebih besar dari 2."
+
+#. 9DyRz
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148408\n"
+"help.text"
+msgid "Boolean Or"
+msgstr "Boolean Or (Atau)"
+
+#. UfFLs
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150274\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/or\">Tests for values matching the Boolean OR</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/or\">Menguji apakah nilai-nilai cocok dengan Boolean OR</ahelp>"
+
+#. wmnDC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150297\n"
+"help.text"
+msgid "Example: 0 OR 0 displays 0 (false), anything else results in 1 (true)"
+msgstr "Contoh: 0 OR 0 menampilkan 0 (salah), sementara yang lain akan menghasilkan 1 (benar)"
+
+#. GNQAT
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149434\n"
+"help.text"
+msgid "Boolean X Or"
+msgstr "Boolean X Or"
+
+#. vEKy7
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3146980\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/xor\">Tests for values matching the Boolean exclusive OR</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/xor\">Menguji apakah nilai-nilai cocok dengan Boolean OR ekslusif</ahelp>"
+
+#. N9cHQ
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147003\n"
+"help.text"
+msgid "Example: 1 XOR 0 displays 1 (true)"
+msgstr "Contoh: 1 XOR 0 menghasilkan 1 (benar)"
+
+#. CNW42
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3152925\n"
+"help.text"
+msgid "Boolean And"
+msgstr "Boolean And (Dan)"
+
+#. CPiHF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153792\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/and\">Tests for values matching the Boolean AND</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/and\">Menguji apakah nilai-nilai cocok dengan Boolean AND</ahelp>"
+
+#. DFCfW
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153814\n"
+"help.text"
+msgid "Example: 1 AND 2 displays 1 (true)"
+msgstr "Contoh: 1 AND 2 menghasilkan 1 (benar)"
+
+#. a23Nq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153938\n"
+"help.text"
+msgid "Boolean Not"
+msgstr "Boolean Not (Bukan)"
+
+#. i4SeE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148633\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/not\">Tests for values matching the Boolean NOT</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/not\">Menguji apakah nilai-nilai cocok dengan Boolean NOT</ahelp>"
+
+#. r4fRG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148655\n"
+"help.text"
+msgid "Example: NOT 1 (true) displays 0 (false)"
+msgstr "Contoh: NOT 1 (benar) menampilkan 0 (salah)"
+
+#. 5JNFn
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3154240\n"
+"help.text"
+msgid "Statistical Functions"
+msgstr "Fungsi Statistika"
+
+#. CEssi
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154263\n"
+"help.text"
+msgid "<ahelp hid=\".\">You can choose from the following statistical functions:</ahelp>"
+msgstr "<ahelp hid=\".\">Anda dapat memilih dari fungsi-fungsi statistik berikut:</ahelp>"
+
+#. AeKzo
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id541599496194035\n"
+"help.text"
+msgid "Function"
+msgstr "Fungsi"
+
+#. fLyDG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id481599496194036\n"
+"help.text"
+msgid "Name"
+msgstr "Nama"
+
+#. z9BBL
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id331599524563749\n"
+"help.text"
+msgid "Example"
+msgstr "Contoh"
+
+#. SimgP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153176\n"
+"help.text"
+msgid "Mean"
+msgstr "Rerata (mean)"
+
+#. Gu59Y
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154076\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/mean\">Calculates the arithmetic mean of the values in an area or a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/mean\">Menghitung rata-rata aritmetika dari nilai-nilai dalam suatu area atau daftar.</ahelp>"
+
+#. GjHGV
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145625\n"
+"help.text"
+msgid "Example: MEAN 10|30|20 displays 20"
+msgstr "Contoh: MEAN 10|30|20 menghasilkan 20"
+
+#. TNZeD
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145652\n"
+"help.text"
+msgid "Minimum Value"
+msgstr "Nilai Terkecil"
+
+#. 9CKG8
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155281\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/min\">Calculates the minimum value in an area or a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/min\">Menghitung nilai minimum dalam suatu area atau daftar.</ahelp>"
+
+#. F9J3k
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3155304\n"
+"help.text"
+msgid "Example: MIN 10|30|20 displays 10"
+msgstr "Contoh: MIN 10|30|20 menghasilkan 10"
+
+#. G4CMT
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153993\n"
+"help.text"
+msgid "Maximum Value"
+msgstr "Nilai Tertinggi"
+
+#. mCGfj
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154726\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/max\">Calculates the maximum value in an area or a list.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/max\">Menghitung nilai maksimum dalam suatu area atau daftar.</ahelp>"
+
+#. 3mb2K
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154748\n"
+"help.text"
+msgid "Example: MAX 10|30|20 displays 30.00"
+msgstr "Contoh: MAX 10|30|20 menghasilkan 30.00"
+
+#. 76riF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id21599557699262\n"
+"help.text"
+msgid "Product"
+msgstr "Produk"
+
+#. 5caRN
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id671599563830630\n"
+"help.text"
+msgid "Calculates the product of the selected cells."
+msgstr "Menghitung produk dari sel yang dipilih."
+
+#. bwMRb
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id631599557734781\n"
+"help.text"
+msgid "Example: PRODUCT <A2:C2> displays the product of the values in cells A2 to C2"
+msgstr "Contoh: PRODUCT <A2:C2> menampilkan produk dari nilai-nilai dalam sel A2 hingga C2"
+
+#. DXVgk
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id31599557699262\n"
+"help.text"
+msgid "Count"
+msgstr "Hitung"
+
+#. 53YC3
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id331599557734781\n"
+"help.text"
+msgid "Counts the number of non empty cells."
+msgstr "Menghitung jumlah sel yang tidak kosong."
+
+#. zj2px
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id141599563739504\n"
+"help.text"
+msgid "Example: COUNT <A2:C2> displays the number of non empty cells in A2 to C2."
+msgstr "Contoh: COUNT <A2:C2> menampilkan jumlah sel yang tidak kosong di A2 hingga C2."
+
+#. SJ9rR
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3153200\n"
+"help.text"
+msgid "Functions"
+msgstr "Fungsi-fungsi"
+
+#. gRWF7
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153226\n"
+"help.text"
+msgid "<ahelp hid=\".\">You can choose from the following  functions:</ahelp>"
+msgstr "<ahelp hid=\".\">Anda dapat memilih dari fungsi berikut:</ahelp>"
+
+#. CYmFE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id341599524600306\n"
+"help.text"
+msgid "Function"
+msgstr "Fungsi"
+
+#. zUhbC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id521599524600307\n"
+"help.text"
+msgid "Name"
+msgstr "Nama"
+
+#. S6FE9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id831599524616362\n"
+"help.text"
+msgid "Example"
+msgstr "Contoh"
+
+#. HmrvU
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145156\n"
+"help.text"
+msgid "Sine"
+msgstr "Sinus"
+
+#. PefeW
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149530\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sin\">Calculates the sine in radians</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/sin\">Menghitung sinus dalam radian</ahelp>"
+
+#. zAmxx
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153312\n"
+"help.text"
+msgid "Example: SIN (PI/2)"
+msgstr "Contoh: SIN (PI/2)"
+
+#. NvdMX
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153340\n"
+"help.text"
+msgid "Cosine"
+msgstr "Kosinus"
+
+#. xBop9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154533\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/cos\">Calculates the cosine in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/cos\">Menghitung kosinus dalam radian.</ahelp>"
+
+#. 6FAgD
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3154554\n"
+"help.text"
+msgid "Example: COS 1"
+msgstr "Contoh: COS 1"
+
+#. tpfdH
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150989\n"
+"help.text"
+msgid "Tangent"
+msgstr "Tangen"
+
+#. zaJcG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149369\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/tag\">Calculates the tangent in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/tag\">Menghitung tangen dalam radian.</ahelp>"
+
+#. 4UG3b
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149391\n"
+"help.text"
+msgid "Example: TAN <A1>"
+msgstr "Contoh: TAN <A1>"
+
+#. Es4fE
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151032\n"
+"help.text"
+msgid "Arc Sine"
+msgstr "Arc Sinus"
+
+#. CVzAA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150565\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/asin\">Calculates the arc sine in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/asin\">Menghitung arc sinus dalam radian.</ahelp>"
+
+#. qoLYg
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150588\n"
+"help.text"
+msgid "Example: ASIN 1"
+msgstr "Contoh: ASIN 1"
+
+#. 3mn7r
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150615\n"
+"help.text"
+msgid "Arc Cosine"
+msgstr "Arc Cosinus"
+
+#. ZRyBG
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3149750\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/acos\">Calculates the arc cosine in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/acos\">Menghitung arc kosinus dalam radian.</ahelp>"
+
+#. LnLqq
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153833\n"
+"help.text"
+msgid "Example: ACOS 1"
+msgstr "Contoh: ACOS 1"
+
+#. 8gRyA
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153860\n"
+"help.text"
+msgid "Arc Tangent"
+msgstr "Arc Tangen"
+
+#. aEs7N
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147080\n"
+"help.text"
+msgid "<ahelp hid=\"modules/swriter/ui/inputwinmenu/atan\">Calculates the arc tangent in radians.</ahelp>"
+msgstr "<ahelp hid=\"modules/swriter/ui/inputwinmenu/atan\">Menghitung arc tangen dalam radian.</ahelp>"
+
+#. bssFz
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147102\n"
+"help.text"
+msgid "Example: ATAN 1"
+msgstr "Contoh: ATAN 1"
+
+#. bsPu3
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id591599557967519\n"
+"help.text"
+msgid "Absolute value"
+msgstr "Nilai Mutlak"
+
+#. 2tt8G
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id211593557987787\n"
+"help.text"
+msgid "Returns the absolute value of the number."
+msgstr "Mengembalikan nilai mutlak dari angka."
+
+#. jYyUX
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id301599563956612\n"
+"help.text"
+msgid "Example: ABS -34 returns 34"
+msgstr "Contoh: ABS -34 mengembalikan 34"
+
+#. zEe8j
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id591599557963519\n"
+"help.text"
+msgid "Sign"
+msgstr "Sign"
+
+#. 8Y984
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id211599557987787\n"
+"help.text"
+msgid "Returns the algebraic sign of the number."
+msgstr "Mengembalikan tanda aljabar dari bilangan tersebut."
+
+#. wDJs9
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id941599563922458\n"
+"help.text"
+msgid "Example: SIGN -23 returns -1"
+msgstr "Contoh: SIGN -23 mengembalikan -1"
+
+#. sHz7K
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3150888\n"
+"help.text"
+msgid "Variables for document properties"
+msgstr "Variabel untuk properti dokumen"
+
+#. bEyNW
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150161\n"
+"help.text"
+msgid "The following document properties are also found under <emph>File - Properties - Statistics</emph>."
+msgstr "Atribut dokumen berikut ini dapat dijumpai di bawah menu <emph>Berkas - Atribut - Statistik</emph>."
+
+#. jxf6E
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id901599524662588\n"
+"help.text"
+msgid "Name"
+msgstr "Nama"
+
+#. vmA7Y
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id741599524662589\n"
+"help.text"
+msgid "Description"
+msgstr "Keterangan"
+
+#. Mehmy
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3152954\n"
+"help.text"
+msgid "Number of characters in the document"
+msgstr "Banyaknya karakter pada dokumen"
+
+#. knEJC
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153005\n"
+"help.text"
+msgid "Number of words in the document"
+msgstr "Banyaknya kata pada dokumen"
+
+#. X5hJF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3152738\n"
+"help.text"
+msgid "Number of paragraphs in the document"
+msgstr "Banyaknya paragraf pada dokumen"
+
+#. t5nqK
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3148476\n"
+"help.text"
+msgid "Number of graphics in the document"
+msgstr "Banyaknya grafis pada dokumen"
+
+#. Bdc8a
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151114\n"
+"help.text"
+msgid "Number of tables in the document"
+msgstr "Banyaknya tabel pada dokumen"
+
+#. zJGko
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3151220\n"
+"help.text"
+msgid "Number of OLE objects in the document"
+msgstr "Banyaknya objek OLE pada dokumen"
+
+#. QeCMR
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3146926\n"
+"help.text"
+msgid "Total number of pages in the document"
+msgstr "Banyaknya halaman pada dokumen"
+
+#. akE2k
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"hd_id3146944\n"
+"help.text"
+msgid "More Defined Values"
+msgstr "Nilai yang sudah Ditentukan Lainnya"
+
+#. TUJRH
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id981599524696609\n"
+"help.text"
+msgid "Description"
+msgstr "Keterangan"
+
+#. gnbPF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id101599524696610\n"
+"help.text"
+msgid "Name"
+msgstr "Nama"
+
+#. FFwhP
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id731599524730168\n"
+"help.text"
+msgid "Value"
+msgstr "Nilai"
+
+#. 7QQ8G
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3153562\n"
+"help.text"
+msgid "PI"
+msgstr "PI"
+
+#. SqL4F
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3147393\n"
+"help.text"
+msgid "Euler's constant"
+msgstr "Konstanta Euler"
+
+#. GGtyF
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145332\n"
+"help.text"
+msgid "True"
+msgstr "Benar (true)"
+
+#. db4a5
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3145378\n"
+"help.text"
+msgid "not equal to 0"
+msgstr "tidak sama dengan 0"
+
+#. nVven
+#: 14020000.xhp
+msgctxt ""
+"14020000.xhp\n"
+"par_id3150362\n"
+"help.text"
+msgid "False"
+msgstr "Salah (False)"
+
+#. qx5iP
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Cancel"
+msgstr "Batal"
+
+#. DQPaG
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"hd_id3149957\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14030000.xhp\" name=\"Cancel\">Cancel</link>"
+msgstr "<link href=\"text/swriter/02/14030000.xhp\" name=\"Batal\">Batal</link>"
+
+#. 4Yz3J
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"par_id3149602\n"
+"help.text"
+msgid "<ahelp hid=\".\">Clears the contents of the input line and closes the formula bar.</ahelp>"
+msgstr "<ahelp hid=\".\">Menghapus isi baris masukan dan menutup bilah rumus.</ahelp>"
+
+#. kp7Vc
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"par_id3149574\n"
+"help.text"
+msgid "<image id=\"img_id3149580\" src=\"sw/res/sc20557.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149580\">Icon</alt></image>"
+msgstr "<image id=\"img_id3149580\" src=\"sw/res/sc20557.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149580\">Ikon</alt></image>"
+
+#. 8UEDX
+#: 14030000.xhp
+msgctxt ""
+"14030000.xhp\n"
+"par_id3148855\n"
+"help.text"
+msgid "Cancel"
+msgstr "Batal"
+
+#. USB9A
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Apply"
+msgstr "Terapkan"
+
+#. G5xBZ
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"hd_id3154834\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14040000.xhp\" name=\"Apply\">Apply</link>"
+msgstr "<link href=\"text/swriter/02/14040000.xhp\" name=\"Terapkan\">Terapkan</link>"
+
+#. GcphZ
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"par_id3147173\n"
+"help.text"
+msgid "<ahelp hid=\".\">Transfers the contents of the input line into your document and closes the formula bar. The contents of the input line are inserted at the cursor position in the document.</ahelp>"
+msgstr "<ahelp hid=\".\">Memindah isi baris masukan ke dalam dokumen dan menutup bilah rumus. Isi baris masukan disisipkan pada posisi kursor di dokumen.</ahelp>"
+
+#. YsphR
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"par_id3149286\n"
+"help.text"
+msgid "<image src=\"svx/res/nu01.png\" id=\"img_id3149291\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149291\">Icon Apply</alt></image>"
+msgstr "<image src=\"svx/res/nu01.png\" id=\"img_id3149291\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149291\">Ikon Terapkan</alt></image>"
+
+#. nwkU8
+#: 14040000.xhp
+msgctxt ""
+"14040000.xhp\n"
+"par_id3150749\n"
+"help.text"
+msgid "Apply"
+msgstr "Terapkan"
+
+#. fq9ZR
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Formula Area"
+msgstr "Wilayah Rumus"
+
+#. X2q6J
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"hd_id3155624\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/14050000.xhp\" name=\"Formula Area\">Formula Area</link>"
+msgstr "<link href=\"text/swriter/02/14050000.xhp\" name=\"Wilayah Rumus\">Wilayah Rumus</link>"
+
+#. VRahE
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"par_id3154501\n"
+"help.text"
+msgid "<ahelp hid=\".\">Allows you to create a formula by typing it directly into the input line or by clicking the <emph>Formula</emph> icon to display the formulas in submenu.</ahelp>"
+msgstr "<ahelp hid=\".\">Memungkinkan pembuatan rumus secara langsung dengan mengetik pada baris masukan atau mengklik ikon <emph>Rumus</emph> untuk menampilkan rumus dalam submenu.</ahelp>"
+
+#. evDCZ
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"par_id3151174\n"
+"help.text"
+msgid "<image src=\"media/helpimg/rechenlt.png\" id=\"img_id3156377\" localize=\"true\"><alt id=\"alt_id3156377\">Formula area with formula</alt></image>"
+msgstr "<image src=\"media/helpimg/rechenlt.png\" id=\"img_id3156377\" localize=\"true\"><alt id=\"alt_id3156377\">Wilayah rumus dengan rumus</alt></image>"
+
+#. 6GPdp
+#: 14050000.xhp
+msgctxt ""
+"14050000.xhp\n"
+"par_id3151178\n"
+"help.text"
+msgid "Formula Area"
+msgstr "Wilayah Rumus"
+
+#. BwqAM
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Sisip"
+
+#. JrBjF
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3145824\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18010000.xhp\" name=\"Insert\">Insert</link>"
+msgstr "<link href=\"text/swriter/02/18010000.xhp\" name=\"Sisip\">Sisip</link>"
+
+#. Ha2Rw
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3145244\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertCtrl\">The toolbar contains various functions for inserting frames, graphics, tables, and other objects.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertCtrl\">BIlah alat (toolbar) mengandung berbagai fungsi untuk menyisipkan bingkai, grafik, tabel dan objek lain.</ahelp>"
+
+#. kdTjb
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_id3149809\n"
+"help.text"
+msgid "You can select the following functions:"
+msgstr "Anda dapat memilih fungsi-fungsi berikut:"
+
+#. jyoA2
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3143272\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04150000.xhp\" name=\"Insert Table\">Table</link>"
+msgstr "<link href=\"text/swriter/01/04150000.xhp\" name=\"Sisip Tabel\">Tabel</link>"
+
+#. qGtAL
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3150115\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04020000.xhp\" name=\"Insert Section\">Section</link>"
+msgstr "<link href=\"text/swriter/01/04020000.xhp\" name=\"Sisip Seksi\">Seksi</link>"
+
+#. BvcDT
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3154572\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04130000.xhp\" name=\"Insert Frame Manually\">Insert Frame Manually</link>"
+msgstr "<link href=\"text/swriter/01/04130000.xhp\" name=\"Sisip Bingkai Manual\">Sisip Bingkai Manual</link>"
+
+#. 6mCFC
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3151341\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160500.xhp\" name=\"Floating Frame\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\" name=\"Bingkai mengambang\">Bingkai mengambang</link>"
+
+#. ZvwVw
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3148974\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04030000.xhp\" name=\"Insert Footnote Directly\">Insert Footnote Directly</link>"
+msgstr "<link href=\"text/swriter/01/04030000.xhp\" name=\"Menyisipkan Catatan kaki (footnote) secara langsung\">Menyisipkan Catatan kaki (footnote) secara langsung</link>"
+
+#. UXNEx
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3152773\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04030000.xhp\" name=\"Insert Endnote Directly\">Insert Endnote Directly</link>"
+msgstr "<link href=\"text/swriter/01/04030000.xhp\" name=\"Menyisipkan Catatan akhir (Endnote) secara langsung\">Menyisipkan Catatan akhir (Endnote) secara langsung</link>"
+
+#. EosFy
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10777\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04050000.xhp\">Note</link>"
+msgstr "<link href=\"text/shared/01/04050000.xhp\">Catatan</link>"
+
+#. tnpLA
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10863\n"
+"help.text"
+msgid "Inserts a note at the current cursor position."
+msgstr "Menyisipkan catatan pada posisi kursor bersangkutan."
+
+#. kdADV
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3145262\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04040000.xhp\" name=\"Bookmark\">Bookmark</link>"
+msgstr "<link href=\"text/swriter/01/04040000.xhp\" name=\"Markah\">Markah</link>"
+
+#. rb7oP
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3149098\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04190000.xhp\" name=\"Insert Document\">File</link>"
+msgstr "<link href=\"text/swriter/01/04190000.xhp\" name=\"Sisip Dokumen\">Berkas</link>"
+
+#. CBNvB
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10772\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/02120000.xhp\" name=\"AutoText\">AutoText</link>"
+msgstr "<link href=\"text/swriter/01/02120000.xhp\" name=\"Teks Otomatis\">Teks Otomatis</link>"
+
+#. eUNdr
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3145780\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\" name=\"Special Character\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\" name=\"Karakter Khusus\">Karakter Khusus</link>"
+
+#. DKTSB
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10759\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090000.xhp\">Insert Fields</link>"
+msgstr "<link href=\"text/swriter/01/04090000.xhp\">Sisip Bidang</link>"
+
+#. A5HwP
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN1077E\n"
+"help.text"
+msgid "Inserts a field at the current cursor position."
+msgstr "Menyisipkan bidang pada posisi kursor bersangkutan."
+
+#. evVAV
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10768\n"
+"help.text"
+msgid "<link href=\"text/shared/02/01170000.xhp\">Controls</link>"
+msgstr "<link href=\"text/shared/02/01170000.xhp\">Kontrol</link>"
+
+#. rDtXF
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN107ED\n"
+"help.text"
+msgid "The Controls icon opens a toolbar with the tools that you need to create an interactive form."
+msgstr "Ikon Kendali membuka bilah alat (toolbar) dengan berbagai alat yang diperlukan untuk membuat borang (form) interaktif."
+
+#. mYyU9
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3155174\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\" name=\"From File\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\" name=\"Dari Berkas\">Dari Berkas</link>"
+
+#. iv4CF
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN106F4\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04160300.xhp\" name=\"Insert Formula\">Formula</link>"
+msgstr "<link href=\"text/shared/01/04160300.xhp\" name=\"Sisip Rumus\">Rumus</link>"
+
+#. MABzX
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10769\n"
+"help.text"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\" name=\"Insert Chart\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\" name=\"Sisip Bagan\">Bagan</link>"
+
+#. AAVfU
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id1586962\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04150100.xhp\" name=\"OLE Object\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/04150100.xhp\" name=\"Objek OLE\">Objek OLE</link>"
+
+#. uDrd9
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN1076D\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04120200.xhp\">Insert Index</link>"
+msgstr "<link href=\"text/swriter/01/04120200.xhp\">Sisip Indeks</link>"
+
+#. WRsG4
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"par_idN10814\n"
+"help.text"
+msgid "Inserts an index or a table of contents at the current cursor position."
+msgstr "Menyisipkan indeks atau daftar isi pada posisi kursor bersangkutan."
+
+#. eU6wi
+#: 18010000.xhp
+msgctxt ""
+"18010000.xhp\n"
+"hd_id3155861\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04120100.xhp\" name=\"Insert Index Marker\">Entry</link>"
+msgstr "<link href=\"text/swriter/01/04120100.xhp\" name=\"Sisip Penanda Indeks\">Entri</link>"
+
+#. nzTGs
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Fields"
+msgstr "Sisip Bidang"
+
+#. cGt46
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"hd_id3153916\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030000.xhp\" name=\"Insert Fields\">Insert Fields</link>"
+msgstr "<link href=\"text/swriter/02/18030000.xhp\" name=\"Sisip Field\">Sisip Field</link>"
+
+#. VSSUW
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"par_id3147403\n"
+"help.text"
+msgid "<ahelp hid=\".\" visibility=\"hidden\">Click to open the Fields dialog. Click the arrow next to the icon to open a submenu.</ahelp> Click to open the <link href=\"text/swriter/01/04090000.xhp\">Fields</link> dialog. Click the arrow next to the icon to open a submenu."
+msgstr "<ahelp hid=\".\" visibility=\"hidden\">Kliklah untuk membuka kotak dialog Field. Klik panah dekat ikon untuk membuka submenu.</ahelp> Klik untuk membuka dialog <link href=\"text/swriter/01/04090000.xhp\">Field</link> . Klik panah dekat ikon untuk membuka submenu."
+
+#. gthge
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"par_id3154503\n"
+"help.text"
+msgid "You can choose from the following functions:"
+msgstr "Anda dapat memilih dari fungsi-fungsi berikut:"
+
+#. BtkyF
+#: 18030000.xhp
+msgctxt ""
+"18030000.xhp\n"
+"hd_id3148566\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090000.xhp\" name=\"Other\">Other</link>"
+msgstr "<link href=\"text/swriter/01/04090000.xhp\" name=\"Lainnya\">Lainnya</link>"
+
+#. UWFxy
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"tit\n"
+"help.text"
+msgid "Date"
+msgstr "Tanggal"
+
+#. QADBv
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"hd_id3151175\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030100.xhp\" name=\"Date\">Date</link>"
+msgstr "<link href=\"text/swriter/02/18030100.xhp\" name=\"Tanggal\">Tanggal</link>"
+
+#. FfGqq
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"par_id3147511\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertDateField\">Inserts the current date as a field.</ahelp> The default date format is used, and the date is not automatically updated."
+msgstr "<ahelp hid=\".uno:InsertDateField\">Menyisipkan tanggal saat ini sebagai field.</ahelp> Format tanggal default akan digunakan, dan tanggal tidak diupdate secara otomatis."
+
+#. Nb7FF
+#: 18030100.xhp
+msgctxt ""
+"18030100.xhp\n"
+"par_id3151312\n"
+"help.text"
+msgid "If you would like to define a different date format, or have the date updated automatically, select <emph>Insert - Field - More Fields</emph> to insert a field command and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\" name=\"Fields\"><emph>Fields</emph></link> dialog. The format of an existing date field can be modified at any time by choosing <link href=\"text/swriter/01/02140000.xhp\" name=\"Edit - Fields\"><emph>Edit - Fields</emph></link>."
+msgstr "Jika hendak menentukan format tanggal yang berbeda, atau ingin mengotomatiskan pemutakhiran, pilih <emph>Sisip - Ruas - Ruas Lain</emph> untuk menyisipkan perintah ruas dan membuat pengaturan yang diinginkan pada dialog <link href=\"text/swriter/01/04090000.xhp\" name=\"Fields\"><emph>Ruas</emph></link>. Format ruas tanggal dapat diubah setiap saat dengan memilih <link href=\"text/swriter/01/02140000.xhp\" name=\"Edit - Fields\"><emph>Sunting - Ruas</emph></link>."
+
+#. RfAPA
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"tit\n"
+"help.text"
+msgid "Time"
+msgstr "Waktu"
+
+#. yxN2Q
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"bm_id3147174\n"
+"help.text"
+msgid "<bookmark_value>time fields;inserting</bookmark_value><bookmark_value>fields;inserting time</bookmark_value>"
+msgstr "<bookmark_value>bagian waktu;menyisipkan</bookmark_value><bookmark_value>bagian;dalam waktu</bookmark_value>"
+
+#. LXRxX
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"hd_id3147174\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030200.xhp\" name=\"Time\">Time</link>"
+msgstr "<link href=\"text/swriter/02/18030200.xhp\" name=\"Waktu\">Waktu</link>"
+
+#. Uwk2Y
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"par_id3152896\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertTimeField\" visibility=\"visible\">Inserts the current time as a field.</ahelp> The time is taken directly from the system settings of your operating system. A fixed time format is applied, which cannot be updated by using the F9 function key."
+msgstr "<ahelp hid=\".uno:InsertTimeField\" visibility=\"visible\">Menyisipkan waktu saat ini sebagai field.</ahelp> Nilai waktu diambil dari pengaturan waktu di sistem operasi. Format waktu tidak dapat diubah dan nilai waktu tidak dapat diupdate dengan menekan tombol F9."
+
+#. G6Z68
+#: 18030200.xhp
+msgctxt ""
+"18030200.xhp\n"
+"par_id3151177\n"
+"help.text"
+msgid "To assign a different time format, or adapt the actual time data, select <emph>Insert - Field - More Fields</emph> and make the desired changes in the <link href=\"text/swriter/01/04090000.xhp\" name=\"Fields\"><emph>Fields</emph></link> dialog. Additionally, you can modify the format of an inserted time field at any time by choosing <link href=\"text/swriter/01/02140000.xhp\" name=\"Edit - Fields\"><emph>Edit - Fields</emph></link>."
+msgstr "Untuk menggunakan format waktu yang lain, atau mengadaptasi data waktu sebenarnya, pilih <emph>Sisip - Ruas - Ruas Lain</emph> dan lakukan perubahan pada dialog <link href=\"text/swriter/01/04090000.xhp\" name=\"Fields\"><emph>Ruas</emph></link>. Anda bisa mengubah format ruas waktu yang disisipkan dengan memilih menu <link href=\"text/swriter/01/02140000.xhp\" name=\"Edit - Fields\"><emph>Sunting - Ruas</emph></link>."
+
+#. F5PB7
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page Number"
+msgstr "Nomor Halaman"
+
+#. uKCiH
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"hd_id3147173\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030300.xhp\" name=\"Page Number\">Page Number</link>"
+msgstr "<link href=\"text/swriter/02/18030300.xhp\" name=\"Page Number\">Nomor Halaman</link>"
+
+#. Eyxsj
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"par_id3150760\n"
+"help.text"
+msgid "<ahelp hid=\".\">Inserts the current page number as a field at the cursor position.</ahelp> The default setting is for it to use the <emph>Page Number</emph> character style."
+msgstr "<ahelp hid=\".\">Menyisipkan nomor halaman saat ini sebagai sebuah ruas pada posisi kursor.</ahelp> Pengaturan baku memakai gaya karakter <emph>Nomor Halaman</emph>."
+
+#. mDJBW
+#: 18030300.xhp
+msgctxt ""
+"18030300.xhp\n"
+"par_id3151175\n"
+"help.text"
+msgid "If you would like to define a different format or modify the page number, insert a field with <emph>Insert - Field - More Fields</emph> and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\" name=\"Fields\"><emph>Fields</emph></link> dialog. It is also possible to edit a field inserted with the <emph>Page Number</emph> command with <link href=\"text/swriter/01/02140000.xhp\" name=\"Edit - Fields\"><emph>Edit - Fields</emph></link>. To change page numbers, read the <link href=\"text/swriter/guide/pagenumbers.xhp\" name=\"Page Numbers\"><emph>Page Numbers</emph></link> guide."
+msgstr "Jika format atau nilai dari nomor halaman ingin diubah, sisipkan ruas dengan menu <emph>Sisip - Ruas - Ruas Lain</emph> dan gunakan dialog <link href=\"text/swriter/01/04090000.xhp\" name=\"Field\"><emph>Ruas</emph></link>. Ruas yang disisipkan menggunakan perintah <emph>Nomor Halaman</emph> bisa juga disunting dengan memilih menu <link href=\"text/swriter/01/02140000.xhp\" name=\"Edit - Fields\"><emph>Sunting - Ruas</emph></link>. Untuk mengubah nomor halaman, baca panduan <link href=\"text/swriter/guide/pagenumbers.xhp\" name=\"Page Numbers\"><emph>Nomor Halaman</emph></link>."
+
+#. 6HY9G
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"tit\n"
+"help.text"
+msgid "Page Count"
+msgstr "Cacah Halaman"
+
+#. hJsbL
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"hd_id3145828\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030400.xhp\" name=\"Page Count\">Page Count</link>"
+msgstr "<link href=\"text/swriter/02/18030400.xhp\" name=\"Cacah Halaman\">Cacah Halaman</link>"
+
+#. Zq6RD
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"par_id3148772\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertPageCountField\">Inserts as a field the total number of pages in the document.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertPageCountField\">Menyisipkan jumlah total halaman dalam dokumen sebagai sebuah field.</ahelp>"
+
+#. pkgeA
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"par_id3149294\n"
+"help.text"
+msgid "The format of the field inserted using the <emph>Page Count</emph> command can be modified using the <link href=\"text/swriter/01/02140000.xhp\" name=\"Edit - Field\"><menuitem>Edit - Fields</menuitem></link> command."
+msgstr "Format field yang disisipkan menggunakan perintah <emph>Page Count</emph> dapat dimodifikasi menggunakan <link href=\"text/swriter/01/02140000.xhp\" name=\"Edit - Field\"><menuitem>Edit - Perintah Fields</menuitem></link>."
+
+#. iqoa4
+#: 18030400.xhp
+msgctxt ""
+"18030400.xhp\n"
+"par_id291613751393995\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090001.xhp\" name=\"Document\">Document Statistics Fields</link>"
+msgstr "<link href=\"text/swriter/01/04090001.xhp\" name=\"Document\">Dokumen Bidang Statistik</link>"
+
+#. GRfFZ
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"tit\n"
+"help.text"
+msgid "Subject"
+msgstr "Subjek"
+
+#. DadAn
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"bm_id3147169\n"
+"help.text"
+msgid "<bookmark_value>subject fields</bookmark_value><bookmark_value>fields; subject</bookmark_value>"
+msgstr "<bookmark_value>bagian subjek</bookmark_value><bookmark_value>bagian; subjek</bookmark_value>"
+
+#. x6vpG
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"hd_id3147169\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030500.xhp\" name=\"Subject\">Subject</link>"
+msgstr "<link href=\"text/swriter/02/18030500.xhp\" name=\"Subjek\">Subjek</link>"
+
+#. Sq7ra
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"par_id3152892\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertTopicField\">Inserts the subject specified in the document properties as a field .</ahelp> This field displays the data entered in the <emph>Subject</emph> field under <emph>File - Properties - Description</emph>."
+msgstr "<ahelp hid=\".uno:InsertTopicField\">Sisipkan subjek yang dinyatakan dalam atribut dokumen sebagai sebuah field.</ahelp> Field ini menampilkan data yang diisikan dalam field <emph>Subjek</emph> menggunakan menu <emph>Berkas - Atribut - Keterangan</emph>."
+
+#. wsHdq
+#: 18030500.xhp
+msgctxt ""
+"18030500.xhp\n"
+"par_id3156380\n"
+"help.text"
+msgid "If you would like to insert a different document property as a field, select <emph>Insert - Field - More Fields</emph> and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\" name=\"Fields\"><emph>Fields</emph></link> dialog. The <emph>DocInformation</emph> category contains all of the fields shown in the document properties."
+msgstr "Jika hendak menyisipkan atribut dokumen lain sebagai ruas, pilih <emph>Sisip - Ruas - Ruas Lain</emph> dan lakukan perubahan pada dialog <link href=\"text/swriter/01/04090000.xhp\" name=\"Field\"><emph>Ruas</emph></link>. Kategori <emph>InfoDokumen</emph> mengandung semua ruas yang tampil dalam properti dokumen."
+
+#. aFDKk
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"tit\n"
+"help.text"
+msgid "Title"
+msgstr "Judul"
+
+#. cBXB2
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"hd_id3154484\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030600.xhp\" name=\"Title\">Title</link>"
+msgstr "<link href=\"text/swriter/02/18030600.xhp\" name=\"Judul\">Judul</link>"
+
+#. 4fVi2
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"par_id3151392\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertTitleField\">Inserts the title specified in the document properties as a field.</ahelp> This field displays the data entered in the <emph>Title</emph> field under <emph>File - Properties - Description</emph>."
+msgstr "<ahelp hid=\".uno:InsertTitleField\">Menyisipkan judul dokumen seperti tercantum dalam atribut sebagai sebuah field.</ahelp> Field ini menampilkan data yang diisikan pada field <emph>Judul</emph> menggunakan menud <emph>Berkas - Atribut - Keterangan</emph>."
+
+#. RSHaD
+#: 18030600.xhp
+msgctxt ""
+"18030600.xhp\n"
+"par_id3148768\n"
+"help.text"
+msgid "If you would like to insert a different document property as a field, select <emph>Insert - Field - More Fields</emph> and make the desired settings in the <link href=\"text/swriter/01/04090000.xhp\" name=\"Fields\"><emph>Fields</emph></link> dialog. The <emph>DocInformation</emph> category contains all of the fields shown in the document properties."
+msgstr "Jika hendak menyisipkan atribut dokumen lain sebagai ruas, pilih <emph>Sisip - Ruas - Ruas Lain</emph> dan lakukan perubahan pada dialog <link href=\"text/swriter/01/04090000.xhp\" name=\"Field\"><emph>Ruas</emph></link>. Kategori <emph>InfoDokumen</emph> mengandung semua ruas yang tampil dalam properti dokumen."
+
+#. XDZuz
+#: 18030700.xhp
+msgctxt ""
+"18030700.xhp\n"
+"tit\n"
+"help.text"
+msgid "First Author (field)"
+msgstr "Pengarang Pertama (bidang)"
+
+#. 7ACzA
+#: 18030700.xhp
+msgctxt ""
+"18030700.xhp\n"
+"hd_id3154505\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18030700.xhp\" name=\"Author\">First Author (field)</link>"
+msgstr "<link href=\"text/swriter/02/18030700.xhp\" name=\"Author\">Pengarang Pertama (bidang)</link>"
+
+#. wAFbk
+#: 18030700.xhp
+msgctxt ""
+"18030700.xhp\n"
+"par_id3152896\n"
+"help.text"
+msgid "<ahelp hid=\".uno:InsertAuthorField\">Inserts the name of the person who created the document here as a field.</ahelp> The field applies the entry made under <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/01010100.xhp\" name=\"$[officename] - User data\"><emph>$[officename] - User data</emph></link>."
+msgstr "<ahelp hid=\".uno:InsertAuthorField\">Sisipkan nama orang yang membuat dokumen di sini sebagai suatu ruas.</ahelp> Ruas menerapkan entri yang dibuat di bawah <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferensi</emph></caseinline><defaultinline><emph>Peralatan - Opsi</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/01010100.xhp\" name=\"$[officename] - User data\"><emph>$[officename] - Data pengguna</emph></link>."
+
+#. xEPBR
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Images and Charts"
+msgstr "Citra dan Bagan"
+
+#. WcvKF
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"hd_id3148568\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18120000.xhp\" name=\"Images and Charts\">Images and Charts</link>"
+msgstr "<link href=\"text/swriter/02/18120000.xhp\" name=\"Images and Charts\">Citra dan Bagan</link>"
+
+#. JQmg6
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"bm_id3147167\n"
+"help.text"
+msgid "<bookmark_value>graphics;do not show</bookmark_value>  <bookmark_value>images;do not show</bookmark_value>  <bookmark_value>pictures;do not show</bookmark_value>"
+msgstr "<bookmark_value>grafis;jangan tampilkan</bookmark_value><bookmark_value>citra;jangan tampilkan</bookmark_value><bookmark_value>gambar;jangan tampilkan</bookmark_value>"
+
+#. gHWtd
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"par_id3147167\n"
+"help.text"
+msgid "<ahelp hid=\".uno:Graphic\">If the <emph>Images and Charts</emph> icon on the <emph>Tools</emph> bar is activated, no graphics are displayed - only empty frames as placeholders.</ahelp>"
+msgstr "<ahelp hid=\".uno:Graphic\">Bila ikon <emph>Citra dan Bagan</emph> pada bilah <emph>Alat</emph> diaktifkan, tak ada grafik yang ditampilkan - hanya bingkai kosong sebagai tanda tempat.</ahelp>"
+
+#. cpSji
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"par_id3151177\n"
+"help.text"
+msgid "<image id=\"img_id3156379\" src=\"cmd/sc_graphic.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156379\">Icon Images and Charts</alt></image>"
+msgstr "<image id=\"img_id3156379\" src=\"cmd/sc_graphic.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156379\">Ikon Citra dan Bagan</alt></image>"
+
+#. P95p4
+#: 18120000.xhp
+msgctxt ""
+"18120000.xhp\n"
+"par_id3154107\n"
+"help.text"
+msgid "Images and Charts"
+msgstr "Citra dan Bagan"
+
+#. QCRVC
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Direct Cursor Mode"
+msgstr "Mode Kursor Langsung"
+
+#. mt7Ns
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"bm_id3147167\n"
+"help.text"
+msgid "<bookmark_value>direct cursor; restriction</bookmark_value>"
+msgstr "<bookmark_value>kursor langsung; pembatasan</bookmark_value>"
+
+#. 8QqiC
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"hd_id3147167\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/18130000.xhp\" name=\"Direct Cursor Mode\">Direct Cursor Mode</link>"
+msgstr "<link href=\"text/swriter/02/18130000.xhp\" name=\"Direct Cursor Mode\">Mode Kursor Langsung</link>"
+
+#. JtTFV
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3152896\n"
+"help.text"
+msgid "<ahelp hid=\".uno:ShadowCursor\">Activates or deactivates the direct cursor.</ahelp> You can specify the behavior of the direct cursor by choosing <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/01040600.xhp\" name=\"Text Document - Formatting Aids\"><emph>%PRODUCTNAME Writer - Formatting Aids</emph></link>."
+msgstr "<ahelp hid=\".uno:ShadowCursor\">Mengaktifkan atau menonaktifkan kursor langsung.</ahelp> Anda dapat menyatakan perilaku kursor langsung dengan memilih <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferensi</emph></caseinline><defaultinline><emph>Peralatan - Opsi</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/01040600.xhp\" name=\"Text Document - Formatting Aids\"><emph>%PRODUCTNAME Writer - Bantuan Pemformatan</emph></link>."
+
+#. 4k7XD
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3151133\n"
+"help.text"
+msgid "On Tools bar, click"
+msgstr "Pada bilah Alat, klik"
+
+#. DPCTF
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3147508\n"
+"help.text"
+msgid "<image id=\"img_id3154840\" src=\"cmd/sc_shadowcursor.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3154840\">Icon Toggle Direct Cursor Mode</alt></image>"
+msgstr "<image id=\"img_id3154840\" src=\"cmd/sc_shadowcursor.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3154840\">Ikon Jungkitkan Mode Kursor Langsung</alt></image>"
+
+#. yboK5
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3151310\n"
+"help.text"
+msgid "Toggle Direct Cursor Mode"
+msgstr "Jungkitkan Mode Kursor Langsung"
+
+#. kCFZu
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3154570\n"
+"help.text"
+msgid "The direct cursor allows you to click in any blank area of a page to place text, images, tables, frames, and other objects."
+msgstr "Kursor langsung memungkinkan anda mengklik area kosong pada halaman untuk meletakkan teks, gambar, tabel, bingkai dan objek lainnya."
+
+#. RwxaU
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3155902\n"
+"help.text"
+msgid "If you place the direct cursor approximately in the middle between the left and the right margin of a page or a table cell, the text you insert will be centered. Similarly, text is right-aligned when the direct cursor is placed on the right margin."
+msgstr "Jika kursor langsung diletakkan kira-kira di tengah halaman atau sel tabel, maka teks yang disisipkan akan diformat rata tengah. Jika kursor langsung diletakkan di sekitar kanan halaman, maka teks menjadi rata kanan."
+
+#. 5miBP
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3151255\n"
+"help.text"
+msgid "The AutoCorrect tool automatically removes empty paragraphs, tabs, and spaces that are inserted by the direct cursor. If you want to use the direct cursor, then disable the AutoCorrect tool."
+msgstr "Fasilitas Koreksi Otomatis membuang paragraf kosong, tabulasi dan spasi yang disisipkan oleh kursor langsung. Jika Anda ingin menggunakan fasilitas kursor langsung, matikan fasilitas Koreksi Otomatis."
+
+#. ATnfu
+#: 18130000.xhp
+msgctxt ""
+"18130000.xhp\n"
+"par_id3148982\n"
+"help.text"
+msgid "The direct cursor sets tabs to position the cursor. If you change the tabs later. the position of the text on the page may change as well."
+msgstr "Kursor langsung menyisipkan tab untuk mengatur letak kursor. Jika posisi tab diubah posisi teks juga akan berubah."
+
+#. 58ib2
+#: 19010000.xhp
+msgctxt ""
+"19010000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Header"
+msgstr "Sisip Kop (Header)"
+
+#. x8KnU
+#: 19010000.xhp
+msgctxt ""
+"19010000.xhp\n"
+"hd_id3148769\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19010000.xhp\" name=\"Insert Header\">Insert Header</link>"
+msgstr "<link href=\"text/swriter/02/19010000.xhp\" name=\"Sisip Kop\">Sisip Kop</link>"
+
+#. BoW4Z
+#: 19010000.xhp
+msgctxt ""
+"19010000.xhp\n"
+"par_id3151180\n"
+"help.text"
+msgid "<ahelp hid=\"FN_INSERT_HEADER\">Displays the header of an HTML document if headers are enabled on the <link href=\"text/shared/01/05040300.xhp\" name=\"Format - Page - Header\"><emph>Format - Page - Header</emph></link> tab page.</ahelp>"
+msgstr "<ahelp hid=\"FN_INSERT_HEADER\">Menampilkan header dokumen HTML jika tampilan header di-enable pada tab <link href=\"text/shared/01/05040300.xhp\" name=\"Format - Halaman - Header\"><emph>Format - Halaman - Header</emph></link>.</ahelp>"
+
+#. LveMa
+#: 19020000.xhp
+msgctxt ""
+"19020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Footer"
+msgstr "Sisip Kaki (Footer)"
+
+#. EfFWA
+#: 19020000.xhp
+msgctxt ""
+"19020000.xhp\n"
+"hd_id3145829\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19020000.xhp\" name=\"Insert Footer\">Insert Footer</link>"
+msgstr "<link href=\"text/swriter/02/19020000.xhp\" name=\"Sisip Kaki\">Sisip Kaki</link>"
+
+#. EGVSz
+#: 19020000.xhp
+msgctxt ""
+"19020000.xhp\n"
+"par_id3148768\n"
+"help.text"
+msgid "<ahelp hid=\"FN_INSERT_FOOTER\">Displays the footer of an HTML document if footers are enabled on the <link href=\"text/shared/01/05040400.xhp\" name=\"Format - Page - Footer\"><emph>Format - Page - Footer</emph></link> tab page.</ahelp>"
+msgstr "<ahelp hid=\"FN_INSERT_FOOTER\">Menampilkan footer dokumen HTML jika tampilan footer di-enable pada tab <link href=\"text/shared/01/05040400.xhp\" name=\"Format - Page - Footer\"><emph>Format - Halaman - Footer</emph></link>.</ahelp>"
+
+#. phEfn
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert"
+msgstr "Sisip"
+
+#. dhKPN
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3147167\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19030000.xhp\" name=\"Insert\">Insert</link>"
+msgstr "<link href=\"text/swriter/02/19030000.xhp\" name=\"Sisip\">Sisip</link>"
+
+#. AAt9h
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3145241\n"
+"help.text"
+msgid "Click the arrow next to the icon to open a toolbar with various functions for inserting graphics, tables, documents, and special characters."
+msgstr "Klik panah dekat ikon untuk membuka bilah alat (toolbar) dengan berbagai fungsi untuk menyisipkan grafik, tabel, dokumen dan karakter khusus."
+
+#. TLGgk
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3151171\n"
+"help.text"
+msgid "<image id=\"img_id3151178\" src=\"cmd/sc_grid.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151178\">Icon</alt></image>"
+msgstr "<image id=\"img_id3151178\" src=\"cmd/sc_grid.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151178\">Ikon</alt></image>"
+
+#. MDRwB
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3149801\n"
+"help.text"
+msgid "Insert"
+msgstr "Sisip"
+
+#. fA9Po
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"par_id3155898\n"
+"help.text"
+msgid "You can select the following functions:"
+msgstr "Anda dapat memilih fungsi-fungsi berikut:"
+
+#. BYxCC
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3149689\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04130000.xhp\" name=\"Insert single-column frame manually\">Insert single-column frame manually</link>"
+msgstr "<link href=\"text/swriter/01/04130000.xhp\" name=\"Insert single-column frame manually\">Menyisipkan bingkai satu kolom secara manual</link>"
+
+#. jeDHu
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3143278\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04140000.xhp\" name=\"From File\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\" name=\"Dari Berkas\">Dari Berkas</link>"
+
+#. nufkW
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3149104\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04150000.xhp\" name=\"Insert Table\">Insert Table</link>"
+msgstr "<link href=\"text/swriter/01/04150000.xhp\" name=\"Sisip Tabel\">Sisip Tabel</link>"
+
+#. gXw6D
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3151259\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04190000.xhp\" name=\"Insert Document\">Insert Document</link>"
+msgstr "<link href=\"text/swriter/01/04190000.xhp\" name=\"Sisip Dokumen\">Sisip Dokumen</link>"
+
+#. SC8tK
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3153643\n"
+"help.text"
+msgid "<link href=\"text/shared/01/04100000.xhp\" name=\"Insert Special Character\">Insert Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\" name=\"Sisip Karakter Khusus\">Sisip Karakter Khusus</link>"
+
+#. Chov9
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3152766\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04020000.xhp\" name=\"Insert Section\">Insert Section</link>"
+msgstr "<link href=\"text/swriter/01/04020000.xhp\" name=\"Sisip Seksi\">Sisip Seksi</link>"
+
+#. CC9wT
+#: 19030000.xhp
+msgctxt ""
+"19030000.xhp\n"
+"hd_id3145774\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04040000.xhp\" name=\"Insert Bookmark\">Insert Bookmark</link>"
+msgstr "<link href=\"text/swriter/01/04040000.xhp\" name=\"Sisip Markah\">Sisip Markah</link>"
+
+#. J6RpX
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Insert Fields"
+msgstr "Sisip Bidang"
+
+#. JzPhD
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"hd_id3149286\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19040000.xhp\" name=\"Insert Fields\">Insert Fields</link>"
+msgstr "<link href=\"text/swriter/02/19040000.xhp\" name=\"Sisip Bagian\">Sisip Bagian</link>"
+
+#. Fzfpw
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"par_id3151173\n"
+"help.text"
+msgid "Click to open the <link href=\"text/swriter/01/04090000.xhp\" name=\"Fields\">Fields</link> dialog. Click the arrow next to the icon and select the required field from the submenu."
+msgstr "Klik untuk membuka dialog <link href=\"text/swriter/01/04090000.xhp\" name=\"Fields\">Field</link>. Klik panah dekat ikon dan pilih field yang diinginkan dari submenu yang muncul."
+
+#. 48CyU
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"par_id3154104\n"
+"help.text"
+msgid "You can select the following functions:"
+msgstr "Anda dapat memilih fungsi-fungsi berikut:"
+
+#. 38kfT
+#: 19040000.xhp
+msgctxt ""
+"19040000.xhp\n"
+"hd_id3145248\n"
+"help.text"
+msgid "<link href=\"text/swriter/01/04090000.xhp\" name=\"Other\">Other</link>"
+msgstr "<link href=\"text/swriter/01/04090000.xhp\" name=\"Lainnya\">Lainnya</link>"
+
+#. FM5sf
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Text Animation"
+msgstr "Animasi Teks"
+
+#. YYLE8
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"hd_id3155626\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/19050000.xhp\" name=\"Text Animation\">Text Animation</link>"
+msgstr "<link href=\"text/swriter/02/19050000.xhp\" name=\"Animasi Teks\">Animasi Teks</link>"
+
+#. aDAnh
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"par_id3149286\n"
+"help.text"
+msgid "<image src=\"cmd/sc_text_marquee.png\" id=\"img_id3149292\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149292\">Icon Text Animation</alt></image>"
+msgstr "<image src=\"cmd/sc_text_marquee.png\" id=\"img_id3149292\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149292\">Ikon Animasi Teks</alt></image>"
+
+#. Hp96F
+#: 19050000.xhp
+msgctxt ""
+"19050000.xhp\n"
+"par_id3149290\n"
+"help.text"
+msgid "Text Animation"
+msgstr "Animasi Teks"
+
+#. RajEo
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"tit\n"
+"help.text"
+msgid "Add to List"
+msgstr "Tambahkan ke Daftar"
+
+#. mjGvU
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"bm_id1001616018043189\n"
+"help.text"
+msgid "<bookmark_value>Add to List</bookmark_value><bookmark_value>Lists;merging</bookmark_value>"
+msgstr "<bookmark_value>Tambahkan ke Daftar</bookmark_value><bookmark_value>Daftar;penggabungan</bookmark_value>"
+
+#. X8yaz
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"hd_id711614068729277\n"
+"help.text"
+msgid "<variable id=\"addtolisth1\"><link href=\"text/swriter/02/add_to_list.xhp\" name=\"Add to List\">Add to List</link></variable>"
+msgstr "<variable id=\"addtolisth1\"><link href=\"text/swriter/02/add_to_list.xhp\" name=\"Add to List\">Tambahkan ke Daftar</link></variable>"
+
+#. kM6AJ
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id231614069215429\n"
+"help.text"
+msgid "Include selected paragraphs, whether a list item or not, as part of a list."
+msgstr "Sertakan paragraf yang dipilih, apakah item daftar atau tidak, sebagai bagian dari daftar."
+
+#. pxcFF
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id151614079148636\n"
+"help.text"
+msgid "<variable id=\"howtogetaddtolist\">Choose <menuitem>Format - Lists - Add to List</menuitem></variable>."
+msgstr "<variable id=\"howtogetaddtolist\">Pilih <menuitem>Format - Daftar - Tambahkan ke Daftar</menuitem></variable>."
+
+#. PUsxs
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id631614079159620\n"
+"help.text"
+msgid "Right-click a paragraph, choose <menuitem>List - Add to List</menuitem>."
+msgstr "Klik kanan paragraf, pilih <menuitem>Daftar - Tambahkan ke Daftar</menuitem>."
+
+#. Zb43J
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id151615752168785\n"
+"help.text"
+msgid "<variable id=\"toolbar\">On <menuitem>Bullets and Numbering</menuitem> bar, click <emph>Add to List</emph> icon.</variable>"
+msgstr "<variable id=\"toolbar\">Pada bilah <menuitem>Bullet and Numbering</menuitem>, klik ikon <emph>Tambahkan ke Daftar</emph>.</variable>"
+
+#. ViA36
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id651615752040364\n"
+"help.text"
+msgid "<image src=\"cmd/lc_continuenumbering.png\" id=\"img_id981615752040364\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761615752040364\">Add to List Icon</alt></image>"
+msgstr "<image src=\"cmd/lc_continuenumbering.png\" id=\"img_id981615752040364\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761615752040364\">Tambahkan ke Daftar Ikon</alt></image>"
+
+#. hxMDa
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id51615752040365\n"
+"help.text"
+msgid "Add to List"
+msgstr "Tambahkan ke Daftar"
+
+#. 6kruw
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id711616001147778\n"
+"help.text"
+msgid "The list labeling and indent formatting are applied to the selected paragraphs. The position of the paragraphs in the document does not change."
+msgstr "Pelabelan daftar dan pemformatan indentasi diterapkan ke paragraf yang dipilih. Posisi paragraf dalam dokumen tidak berubah."
+
+#. L9RdM
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"hd_id441616017998739\n"
+"help.text"
+msgid "Add Consecutive List Entries to an Immediately Prior List"
+msgstr "Tambahkan Entri Daftar Berturut-turut ke Daftar Segera Sebelumnya"
+
+#. GJuBD
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id631616018294373\n"
+"help.text"
+msgid "Select one or more consecutive list entries, starting from the first entry, that you want to add to the immediately prior list."
+msgstr "Pilih satu atau lebih entri daftar berurutan, mulai dari entri pertama, yang ingin Anda tambahkan ke daftar sebelumnya."
+
+#. g9LRR
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id621616018340980\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/02/add_to_list.xhp#rightclick\"/>"
+msgstr "<embedvar href=\"text/swriter/02/add_to_list.xhp#rightclick\"/>"
+
+#. p9hUv
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id811616018796902\n"
+"help.text"
+msgid "Use this procedure to combine two lists."
+msgstr "Gunakan prosedur ini untuk menggabungkan dua senarai."
+
+#. pADj5
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"hd_id851614072896370\n"
+"help.text"
+msgid "Add Selected Paragraphs to a List"
+msgstr "Tambahkan Paragraf yang Dipilih ke Daftar"
+
+#. FGi4A
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id491615988072533\n"
+"help.text"
+msgid "Select paragraphs, whether in a list or not, to be added to a list."
+msgstr "Pilih paragraf, baik dalam daftar atau tidak, untuk ditambahkan ke daftar."
+
+#. VEa3N
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id271615998908234\n"
+"help.text"
+msgid "For multiple selections, press and hold the <keycode> Ctrl</keycode> key after the first selection. Only one character needs to be selected in each paragraph to be added. The <keycode>Ctrl</keycode> key can be released without losing the selections, but must be pressed whenever clicking in the document to preserve the selection."
+msgstr "Untuk beberapa pilihan, tekan dan tahan tombol <keycode> Ctrl</keycode> setelah pilihan pertama. Hanya satu karakter yang perlu dipilih di setiap paragraf untuk ditambahkan. Tombol <keycode>Ctrl</keycode> dapat dilepaskan tanpa kehilangan pilihan, tetapi harus ditekan setiap kali mengklik dokumen untuk mempertahankan pilihan."
+
+#. Lshcb
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id551615985719902\n"
+"help.text"
+msgid "Press and hold the <keycode>Ctrl</keycode> key, select at least one character in the list, then release the <keycode> Ctrl</keycode> key."
+msgstr "Tekan dan tahan tombol <keycode>Ctrl</keycode>, pilih setidaknya satu karakter dalam daftar, lalu lepaskan tombol <keycode> Ctrl</keycode>."
+
+#. 3VT7j
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id901615999151001\n"
+"help.text"
+msgid "Do one of the following:"
+msgstr "Lakukan salah satu hal berikut:"
+
+#. qPKKN
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id141615979735757\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/02/add_to_list.xhp#howtogetaddtolist\"/>"
+msgstr "<embedvar href=\"text/swriter/02/add_to_list.xhp#howtogetaddtolist\"/>"
+
+#. FADNr
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id961614073544958\n"
+"help.text"
+msgid "<embedvar href=\"text/swriter/02/add_to_list.xhp#toolbar\"/>"
+msgstr "<embedvar href=\"text/swriter/02/add_to_list.xhp#toolbar\"/>"
+
+#. L2ZPB
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id161615999749854\n"
+"help.text"
+msgid "<variable id=\"rightclick\">Right-click anywhere in highlighted selection, choose <menuitem>List - Add to List</menuitem>.</variable>"
+msgstr "<variable id=\"rightclick\">Klik kanan di mana saja dalam pilihan yang disorot, pilih <menuitem>Daftar - Tambahkan ke Daftar</menuitem>.</variable>"
+
+#. qFmgS
+#: add_to_list.xhp
+msgctxt ""
+"add_to_list.xhp\n"
+"par_id861614074931979\n"
+"help.text"
+msgid "This procedure works for ordered and unordered lists."
+msgstr "Prosedur ini berfungsi untuk daftar yang dipesan dan tidak berurutan."
+
+#. JsrhA
+#: word_count_stb.xhp
+msgctxt ""
+"word_count_stb.xhp\n"
+"title\n"
+"help.text"
+msgid "Word Count Status Bar Field"
+msgstr "Ruas Bilah Status Cacah Kata"
+
+#. azQ8F
+#: word_count_stb.xhp
+msgctxt ""
+"word_count_stb.xhp\n"
+"page_heading\n"
+"help.text"
+msgid "<link href=\"text/swriter/02/word_count_stb.xhp\" name=\"Word Count Status Bar Field\">Word Count Status Bar Field</link>"
+msgstr "<link href=\"text/swriter/02/word_count_stb.xhp\" name=\"Word Count Status Bar Field\">Ruas Bilah Status Cacah Kata</link>"
+
+#. ESMYi
+#: word_count_stb.xhp
+msgctxt ""
+"word_count_stb.xhp\n"
+"hd_id3149687\n"
+"help.text"
+msgid "<ahelp hid=\".uno:StateWordCount\">The number of words in the document and selection is displayed in this field of the status bar. A double-click opens the <link href=\"text/swriter/01/06040000.xhp\" name=\"Word Count\">word count dialog</link>, which shows extra document statistics.</ahelp>"
+msgstr "<ahelp hid=\".uno:StateWordCount\">Cacah kata dalam dokumen dan pemilihan ditampilkan pada ruas ini di bilah status. Klik ganda akan membuka <link href=\"text/swriter/01/06040000.xhp\" name=\"Word Count\">dialog cacah kata</link>, yang menampilkan statistik dokumen tambahan.</ahelp>"

@@ -1,0 +1,1907 @@
+#. extracted from helpcontent2/source/text/scalc/04
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
+"POT-Creation-Date: 2021-11-24 12:02+0100\n"
+"PO-Revision-Date: 2020-06-14 12:45+0000\n"
+"Last-Translator: Ming Hua <plateauwolf@qq.com>\n"
+"Language-Team: Chinese (Simplified) <https://weblate.documentfoundation.org/projects/libo_help-master/textscalc04/zh_Hans/>\n"
+"Language: zh-CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Accelerator-Marker: ~\n"
+"X-Generator: LibreOffice\n"
+"X-POOTLE-MTIME: 1562722688.000000\n"
+
+#. NQkD7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"tit\n"
+"help.text"
+msgid "Shortcut Keys for Spreadsheets"
+msgstr "电子表格的快捷键"
+
+#. DdGD4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3145801\n"
+"help.text"
+msgid "<bookmark_value>spreadsheets; shortcut keys in</bookmark_value>        <bookmark_value>shortcut keys; spreadsheets</bookmark_value>        <bookmark_value>sheet ranges; filling</bookmark_value>"
+msgstr ""
+
+#. CkSXA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145801\n"
+"help.text"
+msgid "<variable id=\"calc_keys\"><link href=\"text/scalc/04/01020000.xhp\" name=\"Shortcut Keys for Spreadsheets\">Shortcut Keys for Spreadsheets</link></variable>"
+msgstr "<variable id=\"calc_keys\"><link href=\"text/scalc/04/01020000.xhp\" name=\"电子表格快捷键\">电子表格快捷键</link></variable>"
+
+#. nwThC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155067\n"
+"help.text"
+msgid "To fill a selected cell range with the formula that you entered on the <emph>Input line</emph>, press <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter."
+msgstr ""
+
+#. RYfUJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153967\n"
+"help.text"
+msgid "To create a matrix in which all the cells contain the same information as what you entered on the <emph>Input line</emph>, press Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter. You cannot edit the components of the matrix."
+msgstr "要创建一个矩阵，并使其中所有单元格都包含「<emph>编辑栏</emph>」中输入的信息，请按 Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter 组合键。但是您不能编辑该矩阵的组件。"
+
+#. GFbcA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3166426\n"
+"help.text"
+msgid "To select multiple cells in different areas of a sheet, hold down <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> and drag in the different areas."
+msgstr "要选择工作表中位于不同位置的多个单元格，请按下 <switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline> 并拖入不同区域。"
+
+#. 3eEtd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150207\n"
+"help.text"
+msgid "To select multiple sheets in a spreadsheet, hold down <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>, and then click the name tabs at the lower edge of the workspace. To select only one sheet in a selection, hold down Shift, and then click the name tab of the sheet."
+msgstr "要选择一个电子表格中的多个工作表，请按住 <switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline> 键，然后点击工作区下边缘的名称标签。要仅选择其中的一个工作表，请按住 Shift 键，然后点击该工作表的名称标签。"
+
+#. DgYxH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3166432\n"
+"help.text"
+msgid "To insert a manual line break in a cell, click in the cell, and then press <switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter."
+msgstr "要在单元格中插入一个手动换行符，请在单元格中点击，然后按 <switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter 组合键。"
+
+#. GDa5C
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3146978\n"
+"help.text"
+msgid "To delete the contents of selected cells, press Backspace. This opens the <link href=\"text/scalc/01/02150000.xhp\" name=\"Delete Contents\">Delete Contents</link> dialog, where you choose which contents of the cell you want to delete. To delete the contents of selected cells without a dialog, press the Delete key."
+msgstr "要删除选中单元格的内容，请按「退格」键。这将打开「<link href=\"text/scalc/01/02150000.xhp\" name=\"Delete Contents\">删除内容</link>」对话框，可选择希望删除单元格的哪些内容。如果希望不打开对话框确认，直接删除选中单元格的内容，请按「删除」键。"
+
+#. U7wer
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145386\n"
+"help.text"
+msgid "Navigating in Spreadsheets"
+msgstr "浏览电子表格"
+
+#. 9zdut
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149407\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "快捷键"
+
+#. 4j5yV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153815\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "「<emph>效果</emph>」"
+
+#. t9kZy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146871\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Home"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Home 组合键"
+
+#. 2DjmA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159093\n"
+"help.text"
+msgid "Moves the cursor to the first cell in the sheet (A1)."
+msgstr "将光标移到工作表的第一个单元格 (A1)。"
+
+#. eP4Fr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145073\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+End"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+End 组合键"
+
+#. GE2Wd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153283\n"
+"help.text"
+msgid "Moves the cursor to the last cell on the sheet that contains data."
+msgstr "将光标移到工作表中最后一个含有数据的单元格。"
+
+#. 4aZBF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149127\n"
+"help.text"
+msgid "Home"
+msgstr "(Home)"
+
+#. YUmpj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159205\n"
+"help.text"
+msgid "Moves the cursor to the first cell of the current row."
+msgstr "将光标移到当前行的第一个单元格。"
+
+#. BsKYJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149897\n"
+"help.text"
+msgid "End"
+msgstr "(End)"
+
+#. THrNt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155095\n"
+"help.text"
+msgid "Moves the cursor to the last cell that contains values in the current row."
+msgstr ""
+
+#. FhvWD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id4149127\n"
+"help.text"
+msgid "Shift+Home"
+msgstr "(Shift)+(Home)"
+
+#. jKpFU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id4159205\n"
+"help.text"
+msgid "Selects cells from the current cell to the first cell of the current row."
+msgstr "从当前单元格开始选择到当前行的第一个单元格。"
+
+#. dvr5t
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id4149897\n"
+"help.text"
+msgid "Shift+End"
+msgstr "(Shift)+(End)"
+
+#. CsAmu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id4155095\n"
+"help.text"
+msgid "Selects all cells from the current cell to the last cell that contains values in the current row."
+msgstr ""
+
+#. 8bBCM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id5149127\n"
+"help.text"
+msgid "Shift+Page Up"
+msgstr "(Shift)+(向上翻页)"
+
+#. cekU3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id5159205\n"
+"help.text"
+msgid "Selects cells from the current cell up to one page in the current column or extends the existing selection one page up."
+msgstr "从当前单元格开始选择到当前列的上一页，或将当前选区向上扩展一整页。"
+
+#. zAiRd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id5149897\n"
+"help.text"
+msgid "Shift+Page Down"
+msgstr "(Shift)+(向下翻页)"
+
+#. Zc5oJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id5155095\n"
+"help.text"
+msgid "Selects cells from the current cell down to one page in the current column or extends the existing selection one page down."
+msgstr "从当前单元格开始选择到当前列的下一页，或将当前选区向下扩展一整页。"
+
+#. CGrdr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id451550311052582\n"
+"help.text"
+msgid "Shift+Space"
+msgstr "Shift+空格"
+
+#. RCDeC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id971550311052582\n"
+"help.text"
+msgid "Selects the current row or extends the existing selection to all respective rows."
+msgstr "选择当前行，或将现有选区扩展到所有相对应的行。"
+
+#. FRMgL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id281550311052582\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Space"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+空格"
+
+#. zSmcn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id261550311052582\n"
+"help.text"
+msgid "Selects the current column or extends the existing selection to all respective columns."
+msgstr "选择当前列，或将现有选区扩展到所有相对应的列。"
+
+#. AErV8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id311550311052582\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Space"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+空格"
+
+#. BUNZP
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id851550311052582\n"
+"help.text"
+msgid "Selects all cells in the sheet."
+msgstr "选择工作表中的所有单元格。"
+
+#. dXFKv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3143220\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Left Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+向左方向键"
+
+#. ziZQj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154766\n"
+"help.text"
+msgid "Moves the cursor leftward to the start and end of cell blocks with data. If the cell to the left of the cursor is empty or the cell with the cursor is empty, the cursor moves leftward in the current row until it reaches the next cell with contents. If all cells in the same row to the left of the cursor are empty, the cursor moves to the first cell in the row."
+msgstr ""
+
+#. PgM3v
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153554\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Right Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+向右方向键"
+
+#. WxdVv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155593\n"
+"help.text"
+msgid "Moves the cursor rightward to the start and end of cell blocks with data. If the cell to the right of the cursor is empty or the cell with the cursor is empty, the cursor moves rightward in the current row until it reaches the next cell with contents. If all cells in the same row to the right of the cursor are empty, the cursor moves to the last cell in the row."
+msgstr ""
+
+#. R9tmv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149317\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Up Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+向上方向键"
+
+#. UV76n
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153076\n"
+"help.text"
+msgid "Moves the cursor upward to the start and end of cell blocks with data. If the cell above the cursor is empty or the cell with the cursor is empty, the cursor moves upward in the current column until it reaches the next cell with contents. If all cells in the same column above the cursor are empty, the cursor moves to the first cell in the column."
+msgstr ""
+
+#. EamtM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147250\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Down Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+向下方向键"
+
+#. x95TY
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149054\n"
+"help.text"
+msgid "Moves the cursor downward to the start and end of cell blocks with data. If the cell below the cursor is empty or the cell with the cursor is empty, the cursor moves downward in the current column until it reaches the next cell with contents. If all cells in the same column below the cursor are empty, the cursor moves to the last cell in the column."
+msgstr ""
+
+#. UQi4B
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148744\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+方向键"
+
+#. FwaRy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159258\n"
+"help.text"
+msgid "Selects all cells of the range created by the cursor movements using the <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Arrows</keycode> key combinations. If used to select rows and columns together, a rectangular cell range is selected. If the cursor is in an empty cell, the selection will stretch from the current cell up to the first cell with value in the direction of the arrow pressed."
+msgstr ""
+
+#. F95ji
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156399\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Up"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Up 组合键"
+
+#. S5nRM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145236\n"
+"help.text"
+msgid "Moves one sheet to the left."
+msgstr "向左移动工作表。"
+
+#. 6cFXE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149725\n"
+"help.text"
+msgid "In the print preview: Moves to the previous print page."
+msgstr "在打印预览中: 移到上一个打印页面。"
+
+#. gEiyB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147411\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Down"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Down 组合键"
+
+#. DYMYx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150372\n"
+"help.text"
+msgid "Moves one sheet to the right."
+msgstr "向右移到下一个工作表。"
+
+#. o2xPG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159120\n"
+"help.text"
+msgid "In the print preview: Moves to the next print page."
+msgstr "在打印预览中: 移到下一个打印页面。"
+
+#. RBATr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146885\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Page Up"
+msgstr "(<switchinline select=\"sys\"><caseinline select=\"MAC\">选项</caseinline><defaultinline>Alt</defaultinline></switchinline>)+(向上翻页)"
+
+#. GYoY6
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152976\n"
+"help.text"
+msgid "Moves one screen to the left."
+msgstr "向左滚动一个屏幕页面。"
+
+#. izdDB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149013\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Page Down"
+msgstr "(<switchinline select=\"sys\"><caseinline select=\"MAC\">选项</caseinline><defaultinline>Alt</defaultinline></switchinline>)+(向下翻页)"
+
+#. G9qzM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150477\n"
+"help.text"
+msgid "Moves one screen page to the right."
+msgstr "向右滚动一个屏幕页面。"
+
+#. oVtdB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10AFC\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Up"
+msgstr "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Up 组合键"
+
+#. RBou4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10B00\n"
+"help.text"
+msgid "Adds the previous sheet to the current selection of sheets. If all the sheets in a spreadsheet are selected, this shortcut key combination only selects the previous sheet. Makes the previous sheet the current sheet."
+msgstr "将上一个工作表添加到当前选择的工作表。如果选择了电子表格中的所有工作表，此组合快捷键只会选择上一个工作表。使上一个工作表成为当前工作表。"
+
+#. c6GDa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10B03\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Down"
+msgstr "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Page Down 组合键"
+
+#. ZwywJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN10B07\n"
+"help.text"
+msgid "Adds the next sheet to the current selection of sheets. If all the sheets in a spreadsheet are selected, this shortcut key combination only selects the next sheet. Makes the next sheet the current sheet."
+msgstr "将下一个工作表添加到当前选择的工作表。如果选择了电子表格中的所有工作表，此组合快捷键只会选择下一个工作表。使下一个工作表成为当前工作表。"
+
+#. aErRL
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145826\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ *"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ *"
+
+#. d5f9B
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148882\n"
+"help.text"
+msgid "where (*) is the multiplication sign on the numeric key pad"
+msgstr "其中，「*」是数字小键盘中的乘法符号"
+
+#. iaUDA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154847\n"
+"help.text"
+msgid "Selects the data range that contains the cursor. A range is a contiguous cell range that contains data and is bounded by empty row and columns."
+msgstr "选择光标所在的数据区域。此处的区域是指含有数据的一组连续单元格，而且其四周的行和列都为空。"
+
+#. 9Ae2w
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151233\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ /"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ /"
+
+#. Kyj8C
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149949\n"
+"help.text"
+msgid "where (/) is the division sign on the numeric key pad"
+msgstr "(/) 是数字小键盘中的除法符号"
+
+#. WmCoM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150144\n"
+"help.text"
+msgid "Selects the matrix formula range that contains the cursor."
+msgstr "选择光标所在的矩阵公式区域。"
+
+#. MFam3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id8163396\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Plus key"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+加号 (+) 键"
+
+#. 6WSJE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id9901425\n"
+"help.text"
+msgid "Insert cells (as in menu Insert - Cells)"
+msgstr "插入单元格 (例如在菜单中「插入」-「单元格」)"
+
+#. LSCN9
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3389080\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Minus key"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+减号 (-) 键"
+
+#. 8NHAr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id5104220\n"
+"help.text"
+msgid "Delete cells (as in menu Edit - Delete Cells)"
+msgstr "删除单元格 (例如在菜单中「编辑」-「删除单元格」)"
+
+#. ghA2J
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155825\n"
+"help.text"
+msgid "Enter (in a selected range)"
+msgstr "输入 (在选中区域内)"
+
+#. aFEgB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153935\n"
+"help.text"
+msgid "Moves the cursor down one cell in a selected range. To specify the direction that the cursor moves, choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - %PRODUCTNAME Calc - General</emph> and change the option in <emph>Press Enter to move selection</emph>."
+msgstr ""
+
+#. DbRBy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id351630625364216\n"
+"help.text"
+msgid "Enter (after copying cell contents)"
+msgstr ""
+
+#. 5PZQn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id681630625395135\n"
+"help.text"
+msgid "If cell contents have just been copied to the clipboard and no additional editing has been done in the current file, then pressing <keycode>Enter</keycode> will paste clipboard contents to the current cursor position."
+msgstr ""
+
+#. 2MKS8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id521630625780621\n"
+"help.text"
+msgid "Shift+Enter"
+msgstr ""
+
+#. dAv3b
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id541630625783264\n"
+"help.text"
+msgid "If the clipboard contains cell contents and no editing has been done in the file, then <keycode>Shift+Enter</keycode> has the same behavior as <keycode>Enter</keycode> and pastes clipboard contents to the current cursor position."
+msgstr ""
+
+#. so8sW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id921630625968749\n"
+"help.text"
+msgid "If no cells are selected, <keycode>Shift+Enter</keycode> moves the cursor to the opposite direction defined in the option <emph>Press Enter to move selection</emph> found in <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - %PRODUCTNAME Calc - General</emph>."
+msgstr ""
+
+#. f4gCc
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id951630626229215\n"
+"help.text"
+msgid "If a range of cells is selected, <keycode>Shift+Enter</keycode> moves the cursor inside the current selection to the opposite direction defined in the option <emph>Press Enter to move selection</emph>."
+msgstr ""
+
+#. ESQwM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id5961180\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ ` (see note below this table)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ ` (参见本表格下方的注释)"
+
+#. ZParU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id6407055\n"
+"help.text"
+msgid "Displays or hides the formulas instead of the values in all cells."
+msgstr "显示或隐藏公式而不是全部单元格内的值。"
+
+#. WBh3X
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id8070314\n"
+"help.text"
+msgid "The ` key is located next to the \"1\" key on most English keyboards. If your keyboard does not show this key, you can assign another key: Choose Tools - Customize, click the Keyboard tab. Select the \"View\" category and the \"Toggle Formula\" function."
+msgstr "在大部分英文键盘上，` 键位于 \"1\" 键旁。如果您的键盘没有显示此键，您可以指定另一个键: 选择「工具」-「自定义」，点击「键盘」选项卡。选择「查看」分类和 \"Toggle Formula\" 函数。"
+
+#. De3Yx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"bm_id3143661\n"
+"help.text"
+msgid "<bookmark_value>spreadsheets; duplicate</bookmark_value>      <bookmark_value>spreadsheets; quick rename</bookmark_value>"
+msgstr ""
+
+#. AxVu3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id271637246984980\n"
+"help.text"
+msgid "Copying and Renaming Sheets"
+msgstr ""
+
+#. dNyPQ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id781637247029711\n"
+"help.text"
+msgid "The sheet tabs used to navigate between sheets can be clicked in combination with keyboard keys to perform the following operations:"
+msgstr ""
+
+#. DDZy3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id741637247123788\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr ""
+
+#. ZB9vf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id731637247123788\n"
+"help.text"
+msgid "Effect"
+msgstr ""
+
+#. 9SNqY
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id211637247123788\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + Drag sheet tab"
+msgstr ""
+
+#. F7Wju
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id981637247123788\n"
+"help.text"
+msgid "Creates a copy of the sheet whose tab was clicked. The copied sheet is placed at the position where the mouse button was released."
+msgstr ""
+
+#. 4BauE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id211637247123024\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> + Click sheet tab"
+msgstr ""
+
+#. DqgFn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id981637247123114\n"
+"help.text"
+msgid "Makes the sheet name editable. Edit the sheet name and press <keycode>Enter</keycode> when finished."
+msgstr ""
+
+#. TDGrd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148756\n"
+"help.text"
+msgid "Function Keys Used in Spreadsheets"
+msgstr "电子表格用中的功能键"
+
+#. iZc4Z
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148581\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "快捷键"
+
+#. q6YD5
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152790\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "「<emph>效果</emph>」"
+
+#. 7B8Uu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154809\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F1"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F1 组合键"
+
+#. PMz3i
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145140\n"
+"help.text"
+msgid "Displays the comment that is attached to the current cell"
+msgstr "显示当前单元格附加的批注"
+
+#. NRB2f
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146142\n"
+"help.text"
+msgid "F2"
+msgstr "F2"
+
+#. BUfoX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148568\n"
+"help.text"
+msgid "With a cell selected, press F2 to open cell contents for editing. If the cell contains a formula, use arrow keys to navigate the sheet to easily enter range addresses into the formula."
+msgstr ""
+
+#. KPNsf
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id381629750112725\n"
+"help.text"
+msgid "Press F2 again to enable the use of arrow keys to move the cursor in the formula text."
+msgstr ""
+
+#. YE2ga
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id481629750230372\n"
+"help.text"
+msgid "Each additional use of the F2 shortcut switches between the two states previously described."
+msgstr ""
+
+#. Dzhco
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id461629750358215\n"
+"help.text"
+msgid "Some dialog boxes have input fields with a <emph>Shrink</emph> button. Pressing F2 with the cursor inside such field causes the <emph>Shrink</emph> command to be executed."
+msgstr ""
+
+#. seNCx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146850\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2 组合键"
+
+#. hdqjK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145162\n"
+"help.text"
+msgid "Opens the Function Wizard."
+msgstr "打开「函数向导」。"
+
+#. ppW28
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147366\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
+msgstr "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2 组合键"
+
+#. uPqcZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155929\n"
+"help.text"
+msgid "Moves the cursor to the <emph>Input line</emph> where you can enter a formula for the current cell."
+msgstr "将光标移到「<emph>输入行</emph>」，为当前单元格输入公式。"
+
+#. hBwvr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153730\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F3 组合键"
+
+#. FiJzq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145245\n"
+"help.text"
+msgid "Opens the <emph>Define Names</emph> dialog."
+msgstr "打开「<emph>定义名称</emph>」对话框。"
+
+#. DF5mE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148768\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F4"
+msgstr "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F4"
+
+#. AiMqF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153047\n"
+"help.text"
+msgid "Shows or Hides the Database explorer."
+msgstr "显示或隐藏数据库资源管理器。"
+
+#. YA3xd
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145353\n"
+"help.text"
+msgid "F4"
+msgstr "F4"
+
+#. 7GNxN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155620\n"
+"help.text"
+msgid "Rearranges the relative or absolute references (for example, A1, $A$1, $A1, A$1) in the input field."
+msgstr "在输入字段中，重新排列相对或绝对引用 (例如 A1, $A$1, $A1, A$1)。"
+
+#. oE5B2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156063\n"
+"help.text"
+msgid "F5"
+msgstr "F5"
+
+#. AB9fs
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149540\n"
+"help.text"
+msgid "Shows or hides the <emph>Navigator</emph>."
+msgstr "显示或隐藏「<emph>导航</emph>」。"
+
+#. Qb9y9
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148392\n"
+"help.text"
+msgid "Shift+F5"
+msgstr "Shift+F5"
+
+#. EdNGE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150268\n"
+"help.text"
+msgid "Traces dependents."
+msgstr "追踪从属单元格。"
+
+#. ytBaa
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148430\n"
+"help.text"
+msgid "Shift+F9"
+msgstr "Shift+F9"
+
+#. FWpeb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153179\n"
+"help.text"
+msgid "Traces precedents."
+msgstr "追踪引用单元格。"
+
+#. uAxBV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150568\n"
+"help.text"
+msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F5"
+msgstr "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F5 组合键"
+
+#. oTBgR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153551\n"
+"help.text"
+msgid "Moves the cursor from the <emph>Input line</emph> to the <emph>Sheet area</emph> box. You can also use Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+T."
+msgstr ""
+
+#. 6NRwR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155368\n"
+"help.text"
+msgid "F7"
+msgstr "F7"
+
+#. wEzCo
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154871\n"
+"help.text"
+msgid "Checks spelling in the current sheet."
+msgstr "对当前工作表进行拼写检查。"
+
+#. Fobqn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150688\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F7"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F7 组合键"
+
+#. bJfnW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149781\n"
+"help.text"
+msgid "Opens the Thesaurus if the current cell contains text."
+msgstr "如果当前单元格含有文字，打开同义词词典。"
+
+#. xdDid
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156257\n"
+"help.text"
+msgid "F8"
+msgstr "F8"
+
+#. 7TksC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147482\n"
+"help.text"
+msgid "Turns additional selection mode on or off. In this mode, you can use the arrow keys to extend the selection. You can also click in another cell to extend the selection."
+msgstr "打开/关闭其他选择模式。在此模式中，可以使用箭头键以及点击另一个单元格来扩展选择范围。"
+
+#. 7GjGR
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154313\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F8"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F8 组合键"
+
+#. uQ2pe
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150385\n"
+"help.text"
+msgid "Highlights cells containing values."
+msgstr "高亮显示含有数值的单元格。"
+
+#. rQLdE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3152479\n"
+"help.text"
+msgid "F9"
+msgstr "F9"
+
+#. gHTre
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3163827\n"
+"help.text"
+msgid "Recalculates changed formulas in the current sheet."
+msgstr "在当前工作表中重新计算已更改的公式。"
+
+#. mrLpF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id9027069\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F9"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+F9 组合键"
+
+#. iEeQr
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id1729178\n"
+"help.text"
+msgid "Recalculates all formulas in all sheets."
+msgstr "在所有工作表中重新计算全部公式。"
+
+#. 8sbVu
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156300\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F9"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F9 组合键"
+
+#. bKMjk
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154817\n"
+"help.text"
+msgid "Updates the selected chart."
+msgstr "更新选中的图表。"
+
+#. VLV2J
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149279\n"
+"help.text"
+msgid "<switchinline select=\"sys\">              <caseinline select=\"MAC\">Command+T</caseinline>              <defaultinline>F11</defaultinline>            </switchinline>"
+msgstr ""
+
+#. edNSJ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150967\n"
+"help.text"
+msgid "Opens the <emph>Styles</emph> window where you can apply a formatting style to the contents of the cell or to the current sheet."
+msgstr "打开「<emph>样式</emph>」窗口。该窗口可为单元格内容和当前工作表应用样式。"
+
+#. jr8HD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156308\n"
+"help.text"
+msgid "Shift+F11"
+msgstr "(Shift) (F11)"
+
+#. ZEAFn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3145209\n"
+"help.text"
+msgid "Creates a document template."
+msgstr "创建文档模板。"
+
+#. imZDB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147622\n"
+"help.text"
+msgid "Shift<switchinline select=\"sys\"><caseinline select=\"MAC\">+Command</caseinline><defaultinline>+Ctrl</defaultinline></switchinline>+F11"
+msgstr "Shift<switchinline select=\"sys\"><caseinline select=\"MAC\">+Command</caseinline><defaultinline>+Ctrl</defaultinline></switchinline>+F11 组合键"
+
+#. pBFoe
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153215\n"
+"help.text"
+msgid "Updates the templates."
+msgstr "更新模板。"
+
+#. YCqt2
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150760\n"
+"help.text"
+msgid "F12"
+msgstr "F12"
+
+#. 4e6VH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156321\n"
+"help.text"
+msgid "Groups the selected data range."
+msgstr "组合选中数据区域。"
+
+#. Si4Tz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146859\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12 组合键"
+
+#. Zva97
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3156128\n"
+"help.text"
+msgid "Ungroups the selected data range."
+msgstr "取消选中数据区域的组合。"
+
+#. DPRGM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151264\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Down Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">选项</caseinline><defaultinline>Alt</defaultinline></switchinline>+向下箭头键"
+
+#. 3KnNK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153155\n"
+"help.text"
+msgid "Increases the height of current row (only in <link href=\"text/shared/optionen/01060800.xhp\" name=\"Compatibility\">OpenOffice.org legacy compatibility mode</link>)."
+msgstr "增加当前行的高度 (仅限在 <link href=\"text/shared/optionen/01060800.xhp\" name=\"Compatibility\">OpenOffice.org 保守兼容模式</link>下)。"
+
+#. v7V4h
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3151297\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Up Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">选项</caseinline><defaultinline>Alt</defaultinline></switchinline>+向上箭头键"
+
+#. K487L
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155849\n"
+"help.text"
+msgid "Decreases the height of current row (only in <link href=\"text/shared/optionen/01060800.xhp\" name=\"Compatibility\">OpenOffice.org legacy compatibility mode</link>)."
+msgstr "减小当前行的高度 (仅限在 <link href=\"text/shared/optionen/01060800.xhp\" name=\"Compatibility\">OpenOffice.org 保守兼容模式</link>下)。"
+
+#. CMCuV
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155997\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Right Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">选项</caseinline><defaultinline>Alt</defaultinline></switchinline>+向右箭头键"
+
+#. wPsAN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150256\n"
+"help.text"
+msgid "Increases the width of the current column."
+msgstr "增加当前列的列宽。"
+
+#. 49fV4
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154046\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Left Arrow"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">选项</caseinline><defaultinline>Alt</defaultinline></switchinline>+向左箭头键"
+
+#. BvqE3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150155\n"
+"help.text"
+msgid "Decreases the width of the current column."
+msgstr "减小当前列的宽度。"
+
+#. YKEBG
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149293\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+Arrow Key"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Shift+方向键"
+
+#. rBzCH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159180\n"
+"help.text"
+msgid "Optimizes the column width or row height based on the current cell."
+msgstr "为当前单元格设置最佳列宽或最佳行高。"
+
+#. sVJdH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3156013\n"
+"help.text"
+msgid "Formatting Cells Using Shortcut Keys"
+msgstr "使用快捷键格式化单元格。"
+
+#. tpkFF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153979\n"
+"help.text"
+msgid "The following cell formats can be applied with the keyboard:"
+msgstr "以下单元格格式可以直接用键盘进行设置:"
+
+#. 3357D
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3147492\n"
+"help.text"
+msgid "Shortcut Keys"
+msgstr "快捷键"
+
+#. GB6qD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154305\n"
+"help.text"
+msgid "<emph>Effect</emph>"
+msgstr "「<emph>效果</emph>」"
+
+#. nKrcB
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145669\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+1 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+1 键 (不是数字键盘上的键)"
+
+#. NoxhF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149197\n"
+"help.text"
+msgid "Open Format Cells dialog"
+msgstr "打开「单元格格式」对话框"
+
+#. XxnqH
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145668\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+1 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+1 键 (不是数字键盘上的键)"
+
+#. xqALX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149196\n"
+"help.text"
+msgid "Two decimal places, thousands separator"
+msgstr "两个小数位数, 千位分隔符"
+
+#. 8ta7J
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155331\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+2 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+2 键 (不是数字键盘上的键)"
+
+#. NFJyj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3150120\n"
+"help.text"
+msgid "Standard exponential format"
+msgstr "标准指数格式"
+
+#. oFm4G
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154932\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+3 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+3 键 (不是数字键盘上的键)"
+
+#. YHrPb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148822\n"
+"help.text"
+msgid "Standard date format"
+msgstr "标准日期格式"
+
+#. 8BFmW
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148829\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+4 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+4 键 (不是数字键盘上的键)"
+
+#. FEzGK
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159152\n"
+"help.text"
+msgid "Standard currency format"
+msgstr "标准货币格式"
+
+#. EiJ83
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150776\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+5 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+5 键 (不是数字键盘上的键)"
+
+#. uTbpv
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148800\n"
+"help.text"
+msgid "Standard percentage format (two decimal places)"
+msgstr "标准百分比格式 (保留小数点后两位)"
+
+#. e4pHb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3158407\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+6 (not on the number pad)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Cmd</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+6 键 (不是数字键盘上的键)"
+
+#. t9jfU
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148444\n"
+"help.text"
+msgid "Standard format"
+msgstr "标准格式"
+
+#. QFNee
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154205\n"
+"help.text"
+msgid "Using the pivot table"
+msgstr "使用透视表"
+
+#. iDg7S
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id631581375238556\n"
+"help.text"
+msgid "The shortcut keys below are for the <emph>Pivot Table Layout</emph> dialog."
+msgstr ""
+
+#. dRGGD
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN11326\n"
+"help.text"
+msgid "Keys"
+msgstr "关键字集合"
+
+#. xKHGN
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_idN1132C\n"
+"help.text"
+msgid "Effect"
+msgstr "效果"
+
+#. CYiCE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153577\n"
+"help.text"
+msgid "<keycode>Tab</keycode>"
+msgstr ""
+
+#. EyvCk
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3147511\n"
+"help.text"
+msgid "Changes the focus by moving forwards through the areas and buttons of the dialog."
+msgstr "在对话框中的区域和按钮之间正向切换焦点。"
+
+#. nEd6M
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154266\n"
+"help.text"
+msgid "<keycode>Shift+Tab</keycode>"
+msgstr ""
+
+#. ESR2E
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3155362\n"
+"help.text"
+msgid "Changes the focus by moving backwards through the areas and buttons of the dialog."
+msgstr "在对话框中的区域和按钮之间反向切换焦点。"
+
+#. FoedZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148484\n"
+"help.text"
+msgid "<keycode>Up Arrow</keycode>"
+msgstr ""
+
+#. jWNGS
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149152\n"
+"help.text"
+msgid "Moves the focus up one item in the current dialog area."
+msgstr "将焦点在当前对话框区域中上移一项。"
+
+#. GYukz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154273\n"
+"help.text"
+msgid "<keycode>Down Arrow</keycode>"
+msgstr ""
+
+#. g3pGx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3158424\n"
+"help.text"
+msgid "Moves the focus down one item in the current dialog area."
+msgstr "将焦点在当前对话框区域中下移一项。"
+
+#. uNDr8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148912\n"
+"help.text"
+msgid "<keycode>Left Arrow</keycode>"
+msgstr ""
+
+#. dEqdi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153238\n"
+"help.text"
+msgid "Moves the focus one item to the left in the current dialog area."
+msgstr "将焦点在当前对话框区域中左移一项。"
+
+#. jqgGw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150712\n"
+"help.text"
+msgid "<keycode>Right Arrow</keycode>"
+msgstr ""
+
+#. DKiGb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3166458\n"
+"help.text"
+msgid "Moves the focus one item to the right in the current dialog area."
+msgstr "将焦点在当前对话框区域中右移一项。"
+
+#. B6CEw
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3146947\n"
+"help.text"
+msgid "<keycode>Home</keycode>"
+msgstr ""
+
+#. 2myZF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153742\n"
+"help.text"
+msgid "Selects the first item in the current dialog area."
+msgstr "选择当前对话框区域中的第一项。"
+
+#. PVgpY
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3153387\n"
+"help.text"
+msgid "<keycode>End</keycode>"
+msgstr ""
+
+#. RhFGF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153684\n"
+"help.text"
+msgid "Selects the last item in the current dialog area."
+msgstr "选择当前对话框区域中的最后一项。"
+
+#. VLEGM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3155584\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Option</keycode></caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> and the underlined character in the label \"Row Fields\""
+msgstr ""
+
+#. cSthX
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152949\n"
+"help.text"
+msgid "Copies or moves the current field into the \"Row Fields\" area."
+msgstr ""
+
+#. qFSYZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3159269\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> and the underlined character in the label \"Column Fields\""
+msgstr ""
+
+#. 5PHQg
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149968\n"
+"help.text"
+msgid "Copies or moves the current field into the \"Column Fields\" area."
+msgstr ""
+
+#. wGVoz
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149923\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Option</keycode></caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> and the underlined character in the label \"Data Fields\""
+msgstr ""
+
+#. LpaiM
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3148649\n"
+"help.text"
+msgid "Copies or moves the current field into the \"Data Fields\" area."
+msgstr ""
+
+#. raCg3
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149423\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Option</keycode></caseinline><defaultinline><keycode>Alt</keycode></defaultinline></switchinline> and the underlined character in the label \"Filters\""
+msgstr ""
+
+#. Dnys7
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3144649\n"
+"help.text"
+msgid "Copies or moves the current field into the \"Filters\" area."
+msgstr ""
+
+#. RBfHn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149418\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Up Arrow</keycode>"
+msgstr ""
+
+#. 5sk3h
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154335\n"
+"help.text"
+msgid "Moves the current field up one place."
+msgstr "将当前字段上移一个位置。"
+
+#. awZUE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148462\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Down Arrow</keycode>"
+msgstr ""
+
+#. eMbdi
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3154603\n"
+"help.text"
+msgid "Moves the current field down one place."
+msgstr "将当前字段下移一个位置。"
+
+#. aCgXn
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145373\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Left Arrow</keycode>"
+msgstr ""
+
+#. ZhhRj
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3151125\n"
+"help.text"
+msgid "Moves the current field one place to the left."
+msgstr "将当前字段左移一个位置。"
+
+#. wkTdy
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3150423\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Right Arrow</keycode>"
+msgstr ""
+
+#. hDqUA
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153316\n"
+"help.text"
+msgid "Moves the current field one place to the right."
+msgstr "将当前字段右移一个位置。"
+
+#. CjoEb
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3149519\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Home</keycode>"
+msgstr ""
+
+#. SFdar
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3149237\n"
+"help.text"
+msgid "Moves the current field to the first place."
+msgstr "将当前字段移到第一个位置。"
+
+#. 5QbLt
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3145310\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+End</keycode>"
+msgstr ""
+
+#. ZeXEZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3153942\n"
+"help.text"
+msgid "Moves the current field to the last place."
+msgstr "将当前字段移到最后一个位置。"
+
+#. GdEkF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3148418\n"
+"help.text"
+msgid "<keycode>Delete</keycode>"
+msgstr ""
+
+#. sGFF8
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3159251\n"
+"help.text"
+msgid "Removes the current field from the area."
+msgstr "删除区域中的当前字段。"
