@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpressguideanimated_slidechangexml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Animating Slide Transitions</title>
+<filename>/text/simpress/guide/animated_slidechange.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153820"><bookmark_value>cross-fading; slides</bookmark_value>
+<bookmark_value>slide transitions; applying effects</bookmark_value>
+<bookmark_value>animated slide transitions</bookmark_value>
+<bookmark_value>transition effects</bookmark_value>
+<bookmark_value>deleting; slide transition effects</bookmark_value>
+<bookmark_value>effects;animated slide transitions</bookmark_value>
+</bookmark><comment>MW changed "removing;..." to "deleting;..."</comment><h1 id="hd_id3153820"><variable id="animated_slidechange"><link href="text/simpress/guide/animated_slidechange.xhp" name="Animating Slide Transitions">Animating Slide Transitions</link>
+</variable></h1>
+<paragraph role="paragraph" id="par_id3150049" xml-lang="en-US">You can apply a special effect that plays when you display a slide.</paragraph>
+<h3 id="hd_id3153811">To apply a transition effect to a slide</h3>
+<list type="ordered">
+<listitem>
+<paragraph role="paragraph" id="par_id3145086" xml-lang="en-US">In <emph>Normal</emph> view, select the slide that you want to add the transition effect to.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id3150655" xml-lang="en-US">On the <emph>Tasks</emph> pane, click <emph>Slide Transition</emph>.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id3154554" xml-lang="en-US">Select a slide transition from the list.</paragraph>
+</listitem>
+</list>
+<paragraph role="paragraph" id="par_id3149022" xml-lang="en-US">You can preview the transition effect in the document window.</paragraph>
+<paragraph role="note" id="par_id3148826234">On Slide Pane an <image id="img_id3151172234" src="sd/res/fade_effect_indicator.png" width="0.222inch" height="0.222inch"/> icon appears next to the preview of those slides, which have slide transition. When you present the slide show with the Presenter Console, <image id="img_id3151172235" src="sd/res/presenterscreen-Transition.png" width="0.222inch" height="0.222inch"/> icon indicates that the next slide has slide transition.</paragraph>
+<h3 id="hd_id3147562">To apply the same transition effect to more than one slide</h3>
+<list type="ordered">
+<listitem>
+<paragraph role="paragraph" id="par_id3150263" xml-lang="en-US">In <emph>Slide Sorter</emph> view, select the slides that you want to add the transition effect to.</paragraph>
+<paragraph role="paragraph" id="par_id3148826" xml-lang="en-US">If you want, you can use the <emph>Zoom</emph> toolbar
+<image id="img_id3151172" src="cmd/sc_zoom.png" width="0.222inch" height="0.222inch"><alt id="alt_id3151172" xml-lang="en-US">Icon Zoom</alt></image> to change the view magnification for the slides.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id3154269" xml-lang="en-US">On the Tasks pane, click Slide Transition.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="paragraph" id="par_id3154102" xml-lang="en-US">Select a slide transition from the list.</paragraph>
+</listitem>
+</list>
+<paragraph role="paragraph" id="par_id3153785" xml-lang="en-US">To preview the transition effect for a slide, click the small icon underneath the slide on the <emph>Slides Pane</emph>.</paragraph>
+<h3 id="hd_id3149341">To remove a transition effect</h3>
+<list type="ordered">
+<listitem>
+<paragraph role="listitem" id="par_id3151287" xml-lang="en-US">In <emph>Slide Sorter</emph> View, select the slides that you want to remove the transition effect from.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3146930" xml-lang="en-US">Choose <emph>No Transition </emph>in the listbox on the <emph>Tasks</emph> pane.</paragraph>
+</listitem>
+</list>
+<section id="relatedtopics">
+<paragraph role="paragraph" id="par_id3149300" xml-lang="en-US"><link href="text/simpress/01/06040000.xhp" name="Slide Transition">Slide Transition</link></paragraph>
+<embed href="text/simpress/guide/animated_objects.xhp#animated_objects"/>
+</section>
+</body>
+</helpdocument>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+	
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+ 
+	
+<meta>
+      <topic id="textswriterguidefield_convertxml" indexer="include" status="PUBLISH">
+         <title xml-lang="en-US" id="tit">Converting a Field into Text</title>
+         <filename>/text/swriter/guide/field_convert.xhp</filename>
+      </topic>
+   </meta>
+   <body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154079"><bookmark_value>fields; converting into text</bookmark_value>
+      <bookmark_value>converting;fields, into text</bookmark_value>
+      <bookmark_value>replacing;fields, by text</bookmark_value>
+      <bookmark_value>changing;fields, into text</bookmark_value>
+</bookmark>
+<paragraph xml-lang="en-US" id="hd_id3154079" role="heading" level="1"><variable id="field_convert"><link href="text/swriter/guide/field_convert.xhp" name="Converting a Field into Text">Converting a Field into Text</link>
+</variable></paragraph>
+      <paragraph xml-lang="en-US" id="par_id3149281" role="paragraph">You can change a field to regular text, so that it is no longer updated. After you change a field to text, you cannot change the text back into a field.</paragraph>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3155608" role="listitem">Select the field and choose <emph>Edit - Cut</emph>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3154238" role="listitem">Choose <emph>Edit - Paste Special</emph>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3154262" role="listitem">Click "Unformatted text" in the
+               <item type="menuitem">Selection</item> list, and then click
+               <item type="menuitem">OK</item>.</paragraph>
+         </listitem>
+      </list>
+      <embed href="text/shared/00/00000004.xhp#related"/>
+      <embed href="text/swriter/guide/fields.xhp#fields"/>
+      <paragraph xml-lang="en-US" id="par_id3157551" role="paragraph"><link href="text/shared/01/02070000.xhp" name="Paste Special">Paste Special</link></paragraph>
+   </body>
+</helpdocument>

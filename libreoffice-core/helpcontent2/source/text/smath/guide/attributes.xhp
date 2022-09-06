@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsmathguideattributesxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Changing Default Attributes</title>
+<filename>/text/smath/guide/attributes.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3145792"><bookmark_value>attributes; changing in $[officename] Math</bookmark_value>
+<bookmark_value>font attributes;changing defaults</bookmark_value>
+<bookmark_value>formatting;changing default attributes</bookmark_value>
+<bookmark_value>defaults;changing default formatting</bookmark_value>
+<bookmark_value>changing;default formatting</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3145792" xml-lang="en-US" level="1"><variable id="attributes"><link href="text/smath/guide/attributes.xhp" name="Changing Default Attributes">Changing Default Attributes</link>
+</variable></paragraph>
+<paragraph role="heading" id="hd_id3154484" xml-lang="en-US" level="3">Can default formats in $[officename] Math be modified?</paragraph>
+<paragraph role="paragraph" id="par_id3148870" xml-lang="en-US">Some parts of formulas are always formatted bold or italic by default.</paragraph>
+<paragraph role="paragraph" id="par_id3150210" xml-lang="en-US">You can remove these attributes using "nbold" and "nitalic". Example:</paragraph>
+<paragraph role="smathcode" id="par_id3143231" xml-lang="en-US" localize="false">a + b</paragraph>
+<paragraph role="smathcode" id="par_id3153810" xml-lang="en-US" localize="false">nitalic a + bold b.</paragraph>
+<paragraph role="paragraph" id="par_id3149872" xml-lang="en-US">In the second formula, the a is not italic. The b is bold. You cannot change the plus sign by this method.</paragraph>
+<section id="relatedtopics">
+<embed href="text/smath/guide/main.xhp#main"/>
+</section>
+</body>
+</helpdocument>

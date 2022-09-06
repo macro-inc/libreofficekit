@@ -1,0 +1,1501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+-->
+
+<meta>
+  <topic id="SF_String" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">ScriptForge.String service (SF_String)</title>
+    <filename>/text/sbasic/shared/03/sf_string.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+<section id="ScriptForge-sf_string">
+  <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id151579602147056">
+    <bookmark_value>String service</bookmark_value>
+  </bookmark>
+</section>
+
+<section id="abstract">
+  <h1 id="hd_id521580038927003"><variable id="StringService"><link href="text/sbasic/shared/03/sf_string.xhp" name="String service"><literal>ScriptForge</literal>.<literal>String</literal> service</link></variable></h1>
+  <paragraph role="paragraph" id="par_id351579602570526">The <literal>String</literal> service provides a collection of methods for string processing. These methods can be used to:</paragraph>
+  <list type="unordered">
+    <listitem>
+      <paragraph id="par_id611611952070366" role="listitem">Validate the contents of strings</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id611611952070376" role="listitem">Format strings by trimming, justifying or wrapping their contents</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id611611952070367" role="listitem">Use regular expressions to search and replace substrings</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id611611952070368" role="listitem">Apply hash algorithms on strings, etc.</paragraph>
+    </listitem>
+  </list>
+</section>
+
+  <h2 id="hd_id961579603699855">Definitions</h2>
+
+  <h3 id="hd_id441579603838777">Line breaks</h3>
+    <paragraph role="paragraph" id="par_id791611946942340">The <literal>String</literal> service recognizes the following line breaks:</paragraph>
+   <table id="tab_id411611947117831">
+   <tablerow>
+       <tablecell>
+           <paragraph id="par_id151611947117831" role="tablehead">Symbolic name</paragraph>
+       </tablecell>
+       <tablecell>
+           <paragraph id="par_id721611947117831" role="tablehead">ASCII number</paragraph>
+       </tablecell>
+   </tablerow>
+   <tablerow>
+       <tablecell>
+           <paragraph id="par_id761611947117831" role="tablecontent">
+             Line feed<br/>
+             Vertical tab<br/>
+             Carriage return<br/>
+             Line feed + Carriage return<br/>
+             File separator<br/>
+             Group separator<br/>
+             Record separator<br/>
+             Next line<br/>
+             Line separator<br/>
+             Paragraph separator
+           </paragraph>
+       </tablecell>
+       <tablecell>
+           <paragraph id="par_id211611947117831" role="tablecontent" localize="false">
+             10 <br/> 12 <br/> 13 <br/> 10 + 13 <br/> 28 <br/> 29 <br/> 30 <br/> 133 <br/> 8232 <br/> 8233
+           </paragraph>
+       </tablecell>
+   </tablerow>
+   </table>
+
+  <h3 id="hd_id161579604225813">Whitespaces</h3>
+  <paragraph role="paragraph" id="par_id401611948279056">The <literal>String</literal> service recognizes the following whitespaces:</paragraph>
+  <table id="tab_id411611947117831">
+   <tablerow>
+       <tablecell>
+           <paragraph id="par_id151611947117893" role="tablehead">Symbolic name</paragraph>
+       </tablecell>
+       <tablecell>
+           <paragraph id="par_id721611947117855" role="tablehead">ASCII number</paragraph>
+       </tablecell>
+   </tablerow>
+   <tablerow>
+       <tablecell>
+           <paragraph id="par_id761611947117835" role="tablecontent">
+             Space<br/>
+             Horizontal tab<br/>
+             Line feed<br/>
+             Vertical tab<br/>
+             Form feed<br/>
+             Carriage return<br/>
+             Next line<br/>
+             No-break space<br/>
+             Line separator<br/>
+             Paragraph separator
+           </paragraph>
+       </tablecell>
+       <tablecell>
+           <paragraph id="par_id211611947117832" role="tablecontent" localize="false">
+             32 <br/> 9 <br/> 10 <br/> 11 <br/> 12 <br/> 13 <br/> 133 <br/> 160 <br/> 8232 <br/> 8233
+           </paragraph>
+       </tablecell>
+   </tablerow>
+   </table>
+
+  <h3 id="hd_id191580480825160">Escape sequences</h3>
+  <paragraph role="paragraph" id="par_id971611949145057">Below is a list of escape sequences that can be used in strings.</paragraph>
+  <table id="tab_id411611947117834">
+  <tablerow>
+       <tablecell>
+           <paragraph id="par_id151611947117287" role="tablehead">Escape Sequence</paragraph>
+       </tablecell>
+       <tablecell>
+           <paragraph id="par_id721611947117732" role="tablehead">Symbolic name</paragraph>
+       </tablecell>
+       <tablecell>
+           <paragraph id="par_id721611947117144" role="tablehead">ASCII number</paragraph>
+       </tablecell>
+   </tablerow>
+   <tablerow>
+       <tablecell>
+           <paragraph id="par_id771611948706049" role="tablecontent" localize="false">
+             \n <br/> \r <br/> \t
+           </paragraph>
+       </tablecell>
+       <tablecell>
+           <paragraph id="par_id761611947119834" role="tablecontent">
+             Line feed<br/>
+             Carriage return<br/>
+             Horizontal tab
+           </paragraph>
+       </tablecell>
+       <tablecell>
+           <paragraph id="par_id211611947117163" role="tablecontent" localize="false">
+             10 <br/> 13 <br/> 9
+           </paragraph>
+       </tablecell>
+   </tablerow>
+   </table>
+  <tip id="par_id251611949474763">To have the escape sequence "\n" interpreted as an actual string, simply use "\\n" instead of <literal>"\" &amp; Chr(10).</literal></tip>
+
+  <h3 id="hd_id771579606799550">Non-printable characters:</h3>
+    <paragraph role="paragraph" id="par_id531579606877342">Characters defined in the Unicode Character Database as “Other” or “Separator” are considered as non-printable characters.</paragraph>
+    <paragraph role="paragraph" id="par_id221611949584320">Control characters (ascii code &lt;= 0x1F) are also considered as non-printable.</paragraph>
+
+  <h3 id="hd_id661579604944268">Quotes inside strings:</h3>
+    <paragraph role="paragraph" id="par_id551579605035332">To add quotes in strings use \' (single quote) or \" (double quote). For example:</paragraph>
+    <list type="unordered">
+      <listitem>
+        <paragraph id="par_id201611949691285" role="listitem">The string <literal>[str\'i\'ng]</literal> is interpreted as <literal>[str'i'ng]</literal></paragraph>
+      </listitem>
+      <listitem>
+        <paragraph id="par_id201611949691323" role="listitem">The string <literal>[str\"i\"ng]</literal> is interpreted as <literal>[str"i"ng]</literal></paragraph>
+      </listitem>
+    </list>
+
+  <h2 id="hd_id201586594659135">Service invocation</h2>
+  <paragraph role="paragraph" id="par_id141609955500101">Before using the <literal>ScriptForge.String</literal> service the <literal>ScriptForge</literal> library needs to be loaded using:</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+      <paragraph role="bascode" localize="false" id="bas_id871608192694632">GlobalScope.BasicLibraries.loadLibrary("ScriptForge")</paragraph>
+  </bascode>
+  <paragraph role="paragraph" id="par_id271627158844922">Loading the library will create the <literal>SF_String</literal> object that can be used to call the methods in the <literal>String</literal> service.</paragraph>
+  <paragraph role="paragraph" id="par_id63158659509728">The following code snippets show the three ways to call methods from the <literal>String</literal> service (the <literal>Capitalize</literal> method is used as an example):</paragraph>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id641627157912899">Dim s as String : s = "abc def"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id181586594723543">s = SF_String.Capitalize(s) ' Abc Def</paragraph>
+  </bascode>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id641627157912017">Dim s as String : s = "abc def"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id441586594733346">Dim svc : svc = SF_String</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id481586594739978">s = svc.Capitalize(s) ' Abc Def</paragraph>
+  </bascode>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id641627157912647">Dim s as String : s = "abc def"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id431586594750461">Dim svc : svc = CreateScriptService("String")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id471586594758689">s = svc.Capitalize(s) ' Abc Def</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <paragraph role="paragraph" id="par_id761627158463235">The code snippet below illustrates how to invoke methods from the <literal>String</literal> service in Python scripts. The <literal>IsIPv4</literal> method is used as an example.</paragraph>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id171627158604379">from scriptforge import CreateScriptService</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id101627158604648">svc = CreateScriptService("String")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id171627158604858">ip_address = '192.168.0.14'</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id551627158605138">svc.IsIPv4(ip_address) # True</paragraph>
+  </pycode>
+
+  <h2 id="hd_id651584978211886">Properties</h2>
+  <paragraph role="paragraph" id="par_id241611950267068">The <literal>SF_String</literal> object provides the following properties for Basic scripts:</paragraph>
+  <table id="tab_id761584978211275">
+      <tablerow>
+          <tablecell>
+              <paragraph id="par_id271584978211792" role="tablehead">Name</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id241584978211550" role="tablehead">ReadOnly</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id621584978211403" role="tablehead">Description</paragraph>
+          </tablecell>
+      </tablerow>
+      <tablerow>
+          <tablecell>
+              <paragraph id="par_id581584978715552" role="tablecontent" localize="false">sfCR</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id71584978715562" role="tablecontent">Yes</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id581584978715701" role="tablecontent">Carriage return: Chr(13)</paragraph>
+          </tablecell>
+      </tablerow>
+      <tablerow>
+          <tablecell>
+              <paragraph id="par_id91584978211231" role="tablecontent" localize="false">sfCRLF</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id211584978211383" role="tablecontent">Yes</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id691584978211774" role="tablecontent">Carriage return + Linefeed: Chr(13) &amp; Chr(10)</paragraph>
+          </tablecell>
+      </tablerow>
+      <tablerow>
+          <tablecell>
+              <paragraph id="par_id1001584978666440" role="tablecontent" localize="false">sfLF</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id671584978666689" role="tablecontent">Yes</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id951584978666296" role="tablecontent">Linefeed: Chr(10)</paragraph>
+          </tablecell>
+      </tablerow>
+      <tablerow>
+          <tablecell>
+              <paragraph id="par_id311584978666162" role="tablecontent" localize="false">sfNEWLINE</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id421584978666327" role="tablecontent">Yes</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id901584978666158" role="tablecontent">Carriage return + Linefeed, which can be<br/>1) Chr(13) &amp; Chr(10) or
+                  <br/>2) Linefeed: Chr(10)
+                  <br/>depending on the operating system.</paragraph>
+          </tablecell>
+      </tablerow>
+      <tablerow>
+          <tablecell>
+              <paragraph id="par_id371584978666469" role="tablecontent" localize="false">sfTAB</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id541584978666991" role="tablecontent">Yes</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id741584978666508" role="tablecontent">Horizontal tabulation: Chr(9)</paragraph>
+          </tablecell>
+      </tablerow>
+    </table>
+  <tip id="par_id461584978880380">You can use the properties above to identify or insert the corresponding characters inside strings. For example, the Linefeed can be replaced by <literal>SF_String.sfLF</literal>.</tip>
+
+<table id="tab_id501611613601554">
+   <tablerow>
+     <tablecell colspan="3"><paragraph id="par_id891611613601554" role="tablehead" xml-lang="en-US">List of Methods in the String Service</paragraph></tablecell>
+   </tablerow>
+   <tablerow>
+       <tablecell>
+           <paragraph id="par_id891611613601556" role="tablecontent" localize="false">
+             <link href="text/sbasic/shared/03/sf_string.xhp#Capitalize" name="Capitalize method">Capitalize</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#Count" name="Count method">Count</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#EndsWith" name="EndsWith method">EndsWith</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#Escape" name="Escape method">Escape</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#ExpandTabs" name="ExpandTabs method">ExpandTabs</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#FilterNotPrintable" name="FilterNotPrintable method">FilterNotPrintable</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#FindRegex" name="FindRegex method">FindRegex</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#HashStr" name="HashStr method">HashStr</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#HtmlEncode" name="HtmlEncode method">HtmlEncode</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsADate" name="IsADate method">IsADate</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsAlpha" name="IsAlpha method">IsAlpha</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsAlphaNum" name="IsAlphaNum method">IsAlphaNum</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsAscii" name="IsAscii method">IsAscii</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsDigit" name="IsDigit method">IsDigit</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsEmail" name="IsEmail method">IsEmail</link><br/>
+           </paragraph>
+       </tablecell>
+       <tablecell>
+           <paragraph id="par_id541611613601554" role="tablecontent" localize="false">
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsFileName" name="IsFileName method">IsFileName</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsHexDigit" name="IsHexDigit method">IsHexDigit</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsIBAN" name="IsIBAN method">IsIBAN</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsIPv4" name="IsIPv4 method">IsIPv4</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsLike" name="IsLike method">IsLike</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsLower" name="IsLower method">IsLower</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsPrintable" name="IsPrintable method">IsPrintable</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsRegex" name="IsRegex method">IsRegex</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsSheetName" name="IsSheetName method">IsSheetName</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsTitle" name="IsTitle method">IsTitle</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsUpper" name="IsUpper method">IsUpper</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsUrl" name="IsUrl method">IsUrl</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#IsWhitespace" name="IsWhitespace method">IsWhitespace</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#JustifyCenter" name="JustifyCenter method">JustifyCenter</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#JustifyLeft" name="JustifyLeft method">JustifyLeft</link><br/>
+           </paragraph>
+       </tablecell>
+       <tablecell>
+           <paragraph id="par_id701611613601554" role="tablecontent" localize="false">
+             <link href="text/sbasic/shared/03/sf_string.xhp#JustifyRight" name="JustifyRight method">JustifyRight</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#Quote" name="Quote method">Quote</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#ReplaceChar" name="ReplaceChar method">ReplaceChar</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#ReplaceRegex" name="ReplaceRegex method">ReplaceRegex</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#ReplaceStr" name="ReplaceStr method">ReplaceStr</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#Represent" name="Represent method">Represent</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#Reverse" name="Reverse method">Reverse</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#SplitLines" name="SplitLines method">SplitLines</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#SplitNotQuoted" name="SplitNotQuoted method">SplitNotQuoted</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#StartsWith" name="StartsWith method">StartsWith</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#TrimExt" name="TrimExt method">TrimExt</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#Unescape" name="Unescape method">Unescape</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#Unquote" name="Unquote method">Unquote</link><br/>
+             <link href="text/sbasic/shared/03/sf_string.xhp#Wrap" name="Wrap method">Wrap</link><br/><br/>
+           </paragraph>
+       </tablecell>
+   </tablerow>
+</table>
+  <note id="par_id151611951803163">The first argument of most methods is the string to be considered. It is always passed by reference and left unchanged. Methods such as <literal>Capitalize</literal>, <literal>Escape</literal>, etc return a new string after their execution.</note>
+  <warning id="par_id371627158142730">Because Python has comprehensive built-in string support, most of the methods in the <literal>String</literal> service are available for Basic scripts only. The methods available for Basic and Python are: <literal>HashStr</literal>, <literal>IsADate</literal>, <literal>IsEmail</literal>, <literal>IsFileName</literal>, <literal>IsIBAN</literal>, <literal>IsIPv4</literal>, <literal>IsLike</literal>, <literal>IsSheetName</literal>, <literal>IsUrl</literal>, <literal>SplitNotQuoted</literal> and <literal>Wrap</literal>.</warning>
+
+<section id="Capitalize">
+  <comment> Capitalize -------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id121582203710297">
+    <bookmark_value>String service;Capitalize</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id791579683635979" localize="false">Capitalize</h2>
+  <paragraph role="paragraph" id="par_id271579683706571">Capitalizes the first character from each word in the input string.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id121627158901416">
+    <input>svc.Capitalize(inputstr: str): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id941582304592013"><emph>inputstr</emph>: The string to be capitalized.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id631579688532444">Dim sName as String : sName = "john smith"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id451579686015963">Dim sCapitalizedName as String</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id41579785318230">sCapitalizedName = SF_String.Capitalize(sName)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id801579688542131">MsgBox sCapitalizedName 'John Smith</paragraph>
+  </bascode>
+</section>
+
+<section id="Count">
+  <comment> Count ------------------------------------------------------------------------------------------------- </comment>
+  <bookmark branch="index" id="bm_id421582384432626" localize="false">
+    <bookmark_value>String service;Count</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id1001582384527265" localize="false">Count</h2>
+  <paragraph role="paragraph" id="par_id891582384556756">Counts the number of occurrences of a substring or a regular expression within a string.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id421627159083108">
+    <input>svc.Count(inputstr: str, substring: str, [isregex: bool], [casesensitive: bool]): int</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id571582384689863"><emph>inputstr</emph>: The input string to be examined</paragraph>
+  <paragraph role="paragraph" id="par_id601582384696486"><emph>substring</emph>: The substring or the regular expression to be used during search</paragraph>
+  <paragraph role="paragraph" id="par_id451582384703719"><emph>isregex</emph>: Use <literal>True</literal> if the substring is a regular expression (Default = <literal>False</literal>)</paragraph>
+  <paragraph role="paragraph" id="par_id141582384726168"><emph>casesensitive</emph>: The search can be case sensitive or not (Default = <literal>False</literal>).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" id="bas_id371582384749769">'Counts the occurrences of the substring "or" inside the input string (returns 2)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id281582384809689">MsgBox SF_String.Count("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", "or", CaseSensitive := False)</paragraph>
+    <paragraph role="bascode" id="bas_id561582384801586">'Counts the number of words with only lowercase letters (returns 7)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id631582384780777">MsgBox SF_String.Count("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", "\b[a-z]+\b", IsRegex := True, CaseSensitive := True)</paragraph>
+  </bascode>
+  <tip id="par_id131612223767126">To learn more about regular expressions, refer to the Python's documentation on <link href="https://docs.python.org/3/library/re.html" name="Regular expressions">Regular Expression Operations</link>.</tip>
+</section>
+
+<section id="EndsWith">
+  <comment> EndsWith ---------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id771582203795803">
+    <bookmark_value>String service;EndsWith</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id801579687630238" localize="false">EndsWith</h2>
+  <paragraph role="paragraph" id="par_id581579687739629">Returns <literal>True</literal> if a string ends with a specified substring.</paragraph>
+  <paragraph role="paragraph" id="par_id21612306392239">The function returns <literal>False</literal> when either the string or the substring have a length = 0 or when the substring is longer than the string.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id551627159333520">
+    <input>svc.EndsWith(inputstr: str, substring: str, [casesensitive: bool]): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id191579861552201"><emph>inputstr</emph>: The string to be tested.</paragraph>
+  <paragraph role="paragraph" id="par_id211579861561473"><emph>substring</emph>: The substring to be searched at the end of <literal>inputstr</literal>.</paragraph>
+  <paragraph role="paragraph" id="par_id801579861574009"><emph>casesensitive</emph>: The search can be case sensitive or not (Default = <literal>False</literal>).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" id="bas_id811579862998452">'Returns True because the method was called with the default CaseSensitive = False</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id581579863063364">MsgBox SF_String.EndsWith("abcdefg", "EFG")</paragraph>
+    <paragraph role="bascode" id="bas_id231579863168747">'Returns False due to the CaseSensitive parameter</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id221579863071644">MsgBox SF_String.EndsWith("abcdefg", "EFG", CaseSensitive := True)</paragraph>
+  </bascode>
+</section>
+
+<section id="Escape">
+  <comment> Escape ------------------------------------------------------------------------------------------------ </comment>
+  <bookmark localize="false" branch="index" id="bm_id731585921441446">
+    <bookmark_value>String service;Escape</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id821585921441213" localize="false">Escape</h2>
+  <paragraph role="paragraph" id="par_id921585921441429">Converts linebreaks and tabs contained in the input string to their equivalent escaped sequence (\\, \n, \r, \t).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id151627159520587">
+    <input>svc.Escape(inputstr: str): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id9158592144110"><emph>inputstr</emph>: The string to be converted.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" id="bas_id901585921441483">'Returns the string "abc\n\tdef\\n"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id741585921441977">MsgBox SF_String.Escape("abc" &amp; Chr(10) &amp; Chr(9) &amp; "def\n")</paragraph>
+  </bascode>
+</section>
+
+<section id="ExpandTabs">
+  <comment> ExpandTabs -------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id161582203880251">
+    <bookmark_value>String service;ExpandTabs</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id761579868039113" localize="false">ExpandTabs</h2>
+  <paragraph role="paragraph" id="par_id271579868053137">Replaces Tab characters <literal>Chr(9)</literal> by space characters to replicate the behavior of tab stops.</paragraph>
+  <paragraph role="paragraph" id="par_id951579868064344">If a line break is found, a new line is started and the character counter is reset.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id821627159598950">
+    <input>svc.ExpandTabs(inputstr: str, [tabsize: int]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id231579868290408"><emph>inputstr</emph>: The string to be expanded</paragraph>
+  <paragraph role="paragraph" id="par_id281579868299807"><emph>tabsize</emph>: This parameter is used to determine the Tab stops using the formula: TabSize + 1, 2 * TabSize + 1 , ... N * TabSize + 1 (Default = 8)</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id611579868690878">Dim myText as String</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id931585922081615">myText = "100" &amp; SF_String.sfTAB &amp; "200" &amp; SF_String.sfTAB &amp; "300" &amp; SF_String.sfNEWLINE &amp; _</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id311579868703742">         "X"  &amp; SF_String.sfTAB &amp; "Y" &amp; SF_String.sfTAB &amp; "Z"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id841585921966229">MsgBox SF_String.ExpandTabs(myText)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id461579868714135">'100     200     300</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id461579868714136">'X       Y       Z</paragraph>
+  </bascode>
+</section>
+
+<section id="FilterNotPrintable">
+  <comment> FilterNotPrintable ------------------------------------------------------------------------------------ </comment>
+  <bookmark localize="false" branch="index" id="bm_id231582204001536">
+    <bookmark_value>String service;FilterNotPrintable</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id581579874537114" localize="false">FilterNotPrintable</h2>
+  <paragraph role="paragraph" id="par_id161579874552729">Replaces all non-printable characters in the input string by a given character.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id271627159754299">
+    <input>svc.FilterNotPrintable(inputstr: str, [replacedby: str]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id431579874633865"><emph>inputstr</emph>: The string to be searched</paragraph>
+  <paragraph role="paragraph" id="par_id31579874656437"><emph>replacedby</emph>: Zero, one or more characters that will replace all non-printable characters in <literal>inputstr</literal> (Default = "")</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id481579874686887">Dim LF : LF = Chr(10)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id41579874696422">Dim myText as String</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id611579874737551">myText = "àén ΣlPµ" &amp; LF &amp; " Русский" &amp; "\n"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id271579874750894">MsgBox SF_String.FilterNotPrintable(myText)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id81612308364024">' "àén ΣlPµ Русский\n"</paragraph>
+  </bascode>
+</section>
+
+<section id="FindRegex">
+  <comment> FindRegex --------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id491582204303825">
+    <bookmark_value>String service;FindRegex</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id471579876212449" localize="false">FindRegex</h2>
+  <paragraph role="paragraph" id="par_id1001579876228707">Finds in a string a substring matching a given regular expression.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id591627159907982">
+    <input>svc.FindRegex(inputstr: str, regex: str, [start: int], [casesensitive: bool], [forward: bool]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id131579876314120"><emph>inputstr</emph>: The string to be searched</paragraph>
+  <paragraph role="paragraph" id="par_id751579876371545"><emph>regex</emph>: The regular expression</paragraph>
+  <paragraph role="paragraph" id="par_id881579876394584"><emph>start</emph>: The position in the string where the search will begin. This parameter is passed by reference, so after execution the value of <literal>start</literal> will point to the first character of the found substring. If no matching substring is found, <literal>start</literal> will be set to 0.</paragraph>
+  <paragraph role="paragraph" id="par_id251579876403831"><emph>casesensitive</emph>: The search can be case sensitive or not (Default = <literal>False</literal>).</paragraph>
+  <paragraph role="paragraph" id="par_id841579876412287"><emph>forward</emph>: Determines the direction of the search. If <literal>True</literal>, search moves forward. If <literal>False</literal> search moves backwards (Default = <literal>True</literal>)</paragraph>
+  <paragraph role="paragraph" id="par_id451612309155653">At the first iteration, if <literal>forward = True</literal>, then <literal>start</literal> should be equal to 1, whereas if <literal>forward = False</literal> then <literal>start</literal> should be equal to <literal>Len(inputstr)</literal></paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id621579876463377">Dim lStart As Long : lStart = 1</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id1001579876429088">Dim result as String</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id571579876474344">result = SF_String.FindRegex("abCcdefghHij", "C.*H", lStart, CaseSensitive := True)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id671579876511592">MsgBox lStart &amp; ": " &amp; result</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id51579876497768">'3: CcdefghH</paragraph>
+  </bascode>
+  <tip id="par_id221612309579001">In the example above, the new value of <literal>lStart</literal> can be used to keep searching the same input string by setting the <literal>Start</literal> parameter to <literal>lStart + Len(result)</literal> at the next iteration.</tip>
+</section>
+
+<section id="HashStr">
+  <comment> HashStr ----------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id24160104898372">
+    <bookmark_value>String service;HashStr</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id871601048983883" localize="false">HashStr</h2>
+  <paragraph role="paragraph" id="par_id471601048983628">Hash functions are used inside some cryptographic algorithms, in digital signatures, message authentication codes, manipulation detection, fingerprints, checksums (message integrity check), hash tables, password storage and much more.</paragraph>
+  <paragraph role="paragraph" id="par_id301601048983765">The <literal>HashStr</literal> method returns the result of a hash function applied on a given string and using a specified algorithm, as a string of lowercase hexadecimal digits.</paragraph>
+  <paragraph role="paragraph" id="par_id631601048983149">The hash algorithms supported are: <literal>MD5</literal>, <literal>SHA1</literal>, <literal>SHA224</literal>, <literal>SHA256</literal>, <literal>SHA384</literal> and <literal>SHA512</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id741627160211210">
+    <input>svc.HashStr(inputstr: str, algorithm: str): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id621601048983210"><emph>inputstr</emph>: The string to hash. It is presumed to be encoded in UTF-8. The hashing algorithm will consider the string as a stream of bytes.</paragraph>
+  <paragraph role="paragraph" id="par_id941601048983822"><emph>algorithm</emph>: One of the supported algorithms listed above, passed as a string.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id721601048983555">MsgBox SF_String.HashStr("œ∑¡™£¢∞§¶•ªº–≠œ∑´®†¥¨ˆøπ‘åß∂ƒ©˙∆˚¬", "MD5")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id891612351766467">' c740ccc2e201df4b2e2b4aa086f35d8a</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id201627248048720">svc = CreateScriptService("String")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id101627248049176">bas = CreateScriptService("Basic")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id401627248049343">a_string = "œ∑¡™£¢∞§¶•ªº–≠œ∑´®†¥¨ˆøπ‘åß∂ƒ©˙∆˚¬"</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id611627248049495">hash_value = svc.HashStr(a_string, "MD5")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id471627248049687">bas.MsgBox(hash_value)</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id121627248049991"># c740ccc2e201df4b2e2b4aa086f35d8a</paragraph>
+  </pycode>
+</section>
+
+<section id="HtmlEncode">
+  <comment> HtmlEncode -------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id561582204334292">
+    <bookmark_value>String service;HtmlEncode</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id771579879504956" localize="false">HtmlEncode</h2>
+  <paragraph role="paragraph" id="par_id221579879516929">Encodes the input string into the HTML character codes, replacing special characters by their <literal>&amp;</literal> counterparts.</paragraph>
+  <paragraph role="paragraph" id="par_id341612351999692">For example, the character <literal>é</literal> would be replaced by <literal>&amp;eacute;</literal> or an equivalent numerical HTML code.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id601627160353326">
+    <input>svc.HtmlEncode(inputstr: str): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="bas_id501579879570781"><emph>inputstr</emph>: The string to encode.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id671579879597547">MsgBox SF_String.HtmlEncode("&lt;a href=&quot;&quot;https://a.b.com&quot;&quot;&gt;From α to ω&lt;/a&gt;")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id461579879607044">' "&amp;lt;a href=&amp;quot;https://a.b.com&amp;quot;&amp;gt;From &amp;#945; to &amp;#969;&amp;lt;/a&amp;gt;"</paragraph>
+  </bascode>
+</section>
+
+<section id="IsADate">
+  <comment> IsADate ---------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id11582204732653">
+    <bookmark_value>String service;IsADate</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id141579880967392" localize="false">IsADate</h2>
+  <paragraph role="paragraph" id="par_id171579880990533">Returns <literal>True</literal> if the input string is a valid date according to a specified date format.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id191627160586821">
+    <input>svc.IsADate(inputstr: str, [dateformat: str]): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id151579881091821"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal></paragraph>
+  <paragraph role="paragraph" id="par_id991579881107670"><emph>dateformat</emph>: The date format, as a string. It can be either "YYYY-MM-DD" (default), "DD-MM-YYYY" or "MM-DD-YYYY"</paragraph>
+  <paragraph role="paragraph" id="par_id291579881117126">The dash (-) may be replaced by a dot (.), a slash (/) or a space.</paragraph>
+  <paragraph role="paragraph" id="par_id51579881125801"> If the format is invalid, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id811579881155015">MsgBox SF_String.IsADate("2020-12-31", "YYYY-MM-DD") ' True</paragraph>
+  </bascode>
+  <note id="par_id211612370427721">This method checks the format of the input string without performing any calendar-specific checks. Hence it does not test the input string for leap years or months with 30 or 31 days. For that, refer to the <link href="text/sbasic/shared/03102300.xhp" name="IsDate function"><literal>IsDate</literal> built-in function</link>.</note>
+  <paragraph role="paragraph" id="par_id181612371147364">The example below shows the difference between the methods <literal>IsADate</literal> (ScriptForge) and the <literal>IsDate</literal> (built-in) function.</paragraph>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id531612371248704">Dim myDate as String : myDate = "2020-02-30"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id731612371253577">MsgBox SF_String.IsADate(myDate, "YYYY-MM-DD") 'True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id821612371254969">MsgBox IsDate(myDate) ' False</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id831627248497889">svc = CreateScriptService("String")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id121627248498619">s_date = "2020-12-31"</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id621627248498786">result = svc.IsADate(s_date) # True</paragraph>
+  </pycode>
+</section>
+
+<section id="IsAlpha">
+  <comment> IsAlpha ---------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id491582204781995">
+    <bookmark_value>String service;IsAlpha</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id231579881589037" localize="false">IsAlpha</h2>
+  <paragraph role="paragraph" id="par_id161579881600317">Returns <literal>True</literal> if all characters in the string are alphabetic.</paragraph>
+  <paragraph role="paragraph" id="par_id251579881615469">Alphabetic characters are those characters defined in the <link href="https://unicode.org/reports/tr44/" name="Unicode documentation">Unicode Character Database</link> as <literal>Letter</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id711627160772668">
+    <input>svc.IsAlpha(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id11579881691826"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="par_id381579881735058">MsgBox SF_String.IsAlpha("àénΣlPµ") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id331579881743363">MsgBox SF_String.IsAlpha("myVar3") ' False</paragraph>
+  </bascode>
+</section>
+
+<section id="IsAlphaNum">
+  <comment> IsAlphaNum -------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id581582204814414">
+    <bookmark_value>String service;IsAlphanum</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id711579883155335" localize="false">IsAlphaNum</h2>
+  <paragraph role="paragraph" id="par_id421579883181382">Returns <literal>True</literal> if all characters in the string are alphabetic, digits or "_" (underscore). The first character must not be a digit.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id981627160850954">
+    <input>svc.IsAlphaNum(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id31579884464101"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id611579884379482">MsgBox SF_String.IsAlphaNum("_ABC_123456_abcàénΣlPµ") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id551612445915119">MsgBox SF_String.IsAlphaNum("123ABC") ' False</paragraph>
+  </bascode>
+</section>
+
+<section id="IsAscii">
+  <comment> IsAscii ----------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id991582204833033">
+    <bookmark_value>String service;IsAscii</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id891580039448798" localize="false">IsAscii</h2>
+  <paragraph role="paragraph" id="par_id671580039484786">Returns <literal>True</literal> if all characters in the string are Ascii characters.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id931627160994922">
+    <input>svc.IsAscii(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id791580039528838"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id41580039556401">MsgBox SF_String.IsAscii("a%?,25") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id841580039565265">MsgBox SF_String.IsAscii("abcàénΣlPµ") ' False</paragraph>
+  </bascode>
+</section>
+
+<section id="IsDigit">
+  <comment> IsDigit ---------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id741582204858557">
+    <bookmark_value>String service;IsDigit</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id321580044756464" localize="false">IsDigit</h2>
+  <paragraph role="paragraph" id="par_id861580044805749">Returns <literal>True</literal> if all characters in the string are digits.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id491627161075258">
+    <input>svc.IsDigit(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id41580044873043"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id821580044929100">MsgBox SF_String.IsDigit("123456") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id601580044939971">MsgBox SF_String.IsDigit("_12a") ' False</paragraph>
+  </bascode>
+</section>
+
+<section id="IsEmail">
+  <comment> IsEmail ----------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id721582204903245">
+    <bookmark_value>String service;IsEmail</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id601580045208963" localize="false">IsEmail</h2>
+  <paragraph role="paragraph" id="par_id521580045221758">Returns <literal>True</literal> if the string is a valid email address.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id561627161153727">
+    <input>svc.IsEmail(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id841580045280071"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id351580045300802">MsgBox SF_String.IsEmail("first.last@something.org") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id511580045308668">MsgBox SF_String.IsEmail("first.last@something.com.br") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id621580045319466">MsgBox SF_String.IsEmail("first.last@something.123") ' False</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id921627248625925">svc = CreateScriptService("String")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id671627248629820">bas = CreateScriptService("Basic")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id651627248630083">bas.MsgBox(svc.IsEmail("first.last@something.org")) # True</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id451627248630275">bas.MsgBox(svc.IsEmail("first.last@something.com.br")) # True</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id491627248630514">bas.MsgBox(svc.IsEmail("first.last@something.123")) # False</paragraph>
+  </pycode>
+</section>
+
+<section id="IsFileName">
+  <comment> IsFileName -------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id601582204928759">
+    <bookmark_value>String service;IsFileName</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id941580047025136" localize="false">IsFileName</h2>
+  <paragraph role="paragraph" id="par_id41580047039666">Returns <literal>True</literal> if the string is a valid filename in a given operating system.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id521627161235397">
+    <input>svc.IsFileName(inputstr: str, [osname: str]): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id801580047079938"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <paragraph role="paragraph" id="par_id781580047088954"><emph>osname</emph>: The operating system name, as a string. It can be "WINDOWS", "LINUX", "MACOSX" or "SOLARIS".</paragraph>
+  <paragraph role="paragraph" id="par_id991612372824234">The default value is the current operating system on which the script is running.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id291580047101783">MsgBox SF_String.IsFileName("/home/user/Documents/a file name.odt", "LINUX") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id761580047111201">MsgBox SF_String.IsFileName("C:\home\a file name.odt", "LINUX") ' False</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id901580047128532">MsgBox SF_String.IsFileName("C:\home\a file name.odt", "WINDOWS") ' True</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id921627248625144">svc = CreateScriptService("String")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id671627248629099">bas = CreateScriptService("Basic")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id651627248630165">bas.MsgBox(svc.IsFileName("/home/user/Documents/a file name.odt", "LINUX")) # True</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id451627248630094">bas.MsgBox(svc.IsFileName(r"C:\home\a file name.odt", "LINUX")) # False</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id491627248630255">bas.MsgBox(svc.IsFileName(r"C:\home\a file name.odt", "WINDOWS")) # True</paragraph>
+  </pycode>
+</section>
+
+<section id="IsHexDigit">
+  <comment> IsHexDigit ------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id1001582204955266">
+    <bookmark_value>String service;IsHexDigit</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id441580047541078" localize="false">IsHexDigit</h2>
+  <paragraph role="paragraph" id="par_id911580047551929">Returns <literal>True</literal> if all characters in the string are hexadecimal digits.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id141627161371952">
+    <input>svc.IsHexDigit(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id331580047594144"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <paragraph role="paragraph" id="par_id521612377109554">The hexadecimal digits may be prefixed with "0x" or "&amp;H".</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id51580047615488">MsgBox SF_String.IsHexDigit("&amp;H00FF") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id251580047624832">MsgBox SF_String.IsHexDigit("08AAFF10") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id281580047636521">MsgBox SF_String.IsHexDigit("0x18LA22") ' False</paragraph>
+  </bascode>
+</section>
+
+<section id="IsIBAN">
+  <comment> IsIBAN ------------------------------------------------------------------------------------------------ </comment>
+  <bookmark localize="false" branch="index" id="bm_id931582204907784">
+    <bookmark_value>String service;IsIBAN</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id431580840408317" localize="false">IsIBAN</h2>
+  <paragraph role="paragraph" id="par_id791584008420941">Returns <literal>True</literal> if the string is a valid International Bank Account Number (IBAN). The comparison is not case-sensitive.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id291627161741207">
+    <input>svc.IsIBAN(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id951880048466565"> <emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+  <paragraph role="paragraph" id="par_id631619526542367"><literal>True</literal> if the string contains a valid IBAN number.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id71627249022958">' Basic</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id571500848484444">MsgBox SF_String.IsIBAN("BR15 0000 0000 0000 1093 2840 814 P2") ' True</paragraph>
+  </bascode>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id121627249045568"># Python</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id901627249045753">result = svc.IsIBAN("BR15 0000 0000 0000 1093 2840 814 P2") # True</paragraph>
+  </pycode>
+</section>
+
+<section id="IsIPv4">
+  <comment> IsIPv4 ------------------------------------------------------------------------------------------------ </comment>
+  <bookmark localize="false" branch="index" id="bm_id931582204977084">
+    <bookmark_value>String service;IsIPv4</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id431580048408317" localize="false">IsIPv4</h2>
+  <paragraph role="paragraph" id="par_id791580048420941">Returns <literal>True</literal> if the string is a valid IP(v4) address.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id861627161817305">
+    <input>svc.IsIPv4(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id981580048466565"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id571580048484444">MsgBox SF_String.IsIPv4("192.168.1.50") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id871580048493061">MsgBox SF_String.IsIPv4("192.168.50") ' False</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id201580048501038">MsgBox SF_String.IsIPv4("255.255.255.256") ' False</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id831627249268171">svc = CreateScriptService("String")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id981627249268449">bas = CreateScriptService("Basic")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id871627249268596">bas.MsgBox(svc.IsIPv4("192.168.1.50")) # True</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id211627249268763">bas.MsgBox(svc.IsIPv4("192.168.50")) # False</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id571627249268932">bas.MsgBox(svc.IsIPv4("255.255.255.256")) # False</paragraph>
+  </pycode>
+</section>
+
+<section id="IsLike">
+  <comment> IsLike ------------------------------------------------------------------------------------------------ </comment>
+  <bookmark localize="false" branch="index" id="bm_id721582205008767">
+    <bookmark_value>String service;IsLike</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id791580049073672" localize="false">IsLike</h2>
+  <paragraph role="paragraph" id="par_id831580049093038">Returns <literal>True</literal> if the whole input string matches a given pattern containing wildcards.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id951627161917563">
+    <input>svc.IsLike(inputstr: str, pattern: str, [casesensitive: bool]): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id141580049142548"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <paragraph role="paragraph" id="par_id31580049154551"><emph>pattern</emph>: The pattern as a string. Wildcards are:</paragraph>
+  <list type="unordered">
+    <listitem>
+      <paragraph id="par_id181612441703306" role="listitem">"?" represents any single character;</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph role="paragraph" id="par_id861612377611438">"*" represents zero, one, or multiple characters.</paragraph>
+    </listitem>
+  </list>
+  <paragraph role="paragraph" id="par_id991580049206617"><emph>casesensitive</emph>: The search can be case sensitive or not (Default = <literal>False</literal>).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id541580049238484">MsgBox SF_String.IsLike("aAbB", "?A*") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id821580049249434">MsgBox SF_String.IsLike("C:\a\b\c\f.odb", "?:*.*") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id981580049258743">MsgBox SF_String.IsLike("name:host", "?*@?*") ' False</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id821612378053774">MsgBox SF_String.IsLike("@host", "?*@?*") ' False</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id831627249268227">svc = CreateScriptService("String")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id981627249268238">bas = CreateScriptService("Basic")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id871627249268903">bas.MsgBox(svc.IsLike("aAbB", "?A*")) # True</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id211627249268144">bas.MsgBox(svc.IsLike(r"C:\a\b\c\f.odb", "?:*.*")) # True</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id571627249268752">bas.MsgBox(svc.IsLike("name:host", "?*@?*")) # False</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id661627249433231">bas.MsgBox(svc.IsLike("@host", "?*@?*")) # False</paragraph>
+  </pycode>
+</section>
+
+<section id="IsLower">
+  <comment> IsLower ----------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id91582205043650">
+    <bookmark_value>String service;IsLower</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id621580050021403" localize="false">IsLower</h2>
+  <paragraph role="paragraph" id="par_id581580050048679">Returns <literal>True</literal> if all characters in the string are in lowercase. Non-alphabetic characters are ignored.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id901627162072714">
+    <input>svc.IsLower(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id751580050122938"><emph>InputStr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id731580050158022">MsgBox SF_String.IsLower("abc'(-xy4z") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id881580050187982">MsgBox SF_String.IsLower("1234") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id741580050198046">MsgBox SF_String.IsLower("abcDefg") ' False</paragraph>
+  </bascode>
+</section>
+
+<section id="IsPrintable">
+  <comment> IsPrintable ------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id71582205064134">
+    <bookmark_value>String service;IsPrintable</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id51580051636185" localize="false">IsPrintable</h2>
+  <paragraph role="paragraph" id="par_id231580051650488">Returns <literal>True</literal> if all characters in the string are printable.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id581627162139952">
+    <input>svc.IsPrintable(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id721580051706431"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id341580051737598">MsgBox SF_String.IsPrintable("àén ΣlPµ Русский") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id791580051747813">MsgBox SF_String.IsPrintable("First line." &amp; Chr(10) &amp; "Second Line.") ' False</paragraph>
+  </bascode>
+</section>
+
+<section id="IsRegex">
+  <comment> IsRegex ----------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id561582205088656">
+    <bookmark_value>String service;IsRegex</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id11580052383614" localize="false">IsRegex</h2>
+  <paragraph role="paragraph" id="par_id281580052400960">Returns <literal>True</literal> if the whole input string matches a given regular expression.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id581627162222687">
+    <input>svc.IsRegex(inputstr: str, regex: str, [casesensitive: bool]): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+      <paragraph role="paragraph" id="par_id161580052454770"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+      <paragraph role="paragraph" id="par_id581580052467973"><emph>regex</emph>: The regular expression. If empty, the method returns <literal>False</literal>.</paragraph>
+      <paragraph role="paragraph" id="par_id621580052654341"><emph>casesensitive</emph>: The search can be case sensitive or not (Default = <literal>False</literal>).</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+      <bascode>
+        <paragraph role="bascode" localize="false" id="bas_id711580052523722">MsgBox SF_String.IsRegex("aAbB", "[A-Za-z]+") ' True</paragraph>
+        <paragraph role="bascode" localize="false" id="bas_id431580052508625">MsgBox SF_String.IsRegex("John;100", "[A-Za-z]+;[0-9]+") ' True</paragraph>
+        <paragraph role="bascode" localize="false" id="bas_id71580052534405">MsgBox SF_String.IsRegex("John;100;150", "[A-Za-z]+;[0-9]+") ' False</paragraph>
+      </bascode>
+</section>
+
+<section id="IsSheetName">
+  <comment> IsSheetName ------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id901589460240654">
+    <bookmark_value>String service;IsSheetName</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id791589460240472" localize="false">IsSheetName</h2>
+  <paragraph role="paragraph" id="par_id1001589460240467">Returns <literal>True</literal> if the input string is a valid Calc sheet name.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id171627162339798">
+    <input>svc.IsSheetName(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id671589460240552"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id391589460240928">MsgBox SF_String.IsSheetName("1àbc + ""déf""") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id681589460240214">MsgBox SF_String.IsSheetName("[MySheet]") ' False</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id831627249268323">svc = CreateScriptService("String")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id981627249268455">bas = CreateScriptService("Basic")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id871627249268018">bas.MsgBox(svc.IsSheetName("1àbc + ""déf""")) # True</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id211627249268278">bas.MsgBox(svc.IsSheetName("[MySheet]")) # False</paragraph>
+  </pycode>
+  <note id="par_id551612442002823">A sheet name must not contain the characters [ ] * ? : / \ or the character ' (apostrophe) as first or last character.</note>
+</section>
+
+<section id="IsTitle">
+  <comment> IsTitle ----------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id461582205108468">
+    <bookmark_value>String service;IsTitle</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id571580293080317" localize="false">IsTitle</h2>
+  <paragraph role="paragraph" id="par_id371580293093655">Returns <literal>True</literal> if the first character of every word is in uppercase and the other characters are in lowercase.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id741627162408971">
+    <input>svc.IsTitle(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id471580293142283"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id701580293163557">MsgBox SF_String.IsTitle("This Is The Title Of My Book") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id371580293175037">MsgBox SF_String.IsTitle("This is the Title of my Book") ' False</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id1001580293184622">MsgBox SF_String.IsTitle("Result Number 100") ' True</paragraph>
+  </bascode>
+</section>
+
+<section id="IsUpper">
+  <comment> IsUpper ----------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id31582205124227">
+    <bookmark_value>String service;IsUpper</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id341580128661190" localize="false">IsUpper</h2>
+  <paragraph role="paragraph" id="par_id801580128672004">Returns <literal>True</literal> if all characters in the string are in uppercase. Non alphabetic characters are ignored.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id271627162484974">
+    <input>svc.IsUpper(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id391580128736809"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id81580128769670">MsgBox SF_String.IsUpper("ABC'(-XYZ") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id951580128785698">MsgBox SF_String.IsUpper("A Title") ' False</paragraph>
+  </bascode>
+</section>
+
+<section id="IsUrl">
+  <comment> IsUrl ------------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id431582205169135">
+    <bookmark_value>String service;IsUrl</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id211580132006615" localize="false">IsUrl</h2>
+  <paragraph role="paragraph" id="par_id531580132067813">Returns <literal>True</literal> if the string is a valid absolute URL (Uniform Resource Locator) address. Only the http, https and ftp protocols are supported.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id301627162561225">
+    <input>svc.IsUrl(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id321580132113593"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id41580132143630">MsgBox SF_String.IsUrl("http://foo.bar/?q=Test%20URL-encoded%20stuff") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id811580132160302">MsgBox SF_String.IsUrl("www.somesite.org") ' False</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id831627249268852">svc = CreateScriptService("String")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id981627249268254">bas = CreateScriptService("Basic")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id871627249268007">bas.MsgBox(svc.IsUrl("http://foo.bar/?q=Test%20URL-encoded%20stuff")) # True</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id211627249268997">bas.MsgBox(svc.IsUrl("www.somesite.org")) # False</paragraph>
+  </pycode>
+</section>
+
+<section id="IsWhitespace">
+  <comment> IsWhitespace ----------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id551582205196046">
+    <bookmark_value>String service;IsWhitespace</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id401580132462319" localize="false">IsWhitespace</h2>
+  <paragraph role="paragraph" id="par_id41580132491698">Returns <literal>True</literal> if all characters in the string are whitespaces</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id981627162624424">
+    <input>svc.IsWhitespace(inputstr: str): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id801580132535511"><emph>inputstr</emph>: The string to be checked. If empty, the method returns <literal>False</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id71580132555742">MsgBox SF_String.IsWhitespace("    ") ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id191580132564154">MsgBox SF_String.IsWhitespace(" " &amp; Chr(9) &amp; Chr(10)) ' True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id531580132571745">MsgBox SF_String.IsWhitespace("") ' False</paragraph>
+  </bascode>
+</section>
+
+<section id="JustifyCenter">
+  <comment> JustifyCenter ----------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id421582205214600">
+    <bookmark_value>String service;JustifyCenter</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id291580133287288" localize="false">JustifyCenter</h2>
+  <paragraph role="paragraph" id="par_id891580133307100">Returns the input string center-justified.</paragraph>
+  <paragraph role="paragraph" id="par_id571612380829021">The leading and trailing white spaces are stripped and the remaining characters are completed left and right up to a specified total <literal>length</literal> with the character <literal>padding</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id911627162696565">
+    <input>svc.JustifyCenter(inputstr: str, [length: int], [padding: str]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id911580133391827"><emph>inputstr</emph>: The string to be center-justified. If empty, the method returns an empty string.</paragraph>
+  <paragraph role="paragraph" id="par_id671580133694946"><emph>length</emph>: The length of the resulting string (default = the length of the input string).</paragraph>
+  <paragraph role="paragraph" id="par_id511612381090109">If the specified length is shorter than the center-justified input string, then the returned string is truncated.</paragraph>
+  <paragraph role="paragraph" id="par_id101580133705268"><emph>padding</emph>: The single character to be used as padding (default = the Ascii space " ").</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id121580133437963">MsgBox SF_String.JustifyCenter("Title", Length := 11) ' "   Title   "</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id701580133452083">MsgBox SF_String.JustifyCenter("    ABCDEF", Padding := "_") ' "__ABCDEF__"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id841580133480737">MsgBox SF_String.JustifyCenter("A Long Title", Length := 5) ' "ong T"</paragraph>
+  </bascode>
+</section>
+
+<section id="JustifyLeft">
+  <comment> JustifyLeft ------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id351582205243403">
+    <bookmark_value>String service;JustifyLeft</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id51580135447561" localize="false">JustifyLeft</h2>
+  <paragraph role="paragraph" id="par_id911580135466348">Returns the input string left-justified.</paragraph>
+  <paragraph role="paragraph" id="par_id431612381917641">The leading white spaces are stripped and the remaining characters are completed to the right up to a specified total <literal>length</literal> with the character <literal>padding</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id551627162821330">
+    <input>svc.JustifyLeft(inputstr: str, [length: int], [padding: str]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id281580135523448"><emph>inputstr</emph>: The string to be left-justified. If empty, the method returns an empty string.</paragraph>
+  <paragraph role="paragraph" id="par_id431580135534910"><emph>length</emph>: The length of the resulting string (default = the length of the input string).</paragraph>
+  <paragraph role="paragraph" id="par_id161612381664182">If the specified length is shorter than the left-justified input string, then the returned string is truncated.</paragraph>
+  <paragraph role="paragraph" id="par_id221580135568475"><emph>padding</emph>: The single character to be used as padding (default = the Ascii space " ").</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id611580135592267">MsgBox SF_String.JustifyLeft("Title", Length := 10) ' "Title     "</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id131580135610150">MsgBox SF_String.JustifyLeft("    ABCDEF", Padding := "_") ' "ABCDEF____"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id441580135619176">MsgBox SF_String.JustifyLeft("A Long Title", Length := 5) ' "A Lon"</paragraph>
+  </bascode>
+</section>
+
+<section id="JustifyRight">
+  <comment> JustifyRight ------------------------------------------------------------------------------------------ </comment>
+  <bookmark localize="false" branch="index" id="bm_id401582205265380">
+    <bookmark_value>String service;JustifyRight</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id651580136079149" localize="false">JustifyRight</h2>
+  <paragraph role="paragraph" id="par_id821580136091225">Returns the input string right-justified.</paragraph>
+  <paragraph role="paragraph" id="par_id771612382000293">The leading white spaces are stripped and the remaining characters are completed to the left up to a specified total <literal>length</literal> with the character <literal>padding</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id161627162950390">
+    <input>svc.JustifyRight(inputstr: str, [length: int], [padding: str]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id201580136154170"><emph>inputstr</emph>: The string to be right-justified. If empty, the method returns an empty string.</paragraph>
+  <paragraph role="paragraph" id="par_id71580136164632"><emph>length</emph>: The length of the resulting string (default = the length of the input string).</paragraph>
+  <paragraph role="paragraph" id="par_id191612381732163">If the specified length is shorter than the right-justified input string, then the returned string is truncated.</paragraph>
+  <paragraph role="paragraph" id="par_id751580136200680"><emph>padding</emph>: The single character to be used as padding (default = the Ascii space " ").</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id791580136219992">MsgBox SF_String.JustifyRight("Title", Length := 10) ' "     Title"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id751580136242414">MsgBox SF_String.JustifyRight("  ABCDEF  ", Padding := "_") ' "____ABCDEF"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id861580136253164">MsgBox SF_String.JustifyRight("A Long Title", Length := 5) ' "Title"</paragraph>
+  </bascode>
+</section>
+
+<section id="Quote">
+  <comment> Quote ------------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id241582205281048">
+    <bookmark_value>String service;Quote</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id741580136875363" localize="false">Quote</h2>
+  <paragraph role="paragraph" id="par_id251580136888958">Returns the input string enclosed in single or double quotes. Existing quotes are left unchanged, including leading and/or trailing quotes.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id321627163052678">
+    <input>svc.Quote(inputstr: str, [quotechar: str]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id811580136944674"><emph>inputstr</emph>: The string to quote.</paragraph>
+  <paragraph role="paragraph" id="par_id581599129397412"><emph>quotechar</emph>: Either the single (') or double (") quote (default).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id171580136967087">MsgBox SF_String.Quote("Text Value")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id331612442671018">' "Text Value"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id291580136977341">MsgBox SF_String.Quote("Book Title: ""The Arabian Nights""", "'")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id111612442632444">' 'Book Title: "The Arabian Nights"'</paragraph>
+  </bascode>
+  <tip id="par_id911612382537087">This method can be useful while preparing a string field to be stored in a csv-like file, which requires that text values be enclosed with single or double quotes.</tip>
+</section>
+
+<section id="ReplaceChar">
+  <comment> ReplaceChar ------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id971582205313633">
+    <bookmark_value>String service;ReplaceChar</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id171580139110167" localize="false">ReplaceChar</h2>
+  <paragraph role="paragraph" id="par_id951580139124650">Replaces all occurrences of the characters specified in the <literal>Before</literal> parameter by the corresponding characters specified in <literal>After</literal>.</paragraph>
+  <paragraph role="paragraph" id="par_id1001612384040018">If the length of <literal>Before</literal> is greater than the length of <literal>After</literal>, the residual characters in <literal>Before</literal> are replaced by the last character in <literal>After</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id191627163199236">
+    <input>svc.ReplaceChar(inputstr: str, before: str, after: str): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id11580139160633"><emph>inputstr</emph>: The input string on which replacements will occur.</paragraph>
+  <paragraph role="paragraph" id="par_id111580139169795"><emph>before</emph>: A string with the characters that will be searched in the input string for replacement.</paragraph>
+  <paragraph role="paragraph" id="par_id851580139182113"><emph>after</emph>: A string with the new characters that will replace those defined in <literal>before</literal>.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" id="bas_id921580139218457">' Replaces accented characters</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id281580139228929">MsgBox SF_String.ReplaceChar("Protégez votre vie privée", "àâãçèéêëîïôöûüýÿ", "aaaceeeeiioouuyy")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id361612384219658">' "Protegez votre vie privee"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id201580139288120">MsgBox SF_String.ReplaceChar("Protégez votre vie privée", "àâãçèéêëîïôöûüýÿ", "")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id401612443219105">' "Protgez votre vie prive"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id661580139301417">MsgBox SF_String.ReplaceChar("àâãçèéêëîïôöûüýÿ", "àâãçèéêëîïôöûüýÿ", "aaaceeeeiioouuyy")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id621612443248643">' "aaaceeeeiioouuyy"</paragraph>
+  </bascode>
+  <paragraph role="paragraph" id="par_id151612442904499">The <literal>SF_String</literal> service provides useful public constants for the Latin character sets, as shown in the example below:</paragraph>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id621580139272513">MsgBox SF_String.ReplaceChar("Protégez votre vie privée", SF_String.CHARSWITHACCENT, SF_String.CHARSWITHOUTACCENT)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id551612443170894">' "Protegez votre vie privee"</paragraph>
+  </bascode>
+</section>
+
+<section id="ReplaceRegex">
+  <comment> ReplaceRegex ------------------------------------------------------------------------------------------ </comment>
+  <bookmark localize="false" branch="index" id="bm_id541582205335970">
+    <bookmark_value>String service;ReplaceRegex</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id491580140260181" localize="false">ReplaceRegex</h2>
+  <paragraph role="paragraph" id="par_id671580140272818">Replaces all occurrences of a given regular expression by a new string.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id21627163307092">
+    <input>svc.ReplaceRegex(inputstr: str, regex: str, newstr: str, [casesensitive: bool]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id471580140311626"><emph>inputstr</emph>: The input string on which replacements will occur.</paragraph>
+  <paragraph role="paragraph" id="par_id651580140322666"><emph>regex</emph>: The regular expression.</paragraph>
+  <paragraph role="paragraph" id="par_id891580140334754"><emph>newstr</emph>: The replacing string.</paragraph>
+  <paragraph role="paragraph" id="par_id581580140345221"><emph>casesensitive</emph>: The search can be case sensitive or not (Default = <literal>False</literal>).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id151580140386767">MsgBox SF_String.ReplaceRegex("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", "[a-z]", "x", CaseSensitive := True)</paragraph>
+    <paragraph role="bascode" id="bas_id961612384647003">' "Lxxxx xxxxx xxxxx xxx xxxx, xxxxxxxxxxx xxxxxxxxxx xxxx." (each lowercase letter is replaced by "x")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id11580140400163">MsgBox SF_String.ReplaceRegex("Lorem ipsum dolor sit amet, consectetur adipiscing elit.", "\b[a-z]+\b", "x", CaseSensitive := False)</paragraph>
+    <paragraph role="bascode" id="bas_id751612384623936">' "x x x x x, x x x." (each word is replaced by "x")</paragraph>
+  </bascode>
+</section>
+
+<section id="ReplaceStr">
+  <comment> ReplaceStr -------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id751582205356816">
+    <bookmark_value>String service;ReplaceStr</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id701580146458127" localize="false">ReplaceStr</h2>
+  <paragraph role="paragraph" id="par_id51580146471894">Replaces in a string some or all occurrences of an array of strings by an array of new strings.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id521627163432097">
+    <input>svc.ReplaceStr(inputstr: str, oldstr: str, newstr: str, [occurrences: int], [casesensitive: bool]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id831580146504326"><emph>inputstr</emph>: The input string on which replacements will occur.</paragraph>
+  <paragraph role="paragraph" id="par_id411580146514927"><emph>oldstr</emph>: A single string or an array of strings. Zero-length strings are ignored.</paragraph>
+  <paragraph role="paragraph" id="par_id591580146532966"><emph>newstr</emph>: The replacing string or the array of replacing strings.</paragraph>
+  <paragraph role="paragraph" id="par_id611612384873347">If <literal>oldstr</literal> is an array, each occurrence of any of the items in <literal>oldstr</literal> is replaced by <literal>newstr</literal>.</paragraph>
+  <paragraph role="paragraph" id="par_id611612384880820">If <literal>oldstr</literal> and <literal>newstr</literal> are arrays, replacements occur one by one up to the <literal>UBound(newstr)</literal>.</paragraph>
+  <paragraph role="paragraph" id="par_id241612385058264">If <literal>oldstr</literal> has more entries than <literal>newstr</literal>, then the residual elements in <literal>oldstr</literal> are replaced by the last element in <literal>newstr</literal>.</paragraph>
+  <paragraph role="paragraph" id="par_id701580146547619"><emph>occurrences</emph>: The maximum number of replacements. The default value is 0, meaning that all occurrences will be replaced.</paragraph>
+  <paragraph role="paragraph" id="par_id741612385380533">When <literal>oldstr</literal> is an array, the <literal>occurrence</literal> parameter is computed separately for each item in the array.</paragraph>
+  <paragraph role="paragraph" id="par_id301580146556599"><emph>casesensitive</emph>: The search can be case sensitive or not (Default = <literal>False</literal>).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id481580146574037">MsgBox SF_String.ReplaceStr("100 xxx 200 yyy", Array("xxx", "yyy"), Array("(1)", "(2)"), CaseSensitive := False)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id511612385563994">' "100 (1) 200 (2)"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id151580146611738">MsgBox SF_String.ReplaceStr("abCcdefghHij", Array("c", "h"), Array("Y", "Z"), CaseSensitive := False)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id491612385543543">' "abYYdefgZZij"</paragraph>
+  </bascode>
+</section>
+
+<section id="Represent">
+  <comment> Represent --------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id151582205374090">
+    <bookmark_value>String service;Represent</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id581580147543150" localize="false">Represent</h2>
+  <paragraph role="paragraph" id="par_id901580147558931">Returns a string with a readable representation of the argument, truncated at a given length. This is useful mainly for debugging or logging purposes.</paragraph>
+  <paragraph role="paragraph" id="par_id11612386054691">If the <literal>anyvalue</literal> parameter is an object, it will be enclosed with square brackets "[" and "]".</paragraph>
+  <paragraph role="paragraph" id="par_id491612386081802">In strings, tabs and line breaks are replaced by \t, \n or \r.</paragraph>
+  <paragraph role="paragraph" id="par_id921612386089103">If the final length exceeds the <literal>maxlength</literal> parameter, the latter part of the string is replaced by " ... (N)" where N is the total length of the original string before truncation.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id711627163695452">
+    <input>svc.Represent(anyvalue: any, [maxlength: int]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id91580147593626"><emph>anyvalue</emph>: The input value to be represented. It can be any value, such as a string, an array, a Basic object, a UNO object, etc.</paragraph>
+  <paragraph role="paragraph" id="par_id811580147609322"><emph>maxlength</emph>: The maximum length of the resulting string. The default value is 0, meaning there is no limit to the length of the resulting representation.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id931580147637178">MsgBox SF_String.Represent("this is a usual string") ' "this is a usual string"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id701580147646290">MsgBox SF_String.Represent("this is a usual string", 15) ' "this i ... (22)"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id1001580147656762">MsgBox SF_String.Represent("this is a" &amp; Chr(10) &amp; " 2-lines string") ' "this is a\n 2-lines string"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id661580147668170">MsgBox SF_String.Represent(Empty) ' "[EMPTY]"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id941580147685721">MsgBox SF_String.Represent(Null) ' "[NULL]"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id531580147702074">MsgBox SF_String.Represent(Pi) ' "3.142"</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id461580147719545">MsgBox SF_String.Represent(CreateUnoService("com.sun.star.util.PathSettings")) ' "[com.sun.star.comp.framework.PathSettings]"</paragraph>
+  </bascode>
+  <paragraph role="paragraph" id="par_id641612386659292">Note that the representation of data types such as Arrays and <literal>ScriptForge.Dictionary</literal> object instances include both the data type and their values:</paragraph>
+  <bascode>
+    <paragraph role="bascode" id="bas_id971612386906463">' An example with a Basic built-in Array</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id401580147734722">MsgBox SF_String.Represent(Array(1, 2, "Text" &amp; Chr(9) &amp; "here"))</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id311612386778843">' "[ARRAY] (0:2) (1, 2, Text\there)"</paragraph>
+    <paragraph role="bascode" id="bas_id401612386876329">' An example with a ScriptForge Array</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id621612386824731">Dim aValues as Variant</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id771612386825586">aValues = SF_Array.RangeInit(1, 5)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id841612386825825">MsgBox SF_String.Represent(aValues)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id121612386864144">' "[ARRAY] (0:4) (1.0, 2.0, 3.0, 4.0, 5.0)"</paragraph>
+    <paragraph role="bascode" id="bas_id551612386931680">' An example with a ScriptForge Dictionary</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id951580147750109">Dim myDict As Variant : myDict = CreateScriptService("Dictionary")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id701580147765158">myDict.Add("A", 1) : myDict.Add("B", 2)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id921580147782281">MsgBox SF_String.Represent(myDict)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id911612386800415">' "[Dictionary] ("A":1, "B":2)"</paragraph>
+  </bascode>
+</section>
+
+<section id="Reverse">
+  <comment> Reverse ---------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id111582205394632">
+    <bookmark_value>String service;Reverse</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id781580312915849" localize="false">Reverse</h2>
+  <paragraph role="paragraph" id="par_id411580312925741">Returns the input string in reversed order.</paragraph>
+  <paragraph role="paragraph" id="par_id141612387177873">This method is equivalent to the built-in <link href="text/sbasic/shared/03120412.xhp" name="StrReverse function"><literal>StrReverse</literal> Basic function</link>.</paragraph>
+  <note id="par_id961612387463144">To use the <literal>StrReverse</literal> function, the statement <literal>Option VBASupport 1</literal> must be present in the module.</note>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id951627163820097">
+    <input>svc.Reverse(inputstr: str): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id241580312964497"><emph>inputstr</emph>: The string to be reversed.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id671580313005541">MsgBox SF_String.Reverse("abcdefghij") ' "jihgfedcba"</paragraph>
+  </bascode>
+</section>
+
+<section id="SplitLines">
+  <comment> SplitLines -------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id681582205412371">
+    <bookmark_value>String service;SplitLines</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id111580210751549" localize="false">SplitLines</h2>
+  <paragraph role="paragraph" id="par_id721580210762286">Returns a zero-based array of strings with the lines in the input string. Each item in the array is obtained by splitting the input string at newline characters.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id491627163897526">
+    <input>svc.SplitLines(inputstr: str, [keepbreaks: int]): str[0..*]</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id481580210806878"><emph>inputstr</emph>: The string to be split.</paragraph>
+  <paragraph role="paragraph" id="par_id231580210820309"><emph>keepbreaks</emph>: When <literal>True</literal>, line breaks are preserved in the output array (default = <literal>False</literal>).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id301580210850100">Dim a as Variant</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id561580210860646">a = SF_String.SplitLines("Line1" &amp; Chr(10) &amp; "Line2" &amp; Chr(13) &amp; "Line3")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id661612387860556">' a = Array("Line1", "Line2", "Line3")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id791580210888116">a = SF_String.SplitLines("Line1" &amp; Chr(10) &amp; "Line2" &amp; Chr(13) &amp; "Line3" &amp; Chr(10))</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id701612387837745">' a = Array("Line1", "Line2", "Line3", "")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id451580210958405">a = SF_String.SplitLines("Line1" &amp; Chr(10) &amp; "Line2" &amp; Chr(13) &amp; "Line3" &amp; Chr(10), KeepBreaks := True)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id591612387824058">' a = Array("Line1\n", "Line2\r", "Line3\n", "")</paragraph>
+  </bascode>
+</section>
+
+<section id="SplitNotQuoted">
+  <comment> SplitNotQuoted ---------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id531582205451718">
+    <bookmark_value>String service;SplitNotQuoted</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id131580211748939" localize="false">SplitNotQuoted</h2>
+  <paragraph role="paragraph" id="par_id471580211762739">Splits a string into an array of elements using a specified delimiter.</paragraph>
+  <paragraph role="paragraph" id="par_id281612388034501">If a quoted substring contains a delimiter, it is ignored. This is useful when parsing CSV-like records that contain quoted strings.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id261627164043199">
+    <input>svc.SplitNotQuoted(inputstr: str, [delimiter: str], [occurrences: int], [quotechar: str]): str[0..*]</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id881580211809490"><emph>inputstr</emph>: The string to be split.</paragraph>
+  <paragraph role="paragraph" id="par_id811580211821162"><emph>delimiter</emph>: A string of one or more characters that will be used as delimiter. The default delimiter is the Ascii space " " character.</paragraph>
+  <paragraph role="paragraph" id="par_id181580211833778"><emph>occurrences</emph>: The maximum number of substrings to return. The default value is 0, meaning that there is no limit to the number of returned strings.</paragraph>
+  <paragraph role="paragraph" id="par_id421599123777334"><emph>quotechar</emph>: Either the single (') or double (") quote.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id511580211876156">arr1 = SF_String.SplitNotQuoted("abc def ghi")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id581580211857403">' arr1 = Array("abc", "def", "ghi")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id711580211886107">arr2 = SF_String.SplitNotQuoted("abc,""def,ghi""", ",")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id111580211865432">' arr2 = Array("abc", """def,ghi""")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id101580211896350">arr3 = SF_String.SplitNotQuoted("abc,""def\"",ghi""", ",")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id351612388312049"> ' arr3 = Array("abc", """def\"",ghi""")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id591580211905379">arr4 = SF_String.SplitNotQuoted("abc,""def\"",ghi"""",", ",")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id691580211914228">' arr4 = Array("abc", """def\"",ghi""", "")</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id831627249262582">svc = CreateScriptService("String")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id981627249260364">arr1 = svc.SplitNotQuoted('abc def ghi')</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id871627249262177"># arr1 = ('abc', 'def', 'ghi')</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id211627249269827">arr2 = svc.SplitNotQuoted('abc,"def,ghi"', ",")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id11627251280871"># arr2 = ('abc', '"def,ghi"')</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id681627251281232">arr3 = svc.SplitNotQuoted(r'abc,"def\",ghi"', ",")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id291627251281439"># arr3 = ('abc', '"def\\",ghi"')</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id81627251281671">arr4 = svc.SplitNotQuoted(r'abc,"def\",ghi"",', ",")</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id601627251281871"># arr4 = ('abc', '"def\\",ghi""', '')</paragraph>
+  </pycode>
+  <note id="par_id661627251379676">Beware of the differences between Basic and Python when representing strings. For example, in Basic two "" characters inside a string are interpreted as a single " character. In Python, strings enclosed with single quotes can contain " characters without having to double them.</note>
+</section>
+
+<section id="StartsWith">
+  <comment> StartsWith -------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id521582205468821">
+    <bookmark_value>String service;StartsWith</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id121580212826111" localize="false">StartsWith</h2>
+  <paragraph role="paragraph" id="par_id771580212837884">Returns <literal>True</literal> if the first characters of a string are identical to a given substring.</paragraph>
+  <paragraph role="paragraph" id="par_id781612393174350">This method returns <literal>False</literal> if either the input string or the substring have a length = 0 or when the substring is longer than the input string.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id211627164196721">
+    <input>svc.StartsWith(inputstr: str, substring: str, [casesensitive: bool]): bool</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id271580212876135"><emph>inputstr</emph>: The string to be tested.</paragraph>
+  <paragraph role="paragraph" id="par_id571580212889462"><emph>substring</emph>: The substring to be searched at the start of <literal>inputstr</literal>.</paragraph>
+  <paragraph role="paragraph" id="par_id811580212900799"><emph>casesensitive</emph>: The search can be case sensitive or not (Default = <literal>False</literal>).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id581580212931342">MsgBox SF_String.StartsWith("abcdefg", "ABC") 'True</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id491580212940539">MsgBox SF_String.StartsWith("abcdefg", "ABC", CaseSensitive := True) 'False</paragraph>
+  </bascode>
+</section>
+
+<section id="TrimExt">
+  <comment> TrimExt ----------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id461582205488207">
+    <bookmark_value>String service;TrimExt</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id191580295988498" localize="false">TrimExt</h2>
+  <paragraph role="paragraph" id="par_id911580295999690">Returns the input string without its leading and trailing whitespaces.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id241627164299510">
+    <input>svc.TrimExt(inputstr: str): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id541580296044377"><emph>inputstr</emph>: The string to trim.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id231580296079929">MsgBox SF_String.TrimExt(" Some text.  ") ' "Some text."</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id871580296091857">MsgBox SF_String.TrimExt("   ABCDEF" &amp; Chr(9) &amp; Chr(10) &amp; Chr(13) &amp; " ") ' "ABCDEF"</paragraph>
+  </bascode>
+</section>
+
+<section id="Unescape">
+  <comment> Unescape ---------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id651582205521725">
+    <bookmark_value>String service;Unescape</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id831580483080098" localize="false">Unescape</h2>
+  <paragraph role="paragraph" id="par_id61580483096936">Converts any escaped sequence (\\, \n, \r, \t) in the input string to their corresponding Ascii character.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id51627164365699">
+    <input>svc.Unescape(inputstr: str): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id971580483124743"><emph>inputstr</emph>: The string to be converted.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id601580483196328">MsgBox SF_String.Unescape("abc\n\tdef\\n")</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id261580483205906">' "abc" &amp; Chr(10) &amp; Chr(9) &amp; "def\n"</paragraph>
+  </bascode>
+</section>
+
+<section id="Unquote">
+  <comment> Unquote ----------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id471582205541341">
+    <bookmark_value>String service;Unquote</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id481580213622428" localize="false">Unquote</h2>
+  <paragraph role="paragraph" id="par_id831580213634029">Removes the single or double quotes enclosing the input string.</paragraph>
+  <paragraph role="paragraph" id="par_id811612393585600">This is useful when parsing CSV-like records that contain quoted strings.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id391627164432930">
+    <input>svc.Unquote(inputstr: str, [quotechar: str]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id761580213677493"><emph>inputstr</emph>: The string to unquote.</paragraph>
+  <paragraph role="paragraph" id="par_id211599129509890"><emph>quotechar</emph>: Either the single (') or double (") quote (default).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id371580213703732">Dim s as String</paragraph>
+    <paragraph role="bascode" id="bas_id371580213702598">' s = "Some text" (without enclosing quotes)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id981580213799125">s = SF_String.Unquote("""Some text""")</paragraph>
+    <paragraph role="bascode" id="bas_id51580213693694">' The string below does not have enclosing quotes, so it remains unchanged</paragraph>
+    <paragraph role="bascode" id="bas_id961612393917830">' s = "Some text" (unchanged)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id961612393917927">s = SF_String.Unquote("Some text")</paragraph>
+    <paragraph role="bascode" id="bas_id461612394182689">' Quotes inside the string are not removed</paragraph>
+    <paragraph role="bascode" id="bas_id961612394171208">' s = "The ""true"" meaning" (unchanged)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id961612394171186">s = SF_String.Unquote("The ""true"" meaning")</paragraph>
+  </bascode>
+</section>
+
+<section id="Wrap">
+  <comment> Wrap ------------------------------------------------------------------------------------------------- </comment>
+  <bookmark localize="false" branch="index" id="bm_id321585834468367">
+    <bookmark_value>String service;Wrap</bookmark_value>
+  </bookmark>
+  <h2 id="hd_id911585834468456" localize="false">Wrap</h2>
+  <paragraph role="paragraph" id="par_id871585834468102">Converts the input string into an array of substrings so that each item in the array has at most a given number of characters.</paragraph>
+  <paragraph role="paragraph" id="par_id21612394465120">In practice, this method returns a zero-based array of output lines, without newlines at the end, except for the pre-existing line-breaks.</paragraph>
+  <paragraph role="paragraph" id="par_id601612395193333">Tabs are expanded using the same procedure performed by the <link href="text/sbasic/shared/03/sf_string.xhp#ExpandTabs" name="ExpandTabs method">ExpandTabs</link> method.</paragraph>
+  <paragraph role="paragraph" id="par_id641612394826616"> Symbolic line breaks are replaced by their equivalent Ascii characters.</paragraph>
+  <paragraph role="paragraph" id="par_id361612394859733">If the wrapped output has no content, the returned array is empty.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id41627164529595">
+    <input>svc.Wrap(inputstr: str, [width: int], [tabsize: int]): str</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph role="paragraph" id="par_id251585834468498"><emph>inputstr</emph>: The string to wrap.</paragraph>
+  <paragraph role="paragraph" id="par_id351585834773177"><emph>width</emph>: The maximum number of characters in each line (Default = 70).</paragraph>
+  <paragraph role="paragraph" id="par_id741585834874500"><emph>tabsize</emph>: Before wrapping the text, the existing TAB <literal>Chr(9)</literal> characters are replaced with spaces. The argument <literal>tabsize</literal> defines the TAB stops at TabSize + 1, 2 * TabSize + 1 , ... N * TabSize + 1 (Default = 8).</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id461585835162853">a = "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id891585835170534">b = SF_String.Wrap(a, 20)</paragraph>
+    <paragraph role="bascode" localize="false" id="bas_id191585835179883">' Array("Neque porro ", "quisquam est qui ", "dolorem ipsum quia ", "dolor sit amet, ", "consectetur, ", "adipisci velit...")</paragraph>
+  </bascode>
+  <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id221627251731306">a = "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id411627251731572">b = svc.Wrap(a, 20)</paragraph>
+    <paragraph role="pycode" localize="false" id="pyc_id921627251731739"># ('Neque porro ', 'quisquam est qui ', 'dolorem ipsum quia ', 'dolor sit amet, ', 'consectetur, ', 'adipisci velit...')</paragraph>
+  </pycode>
+</section>
+
+  <embed href="text/sbasic/shared/03/lib_ScriptForge.xhp#SF_InternalUse"/>
+
+  <section id="relatedtopics">
+    <embed href="text/sbasic/shared/03/sf_array.xhp#ArrayService"/>
+    <embed href="text/sbasic/shared/03120202.xhp#String_h1"/>
+  </section>
+</body>
+</helpdocument>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpress0213100000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Exit all Groups</title>
+<filename>/text/simpress/02/13100000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+
+
+  <section id="exit_all_groups">
+<bookmark branch="hid/.uno:LeaveAllGroups" xml-lang="en-US" id="bm_id3159155" localize="false"/>
+<h1 id="hd_id3153188"><link href="text/simpress/02/13100000.xhp" name="Exit all Groups">Exit all Groups</link></h1>
+  <paragraph role="paragraph" id="par_id3150011" xml-lang="en-US"><ahelp hid=".uno:LeaveAllGroups" visibility="visible">Exits all groups and returns to normal view.</ahelp></paragraph>
+  </section>
+  <section id="syexit_all_groups">
+  <table id="tbl_id3154015">
+
+
+
+    <tablerow>
+     <tablecell>
+      <paragraph role="paragraph" id="par_id3155443" xml-lang="en-US"><image src="cmd/sc_leaveallgroups.png" id="img_id3154757" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3154757">Icon Exit all groups</alt></image></paragraph>
+     </tablecell>
+     <tablecell>
+      <paragraph role="paragraph" id="par_id3149019" xml-lang="en-US">Exit all groups</paragraph>
+     </tablecell>
+    </tablerow>
+
+  </table>
+  </section>
+
+ </body>
+</helpdocument>

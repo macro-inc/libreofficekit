@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared0106130100xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Change Password</title>
+<filename>/text/sbasic/shared/01/06130100.xhp</filename>
+</topic>
+</meta>
+<body><paragraph role="heading" id="hd_id3159399" xml-lang="en-US" level="1">Change Password</paragraph>
+<paragraph role="paragraph" id="par_id3150276" xml-lang="en-US"><ahelp hid="svx/ui/passwd/PasswordDialog">Protects the selected library with a password.</ahelp> You can enter a new password, or change the current password.</paragraph>
+<paragraph role="heading" id="hd_id3154285" xml-lang="en-US" level="2">Old password</paragraph>
+<paragraph role="heading" id="hd_id3153665" xml-lang="en-US" level="3">Password</paragraph>
+<paragraph role="paragraph" id="par_id3155628" xml-lang="en-US"><ahelp hid="svx/ui/passwd/oldpassEntry">Enter the current password for the selected library.</ahelp></paragraph>
+<paragraph role="heading" id="hd_id3153126" xml-lang="en-US" level="2">New password</paragraph>
+<paragraph role="heading" id="hd_id3153628" xml-lang="en-US" level="3">Password</paragraph>
+<paragraph role="paragraph" id="par_id3159413" xml-lang="en-US"><ahelp hid="svx/ui/passwd/newpassEntry">Enter a new password for the selected library.</ahelp></paragraph>
+<paragraph role="heading" id="hd_id3148947" xml-lang="en-US" level="3">Confirm</paragraph>
+<paragraph role="paragraph" id="par_id3149457" xml-lang="en-US"><ahelp hid="svx/ui/passwd/confirmpassEntry">Repeat the new password for the selected library.</ahelp><comment>i66515</comment></paragraph>
+</body>
+</helpdocument>

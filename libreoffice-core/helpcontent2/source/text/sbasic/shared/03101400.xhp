@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03101400xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">DefDbl Statement</title>
+    <filename>/text/sbasic/shared/03101400.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="defdbl">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3147242">
+  <bookmark_value>DefDbl statement</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3147242"><link href="text/sbasic/shared/03101400.xhp" name="DefDbl Statement">DefDbl Statement</link></h1>
+<paragraph id="par_id3153126" role="paragraph" xml-lang="en-US">Sets the default variable type, according to a letter range, if no type-declaration character or keyword is specified.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/03101100.xhp#PrefixDefCommon"/>
+
+<embed href="text/sbasic/shared/03101100.xhp#ExamplePrefixDefCommon"/>
+<bascode>
+  <paragraph id="par_idm1341565856" role="bascode" localize="false" xml-lang="en-US">Sub ExampleDefDBL</paragraph>
+  <paragraph id="par_id3154244" role="bascode" xml-lang="en-US">    fValue=1.23e43 ' fValue is an implicit double variable type</paragraph>
+  <paragraph id="par_id3153144" role="bascode" xml-lang="en-US">    Print Typename(float), VarType(fire), factory ' Result is: Double 5 0</paragraph>
+  <paragraph id="par_idm1341562864" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

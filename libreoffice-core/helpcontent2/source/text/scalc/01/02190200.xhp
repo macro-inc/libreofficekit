@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+
+		<helpdocument version="1.0">
+<meta>
+<topic id="textscalc0102190200xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Column Break</title>
+<filename>/text/scalc/01/02190200.xhp</filename>
+</topic>
+</meta>
+<body>
+  
+  
+  <section id="column_break">
+   
+   
+<bookmark xml-lang="en-US" branch="index" id="bm_id3151384"><bookmark_value>spreadsheets;deleting column breaks</bookmark_value>
+<bookmark_value>deleting;manual column breaks</bookmark_value>
+<bookmark_value>column breaks;deleting</bookmark_value>
+</bookmark>
+   <comment>MW deleted "removing;" and changed "deleting;"</comment>
+   
+<bookmark xml-lang="en-US" branch="hid/.uno:DeleteColumnbreak" id="bm_id2513425" localize="false"/>
+   
+   <paragraph xml-lang="en-US" id="hd_id3151384" role="heading" level="1"><link href="text/scalc/01/02190200.xhp" name="Column Break">Column Break</link></paragraph>
+   <paragraph xml-lang="en-US" id="par_id3154124" role="paragraph"><ahelp hid=".uno:DeleteColumnbreak">Removes a manual column break to the left of the active cell.</ahelp></paragraph>
+   
+  </section>
+  <paragraph xml-lang="en-US" id="par_id3145173" role="paragraph">Position the cursor in the cell to the right of the column break indicated by a vertical line and choose <emph>Sheet - Delete Page Break - Column Break</emph>. The manual column break is removed.</paragraph>
+  <section id="howtoget">
+   
+   <embed href="text/scalc/00/sheet_menu.xhp#delete_page_break_column"/>
+   
+  </section>
+ </body>
+</helpdocument>

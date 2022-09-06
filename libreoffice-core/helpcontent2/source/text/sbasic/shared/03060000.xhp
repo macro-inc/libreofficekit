@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03060000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Logical Operators</title>
+<filename>/text/sbasic/shared/03060000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+
+  <section id="logi">
+  <h1 id="hd_id3147559"><variable id="BoolOper_h1"><link href="text/sbasic/shared/03060000.xhp" name="Logical Operators">Logical Operators</link></variable></h1>
+  <paragraph role="paragraph" id="par_id3153379" xml-lang="en-US">The following logical operators are supported by $[officename] Basic.</paragraph>
+  </section>
+
+  <paragraph role="paragraph" id="par_id3154138" xml-lang="en-US">Logical operators combine (bitwise) the contents of two expressions or variables, for example, to test if specific bits are set or not.</paragraph>
+  <embed href="text/sbasic/shared/03060100.xhp#and"/>
+  <embed href="text/sbasic/shared/03060200.xhp#eqv"/>
+  <embed href="text/sbasic/shared/03060300.xhp#imp"/>
+  <embed href="text/sbasic/shared/03060400.xhp#not"/>
+  <embed href="text/sbasic/shared/03060500.xhp#or"/>
+  <embed href="text/sbasic/shared/03060600.xhp#xor"/>
+
+  <section id="relatedtopics">
+    <embed href="text/sbasic/shared/03070000.xhp#MathOper_h1"/>
+    <embed href="text/sbasic/shared/03110100.xhp#CompOper_h1"/>
+  </section>
+
+ </body>
+</helpdocument>

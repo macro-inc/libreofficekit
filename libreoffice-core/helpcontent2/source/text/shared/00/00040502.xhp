@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+    <!--
+    * This file is part of the LibreOffice project.
+    *
+    * This Source Code Form is subject to the terms of the Mozilla Public
+    * License, v. 2.0. If a copy of the MPL was not distributed with this
+    * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    *
+    * This file incorporates work covered by the following license notice:
+    *
+    *   Licensed to the Apache Software Foundation (ASF) under one or more
+    *   contributor license agreements. See the NOTICE file distributed
+    *   with this work for additional information regarding copyright
+    *   ownership. The ASF licenses this file to you under the Apache
+    *   License, Version 2.0 (the "License"); you may not use this file
+    *   except in compliance with the License. You may obtain a copy of
+    *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+    -->
+
+    <meta>
+        <topic id="textshared0000040502xml" indexer="exclude">
+            <title id="tit">Format Menu</title>
+            <filename>/text/shared/00/00040502.xhp</filename>
+        </topic>
+    </meta>
+    <body>
+    <comment>This listing is split over the files 00040500, 00040501, 00040502 and 00040503.</comment>
+    <h1 id="hd_id3149741">Format Menu</h1>
+    <section id="line1">
+        <paragraph id="par_id3146857" role="paragraph">Choose <menuitem>Format - Line</menuitem> (Impress and Draw).</paragraph><comment>i64150</comment>
+        <paragraph id="par_id366527" role="paragraph">Choose <menuitem>Format - Text Box and Shape - Line</menuitem> (Writer).</paragraph>
+        <paragraph id="par_id3835261" role="paragraph">Choose <menuitem>Format - Object - Line</menuitem> (Calc).</paragraph>
+        <paragraph id="par_id3148668" role="paragraph">On <emph>Line and Filling</emph> bar, click</paragraph>
+        <section id="syline">
+            <table id="tbl_id3145160">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3148889" role="paragraph"><image id="img_id3150669" src="cmd/sc_formatline.svg" width="1cm" height="1cm"><alt id="alt_id3150669">Icon Line</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3159147" role="paragraph">Line</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="line2">
+      <switch select="appl">
+      <case select="WRITER">
+        <paragraph id="par_id3154285" role="paragraph">Choose <menuitem>Format - Text Box and Shape - Line - Line</menuitem> tab.</paragraph>
+      </case>
+      <case select="CALC">
+        <paragraph id="par_id3153596" role="paragraph">Choose <menuitem>Format - Object - Line - Line</menuitem> tab.</paragraph>
+      </case>
+      <case select="CHART">
+        <paragraph id="par_id3156023" role="paragraph">Choose <menuitem>Format - Title - Borders</menuitem> tab (charts).</paragraph>
+        <paragraph id="par_id3153061" role="paragraph">Choose <menuitem>Format - Legend - Borders</menuitem> tab (charts).</paragraph>
+        <paragraph id="par_id3155922" role="paragraph">Choose <menuitem>Format - Axis - Line</menuitem> tab (charts).</paragraph>
+        <paragraph id="par_id3147559" role="paragraph">Choose <menuitem>Format - Grid - Line</menuitem> tab (charts).</paragraph>
+        <paragraph id="par_id3154758" role="paragraph">Choose <menuitem>Format - Chart Wall - Borders</menuitem> tab (charts).</paragraph>
+        <paragraph id="par_id3153960" role="paragraph">Choose <menuitem>Format - Chart Floor - Borders</menuitem> tab (charts).</paragraph>
+        <paragraph id="par_id3154939" role="paragraph">Choose <menuitem>Format - Chart Area - Borders</menuitem> tab (charts).</paragraph>
+      </case>
+      <case select="IMPRESS">
+        <paragraph id="par_id3147335" role="paragraph">Choose <menuitem>View - Styles</menuitem> - open context menu and choose <menuitem>Modify/New - Line</menuitem> tab (presentation documents).</paragraph>
+      </case>
+      </switch>
+    </section>
+    <paragraph id="par_id3151293" role="paragraph"><variable id="linienstile">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - </menuitem></caseinline></switchinline><menuitem>Line - Line Styles</menuitem> tab.</variable></paragraph>
+
+<section id="ArrowStyle">   
+   <switch select="appl">
+     <case select="DRAW">
+       <paragraph role="paragraph" id="par_id811654761854632">Choose <menuitem>Format - Line</menuitem></paragraph>
+     </case>
+     <default>
+       <paragraph id="par_id3149317" role="paragraph"><variable id="lineend">Choose <menuitem>Format - Text Box and Shape - Line - Arrow Styles</menuitem> tab.</variable></paragraph>
+     </default>
+   </switch>
+   <paragraph role="paragraph" id="par_id631649991449892"><variable id="right-click-arrowhead">Right-click a selected object - choose <menuitem>Line - Arrow Styles</menuitem> tab.</variable></paragraph>
+   <switch select="appl">
+     <case select="WRITER">
+       <paragraph role="paragraph" id="par_id641654762186921">On the <menuitem>Drawing Object Properties</menuitem> bar, choose <menuitem>Arrow Styles</menuitem> tab, after clicking</paragraph>
+     </case>
+     <case select="CALC">
+       <paragraph role="paragraph" id="par_id331654762248984">On the <menuitem>Drawing Object Properties</menuitem> bar or <menuitem>Image</menuitem> bar, choose <menuitem>Arrow Styles</menuitem> tab, after clicking</paragraph>
+     </case>
+     <default>
+       <paragraph role="paragraph" id="par_id411654762306808">On the <menuitem>Image</menuitem> bar or <menuitem>Line and Filling</menuitem> bar, choose <menuitem>Arrow Styles</menuitem> tab, after clicking</paragraph>
+     </default>
+  </switch>
+  <embed href="text/shared/00/00040502.xhp#syline"/>
+</section>
+
+     <section id="area1">
+        <paragraph id="par_id3156082" role="paragraph">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - </menuitem></caseinline></switchinline><menuitem>Area</menuitem>.</paragraph>
+        <paragraph id="par_id3148922" role="paragraph">On <emph>Line and Filling</emph> bar, click</paragraph>
+        <section id="syarea">
+            <table id="tbl_id3145174">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3156424" role="paragraph"><image id="img_id3150868" src="cmd/sc_fillstyle.png" width="1cm" height="1cm"><alt id="alt_id3150868">Icon Area</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3150393" role="paragraph">Area</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="area2">
+        <switch select="appl">
+            <case select="WRITER">
+                <section id="areawriter">
+                <paragraph role="paragraph" id="par_id511592159765396">Choose <menuitem>View - Styles</menuitem> (<switchinline select="sys"><caseinline select="MAC"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>) - choose Paragraph, Frame or Page style - open context menu - choose <menuitem>Modify/New - Area</menuitem> tab.</paragraph>
+                <paragraph role="paragraph" id="par_id841527083135387">Choose <menuitem>Table - Properties - Background</menuitem> tab. Select the table object - Cell, Row or Table - which background area is to be filled.</paragraph>
+                <paragraph role="paragraph" id="par_id821578662265845">Choose <menuitem>Format - Page Style - Area</menuitem> tab.</paragraph>
+                <paragraph role="paragraph" id="par_id901592158395353">Choose <menuitem>Format - Text Box and Shape - Area - Area</menuitem></paragraph>
+            </section>
+            </case>
+            <case select="CALC">
+                <paragraph role="paragraph" id="par_id1001592157774069">Choose <menuitem>Styles - Manage Styles</menuitem> (<switchinline select="sys"><caseinline select="MAC"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>) - choose Cell or Page style - open context menu - choose <menuitem>Modify/New - Background</menuitem> tab.</paragraph>
+                <paragraph role="paragraph" id="par_id771592156369992">Choose <menuitem>Format - Page - Background</menuitem> tab</paragraph>
+                <paragraph role="paragraph" id="par_id431578737397995">Choose <menuitem>Format - Cells - Background</menuitem> tab</paragraph>
+                <paragraph role="paragraph" id="par_id881592158156157">Choose <menuitem>Format - Object - Area - Area</menuitem> tab.</paragraph>
+            </case>
+            <case select="IMPRESS">
+                <paragraph role="paragraph" id="par_id951592158682096">Choose <menuitem>Format - Style - Edit Style - Area</menuitem> tab</paragraph>
+                <paragraph role="paragraph" id="par_id11592158856626">Choose <menuitem>Slide - Properties - Background</menuitem> tab</paragraph>
+                <paragraph role="paragraph" id="par_id891592159117695">Choose <menuitem>Format - Styles - Manage Styles</menuitem> (<switchinline select="sys"><caseinline select="MAC"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>), choose Drawing or Presentation style - open context menu - choose <menuitem>Modify/New - Area</menuitem> tab.</paragraph>
+                <paragraph role="paragraph" id="par_id741592159264211">Choose <menuitem>Format - Object and Shape - Area - Area</menuitem> tab</paragraph>
+            </case>
+            <case select="DRAW">
+                <paragraph role="paragraph" id="par_id271592159552714">Choose <menuitem>Format - Style - Edit Style - Area</menuitem> tab</paragraph>
+                <paragraph role="paragraph" id="par_id161592159449638">Choose <menuitem>Format - Styles - Manage Styles</menuitem> (<switchinline select="sys"><caseinline select="MAC"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>), choose Drawing style - open context menu - choose <menuitem>Modify/New - Area</menuitem> tab.</paragraph>
+                <paragraph id="par_id9149694" role="paragraph">Choose <menuitem>Page - Properties - Background</menuitem> tab.</paragraph>
+                <paragraph role="paragraph" id="par_id471592158481451">Choose <menuitem>Format - Area - Area</menuitem> tab</paragraph>
+            </case>
+            <case select="CHART">
+                <paragraph id="par_id3152922" role="paragraph">Choose <menuitem>Format - Title - Area</menuitem> tab.</paragraph>
+                <paragraph id="par_id3157894" role="paragraph">Choose <menuitem>Format - Legend - Area</menuitem> tab.</paragraph>
+                <paragraph id="par_id3144444" role="paragraph">Choose <menuitem>Format - Chart Wall - Area</menuitem> tab.</paragraph>
+                <paragraph id="par_id3156543" role="paragraph">Choose <menuitem>Format - Chart Floor - Area</menuitem>.</paragraph>
+                <paragraph id="par_id3150685" role="paragraph">Choose <menuitem>Format - Chart Area - Area</menuitem>.</paragraph>
+            </case>
+            <case select="BASE">
+                <paragraph role="paragraph" id="par_id901592160809757">When editing a form:</paragraph>
+                <embed href="text/shared/00/00040502.xhp#areawriter"/>
+                <paragraph role="paragraph" id="par_id201592161190323">When editing a report:</paragraph>
+                <paragraph role="paragraph" id="par_id591592161180508">Choose <menuitem>Format - Page - Background</menuitem> tab.</paragraph>
+            </case>
+            <default>
+                <embed href="text/shared/00/00040502.xhp#areawriter"/>
+            </default>
+      </switch>
+    </section>
+    <section id="trans">
+        <paragraph id="par_id3154985" role="paragraph">Choose <menuitem>Format - Area - Transparency</menuitem> tab (drawing documents).</paragraph>
+        <paragraph id="par_id3145365" role="paragraph">Choose <menuitem>Format - Object and Shape - Area - Transparency</menuitem> tab (presentation documents).</paragraph>
+        <paragraph id="par_id3151117" role="paragraph">Choose <menuitem>Format - Chart Wall - Transparency</menuitem> tab (chart documents).</paragraph>
+        <paragraph id="par_id3147326" role="paragraph">Choose <menuitem>Format - Chart Area - Transparency</menuitem> tab (chart documents).</paragraph>
+        <paragraph id="par_id3154920" role="paragraph">Choose <menuitem>Format - Chart Floor - Transparency</menuitem> tab (chart documents).</paragraph>
+        <paragraph id="par_id3145591" role="paragraph">Choose <menuitem>Format - Title - All Titles - Transparency</menuitem> tab (chart documents).</paragraph>
+        <paragraph id="par_id3145750" role="paragraph">Choose <menuitem>Format - Title - Main Title - Transparency </menuitem>tab (chart documents).</paragraph>
+        <paragraph id="par_id3148556" role="paragraph">Choose <menuitem>Format - Title - Subtitle - Transparency</menuitem> tab (chart documents).</paragraph>
+        <paragraph id="par_id3163710" role="paragraph">Choose <menuitem>Format - Title - Title (X Axis) - Transparency</menuitem> tab (chart documents).</paragraph>
+        <paragraph id="par_id3150487" role="paragraph">Choose <menuitem>Format - Title - Title (Y Axis) - Transparency</menuitem> tab (chart documents).</paragraph>
+        <paragraph id="par_id3154320" role="paragraph">Choose <menuitem>Format - Title - Title (Z Axis) - Transparency</menuitem> tab (chart documents)</paragraph>
+        <paragraph id="par_id3151113" role="paragraph">Choose <menuitem>Format - Object Properties - Data Point - Transparency</menuitem> - tab (chart documents).</paragraph>
+        <paragraph id="par_id3149266" role="paragraph">Choose <menuitem>Format - Object Properties - Data Series - Transparency</menuitem> tab (chart documents).</paragraph>
+    </section>
+    <section id="paratrans">
+    <paragraph id="par_id3147189" role="paragraph">Choose <menuitem>Format - Paragraph - Transparency</menuitem> tab.</paragraph>
+    <paragraph id="par_id3144352" role="paragraph">Choose <menuitem>View - Styles</menuitem> - open context menu of an entry and choose <menuitem>Modify/New - Transparency</menuitem> tab.</paragraph>
+    </section>
+    <paragraph id="par_id3150011" role="paragraph"><variable id="schatte">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - </menuitem></caseinline></switchinline><menuitem>Area - Shadow</menuitem> tab.</variable></paragraph>
+    <paragraph id="par_id3147441" role="paragraph"><variable id="verlauf">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - </menuitem></caseinline></switchinline><menuitem>Area - Gradients</menuitem> tab.</variable></paragraph>
+    <paragraph id="par_id3155308" role="paragraph">
+        <variable id="schraffur">Choose <menuitem>Format - </menuitem>
+            <switchinline select="appl">
+                <caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem></caseinline>
+                <caseinline select="CALC"><menuitem>Object - </menuitem></caseinline>
+                <caseinline select="IMPRESS"><menuitem>Object and Shape - </menuitem></caseinline>
+            </switchinline>
+            <menuitem>Area - Hatch</menuitem> tab.
+        </variable>
+    </paragraph>
+    <paragraph id="par_id3155314" role="paragraph">
+        <variable id="page_hatch">
+            <switchinline select="appl">
+                <caseinline select="WRITER">Choose <menuitem>Format - Page Style - Area</menuitem></caseinline>
+                <caseinline select="DRAW">Choose <menuitem>Page - Properties - Background</menuitem></caseinline>
+                <caseinline select="IMPRESS">Choose <menuitem>Slide - Properties - Background</menuitem></caseinline>
+            </switchinline>
+            <emph> - Hatch</emph> tab.
+        </variable>
+    </paragraph>
+    <paragraph id="par_id3145800" role="paragraph"><variable id="image">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - </menuitem></caseinline></switchinline><menuitem>Area - Image</menuitem> tab.</variable></paragraph>
+    <paragraph id="par_id3145251" role="paragraph"><variable id="formattext">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - Text Attributes</menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - Text - </menuitem></caseinline><defaultinline><menuitem>Text</menuitem></defaultinline></switchinline>.</variable></paragraph>
+    <paragraph id="par_id3152810" role="paragraph"><variable id="text">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - Text Attributes</menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - Text</menuitem></caseinline><caseinline select="IMPRESS"><menuitem>Object and Shape</menuitem></caseinline><defaultinline><menuitem>Text</menuitem></defaultinline></switchinline><menuitem> - Text</menuitem> tab.</variable></paragraph>
+    <paragraph id="par_id3151060" role="paragraph"><variable id="laufext">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - Text Attributes </menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - Text</menuitem></caseinline><defaultinline><menuitem>Text</menuitem></defaultinline></switchinline><menuitem> - Text Animation</menuitem> tab.</variable></paragraph>
+    <section id="position1">
+        <paragraph id="par_id3149911" role="paragraph">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - </menuitem></caseinline></switchinline><menuitem>Position and Size</menuitem>.</paragraph>
+        <paragraph id="par_id3156286" role="paragraph"><switchinline select="appl"><caseinline select="DRAW"><keycode>F4</keycode> key</caseinline><caseinline select="IMPRESS"><keycode>F4</keycode> key</caseinline></switchinline></paragraph>
+    </section>
+    <section id="syposition">
+        <table id="Table1">
+            <tablerow>
+                <tablecell>
+                    <paragraph id="par_id3153052" role="paragraph"><image id="img_id3150965" src="cmd/sc_transformdialog.svg" width="1cm" height="1cm"><alt id="alt_id3150965">Icon Position and Size</alt></image></paragraph>
+                </tablecell>
+                <tablecell>
+                    <paragraph id="par_id3149938" role="paragraph">Position and Size<comment>UFI: in Form Design toolbar</comment></paragraph>
+                </tablecell>
+            </tablerow>
+        </table>
+    </section>
+    <section id="name">
+        <paragraph id="par_id3148833" role="paragraph">Open the context menu for the object - choose <menuitem>Name</menuitem>.</paragraph>
+    </section>
+    <section id="descript">
+        <paragraph id="par_id411999" role="paragraph">Right-click on a selected image, frame, or OLE object - choose <menuitem>Properties - Options</menuitem> tab.</paragraph>
+        <paragraph role="paragraph" id="par_id301652608714795">For a selected object, choose <menuitem>Format - Description</menuitem></paragraph>
+    </section>
+<section id="Shape_PositionSize">
+<paragraph role="paragraph" id="par_id921602059453828">Click on textbox or shape to select, then...</paragraph>
+<paragraph id="par_id3153099" role="paragraph"><variable id="position2">Choose <menuitem>Format - </menuitem><switchinline select="appl">
+  <caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem></caseinline>
+  <caseinline select="CALC"><menuitem>Object - </menuitem></caseinline>
+  <caseinline select="IMPRESS"><menuitem>Object and Shape - </menuitem> </caseinline></switchinline>
+   <menuitem>Position and Size - Position and Size</menuitem> tab.</variable>
+ </paragraph>
+<paragraph role="paragraph" id="par_id361602065556003">Open context menu for selected object - choose <menuitem>Position and Size</menuitem> - <emph>Position and Size</emph> tab.</paragraph>
+<table id="tab_id591602337542349">
+    <tablerow>
+        <tablecell>
+            <paragraph role="paragraph" id="par_id371602337542349">
+<image id="img_id3150965" src="cmd/sc_transformdialog.svg" width="1cm" height="1cm"><alt id="alt_id3150965">Icon Position and Size</alt></image>
+            </paragraph>
+       </tablecell>
+             <tablecell>
+           <paragraph id="par_id841602337832667" role="tablecontent">Position and Size menu icon</paragraph>
+       </tablecell>
+
+         </tablerow>
+</table>
+<switch select="appl">
+<case select="CALC"></case>
+<case select="WRITER"></case>
+<default>
+<tip id="par_id971602065138382">Press <keycode>F4</keycode> after selection to open the tab directly.</tip>
+</default>
+</switch>
+</section>
+    <section id="rotation">
+        <paragraph id="par_id3152973" role="paragraph">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - </menuitem></caseinline></switchinline><menuitem>Position and Size - Rotation</menuitem> tab.</paragraph>
+        <table id="tbl_id3147496">
+            <tablerow>
+                <tablecell>
+                    <paragraph id="par_id3148495" role="paragraph"><image id="img_id3146898" src="cmd/sc_toggleobjectrotatemode.svg" width="1cm" height="1cm"><alt id="alt_id3146898">Icon Rotate</alt></image></paragraph>
+                </tablecell>
+                <tablecell>
+                    <paragraph id="par_id3146790" role="paragraph">Rotate</paragraph>
+                </tablecell>
+            </tablerow>
+        </table>
+    </section>
+    <paragraph id="par_id3145666" role="paragraph"><variable id="ecke">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - </menuitem></caseinline></switchinline><menuitem>Position and Size - Slant &amp; Corner Radius</menuitem> tab.</variable></paragraph>
+    <paragraph id="par_id3146081" role="paragraph"><variable id="legende">Choose <menuitem>Format - </menuitem><switchinline select="appl"><caseinline select="WRITER"><menuitem>Text Box and Shape - </menuitem>
+                    </caseinline><caseinline select="CALC"><menuitem>Object - </menuitem></caseinline></switchinline><menuitem>Position and Size - Callout</menuitem> tab. This is only available for textbox callouts, not for custom shapes callouts.</variable></paragraph>
+    <section id="edit_points">
+        <paragraph id="par_id3083283" role="paragraph">Choose <menuitem>Edit - Points</menuitem>.</paragraph>
+        <paragraph id="par_id3145642" role="paragraph"><switchinline select="appl"><caseinline select="DRAW">Open context menu - choose <menuitem>Edit Points</menuitem>.
+                    </caseinline></switchinline><switchinline select="appl"><caseinline select="IMPRESS">Open context menu - choose <menuitem>Edit Points</menuitem>.</caseinline></switchinline></paragraph>
+        <paragraph id="par_id3149019" role="paragraph"><switchinline select="appl"><caseinline select="DRAW"><keycode>F8</keycode> key</caseinline><caseinline select="IMPRESS"><keycode>F8</keycode> key</caseinline></switchinline></paragraph>
+            <table id="tbl_id3145618">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3150044" role="paragraph"><image id="img_id3147100" src="cmd/sc_toggleobjectbeziermode.svg" width="1cm" height="1cm"><alt id="alt_id3147100">Icon Edit Points</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3153966" role="paragraph">Edit Points</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+    </section>
+    <section id="character">
+        <paragraph id="par_id3151248" role="paragraph">Choose <menuitem>Format - Character</menuitem> (drawing functions).</paragraph>
+        <paragraph id="par_id3145229" role="paragraph">Open context menu - choose <menuitem>Character</menuitem>.</paragraph>
+    </section>
+    <section id="size">
+        <paragraph id="par_id3151342" role="paragraph">Open context menu - choose <menuitem>Size</menuitem>.</paragraph>
+    </section>
+    <section id="style">
+        <paragraph id="par_id3149255" role="paragraph">Open context menu - choose <menuitem>Style</menuitem>.</paragraph>
+    </section>
+    <section id="bold">
+        <paragraph id="par_id3155177" role="paragraph">Open context menu - choose <menuitem>Style - Bold</menuitem>.</paragraph>
+        <section id="sybold">
+            <table id="tbl_id3147252">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3145766" role="paragraph"><image id="img_id3156558" src="cmd/sc_bold.svg" width="1cm" height="1cm" localize="true"><alt id="alt_id3156558">Icon Bold</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3147001" role="paragraph">Bold</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="italic">
+        <paragraph id="par_id3151276" role="paragraph">Open context menu - choose <menuitem>Style - Italic</menuitem>.</paragraph>
+        <section id="syitalic">
+            <table id="tbl_id3144416">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3159091" role="paragraph"><image id="img_id3155578" src="cmd/sc_italic.svg" width="1cm" height="1cm" localize="true"><alt id="alt_id3155578">Icon Italic</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3150234" role="paragraph">Italic</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="underline">
+        <paragraph id="par_id3154589" role="paragraph">Open the menu <menuitem>Format - Text</menuitem> and choose <menuitem>Single Underline</menuitem> or <menuitem>Double Underline</menuitem>.</paragraph>
+        <section id="syunderline">
+            <table id="tbl_id3148875">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3145223" role="paragraph"><image id="img_id3151068" src="cmd/sc_underline.svg" width="1cm" height="1cm" localize="true"><alt id="alt_id3151068">Icon Underline</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3154715" role="paragraph">Underline</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="strikethrough">
+        <paragraph id="par_id3145131" role="paragraph">Open context menu - choose <menuitem>Style - Strikethrough</menuitem>.</paragraph>
+    </section>
+    <section id="shadow">
+        <paragraph id="par_id3158214" role="paragraph">Open context menu - choose <menuitem>Style - Shadow</menuitem>.</paragraph>
+    </section>
+    <section id="contour">
+        <paragraph id="par_id3150207" role="paragraph">Open context menu - choose <menuitem>Style - Contour</menuitem>.</paragraph>
+    </section>
+    <section id="superscript">
+        <paragraph id="par_id3154383" role="paragraph">Open context menu - choose <menuitem>Style - Superscript</menuitem>.</paragraph>
+    </section>
+    <section id="subscript">
+        <paragraph id="par_id3152767" role="paragraph">Open context menu - choose <menuitem>Style - Subscript</menuitem>.</paragraph>
+    </section>
+    <section id="line_spacing">
+        <paragraph id="par_id3155377" role="paragraph">Choose <menuitem>Format - Spacing</menuitem>.</paragraph>
+    </section>
+    <section id="line_spacing_single">
+        <paragraph id="par_id3154475" role="paragraph">Choose <menuitem>Format - Spacing - Line Spacing: 1</menuitem>.</paragraph>
+    </section>
+    <section id="line_spacing_one_point_five">
+        <paragraph id="par_id3150478" role="paragraph">Choose <menuitem>Format - Spacing - Line Spacing: 1.5</menuitem>.</paragraph>
+    </section>
+    <section id="line_spacing_double">
+        <paragraph id="par_id3147167" role="paragraph">Choose <menuitem>Format - Spacing - Line Spacing: 2</menuitem>.</paragraph>
+    </section>
+    <section id="align_left">
+        <paragraph id="par_id3146978" role="paragraph">Choose <menuitem>Format - Align Text - Left</menuitem>.</paragraph>
+        <paragraph id="par_id3153009" role="paragraph">Open context menu - choose <menuitem>Align - Left</menuitem>.</paragraph>
+        <section id="syalign_left">
+            <table id="tbl_id3152453">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3147310" role="paragraph"><image id="img_id3155370" src="cmd/sc_alignleft.svg" width="1cm" height="1cm"><alt id="alt_id3155370">Icon Align Left</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3151336" role="paragraph">Align Left</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="align_right">
+        <paragraph id="par_id3155823" role="paragraph">Choose <menuitem>Format - Align Text - Right</menuitem>.</paragraph>
+        <paragraph id="par_id3155762" role="paragraph">Open context menu - choose <menuitem>Align - Right</menuitem>.</paragraph>
+        <section id="syalign_right">
+            <table id="tbl_id3149949">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3149408" role="paragraph"><image id="img_id3154421" src="cmd/sc_alignright.svg" width="1cm" height="1cm"><alt id="alt_id3154421">Icon Align Right</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3153607" role="paragraph">Align Right</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="center">
+        <paragraph id="par_id3149189" role="paragraph">Choose <menuitem>Format - Align Text - Centered</menuitem>.</paragraph>
+        <paragraph id="par_id3154624" role="paragraph">Open context menu - choose <menuitem>Align - Center</menuitem>.</paragraph>
+        <section id="sycenter">
+            <table id="tbl_id3151270">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3153815" role="paragraph"><image id="img_id3149757" src="cmd/sc_centerpara.png" width="1cm" height="1cm"><alt id="alt_id3149757">Icon Centered</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3153076" role="paragraph"><switchinline select="appl"><caseinline select="CALC">Align Center Horizontally</caseinline><defaultinline>Centered</defaultinline></switchinline></paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="blocktext">
+        <paragraph id="par_id3146151" role="paragraph">Choose <menuitem>Format - Align Text - Justified</menuitem>.</paragraph>
+        <paragraph id="par_id3168612" role="paragraph">Open context menu - choose <menuitem>Align - Justified</menuitem>.</paragraph>
+        <section id="syblocksatz">
+            <table id="tbl_id3154828">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3156189" role="paragraph"><image id="img_id3145308" src="cmd/sc_justifypara.png" width="1cm" height="1cm"><alt id="alt_id3145308">Icon Justified</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3153131" role="paragraph">Justified</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <paragraph id="par_id3150527" role="paragraph"><variable id="font">Click <emph>Fontwork</emph> icon on <emph>Drawing</emph> bar.</variable></paragraph>
+    <section id="format_group">
+        <paragraph id="par_id3144503" role="paragraph">Choose <menuitem>Format - Group</menuitem>.</paragraph>
+        <paragraph id="par_id3154854" role="paragraph">Open context menu - choose <menuitem>Group</menuitem>.</paragraph>
+    </section>
+    <section id="group">
+      <switch select="appl">
+        <case select="DRAW">
+          <paragraph id="par_id3157980" role="paragraph">Choose <menuitem>Shape - Group - Group</menuitem></paragraph>
+        </case>
+        <default>
+          <paragraph id="par_id3157985" role="paragraph">Choose <menuitem>Format - Group - Group</menuitem></paragraph>
+        </default>
+      </switch>
+      <paragraph id="par_id3149508" role="paragraph">Open context menu - choose <menuitem>Group</menuitem> (for text box and shapes).</paragraph>
+        <section id="sygroup">
+            <table id="tbl_id3143218">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3146858" role="paragraph"><image id="img_id3154344" src="cmd/sc_formatgroup.svg" width="1cm" height="1cm"><alt id="alt_id3154344">Icon Group</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3149593" role="paragraph">Group</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="ungroup">
+      <switch select="appl">
+        <case select="DRAW">
+           <paragraph id="par_id3163378" role="paragraph">Choose <menuitem>Shape - Group - Ungroup</menuitem>.</paragraph>
+        </case>
+        <default>
+          <paragraph id="par_id3153023" role="paragraph">Choose <menuitem>Format - Group - Ungroup</menuitem>.</paragraph>
+        </default>
+      </switch>
+      <paragraph id="par_id3156038" role="paragraph">Open context menu - choose <menuitem>Ungroup</menuitem>.</paragraph>
+        <section id="syungroup">
+            <table id="tbl_id3149971">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3151300" role="paragraph"><image id="img_id3150831" src="cmd/sc_formatungroup.svg" width="1cm" height="1cm"><alt id="alt_id3150831">Icon Ungroup</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3146894" role="paragraph">Ungroup</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="exit_group">
+      <switch select="appl">
+        <case select="DRAW">
+          <paragraph id="par_id3145678" role="paragraph">Choose <menuitem>Shape - Group - Exit Group</menuitem>.</paragraph>
+        </case>
+        <default>
+          <paragraph id="par_id3153109" role="paragraph">Choose <menuitem>Format - Group - Exit Group</menuitem>.</paragraph>
+        </default>
+      </switch>
+      <paragraph id="par_id3152367" role="paragraph">Open context menu - choose <menuitem>Exit Group</menuitem>.</paragraph>
+      <section id="syexit_group">
+            <table id="tbl_id3152538">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3158402" role="paragraph"><image id="img_id3149422" src="cmd/sc_leavegroup.svg" width="1cm" height="1cm"><alt id="alt_id3149422">Icon Exit Group</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3155347" role="paragraph">Exit Group</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+    <section id="enter_group">
+      <switch select="appl">
+        <case select="DRAW">
+          <paragraph id="par_id3145354" role="paragraph">Choose <menuitem>Shape - Group - Enter Group</menuitem>.</paragraph>
+        </case>
+        <default>
+          <paragraph id="par_id3149129" role="paragraph">Choose <menuitem>Format - Group - Enter Group</menuitem>.</paragraph>
+        </default>
+      </switch>
+        <paragraph id="par_id3149946" role="paragraph">Open context menu - choose <menuitem>Enter Group</menuitem>.</paragraph>
+        <section id="syenter_group">
+            <table id="tbl_id3149546">
+                <tablerow>
+                    <tablecell>
+                        <paragraph id="par_id3152388" role="paragraph"><image id="img_id3149900" src="cmd/sc_entergroup.svg" width="1cm" height="1cm"><alt id="alt_id3149900">Icon Enter Group</alt></image></paragraph>
+                    </tablecell>
+                    <tablecell>
+                        <paragraph id="par_id3152547" role="paragraph">Enter Group</paragraph>
+                    </tablecell>
+                </tablerow>
+            </table>
+        </section>
+    </section>
+</body>
+</helpdocument>

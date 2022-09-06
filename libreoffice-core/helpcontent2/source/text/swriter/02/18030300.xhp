@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriter0218030300xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Page Number</title>
+    <filename>/text/swriter/02/18030300.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="page_number">
+<bookmark xml-lang="en-US" branch="hid/.uno:InsertPageNumberField" id="bm_id2050004" localize="false"/>
+
+<paragraph id="hd_id3147173" role="heading" level="1" xml-lang="en-US"><link href="text/swriter/02/18030300.xhp" name="Page Number">Page Number</link></paragraph>
+<paragraph id="par_id3150760" role="paragraph" xml-lang="en-US"><ahelp hid=".">Inserts the current page number as a field at the cursor position.</ahelp> The default setting is for it to use the <emph>Page Number</emph> character style.</paragraph>
+</section>
+
+<section id="howtoget">
+<embed href="text/swriter/00/00000404.xhp#feldbefehlseitennummer"/>
+</section>
+<paragraph id="par_id3151175" role="paragraph" xml-lang="en-US">If you would like to define a different format or modify the page number, insert a field with <emph>Insert - Field - More Fields</emph> and make the desired settings in the <link href="text/swriter/01/04090000.xhp" name="Fields"><emph>Fields</emph></link> dialog. It is also possible to edit a field inserted with the <emph>Page Number</emph> command with <link href="text/swriter/01/02140000.xhp" name="Edit - Fields"><emph>Edit - Fields</emph></link>. To change page numbers, read the <link href="text/swriter/guide/pagenumbers.xhp" name="Page Numbers"><emph>Page Numbers</emph></link> guide.</paragraph>
+</body>
+
+</helpdocument>

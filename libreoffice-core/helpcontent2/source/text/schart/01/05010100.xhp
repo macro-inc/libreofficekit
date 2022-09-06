@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textschart0105010100xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Data Point</title>
+<filename>/text/schart/01/05010100.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+
+
+  <section id="data_point">
+  <h1 id="hd_id3153768"><link href="text/schart/01/05010100.xhp" name="Data Point">Data Point</link></h1>
+  <paragraph xml-lang="en-US" role="paragraph" id="par_id3152577">This dialog allows you to change the properties of a selected data point. The dialog appears when there is only one data point selected when you choose <emph>Format - Format Selection</emph>. Some of the menu entries are only available for 2D or 3D charts.</paragraph>
+  </section>
+  <note id="par_id3149121">Any changes made only affect this one data point. For example, if you edit the color of a bar, only the color of that bar will be different.</note>
+  <section id="howtoget">
+  <embed href="text/schart/00/00000004.xhp#frtodd"/>
+</section>
+  <embed href="text/shared/01/05200100.xhp#line"/>
+  <embed href="text/shared/01/05210100.xhp#area"/>
+  <embed href="text/shared/01/05210700.xhp#transparency"/>
+  <embed href="text/shared/01/05020100.xhp#characters"/>
+  <embed href="text/schart/01/04030000.xhp#datenbeschriftung"/>
+  <embed href="text/schart/01/04030000.xhp#besch"/>
+  <embed href="text/shared/00/00000001.xhp#reset"/>
+
+ </body>
+</helpdocument>

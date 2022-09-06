@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+
+<meta>
+<topic id="textsharedexplorerdatabasedabawiz02spreadsheetxml" indexer="include">
+<title id="tit" xml-lang="en-US">Spreadsheet Database Connection</title>
+<filename>/text/sdatabase/dabawiz02spreadsheet.xhp</filename>
+</topic>
+</meta>
+<body><comment>** Expression is faulty **</comment>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/dbwizspreadsheetpage/DBWizSpreadsheetPage" id="bm_id5975217" localize="false"/>
+<h1 id="par_idN1053A">Set up Spreadsheet connection</h1>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/dbwizspreadsheetpage/browseurl" id="bm_id5975218" localize="false"/>
+<h2 id="par_idN1053E">Location and file name</h2>
+<paragraph role="paragraph" id="par_idN10542" xml-lang="en-US"><ahelp hid=".">Enter the path and file name to the spreadsheet file.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/dbwizspreadsheetpage/browse" id="bm_id2601702" localize="false"/>
+<h2 id="par_idN10545">Browse</h2>
+<paragraph role="paragraph" id="par_idN10549" xml-lang="en-US"><ahelp hid=".">Click to open a file selection dialog.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/dbwizspreadsheetpage/passwordrequired" id="bm_id4418774" localize="false"/>
+<h3 id="par_idN1054C">Password required</h3>
+<paragraph role="paragraph" id="par_idN10550" xml-lang="en-US"><ahelp hid=".">Select to request a password from the user of the database document.</ahelp></paragraph>
+<paragraph role="paragraph" localize="false" id="par_idN1061A" xml-lang="en-US"><embedvar href="text/sdatabase/dabawiz00.xhp#databasewizardh1"/></paragraph>
+</body>
+</helpdocument>

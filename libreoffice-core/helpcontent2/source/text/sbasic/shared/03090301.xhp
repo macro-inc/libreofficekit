@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03090301xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">GoSub...Return Statement</title>
+    <filename>/text/sbasic/shared/03090301.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="gosubreturn">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3147242">
+  <bookmark_value>GoSub...Return statement</bookmark_value>
+  <bookmark_value>label; in GoSub...Return statement</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3147242" xml-lang="en-US"><variable id="GoSubh1"><link href="text/sbasic/shared/03090301.xhp" name="GoSub...Return Statement">GoSub...Return Statement</link></variable></h1>
+  <paragraph id="par_id3145316" role="paragraph" xml-lang="en-US">Calls a subroutine that is indicated by a label inside a <literal>Sub</literal> or a <literal>Function</literal>. The statements following the label are executed until the next <literal>Return</literal> statement. Afterwards, the program continues with the statement that follows the <literal>GoSub</literal> statement.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3145069" role="bascode" xml-lang="en-US">GoSub label[:]</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph role="paragraph" id="par_id471588670859073"><emph>label: </emph>A line identifier indicating where to continue execution. The scope of a label in that of the routine it belongs to.</paragraph>
+<paragraph id="par_id3147318" role="paragraph" xml-lang="en-US">The <literal>GoSub</literal> statement calls a local subroutine indicated by a label from within a subroutine or a function. The name of the label must end with a colon (":").</paragraph>
+<bascode>
+  <paragraph role="bascode" id="bas_id171588670446922" localize="false">Sub/Function foo</paragraph>
+  <paragraph role="bascode" id="bas_id411588670455217" xml-lang="en-US">    ' statements</paragraph>
+  <paragraph role="bascode" id="bas_id315886704565218" localize="false">    GoSub label</paragraph>
+  <paragraph role="bascode" id="bas_id421588670457589" xml-lang="en-US">    ' statements </paragraph>
+  <paragraph role="bascode" id="bas_id551588670457866" localize="false">    Exit Sub/Function</paragraph>
+  <paragraph role="bascode" id="bas_id721588670458055" localize="false">label:</paragraph>
+  <paragraph role="bascode" id="bas_id171588670458263" xml-lang="en-US">    ' statements </paragraph>
+  <paragraph role="bascode" id="bas_id881588670473041" localize="false">    Return</paragraph>
+  <paragraph role="bascode" id="bas_id661588670476240" localize="false">End Sub/Function</paragraph>
+</bascode>
+
+<paragraph id="par_id3153190" role="warning" xml-lang="en-US">If the program encounters a Return statement not preceded by <emph>GoSub</emph>, $[officename] Basic returns an error message. Use <emph>Exit Sub</emph> or <emph>Exit Function</emph> to ensure that the program leaves a Sub or Function before reaching the next Return statement.</paragraph>
+<paragraph id="par_id3145799" role="paragraph" xml-lang="en-US">The following example demonstrates the use of <emph>GoSub</emph> and <emph>Return</emph>. By executing a program section twice, the program calculates the square root of two numbers that are entered by the user.</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341591488" role="bascode" localize="false" xml-lang="en-US">Sub ExampleGoSub</paragraph>
+<paragraph id="par_idm1341590256" role="bascode" localize="false" xml-lang="en-US">Dim iInputa As Single</paragraph>
+<paragraph id="par_idm1341589024" role="bascode" localize="false" xml-lang="en-US">Dim iInputb As Single</paragraph>
+<paragraph id="par_idm1341587792" role="bascode" localize="false" xml-lang="en-US">Dim iInputc As Single</paragraph>
+<paragraph id="par_id3146970" role="bascode" xml-lang="en-US">    iInputa = Int(InputBox("Enter the first number: ","NumberInput"))</paragraph>
+<paragraph id="par_id3150329" role="bascode" xml-lang="en-US">    iInputb = Int(InputBox("Enter the second number: ","NumberInput"))</paragraph>
+<paragraph id="par_idm1341583040" role="bascode" localize="false" xml-lang="en-US">    iInputc=iInputa</paragraph>
+<paragraph id="par_idm1341581808" role="bascode" localize="false" xml-lang="en-US">    GoSub SquareRoot</paragraph>
+<paragraph id="par_id3154756" role="bascode" xml-lang="en-US">    Print "The square root of";iInputa;" is";iInputc</paragraph>
+<paragraph id="par_idm1341578832" role="bascode" localize="false" xml-lang="en-US">    iInputc=iInputb</paragraph>
+<paragraph id="par_idm1341577600" role="bascode" localize="false" xml-lang="en-US">    GoSub SquareRoot</paragraph>
+<paragraph id="par_id3147340" role="bascode" xml-lang="en-US">    Print "The square root of";iInputb;" is";iInputc</paragraph>
+<paragraph id="par_idm1341574624" role="bascode" localize="false" xml-lang="en-US">    Exit Sub</paragraph>
+<paragraph id="par_idm1341573392" role="bascode" localize="false" xml-lang="en-US">SquareRoot:</paragraph>
+<paragraph id="par_idm1341572160" role="bascode" localize="false" xml-lang="en-US">    iInputc=sqr(iInputc)</paragraph>
+<paragraph id="par_idm1341570912" role="bascode" localize="false" xml-lang="en-US">    Return</paragraph>
+<paragraph id="par_idm1341569680" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+
+<section id="relatedtopics">
+  <embed href="text/sbasic/shared/03090302.xhp#GoToh1"/>
+  <embed href="text/sbasic/shared/03090303.xhp#OnGoSubGoToh1"/>
+</section>
+
+</body>
+
+</helpdocument>

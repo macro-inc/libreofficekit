@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0102100300xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Text Format (Search)</title>
+    <filename>/text/shared/01/02100300.xhp</filename>
+  </topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="hid/svx/ui/findreplacedialog/format" id="bm_id3151100" localize="false"/>
+<h1 id="hd_id3154840">Text Format (Search)</h1>
+  <paragraph role="paragraph" id="par_id3150355" xml-lang="en-US"><variable id="formattext"><ahelp hid="svx/ui/findreplacedialog/format">Finds specific text formatting features, such as font types, font effects, and text flow characteristics.</ahelp></variable></paragraph>
+<section id="howtoget">
+  <embed href="text/shared/00/edit_menu.xhp#suchenformat"/>
+</section>
+<paragraph role="paragraph" id="par_id3145383" xml-lang="en-US">The search criteria for attributes are listed below the <emph>Find</emph> box.</paragraph>
+<note id="par_id3150466">You do not need to specify a search text in the <emph>Find</emph> box when you search and replace formatting.</note>
+<paragraph role="paragraph" id="par_id3156152" xml-lang="en-US">To define a replacement format, click in the <emph>Replace</emph> box, and then click the <emph>Format</emph> button.</paragraph>
+<paragraph role="paragraph" id="par_id3153821" xml-lang="en-US">Use the <emph>Text Format (Search)</emph> or the <emph>Text Format (Replace)</emph> to define your formatting search criteria. These dialogs contain the following tab pages:</paragraph>
+<embed href="text/shared/01/05020100.xhp#characters"/>
+<embed href="text/shared/01/05020200.xhp#font_effects"/>
+<embed href="text/shared/01/05030100.xhp#indent_space"/>
+<embed href="text/shared/01/05030700.xhp#alignment"/>
+<embed href="text/swriter/01/05030200.xhp#text_flow"/>
+<embed href="text/shared/01/05210100.xhp#area"/>
+<embed href="text/shared/00/00000007.xhp#asia"/>
+<embed href="text/shared/01/05020500.xhp#position"/>
+<embed href="text/shared/01/05020600.xhp#asilayout"/>
+<embed href="text/shared/01/05020700.xhp#asitypo"/>
+<section id="relatedtopics">
+<paragraph role="paragraph" id="par_id3149457" xml-lang="en-US"><link href="text/shared/01/02100200.xhp" name="Attributes">Attributes</link></paragraph>
+</section>
+</body>
+</helpdocument>

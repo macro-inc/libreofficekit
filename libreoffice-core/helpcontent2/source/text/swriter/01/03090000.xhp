@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriter0103090000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Field Names</title>
+    <filename>/text/swriter/01/03090000.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="field_names">
+<bookmark xml-lang="en-US" branch="hid/.uno:Fieldnames" id="bm_id4185417" localize="false"/>
+
+<paragraph id="hd_id3154505" role="heading" level="1" xml-lang="en-US"><link href="text/swriter/01/03090000.xhp" name="Field Names">Field Names</link></paragraph>
+<paragraph id="par_id3147171" role="paragraph" xml-lang="en-US"><ahelp hid=".">Switches between showing fields as field names or field values.</ahelp> When enabled the field names are displayed, and when disabled the field values displayed. Some field contents cannot be displayed.</paragraph>
+</section>
+
+<section id="howtoget">
+<embed href="text/swriter/00/00000403.xhp#field_names"/>
+</section>
+<paragraph id="par_id3149287" role="paragraph" xml-lang="en-US">To change the default field display to field names instead of the field contents, choose <switchinline select="sys"><caseinline select="MAC"><item type="menuitem">%PRODUCTNAME - Preferences</item></caseinline><defaultinline><item type="menuitem">Tools - Options</item></defaultinline></switchinline><emph> - %PRODUCTNAME Writer - View</emph>, and then select the <emph>Field codes</emph> checkbox in the <emph>Display</emph> area.</paragraph>
+<paragraph id="par_id3154098" role="paragraph" xml-lang="en-US">When you print a document with <item type="menuitem">View - Field Names</item> enabled, you are prompted to include the field names in the print out.</paragraph>
+
+<section id="relatedtopics">
+<paragraph id="par_id102720151029387618" role="paragraph" xml-lang="en-US"><link href="text/swriter/01/04090000.xhp" name="Insert - Field">Insert - Field</link>.</paragraph>
+</section>
+</body>
+
+</helpdocument>

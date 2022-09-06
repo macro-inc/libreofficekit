@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03100900xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">CSng Function</title>
+    <filename>/text/sbasic/shared/03100900.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="csng">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153753">
+  <bookmark_value>CSng function</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3153753" xml-lang="en-US"><link href="text/sbasic/shared/03100900.xhp" name="CSng Function">CSng Function</link></h1>
+<paragraph id="par_id3149748" role="paragraph" xml-lang="en-US">Converts any string or numeric expression to data type Single.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3148983" role="bascode" xml-lang="en-US">CSng (Expression As Variant) As Single</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3153750" localize="false" role="paragraph">Single</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<section id="ExpressionArgument">
+<paragraph id="par_id3153897" role="paragraph" xml-lang="en-US"> <emph>Expression</emph>: Any string or numeric expression that you want to convert. To convert a string expression, the number must be entered using a dot "." as the decimal point and a comma "," as the thousands separator (for instance 123,456.78), which may differ from your %PRODUCTNAME <link href="text/shared/optionen/01140000.xhp" name="language settings">language settings</link>.</paragraph>
+</section>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<section id="ExampleCountryConvert">
+<paragraph role="paragraph" id="par_id761652451117906">Numeric expressions are displayed according %PRODUCTNAME <link href="text/shared/optionen/01140000.xhp" name="language settings">language settings</link>:</paragraph>
+<bascode>
+<paragraph id="par_idm1341609456" role="bascode" localize="false">Sub ExampleCountryConvert</paragraph>
+<paragraph id="par_idm1341608224" role="bascode" xml-lang="en-US">    MsgBox CDbl(1234.5678) ' 1234.5678</paragraph>
+<paragraph id="par_idm1341606976" role="bascode" localize="false">    MsgBox CInt(1234.5678) ' 1235</paragraph>
+<paragraph id="par_idm1341605728" role="bascode" localize="false">    MsgBox CLng(1234+5678) ' 6912</paragraph>
+<paragraph id="par_idm1341604480" role="bascode" xml-lang="en-US">    MsgBox CSng(1234.5678) ' 1234.567749023</paragraph>
+<paragraph id="par_idm1341603223" role="bascode" localize="false"></paragraph>
+<paragraph id="par_idm1341608242" role="bascode" xml-lang="en-US">    MsgBox CDbl(expression := 5678.1234) ' 5678.1234</paragraph>
+<paragraph id="par_idm1341606967" role="bascode" localize="false">    MsgBox CInt(expression := 5678.1234) ' 5678</paragraph>
+<paragraph id="par_idm1341605782" role="bascode" localize="false">    MsgBox CLng(expression := 5678+1234) ' 6912</paragraph>
+<paragraph id="par_idm1341604408" role="bascode" xml-lang="en-US">    MsgBox CSng(expression := 5678.1234) ' 5678.123535156</paragraph>
+<paragraph id="par_idm1314603223" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+</section>
+
+</body>
+</helpdocument>

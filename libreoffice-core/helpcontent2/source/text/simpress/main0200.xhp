@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpressmain0200xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Toolbars</title>
+<filename>/text/simpress/main0200.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="toolbars">
+<h1 id="hd_id3147434"><variable id="main0200"><link href="text/simpress/main0200.xhp" name="Toolbars">Toolbars</link></variable></h1>
+</section>
+<embed href="text/shared/00/00000007.xhp#symbolleistenneu"/>
+<section id="Section1">
+<embed href="text/shared/main0201.xhp#standardbar"/>
+</section>
+<section id="present">
+<embed href="text/simpress/01/03070000.xhp#presentation"/>
+</section>
+<section id="Section2">
+<embed href="text/simpress/main0210.xhp#drawingbar"/>
+</section>
+<section id="Section34">
+<embed href="text/shared/find_toolbar.xhp#Find_Bar"/>
+</section>
+<section id="Section3">
+<embed href="text/simpress/main0211.xhp#outlinebar"/>
+</section>
+<section id="Section4">
+<embed href="text/simpress/main0212.xhp#slidesorterbar"/>
+</section>
+<section id="Section5">
+<embed href="text/simpress/main0202.xhp#lineandfillingbar"/>
+</section>
+<section id="Section6">
+<embed href="text/simpress/main0204.xhp#slideviewbar"/>
+</section>
+<section id="SectionSW6">
+<embed href="text/shared/main0204.xhp#tablebar"/>
+</section>
+<section id="Section7">
+<embed href="text/simpress/main0203.xhp#textformattingbar"/>
+</section>
+<section id="Section8">
+<embed href="text/simpress/main0214.xhp#imagebar"/>
+</section>
+<section id="Section9">
+<embed href="text/shared/main0227.xhp#bezier"/>
+</section>
+<section id="Section10">
+<embed href="text/simpress/main0213.xhp#optionsbar"/>
+</section>
+<section id="Section11">
+<embed href="text/shared/01/03170000.xhp#colorbar"/>
+</section>
+<section id="Section12">
+<embed href="text/simpress/main0206.xhp#status_bar"/>
+</section>
+<section id="Section13">
+<embed href="text/sdraw/01/3dsettings_toolbar.xhp#3dsettings"/>
+</section>
+<section id="Section14">
+<embed href="text/shared/fontwork_toolbar.xhp#fontwork"/>
+</section>
+<section id="Section15">
+<embed href="text/simpress/02/10110000.xhp#insert"/>
+<paragraph role="paragraph" id="par_id31474099" xml-lang="en-US">Add objects, including charts, spreadsheets, and images, to your document.</paragraph>
+</section>
+<section id="Section16">
+<embed href="text/shared/01/classificationbar.xhp#toolbar"/>
+</section>
+</body>
+</helpdocument>

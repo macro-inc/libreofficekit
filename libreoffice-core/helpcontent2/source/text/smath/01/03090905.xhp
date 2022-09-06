@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsmath0103090905xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Matrix</title>
+<filename>/text/smath/01/03090905.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="matrix2">
+<paragraph role="heading" id="hd_id3154702" xml-lang="en-US" level="1"><link href="text/smath/01/03090905.xhp" name="Matrix">Matrix</link></paragraph>
+<paragraph role="paragraph" id="par_id3150344" xml-lang="en-US">Here is an example of how to create a matrix with <emph>$[officename] Math</emph>. If you want to use the example in your own formula, you can copy it to the <emph>Commands</emph> window using the clipboard.</paragraph>
+</section>
+<paragraph role="paragraph" id="par_id3153912" xml-lang="en-US">
+    <image id="img_id3149126" src="media/helpimg/smzb4.png" width="345px" height="190px"><alt id="alt_id3149126" xml-lang="en-US">Matrix</alt></image>
+</paragraph>
+<paragraph role="smathcode" id="par_id3153808" xml-lang="en-US" localize="false">font sans bold size *2 A =left[matrix{A_11#A_12#dotsaxis#A_{1n}##A_21#{} #{}#A_{2n}##dotsvert#{}#{}#dotsvert##A_{n1}#A_{n2}#dotsaxis#A_nn}right]</paragraph>
+</body>
+</helpdocument>

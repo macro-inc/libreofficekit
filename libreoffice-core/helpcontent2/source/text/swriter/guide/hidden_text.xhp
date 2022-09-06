@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+      <topic id="textswriterguidehidden_textxml" indexer="include" status="PUBLISH">
+         <title xml-lang="en-US" id="tit">Hiding Text</title>
+         <filename>/text/swriter/guide/hidden_text.xhp</filename>
+      </topic>
+   </meta>
+   <body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3148856"><bookmark_value>text; hiding</bookmark_value>
+      <bookmark_value>sections;hiding</bookmark_value>
+      <bookmark_value>paragraphs;hiding</bookmark_value>
+      <bookmark_value>hiding;text, with conditions</bookmark_value>
+      <bookmark_value>variables;for hiding text</bookmark_value>
+</bookmark><comment>mw deleted "comparisons;" and copied two entries to hidden_text_display.xhp and 2 entries to nonprintable_text.xhp</comment><comment>MW added "variables;"</comment>
+<h1 xml-lang="en-US" id="hd_id3148856"><variable id="hidden_text"><link href="text/swriter/guide/hidden_text.xhp" name="Hiding Text">Hiding Text</link></variable></h1>
+      <paragraph xml-lang="en-US" id="par_id3150103" role="paragraph">You can use fields and sections to hide or display text in your document if a condition is met.</paragraph>
+      <paragraph xml-lang="en-US" id="par_id3153409" role="paragraph">Before you can hide text, you must first create a variable to use in the condition for hiding the text.</paragraph>
+<h2 xml-lang="en-US" id="hd_id5174108">To Create a Variable</h2>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3153131" role="listitem">Click in your document and choose <emph>Insert - Field - More Fields</emph>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3149640" role="listitem">Click the <emph>Variables </emph>tab and click "Set Variable" in the <emph>Type </emph>list.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3149970" role="listitem">Click "General" in the <emph>Format </emph>list.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3149620" role="listitem">Type a name for the variable in the <item type="menuitem">Name</item> box, for example, <item type="literal">Hide</item>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3149869" role="listitem">Enter a value for the variable in the <item type="menuitem">Value</item> box, for example, <item type="literal">1</item>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3145108" role="listitem">To hide the variable in your document, select <emph>Invisible</emph>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3149585" role="listitem">Click <item type="menuitem">Insert</item> and <item type="menuitem">Close</item>.</paragraph>
+         </listitem>
+      </list>
+<h2 xml-lang="en-US" id="hd_id3156245">To Hide Text</h2>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3145391" role="listitem">Click in the document where you want to add the text.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3145409" role="listitem">Choose <emph>Insert - Field - More Fields</emph> and click the <emph>Functions</emph> tab.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3155325" role="listitem">Click "Hidden Text" in the <emph>Type </emph>list.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3154404" role="listitem">Enter a statement in the <item type="menuitem">Condition</item> box. For example, using the variable you previously defined, enter <item type="literal">Hide==1</item>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3153371" role="listitem">Type the text that you want to hide in the <emph>Hidden text </emph>box.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3154233" role="listitem">Click <item type="menuitem">Insert</item> and <item type="menuitem">Close</item>.</paragraph>
+         </listitem>
+      </list>
+<h2 xml-lang="en-US" id="hd_id3154256">To Hide a Paragraph</h2>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3154853" role="listitem">Click in the paragraph where you want to add the text.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3154872" role="listitem">Choose <menuitem>Insert - Field - More Fields</menuitem> and click the <emph>Functions</emph> tab.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3155902" role="listitem">Click "Hidden Paragraph" in the <emph>Type </emph>list.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3155947" role="listitem">Enter a statement in the <item type="menuitem">Condition</item> box. For example, using the variable you previously defined, enter <item type="literal">Hide==1</item>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3149991" role="listitem">Click <item type="menuitem">Insert</item> and <item type="menuitem">Close</item>.</paragraph>
+         </listitem>
+      </list>
+      <note xml-lang="en-US" id="par_id3793450">You must enable this feature by removing the check mark <emph>Hidden Paragraphs</emph> in the dialog <switchinline select="sys"><caseinline select="MAC"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline> - <menuitem>%PRODUCTNAME Writer - View</menuitem>. When the check mark is set, you cannot hide any paragraph.</note>
+<h2 xml-lang="en-US" id="hd_id3148675">To Hide a Section</h2>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3148697" role="listitem">Select the text that you want to hide in your document.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3153019" role="listitem">Choose <menuitem>Insert - Section</menuitem>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3148950" role="listitem">In the <item type="menuitem">Hide</item> area, select <item type="menuitem">Hide</item>, and then enter an expression in the <item type="menuitem">Condition</item> box. For example, using the variable you previously defined, enter <item type="literal">Hide==1</item>.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3153636" role="listitem">Click <item type="menuitem">Insert</item>.</paragraph>
+         </listitem>
+      </list>
+      <section id="relatedtopics">
+         <embed href="text/swriter/guide/conditional_text.xhp#conditional_text"/>
+         <embed href="text/swriter/guide/fields_userdata.xhp#fields_userdata"/>
+         <paragraph xml-lang="en-US" id="par_id3846858" role="paragraph"><link href="text/swriter/guide/hidden_text_display.xhp" name="Displaying Hidden Text">Displaying Hidden Text</link></paragraph>
+         <paragraph xml-lang="en-US" id="par_id8148442" role="paragraph"><link href="text/swriter/guide/nonprintable_text.xhp" name="Creating Non-printing Text">Creating Non-printing Text</link></paragraph>
+         <paragraph xml-lang="en-US" id="par_id3148603" role="paragraph"><link href="text/swriter/01/04090000.xhp" name="Insert - Fields - Other">Insert - Field - More Fields</link></paragraph>
+         <paragraph xml-lang="en-US" id="par_id3147011" role="paragraph"><link href="text/swriter/01/04020000.xhp" name="Insert - Section">Insert - Section</link></paragraph>
+         <paragraph xml-lang="en-US" id="par_id3147029" role="paragraph"><link href="text/swriter/02/14020000.xhp" name="List of Operators">List of Operators</link></paragraph>
+      </section>
+   </body>
+</helpdocument>

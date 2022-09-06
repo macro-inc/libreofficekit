@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textswriter0105040501xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Options</title>
+<filename>/text/swriter/01/05040501.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<h1 id="hd_id3149871">Options</h1>
+<paragraph role="paragraph" id="par_id3148569" xml-lang="en-US">Specifies the number of columns and the column layout for the section.</paragraph>
+<section id="howtoget">
+  <embed href="text/swriter/00/00000405.xhp#spaltenber"/>
+</section>
+<paragraph role="paragraph" id="par_id3151390" xml-lang="en-US">Sections follow the text flow behavior of the page they are inserted into.</paragraph>
+<paragraph role="paragraph" id="par_id3083448" xml-lang="en-US">For example, if you insert a section that uses a two-column layout into a page style that uses a four-column layout, the two-column layout is nested inside one of the four columns.</paragraph>
+<paragraph role="paragraph" id="par_id3155625" xml-lang="en-US">You can also nest sections, that is, you can insert a section into another section.</paragraph>
+<embed href="text/swriter/01/05040500.xhp#columns"/>
+<embed href="text/swriter/01/04020200.xhp#indents"/><comment>UFI: changed embedded links, see #i64128</comment>
+<embed href="text/shared/01/05210100.xhp#area"/>
+<embed href="text/swriter/01/05040700.xhp#footnotes_endnotes"/>
+</body>
+</helpdocument>

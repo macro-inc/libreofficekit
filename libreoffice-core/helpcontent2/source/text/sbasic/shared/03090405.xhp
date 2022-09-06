@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03090405xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">FreeLibrary Function</title>
+    <filename>/text/sbasic/shared/03090405.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="freelibrary">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3143270">
+  <bookmark_value>FreeLibrary function</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3143270" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03090405.xhp" name="FreeLibrary Function">FreeLibrary Function</link></paragraph>
+<paragraph id="par_id3147559" role="paragraph" xml-lang="en-US">Releases DLLs that were loaded by a Declare statement. A released DLL is automatically reloaded if one of its functions is called. See also: <link href="text/sbasic/shared/03090403.xhp" name="Declare">Declare</link></paragraph>
+</section>
+
+<paragraph id="hd_id3148550" role="heading" level="2" xml-lang="en-US">Syntax:</paragraph>
+<bascode>
+<paragraph id="par_id3153361" role="bascode" xml-lang="en-US">FreeLibrary (LibName As String)</paragraph>
+</bascode>
+
+<paragraph id="hd_id3153380" role="heading" level="2" xml-lang="en-US">Parameters:</paragraph>
+<paragraph id="par_id3154138" role="paragraph" xml-lang="en-US"> <emph>LibName:</emph> String expression that specifies the name of the DLL.</paragraph>
+<paragraph id="par_id3146923" role="note" xml-lang="en-US">FreeLibrary can only release DLLs that are loaded during Basic runtime.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<paragraph id="hd_id3153363" role="heading" level="2" xml-lang="en-US">Example:</paragraph>
+<bascode>
+<paragraph id="par_idm1340895648" role="bascode" localize="false" xml-lang="en-US">Declare Sub MyMessageBeep Lib "user32.dll" Alias "MessageBeep" ( Long )</paragraph>
+<paragraph id="par_idm1340894368" role="bascode" localize="false" xml-lang="en-US">Sub ExampleDeclare</paragraph>
+<paragraph id="par_idm1340893136" role="bascode" localize="false" xml-lang="en-US">Dim lValue As Long</paragraph>
+<paragraph id="par_idm1340891904" role="bascode" localize="false" xml-lang="en-US">    lValue = 5000</paragraph>
+<paragraph id="par_idm1340890672" role="bascode" localize="false" xml-lang="en-US">    MyMessageBeep( lValue )</paragraph>
+<paragraph id="par_idm1340889424" role="bascode" localize="false" xml-lang="en-US">    FreeLibrary("user32.dll" )</paragraph>
+<paragraph id="par_idm1340888176" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

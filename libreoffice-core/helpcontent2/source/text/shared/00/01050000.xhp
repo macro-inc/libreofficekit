@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textshared0001050000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">General</title>
+<filename>/text/shared/00/01050000.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="general">
+<bookmark xml-lang="en-US" branch="hid/cui/ui/gallerygeneralpage/GalleryGeneralPage" id="bm_id3152895" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/gallerygeneralpage/@@nowidget@@" id="bm_id3152895" localize="false"/>
+<paragraph role="heading" id="hd_id3158397" xml-lang="en-US" level="1"><link href="text/shared/00/01050000.xhp" name="General">General</link><comment>UFI: this is a tab page of the Gallery. Deleted everything else</comment></paragraph>
+<paragraph role="paragraph" id="par_id3159242" xml-lang="en-US"><ahelp hid=".">The<emph> General </emph>tab page lists the general properties of the current theme.</ahelp></paragraph>
+</section>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/gallerygeneralpage/name" id="bm_id3152896" localize="false"/>
+<paragraph role="heading" id="hd_id3150264" xml-lang="en-US" level="2">Name</paragraph>
+<paragraph role="paragraph" id="par_id3154094" xml-lang="en-US"><ahelp hid="cui/ui/gallerygeneralpage/name">Displays the name of the theme.</ahelp> If no name has been assigned, you can type a new name in the text box.</paragraph>
+<paragraph role="heading" id="hd_id3147089" xml-lang="en-US" level="3">Type</paragraph>
+<paragraph role="paragraph" id="par_id3145071" xml-lang="en-US">Specifies the object type. </paragraph>
+<paragraph role="heading" id="hd_id3147576" xml-lang="en-US" level="3">Location</paragraph>
+<paragraph role="paragraph" id="par_id3146797" xml-lang="en-US">Specifies the complete object path.</paragraph>
+</body>
+</helpdocument>

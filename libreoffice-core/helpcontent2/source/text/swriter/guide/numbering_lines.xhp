@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriterguidenumbering_linesxml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Adding Line Numbers</title>
+    <filename>/text/swriter/guide/numbering_lines.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+  <bookmark xml-lang="en-US" branch="index" id="bm_id3150101">
+    <bookmark_value>line numbers</bookmark_value>
+    <bookmark_value>text; line numbers</bookmark_value>
+    <bookmark_value>paragraphs;line numbers</bookmark_value>
+    <bookmark_value>lines of text; numbering</bookmark_value>
+    <bookmark_value>numbering; lines</bookmark_value>
+    <bookmark_value>numbers; line numbering</bookmark_value>
+    <bookmark_value>marginal numbers on text pages</bookmark_value>
+  </bookmark>
+  <h1 id="hd_id3150101"><variable id="numbering_lines"><link href="text/swriter/guide/numbering_lines.xhp" name="Adding Line Numbers">Adding Line Numbers</link></variable></h1>
+  <paragraph id="par_id3149842" role="paragraph">$[officename] can insert line numbers in an entire document or to selected paragraphs in your document. Line numbers are included when you print your document. You can specify the line numbering interval, the starting line number, and whether to count blank lines or lines in frames. You can also add a separator between line numbers.</paragraph>
+  <note id="par_id7184972">Line numbers are not available in HTML format.</note>
+
+  <h2 id="hd_id3153410">To Add Line Numbers to an Entire Document</h2>
+  <list type="ordered">
+    <listitem>
+      <paragraph id="par_id3149640" role="listitem">Choose <emph>Tools - Line Numbering</emph>.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3149612" role="listitem">Select <emph>Show numbering</emph>, and then select the options that you want.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3145101" role="listitem">Click <emph>OK</emph>.</paragraph>
+    </listitem>
+  </list>
+
+  <h2 id="hd_id3156241">To Add Line Numbers to Specific Paragraphs</h2>
+  <list type="ordered">
+    <listitem>
+      <paragraph id="par_id3156264" role="listitem">Choose <emph>Tools - Line Numbering</emph>.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3153385" role="listitem">Select <emph>Show numbering</emph>.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3154248" role="listitem">Press <switchinline select="sys"><caseinline select="MAC">Command+T
+      </caseinline><defaultinline>F11</defaultinline></switchinline> to open the <emph>Styles</emph> window, and then click the <emph>Paragraph Styles</emph> icon.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3154853" role="listitem">Right-click the "Default" paragraph style and choose <emph>Modify</emph>.</paragraph>
+      <paragraph id="par_id3150222" role="listitem">All paragraph styles are based on the "Default" style.</paragraph>
+    </listitem>
+  </list>
+
+  <list type="ordered" startwith="5">
+    <listitem>
+      <paragraph id="par_id3150931" role="listitem">Click the <emph>Outline &amp; List</emph> tab.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3150956" role="listitem">In the <item type="menuitem">Line Numbering</item> area, clear the <item type="menuitem">Include this paragraph in line numbering</item> check box.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3150520" role="listitem">Click <emph>OK</emph>.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3151077" role="listitem">Select the paragraph(s) where you want to add the line numbers.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3151096" role="listitem">Choose <item type="menuitem">Format - Paragraph</item>, and then click the <item type="menuitem">Outline &amp; Numbering</item> tab.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3153733" role="listitem">Select <emph>Include this paragraph in line numbering</emph>.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3153758" role="listitem">Click <emph>OK</emph>.</paragraph>
+    </listitem>
+  </list>
+  <paragraph id="par_id3146864" role="paragraph">You can also create a paragraph style that includes line numbering, and apply it to the paragraphs that you want to add line numbers to.</paragraph>
+
+  <h2 id="hd_id3146880">To Specify the Starting Line Number</h2>
+  <list type="ordered">
+    <listitem>
+      <paragraph id="par_id3150703" role="listitem">Click in a paragraph.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3150721" role="listitem">Choose <menuitem>Format - Paragraph</menuitem>, and then click the <menuitem>Outline &amp; List</menuitem> tab.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3148389" role="listitem">Select the <item type="menuitem">Include this paragraph in line numbering</item> check box.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3148414" role="listitem">Select <item type="menuitem">Restart at the paragraph</item> check box.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3153779" role="listitem">Enter a line number in the <item type="menuitem">Start with</item> box.</paragraph>
+    </listitem>
+    <listitem>
+      <paragraph id="par_id3153804" role="listitem">Click <emph>OK</emph>.</paragraph>
+    </listitem>
+  </list>
+
+  <section id="relatedtopics">
+    <paragraph id="par_id3153934" role="paragraph"><link href="text/swriter/01/06180000.xhp" name="Tools - Line Numbering">Tools - Line Numbering</link></paragraph>
+    <embed href="text/swriter/guide/using_numbering.xhp#using_numbering"/>
+    <paragraph id="par_id3153960" role="paragraph">Format - Paragraph - <link href="text/swriter/01/05030800.xhp" name="Numbering_link">Outline &amp; List</link></paragraph>
+    <paragraph id="par_id2212591" role="paragraph"><link href="https://wiki.documentfoundation.org/Documentation/How_Tos/Setting_up_a_Style_for_Numbering_Lines_in_Code_Listings" name="wiki.documentfoundation.org Setting up a Style for Numbering Lines in Code Listings">Wiki page about numbering paragraphs by styles</link></paragraph>
+  </section>
+</body>
+</helpdocument>

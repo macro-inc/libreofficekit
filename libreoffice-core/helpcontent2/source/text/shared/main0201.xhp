@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedmain0201xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Standard Bar</title>
+<filename>/text/shared/main0201.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="standardbar">
+<bookmark xml-lang="en-US" branch="hid/RID_ENVTOOLBOX" id="bm_id3155805" localize="false"/>
+<h1 id="hd_id3154186"><link href="text/shared/main0201.xhp" name="Standard Bar">Standard Bar</link></h1>
+<paragraph role="paragraph" id="par_id3145136" xml-lang="en-US"><ahelp hid="RID_ENVTOOLBOX">The <emph>Standard</emph> bar is available in every $[officename] application.</ahelp></paragraph>
+</section>
+<embed href="text/shared/01/01010000.xhp#new"/>
+<embed href="text/shared/00/00000401.xhp#newtextdoc"/>
+<h2 id="hd_id3166460"><link href="text/shared/01/01020000.xhp" name="Open File">Open File</link></h2>
+<embed href="text/shared/01/01020000.xhp#oeffnentext"/>
+<embed href="text/shared/00/00000401.xhp#syopen"/>
+<embed href="text/shared/01/01060000.xhp#save"/>
+<embed href="text/shared/00/00000401.xhp#sysave"/>
+<h2 id="par_idN10661"><link href="text/shared/01/01070000.xhp">Save As</link></h2>
+<paragraph role="paragraph" id="par_idN10671" xml-lang="en-US" localize="false">
+	<embedvar href="text/shared/01/01070000.xhp#speichernuntertext"/>
+</paragraph>
+<embed href="text/shared/00/00000401.xhp#sysaveas"/>
+<embed href="text/shared/01/01160200.xhp#sendemail"/>
+<embed href="text/shared/00/00000401.xhp#sysendmail"/>
+<embed href="text/shared/02/07070000.xhp#edit_mode"/>
+<embed href="text/shared/02/07070000.xhp#syedit_mode"/>
+<embed href="text/shared/01/ref_pdf_export.xhp#pdf_export"/>
+<embed href="text/shared/00/00000401.xhp#syexportpdf"/>
+<embed href="text/shared/02/01110000.xhp#print_directly"/>
+<embed href="text/shared/02/01110000.xhp#syprint_directly"/>
+<switch select="appl">
+<case select="WRITER"><embed href="text/swriter/01/01120000.xhp#printpreview"/>
+<embed href="text/shared/00/00000401.xhp#syprint_preview"/>
+</case>
+<case select="CALC"><embed href="text/scalc/01/01120000.xhp#printpreview"/>
+<embed href="text/shared/00/00000401.xhp#syprint_preview"/>
+</case>
+</switch>
+<h2 id="par_idN106A5"><link href="text/shared/01/06010000.xhp">Spelling</link></h2>
+<embed href="text/shared/01/06010000.xhp#recht"/>
+<embed href="text/shared/00/00000406.xhp#syspelling"/>
+<embed href="text/shared/02/18030000.xhp#auto_spell_check"/>
+<embed href="text/shared/02/18030000.xhp#syauto_spell_check"/>
+<embed href="text/shared/01/02040000.xhp#cut"/>
+<embed href="text/shared/00/edit_menu.xhp#sycut"/>
+<embed href="text/shared/01/02050000.xhp#copy"/>
+<embed href="text/shared/00/edit_menu.xhp#sycopy"/>
+<embed href="text/shared/01/02060000.xhp#paste"/>
+<embed href="text/shared/00/edit_menu.xhp#sypaste"/>
+<embed href="text/shared/02/paintbrush.xhp#paintbrush"/>
+<embed href="text/shared/01/02010000.xhp#undo"/>
+<embed href="text/shared/00/edit_menu.xhp#syundo"/>
+<embed href="text/shared/01/02020000.xhp#redo"/>
+<embed href="text/shared/00/edit_menu.xhp#syredo"/>
+<embed href="text/shared/02/09070000.xhp#hyperlink"/>
+<embed href="text/shared/02/09070000.xhp#syhyperdia"/>
+<switch select="appl">
+<case select="WRITER"><embed href="text/swriter/01/04150000.xhp#inserttable"/>
+<embed href="text/swriter/00/00000404.xhp#syinsert_table"/>
+<embed href="text/shared/02/01140000.xhp#show_draw_functions"/>
+<embed href="text/shared/02/01140000.xhp#syshowdraw"/>
+<embed href="text/shared/01/02100000.xhp#find_and_replace"/>
+<embed href="text/shared/00/edit_menu.xhp#syfind_and_replace"/>
+<embed href="text/shared/01/04180100.xhp#data_sources"/>
+<embed href="text/shared/00/00000403.xhp#sydata_sources"/>
+<embed href="text/swriter/01/03100000.xhp#nonprinting_chars"/>
+<embed href="text/swriter/00/00000403.xhp#syformatting_marks"/>
+<embed href="text/shared/02/19090000.xhp#htmlsource"/>
+<embed href="text/shared/00/00000403.xhp#syhtmlsource"/>
+</case>
+<case select="CALC"><embed href="text/shared/02/01140000.xhp#show_draw_functions"/>
+<embed href="text/shared/02/01140000.xhp#syshowdraw"/>
+<embed href="text/shared/01/02100000.xhp#find_and_replace"/>
+<embed href="text/shared/00/edit_menu.xhp#syfind_and_replace"/>
+<embed href="text/shared/01/04180100.xhp#data_sources"/>
+<embed href="text/shared/00/00000403.xhp#sydata_sources"/>
+<h2 id="par_idN1086E"><link href="text/schart/01/wiz_chart_type.xhp">Insert Chart</link></h2>
+<paragraph role="paragraph" id="par_id4964445" xml-lang="en-US">Creates a chart in the current document.</paragraph>
+<embed href="text/shared/00/00000404.xhp#systarchart"/>
+<h2 id="par_idN1088E"><link href="text/scalc/01/12030100.xhp">Sort Descending / Sort Ascending</link></h2>
+<paragraph role="paragraph" id="par_idN108B1" xml-lang="en-US">Sorts the selection from the highest to the lowest value, or from the lowest to the highest value using the column that contains the cursor.</paragraph>
+<embed href="text/scalc/00/00000412.xhp#sysort_criteria"/>
+</case>
+<case select="IMPRESS">
+<h2 id="par_idN108BE"><link href="text/schart/01/wiz_chart_type.xhp">Chart</link></h2>
+<paragraph role="paragraph" id="par_idN108EA" xml-lang="en-US">Creates a chart in the current document.</paragraph>
+<embed href="text/shared/00/00000404.xhp#systarchart"/>
+<embed href="text/simpress/01/04080100.xhp#inserttable"/>
+<embed href="text/swriter/00/00000404.xhp#syinsert_table"/>
+<h2 id="par_idN108C4"><link href="text/shared/02/01171200.xhp" name="Display Grid">Display Grid</link></h2>
+<embed href="text/shared/optionen/01050100.xhp#rastersicht"/>
+<embed href="text/shared/02/01171200.xhp#sydisplay_grid"/>
+</case>
+<case select="DRAW">
+<h2 id="par_idN108D7"><link href="text/schart/01/wiz_chart_type.xhp">Chart</link></h2>
+<paragraph role="paragraph" id="par_idN10976" xml-lang="en-US">Creates a chart in the current document.</paragraph>
+<embed href="text/shared/00/00000404.xhp#systarchart"/>
+<embed href="text/shared/01/05350000.xhp#3deffects"/>
+<embed href="text/shared/00/00040500.xhp#sy3d"/>
+</case>
+</switch>
+<embed href="text/shared/02/01220000.xhp#navigator"/>
+<embed href="text/shared/02/01220000.xhp#synavigator"/>
+<switch select="appl">
+<case select="WRITER"><embed href="text/shared/01/gallery.xhp#stargallery"/>
+<embed href="text/shared/00/00000406.xhp#sygallery"/>
+</case>
+<case select="CALC"><embed href="text/shared/01/gallery.xhp#stargallery"/>
+<embed href="text/shared/00/00000406.xhp#sygallery"/>
+</case>
+</switch>
+<embed href="text/shared/01/03010000.xhp#zoom"/>
+<table id="tbl_id3150046">
+<tablerow>
+<tablecell>
+<paragraph role="paragraph" id="par_idN107D8" xml-lang="en-US">
+<image id="img_id3153070" src="cmd/sc_zoom.png" width="1cm" height="1cm"><alt id="alt_id3153070" xml-lang="en-US">Icon</alt></image></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="paragraph" id="par_idN107F5" xml-lang="en-US">Zoom</paragraph>
+</tablecell>
+</tablerow>
+</table>
+<embed href="text/shared/main0108.xhp#helpcommand"/>
+<embed href="text/shared/main0108.xhp#syhelp"/>
+<section id="whatsthis">
+<bookmark xml-lang="en-US" branch="hid/.uno:ExtendedHelp" id="bm_id6275903" localize="false"/>
+<h2 id="par_idN10818">What’s This?</h2>
+<paragraph role="paragraph" id="par_idN1081E" xml-lang="en-US"><ahelp hid=".">Enables extended help tips under the mouse pointer until the next click.</ahelp></paragraph>
+<section id="sywhatsthis">
+<table id="">
+<tablerow>
+<tablecell>
+<paragraph role="paragraph" id="par_idN10855" xml-lang="en-US">
+<image id="img_id3174230" src="cmd/sc_extendedhelp.png" width="1cm" height="1cm"><alt id="alt_id3174230" xml-lang="en-US">Icon “What’s This?”</alt></image></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="paragraph" id="par_idN10873" xml-lang="en-US">What’s This?</paragraph>
+</tablecell>
+</tablerow>
+</table>
+</section>
+</section>
+<section id="loadurl">
+<embed href="text/shared/02/07010000.xhp#urlladen"/>
+</section>
+</body>
+</helpdocument>

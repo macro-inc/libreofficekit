@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsmath0105030000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Spacing</title>
+<filename>/text/smath/01/05030000.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154658"><bookmark_value>spacing; formula elements</bookmark_value>
+<bookmark_value>formulas;element spacing</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/.uno:ChangeDistance" id="bm_id3150346" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/smath/ui/spacingdialog/@@nowidget@@" id="bm_@@nowidget@@" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/smath/ui/spacingdialog/SpacingDialog" id="bm_id3150356" localize="false"/>
+<h1 id="hd_id3154658">Spacing</h1>
+<paragraph role="paragraph" id="par_id3153818" xml-lang="en-US"><variable id="abstaendetext"><ahelp hid=".">Use this dialog to determine the spacing between formula elements. The spacing is specified as a percentage in relation to the base size defined under <emph>Format - Font Size</emph>.</ahelp>
+</variable></paragraph>
+<section id="howtoget">
+  <embed href="text/smath/00/00000004.xhp#fmtabs"/>
+</section>
+<embed href="text/smath/06/screenshots.xhp#spacingdialog"/>
+<paragraph role="paragraph" id="par_id3143228" xml-lang="en-US">Use the <emph>Category</emph> button to determine the formula element for which you would like to specify the spacing. The appearance of the dialog depends on the selected category. A preview window shows you which spacing is modified through the respective boxes.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/modules/smath/ui/spacingdialog/category" id="bm_id3153811" localize="false"/>
+<h2 id="hd_id3154653">Category</h2>
+<paragraph role="paragraph" id="par_id3149873" xml-lang="en-US"><ahelp hid="modules/smath/ui/spacingdialog/category">This button allows you to select the category for which you would like to change the spacing.</ahelp></paragraph>
+<h2 id="hd_id3150391">Spacing</h2>
+<paragraph role="paragraph" id="par_id3151389" xml-lang="en-US">Defines the spacing between variables and operators, between lines, and between root signs and radicals.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_DEFAULT_DIST" id="bm_id3156401" localize="false"/>
+<h3 id="hd_id3150536">Spacing</h3>
+<paragraph role="paragraph" id="par_id3146323" xml-lang="en-US"><ahelp hid=".">Defines the spacing between variables and operators.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_LINE_DIST" id="bm_id3150743" localize="false"/>
+<h3 id="hd_id3149349">Line Spacing</h3>
+<paragraph role="paragraph" id="par_id3145824" xml-lang="en-US"><ahelp hid=".">Determines the spacing between lines.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_ROOT_DIST" id="bm_id3154561" localize="false"/>
+<h3 id="hd_id3145593">Root Spacing</h3>
+<paragraph role="paragraph" id="par_id3150864" xml-lang="en-US"><ahelp hid=".">Determines the spacing between the root sign and radicals.</ahelp></paragraph>
+<h2 id="hd_id3154508">Indexes</h2>
+<paragraph role="paragraph" id="par_id3149885" xml-lang="en-US">Defines the spacing for superscript and subscript indexes.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_SUP_DIST" id="bm_id3145248" localize="false"/>
+<h3 id="hd_id3147371">Superscript</h3>
+<paragraph role="paragraph" id="par_id3150568" xml-lang="en-US"><ahelp hid=".">Determines the spacing for superscript indexes.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_SUB_DIST" id="bm_id3145301" localize="false"/>
+<h3 id="hd_id3150933">Subscript</h3>
+<paragraph role="paragraph" id="par_id3148772" xml-lang="en-US"><ahelp hid=".">Determines the spacing for subscript indexes.</ahelp></paragraph>
+<h2 id="hd_id3149027">Fractions</h2>
+<paragraph role="paragraph" id="par_id3155369" xml-lang="en-US">Defines the spacing between the fraction bar and the numerator or denominator.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_NUMERATOR_DIST" id="bm_id3155985" localize="false"/>
+<h3 id="hd_id3156256">Numerator</h3>
+<paragraph role="paragraph" id="par_id3155990" xml-lang="en-US"><ahelp hid=".">Determines the spacing between the fraction bar and the numerator.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_DENOMINATOR_DIST" id="bm_id3083284" localize="false"/>
+<h3 id="hd_id3153722">Denominator</h3>
+<paragraph role="paragraph" id="par_id3149711" xml-lang="en-US"><ahelp hid=".">Determines the spacing between the fraction bar and the denominator.</ahelp></paragraph>
+<h2 id="hd_id3151181">Fraction Bars</h2>
+<paragraph role="paragraph" id="par_id3150764" xml-lang="en-US">Defines the excess length and line weight of the fraction bar.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_FRACLINE_EXCWIDTH" id="bm_id3145204" localize="false"/>
+<h3 id="hd_id3151266">Excess length</h3>
+<paragraph role="paragraph" id="par_id3145211" xml-lang="en-US"><ahelp hid=".">Determines the excess length of the fraction line.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_FRACLINE_LINEWIDTH" id="bm_id3149982" localize="false"/>
+<h3 id="hd_id3150260">Weight</h3>
+<paragraph role="paragraph" id="par_id3153148" xml-lang="en-US"><ahelp hid=".">Determines the weight of the fraction line.</ahelp></paragraph>
+<h2 id="hd_id3153627">Limits</h2>
+<paragraph role="paragraph" id="par_id3149755" xml-lang="en-US">Defines the spacing between the sum symbol and the limit conditions.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_UPPERLIMIT_DIST" id="bm_id3151176" localize="false"/>
+<h3 id="hd_id3147260">Upper limit</h3>
+<paragraph role="paragraph" id="par_id3154690" xml-lang="en-US"><ahelp hid=".">Determines the spacing between the sum symbol and the upper limit.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_LOWERLIMIT_DIST" id="bm_id3145419" localize="false"/>
+<h3 id="hd_id3148834">Lower limit</h3>
+<paragraph role="paragraph" id="par_id3147509" xml-lang="en-US"><ahelp hid=".">Determines the spacing between the sum symbol and the lower limit.</ahelp></paragraph>
+<h2 id="hd_id3154267">Brackets</h2>
+<paragraph role="paragraph" id="par_id3154273" xml-lang="en-US">Defines the spacing between brackets and the content.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_BRACKET_EXCHEIGHT" id="bm_id3154100" localize="false"/>
+<h3 id="hd_id3150708">Excess size (left/right)</h3>
+<paragraph role="paragraph" id="par_id3154106" xml-lang="en-US"><ahelp hid=".">Determines the vertical distance between the upper edge of the contents and the upper end of the brackets.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_BRACKET_DIST" id="bm_id3149804" localize="false"/>
+<h3 id="hd_id3109843">Spacing</h3>
+<paragraph role="paragraph" id="par_id3149810" xml-lang="en-US"><ahelp hid=".">Determines the horizontal distance between the contents and the upper end of the brackets.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/modules/smath/ui/spacingdialog/checkbutton" id="bm_id3154792" localize="false"/>
+<h3 id="hd_id3153531">Scale all brackets</h3>
+<paragraph role="paragraph" id="par_id3154799" xml-lang="en-US"><ahelp hid="modules/smath/ui/spacingdialog/checkbutton">Scales all types of brackets.</ahelp> If you then enter <emph>( a over b)</emph> in the <emph>Commands</emph> window, the brackets will surround the whole height of the argument. You normally achieve this effect by entering <emph>left ( a over b right )</emph>.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_BRACKET_EXCHEIGHT2" id="bm_id3151111" localize="false"/>
+<h3 id="hd_id3151099">Excess size</h3>
+<paragraph role="paragraph" id="par_id3147524" xml-lang="en-US"><ahelp hid=".">Adjusts the percentage excess size.</ahelp> At 0 percent the brackets are set so that they surround the argument at the same height. The higher the entered value is, the larger the vertical gap between the contents of the brackets and the external border of the brackets. The field can only be used in combination with <emph>Scale all brackets</emph>.</paragraph>
+<h2 id="hd_id3153673">Matrices</h2>
+<paragraph role="paragraph" id="par_id3151319" xml-lang="en-US">Defines the relative spacing for the elements in a matrix.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_MATRIXROW_DIST" id="bm_id3150980" localize="false"/>
+<h3 id="hd_id3150996">Line spacing</h3>
+<paragraph role="paragraph" id="par_id3153775" xml-lang="en-US"><ahelp hid=".">Determines the spacing between matrix elements in a row.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_MATRIXCOL_DIST" id="bm_id3150352" localize="false"/>
+<h3 id="hd_id3152959">Column spacing</h3>
+<paragraph role="paragraph" id="par_id3150358" xml-lang="en-US"><ahelp hid=".">Determines the spacing between matrix elements in a column.</ahelp></paragraph>
+<h2 id="hd_id3155895">Symbols</h2>
+<paragraph role="paragraph" id="par_id3149690" xml-lang="en-US">Defines the spacing of symbols in relation to variables</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_ATTRIBUT_DIST" id="bm_id3154192" localize="false"/>
+<h3 id="hd_id3149341">Primary height</h3>
+<paragraph role="paragraph" id="par_id3154198" xml-lang="en-US"><ahelp hid=".">Defines the height of the symbols in relation to the baseline.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_INTERATTRIBUT_DIST" id="bm_id3159197" localize="false"/>
+<h3 id="hd_id3154140">Minimum spacing</h3>
+<paragraph role="paragraph" id="par_id3146923" xml-lang="en-US"><ahelp hid=".">Determines the minimum distance between a symbol and variable.</ahelp></paragraph>
+<h2 id="hd_id3149302">Operators</h2>
+<paragraph role="paragraph" id="par_id3155181" xml-lang="en-US">Defines the spacing between operators and variables or numbers.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_OPERATOR_EXCHEIGHT" id="bm_id3151326" localize="false"/>
+<h3 id="hd_id3148992">Excess size</h3>
+<paragraph role="paragraph" id="par_id3151333" xml-lang="en-US"><ahelp hid=".">Determines the height from the variable to the operator's upper edge.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_OPERATOR_DIST" id="bm_id3143280" localize="false"/>
+<h3 id="hd_id3149495">Spacing</h3>
+<paragraph role="paragraph" id="par_id3151250" xml-lang="en-US"><ahelp hid=".">Determines the horizontal distance between operators and variables.</ahelp></paragraph>
+<h2 id="hd_id3149819">Borders</h2>
+<paragraph role="paragraph" id="par_id3149102" xml-lang="en-US">Adds a border to your formula. This option is particularly useful if you want to integrate the formula into a text file in $[officename] Writer. When making settings, be sure that you do not use 0 as a size, since this creates viewing problems for text that surrounds the insertion point.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_LEFTBORDER_DIST" id="bm_id3149790" localize="false"/>
+<h3 id="hd_id3154837">Left</h3>
+<paragraph role="paragraph" id="par_id3149797" xml-lang="en-US"><ahelp hid=".">The left border is positioned between the formula and background.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_RIGHTBORDER_DIST" id="bm_id3147099" localize="false"/>
+<h3 id="hd_id3147088">Right</h3>
+<paragraph role="paragraph" id="par_id3154898" xml-lang="en-US"><ahelp hid=".">The right border is positioned between the formula and background.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_UPPERBORDER_DIST" id="bm_id3149034" localize="false"/>
+<h3 id="hd_id3147218">Top</h3>
+<paragraph role="paragraph" id="par_id3149040" xml-lang="en-US"><ahelp hid=".">The top border is positioned between the formula and background.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/STARMATH_HID_SMA_LOWERBORDER_DIST" id="bm_id3148739" localize="false"/>
+<h3 id="hd_id3147584">Bottom</h3>
+<paragraph role="paragraph" id="par_id3148746" xml-lang="en-US"><ahelp hid=".">The bottom border is positioned between the formula and background.</ahelp></paragraph>
+<embed href="text/shared/00/00000001.xhp#preview_field"/>
+<bookmark xml-lang="en-US" branch="hid/modules/smath/ui/spacingdialog/default" id="bm_id3155136" localize="false"/>
+<h2 id="hd_id3147326">Default</h2>
+<paragraph role="paragraph" id="par_id3155143" xml-lang="en-US"><ahelp hid="modules/smath/ui/spacingdialog/default">Saves your changes as your default settings for all new formulas.</ahelp> A security response will appear before saving these changes.</paragraph>
+<embed href="text/smath/06/screenshots.xhp#savedefaultsdialog"/>
+</body>
+</helpdocument>

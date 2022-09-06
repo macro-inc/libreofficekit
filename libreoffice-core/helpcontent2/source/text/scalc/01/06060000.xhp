@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalc0106060000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Protect Document</title>
+<filename>/text/scalc/01/06060000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="protect_document">
+<paragraph role="heading" id="hd_id3148946" xml-lang="en-US" level="1"><link href="text/scalc/01/06060000.xhp" name="Protect Document">Protect Document</link></paragraph>
+<paragraph role="paragraph" id="par_id3153362" xml-lang="en-US">The <emph>Protect Sheet</emph> or <emph>Protect Spreadsheet Structure</emph> commands prevent changes from being made to cells in the sheets or to sheets in a document. As an option, you can define a password. If a password is defined, removal of the protection is only possible if the user enters the correct password.</paragraph>
+</section>
+<section id="howtoget">
+  <embed href="text/scalc/00/00000406.xhp#protect_sheet"/>
+  <embed href="text/scalc/00/00000406.xhp#protect_spreadsheet"/>
+</section>
+<paragraph role="heading" id="hd_id3147228" xml-lang="en-US" level="2"><link href="text/scalc/01/06060100.xhp" name="Sheets">Sheets</link></paragraph>
+<embed href="text/scalc/01/06060100.xhp#tabelletext"/>
+<paragraph role="heading" id="hd_id3153768" xml-lang="en-US" level="2"><link href="text/scalc/01/06060200.xhp" name="Documents">Documents</link></paragraph>
+<embed href="text/scalc/01/06060200.xhp#dokumenttext"/>
+<section id="relatedtopics">
+<paragraph role="paragraph" id="par_idN10622" xml-lang="en-US" localize="false">
+	<embedvar href="text/scalc/guide/cell_protect.xhp#cell_protect"/>
+</paragraph>
+</section>
+</body>
+</helpdocument>

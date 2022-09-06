@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+<topic id="textswriter0105110100xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Row Height</title>
+<filename>/text/swriter/01/05110100.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="hid/.uno:SetRowHeight" id="bm_id3310623" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/rowheight/@@nowidget@@" id="bm_@@nowidget@@" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/rowheight/RowHeightDialog" id="bm_id3154653" localize="false"/>
+<h1 id="hd_id3149871">Row Height</h1>
+<paragraph role="paragraph" id="par_id3149053" xml-lang="en-US"><variable id="row_height_text"><ahelp hid=".uno:SetRowHeight">Changes the height of the selected row(s).</ahelp>
+</variable></paragraph>
+<section id="howtoget">
+  <embed href="text/swriter/00/00000405.xhp#hoehez"/>
+</section>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/rowheight/heightmf" id="bm_id3145823" localize="false"/>
+<h2 id="hd_id3155625">Height</h2>
+<paragraph role="paragraph" id="par_id3154554" xml-lang="en-US"><ahelp hid="modules/swriter/ui/rowheight/heightmf">Enter the height that you want for the selected row(s).</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/rowheight/fit" id="bm_id3150019" localize="false"/>
+<h3 id="hd_id3149878">Fit to size</h3>
+<paragraph role="paragraph" id="par_id3145244" xml-lang="en-US"><ahelp hid="modules/swriter/ui/rowheight/fit">Automatically adjusts the row height to match the contents of the cells.</ahelp></paragraph>
+<note id="par_id3154646">You can also right-click in a cell, and then choose <link href="text/shared/01/minimal_row_height.xhp" name="Minimal Row Height"><menuitem>Size - Minimal Row Height</menuitem></link>.</note>
+</body>
+</helpdocument>

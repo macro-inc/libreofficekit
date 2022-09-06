@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03020407xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">FileDateTime Function</title>
+    <filename>/text/sbasic/shared/03020407.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="filedatetime">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153361">
+  <bookmark_value>FileDateTime function</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3153361" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03020407.xhp" name="FileDateTime Function">FileDateTime Function</link></paragraph>
+<paragraph id="par_id3156423" role="paragraph" xml-lang="en-US">Returns a string that contains the date and the time that a file was created or last modified.</paragraph>
+</section>
+
+<paragraph id="hd_id3154685" role="heading" level="2" xml-lang="en-US">Syntax:</paragraph>
+<bascode>
+<paragraph id="par_id3154124" role="bascode" xml-lang="en-US">FileDateTime (Text As String)</paragraph>
+</bascode>
+
+<paragraph id="hd_id3150448" role="heading" level="2" xml-lang="en-US">Parameters:</paragraph>
+<paragraph id="par_id3159153" role="paragraph" xml-lang="en-US"> <emph>Text:</emph> Any string expression that contains an unambiguous (no wildcards) file specification. You can also use <link href="text/sbasic/shared/00000002.xhp" name="URL notation">URL notation</link>.</paragraph>
+<paragraph id="par_id3155306" role="paragraph" xml-lang="en-US">This function determines the exact time of creation or last modification of a file, returned in the format "MM.DD.YYYY HH.MM.SS".</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#languageformat"/>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<paragraph id="hd_id3146119" role="heading" level="2" xml-lang="en-US">Example:</paragraph>
+<bascode>
+<paragraph id="par_idm1340766944" role="bascode" localize="false" xml-lang="en-US">Sub ExampleFileDateTime</paragraph>
+<paragraph id="par_idm1340765712" role="bascode" localize="false" xml-lang="en-US">    MsgBox FileDateTime("C:\autoexec.bat")</paragraph>
+<paragraph id="par_idm1340764448" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

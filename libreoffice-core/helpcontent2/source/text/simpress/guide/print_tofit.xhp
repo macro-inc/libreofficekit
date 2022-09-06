@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpressguideprint_tofitxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Printing a Slide to Fit a Paper Size</title>
+<filename>/text/simpress/guide/print_tofit.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3155067"><bookmark_value>fitting to pages; individual slides</bookmark_value>
+<bookmark_value>pages; fitting to printed pages</bookmark_value>
+<bookmark_value>printing; fitting to paper</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3155067" xml-lang="en-US" level="1"><variable id="print_tofit"><link href="text/simpress/guide/print_tofit.xhp" name="Printing a Slide to Fit a Paper Size">Printing a Slide to Fit a Paper Size</link>
+</variable></paragraph>
+<paragraph role="paragraph" id="par_id3154704" xml-lang="en-US">You can reduce the size of a slide when you print, so that the slide can fit on a printed page.</paragraph>
+<list type="ordered">
+<listitem>
+<paragraph role="listitem" id="par_id3154658" xml-lang="en-US">Open the document that you want to print.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3145384" xml-lang="en-US">In <emph>Normal View</emph>, choose <emph>Slide - Properties</emph>, and then click the <emph>Page</emph> tab.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3148871" xml-lang="en-US">In <emph>Layout settings </emph>area, select the <emph>Fit object to paper format</emph> check box.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3153811" xml-lang="en-US">In the <emph>Paper format</emph> area, select a <emph>Format</emph>.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3150431" xml-lang="en-US">Click <emph>OK</emph>. The slide is resized to fit the printed page, while maintaining the relative positions of the objects on the slide.</paragraph>
+</listitem>
+</list>
+<embed href="text/shared/00/00000004.xhp#related"/>
+<embed href="text/simpress/guide/printing.xhp#printing"/>
+</body>
+</helpdocument>

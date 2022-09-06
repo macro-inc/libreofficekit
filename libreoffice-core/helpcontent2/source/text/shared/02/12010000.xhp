@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textshared0212010000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Sort Ascending</title>
+<filename>/text/shared/02/12010000.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="sortascending">
+<h1 id="hd_id3152594"><link href="text/shared/02/12010000.xhp" name="Sort Ascending">Sort Ascending</link></h1>
+<paragraph role="paragraph" id="par_id3150693" xml-lang="en-US"><ahelp hid="." visibility="hidden">Sorts the data of the selected field in ascending order. </ahelp>Text fields are sorted alphabetically, numerical fields are sorted by number.<comment>UFI: Help ID .uno:Sortup is found in 	text/sdatabase/11090000.xhp so I deleted it here</comment></paragraph>
+</section>
+<section id="howtoget">
+    <switch select="appl"><case select="CALC">
+        <embed href="text/scalc/00/00000412.xhp#datasortascending"/>
+        <embed href="text/scalc/00/00000412.xhp#onthestandardbar"/>
+    </case></switch>
+    <embed href="text/scalc/00/00000412.xhp#sortascending"/>
+</section>
+<paragraph role="paragraph" id="par_id3154380" xml-lang="en-US"><variable id="selektionsortieren">Data of the currently selected field are always sorted. A field is always selected as soon as you place the cursor in the field. To sort within tables, you can also click the corresponding column header.
+</variable></paragraph>
+<paragraph role="paragraph" id="par_id3150504" xml-lang="en-US"><variable id="dialogsortieren">To sort more than one data field, choose <emph>Data - Sort</emph>, then choose the <link href="text/shared/02/12100100.xhp" name="Sort Criteria">Sort Criteria</link> tab, where you can combine several sort criteria.
+</variable></paragraph>
+</body>
+</helpdocument>

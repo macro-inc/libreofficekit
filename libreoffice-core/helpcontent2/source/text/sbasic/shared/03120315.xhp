@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03120315xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Join Function</title>
+<filename>/text/sbasic/shared/03120315.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="join">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149416"><bookmark_value>Join function</bookmark_value>
+</bookmark>
+<h1 id="hd_id3149416"><link href="text/sbasic/shared/03120315.xhp" name="Join Function">Join Function</link></h1>
+<paragraph role="paragraph" id="par_id3149670" xml-lang="en-US">Returns a string from a number of substrings in a string array.</paragraph>
+</section>
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph role="bascode" id="par_id3156344" xml-lang="en-US">Join (Text As String Array, delimiter)</paragraph>
+</bascode>
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph role="paragraph" localize="false" id="par_id3150359">String</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph role="paragraph" id="par_id3145171" xml-lang="en-US"><emph>Text:</emph> A string array.</paragraph>
+<paragraph role="paragraph" id="par_id3154908" xml-lang="en-US"><emph>delimiter (optional):</emph> A string character that is used to separate the substrings in the resulting string. The default delimiter is the space character. If delimiter is a string of length zero "", the substrings are joined without separator.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<embed href="text/sbasic/shared/03120314.xhp#splitjoinex"/>
+<section id="relatedtopics">
+    <paragraph role="paragraph" id="par_id161599082457466" localize="false"><embedvar href="text/sbasic/shared/00000003.xhp#stringfunctions"/></paragraph>
+</section>
+</body>
+</helpdocument>

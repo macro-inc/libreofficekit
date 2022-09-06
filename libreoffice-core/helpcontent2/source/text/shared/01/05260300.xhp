@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0105260300xml" indexer="include">
+    <title id="tit" xml-lang="en-US">To Character</title>
+    <filename>/text/shared/01/05260300.xhp</filename>
+  </topic>
+</meta>
+<body>
+<switch select="appl">
+<case select="WRITER">
+<section id="to_character">
+<bookmark xml-lang="en-US" branch="hid/.uno:SetAnchorToChar" id="bm_id9823184" localize="false"/>
+<h1 id="hd_id3154044" xml-lang="en-US"><link href="text/shared/01/05260300.xhp" name="To Character">To Character</link></h1>
+<paragraph role="paragraph" id="par_id3147069" xml-lang="en-US"><ahelp hid=".">Anchors the selected object to a character.</ahelp> Use the mouse to drag the anchor to the desired character.</paragraph>
+</section>
+<section id="howtoget">
+<embed href="text/shared/00/00040501.xhp#to-character"/>
+</section>
+<paragraph role="paragraph" id="par_id3146067" xml-lang="en-US">The character immediately before the anchor position is used for positioning in relation to the <menuitem>Character</menuitem> region and the <menuitem>Line of text</menuitem> reference line.</paragraph>
+<paragraph role="paragraph" id="par_id491654784636830"><embedvar href="text/shared/01/05260200.xhp#paraposition"/></paragraph>
+<tip id="par_id3152924" xml-lang="en-US">To align an image, frame, or OLE object relative to the anchored character, right-click the object, and choose <menuitem>Properties</menuitem>. Click the <menuitem>Position and Size</menuitem> tab, and in the <menuitem>Position</menuitem> area, select <menuitem>Character</menuitem> in the <menuitem>to</menuitem> boxes.</tip>
+</case>
+</switch>
+<section id="relatedtopics">
+<switch select="appl">
+<case select="WRITER">
+<embed href="text/swriter/guide/anchor_object.xhp#anchor_object"/>
+</case>
+</switch>
+<embed href="text/shared/01/05260000.xhp#anchorh1"/>
+</section>
+</body>
+</helpdocument>

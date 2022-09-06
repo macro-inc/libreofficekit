@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textswriter0210070000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Multiple Pages Preview</title>
+<filename>/text/swriter/02/10070000.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="multiple_pages">
+<bookmark xml-lang="en-US" branch="hid/.uno:PreviewZoom" id="bm_id2536826" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/previewzoomdialog/@@nowidget@@" id="bm_@@nowidget@@" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/previewzoomdialog/PreviewZoomDialog" id="bm_id3145243" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:ShowMultiplePages" id="bm_id2980921" localize="false"/>
+<h1 id="hd_id3147171" xml-lang="en-US"><link href="text/swriter/02/10070000.xhp" name="Page Preview: Multiple Pages">Multiple Pages Preview</link></h1>
+<paragraph role="paragraph" id="par_id3148771" xml-lang="en-US"><ahelp hid=".uno:PreviewZoom">Defines the number of pages displayed on screen. Click the arrow next to the icon to open a grid to select the number of pages to be displayed as rows and columns in the preview.</ahelp></paragraph>
+</section>
+<section id="symultiple_pages">
+<table id="tbl_id3151189">
+<tablerow>
+<tablecell>
+<paragraph role="paragraph" id="par_id3152738" xml-lang="en-US">
+<image id="img_id3152744" src="cmd/sc_showmultiplepages.svg" width="1cm" height="1cm"><alt id="alt_id3152744" xml-lang="en-US">Icon Multiple Pages Preview</alt></image></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="paragraph" id="par_id3149805" xml-lang="en-US">Multiple Pages Preview</paragraph>
+</tablecell>
+</tablerow>
+</table>
+</section>
+<paragraph role="paragraph" id="par_id3154573" xml-lang="en-US">After clicking the <menuitem>Multiple Pages Preview</menuitem> icon,  move the mouse over the desired number of rows and columns.</paragraph>
+<h2 id="hd_id121649340192450">More Options</h2>
+<paragraph role="paragraph" id="par_id3149822" xml-lang="en-US">You can also choose settings by clicking <menuitem>More Options</menuitem> to open a new dialog, then use the two spin buttons to set the number of pages to be displayed.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/previewzoomdialog/rows" id="bm_id3155183" localize="false"/>
+<h3 id="hd_id3149695" xml-lang="en-US">Rows</h3>
+<paragraph role="paragraph" id="par_id3149483" xml-lang="en-US"><ahelp hid="modules/swriter/ui/previewzoomdialog/rows">Defines the number of rows of pages.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/previewzoomdialog/cols" id="bm_id3149095" localize="false"/>
+<h3 id="hd_id3143274" xml-lang="en-US">Columns</h3>
+<paragraph role="paragraph" id="par_id3149102" xml-lang="en-US"><ahelp hid="modules/swriter/ui/previewzoomdialog/cols">Defines the number of pages shown in columns.</ahelp></paragraph>
+
+</body>
+</helpdocument>

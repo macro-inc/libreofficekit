@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03030100xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Converting Date Values</title>
+<filename>/text/sbasic/shared/03030100.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="datevalues">
+<paragraph role="heading" id="hd_id3147573" xml-lang="en-US" level="1"><link href="text/sbasic/shared/03030100.xhp" name="Converting Date Values">Converting Date Values</link></paragraph>
+<paragraph role="paragraph" id="par_id3154760" xml-lang="en-US">The following functions convert date values to calculable numbers and back.</paragraph>
+</section>
+<embed href="text/sbasic/shared/03030101.xhp#dateserial"/>
+<embed href="text/sbasic/shared/03030102.xhp#datevalue"/>
+<embed href="text/sbasic/shared/03030103.xhp#day"/>
+<embed href="text/sbasic/shared/03030104.xhp#month"/>
+<embed href="text/sbasic/shared/03030105.xhp#weekday"/>
+<embed href="text/sbasic/shared/03030106.xhp#year"/>
+<embed href="text/sbasic/shared/03030107.xhp#cdatetoiso"/>
+<embed href="text/sbasic/shared/03030108.xhp#cdatefromiso"/>
+<embed href="text/sbasic/shared/03030111.xhp#cdatetounodate"/>
+<embed href="text/sbasic/shared/03030112.xhp#cdatefromunodate"/>
+<embed href="text/sbasic/shared/03030115.xhp#cdatetounodatetime"/>
+<embed href="text/sbasic/shared/03030116.xhp#cdatefromunodatetime"/>
+<embed href="text/sbasic/shared/03030110.xhp#dateadd"/>
+<embed href="text/sbasic/shared/03030120.xhp#datediff"/>
+<embed href="text/sbasic/shared/03030130.xhp#datepart"/>
+</body>
+</helpdocument>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared01030200xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">The Basic Editor</title>
+<filename>/text/sbasic/shared/01030200.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="hid/start" id="bm_id3147247" localize="false"/>
+<section id="basiceditor">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3148647"><bookmark_value>saving;Basic code</bookmark_value>
+<bookmark_value>loading;Basic code</bookmark_value>
+<bookmark_value>Basic editor</bookmark_value>
+<bookmark_value>navigating;in Basic projects</bookmark_value>
+<bookmark_value>long lines;in Basic editor</bookmark_value>
+<bookmark_value>lines of text;in Basic editor</bookmark_value>
+<bookmark_value>continuation;long lines in editor</bookmark_value>
+</bookmark>
+<h1 id="hd_id3147264"><variable id="thebasiceditorh1"><link href="text/sbasic/shared/01030200.xhp" name="The Basic Editor">The Basic Editor</link></variable></h1>
+</section>
+<paragraph role="paragraph" id="par_id3145069" xml-lang="en-US">The Basic Editor provides the standard editing functions you are familiar with when working in a text document. It supports the functions of the <emph>Edit</emph> menu (Cut, Delete, Paste), the ability to select text with the Shift key, as well as cursor positioning functions (for example, moving from word to word with <switchinline select="sys"><caseinline select="MAC">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline> and the arrow keys).</paragraph>
+<paragraph role="paragraph" id="par_id3154686" xml-lang="en-US">Long lines can be split into several parts by inserting a space and an underline character _ as the last two characters of a line. This connects the line with the following line to one logical line. (If "Option Compatible" is used in the same Basic module, the line continuation feature is also valid for comment lines.)</paragraph>
+<paragraph role="paragraph" id="par_id3151042" xml-lang="en-US">If you press the <emph>Run BASIC</emph> icon on the <emph>Macro</emph> bar, program execution starts at the first line of the Basic editor. The program executes the first Sub or Function and then program execution stops. The "Sub Main" does not take precedence on program execution.</paragraph>
+<tip id="par_id59816">Insert your Basic code between the Sub Main and End Sub lines that you see when you first open the IDE. Alternatively, delete all lines and then enter your own Basic code.</tip>
+<h2 id="hd_id3125863">Navigating in a Project</h2>
+<h3 id="hd_id3145785">The Library List</h3>
+<paragraph role="paragraph" id="par_id3146120" xml-lang="en-US">Select a library from the <emph>Library</emph> list at the left of the toolbar to load the library in the editor. The first module of the selected library will be displayed.</paragraph>
+<h3 id="hd_id3153190">The Object Catalog</h3>
+<embed href="text/sbasic/shared/01020200.xhp#object_catalog"/>
+<h2 id="hd_id3148647">Saving and Loading Basic Source Code</h2>
+<paragraph role="paragraph" id="par_id3154320" xml-lang="en-US">You can save Basic code in a text file for saving and importing in other programming systems.</paragraph>
+<warning id="par_id3149959">You cannot save Basic dialogs to a text file.</warning>
+<h3 id="hd_id3149403">Saving Source Code to a Text File</h3>
+<list type="ordered">
+<listitem>
+<paragraph role="listitem" id="par_id3150327" xml-lang="en-US">Select the module that you want to export as text from the object catalog.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3150752" xml-lang="en-US">Click the <emph>Save Source As</emph> icon in the Macro toolbar.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3154754" xml-lang="en-US">Select a file name and click <emph>OK</emph> to save the file.</paragraph>
+</listitem>
+</list>
+<h3 id="hd_id3159264">Loading Source Code From a Text File</h3>
+<list type="ordered">
+<listitem>
+<paragraph role="listitem" id="par_id3147343" xml-lang="en-US">Select the module where you want to import the source code from the object catalog.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3145230" xml-lang="en-US">Position the cursor where you want to insert the program code.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3149565" xml-lang="en-US">Click the <emph>Insert Source Text</emph> icon in the Macro toolbar.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3154020" xml-lang="en-US">Select the text file containing the source code and click <emph>OK</emph>.</paragraph>
+</listitem>
+</list>
+<section id="relatedtopics">
+<paragraph role="paragraph" id="par_id3153198" xml-lang="en-US"><link href="text/sbasic/shared/01050000.xhp" name="Basic IDE">Basic IDE</link></paragraph>
+<embed href="text/sbasic/shared/01020200.xhp#01020200"/>
+</section>
+</body>
+</helpdocument>

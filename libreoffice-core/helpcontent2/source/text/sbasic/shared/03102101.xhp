@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03102101xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">ReDim Statement</title>
+    <filename>/text/sbasic/shared/03102101.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="redim">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150398">
+  <bookmark_value>ReDim statement</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3150398" xml-lang="en-US"><link href="text/sbasic/shared/03102101.xhp" name="ReDim Statement">ReDim Statement</link></h1>
+<paragraph id="par_id3154685" role="paragraph" xml-lang="en-US">Declares or redefines variables or arrays.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<paragraph role="paragraph" id="par_id971587473488701">
+  <image src="media/helpimg/sbasic/ReDim_statement.svg" id="img_id4156296484514"><alt xml-lang="en-US" id="alt_id15152796484514">ReDim Statement diagram</alt></image>
+</paragraph>
+<bascode>
+<paragraph id="par_id3156214" role="bascode">ReDim [Preserve] variable [(start To end)] [As type-name][, variable2 [(start To end)] [As type-name][,...]]</paragraph>
+</bascode>
+<paragraph id="par_id711996" role="paragraph">Optionally, add the <literal>Preserve</literal> keyword to preserve the contents of the array that is redimensioned. <literal>ReDim</literal> can only be used in subroutines.</paragraph>
+
+<embed href="text/sbasic/shared/03102100.xhp#DimCommons"/>
+
+<paragraph id="hd_id3148405" role="heading" level="2" xml-lang="en-US">Example:</paragraph>
+<bascode>
+<paragraph id="par_idm1341054016" role="bascode" localize="false">Sub ExampleRedim</paragraph>
+<paragraph id="par_idm1341052784" role="bascode" localize="false">    Dim iVar() As Integer, iCount As Byte</paragraph>
+<paragraph id="par_idm1341051520" role="bascode" localize="false">    ReDim iVar(5) As Integer</paragraph>
+<paragraph id="par_idm1341050272" role="bascode" localize="false">    For iCount = 1 To 5</paragraph>
+<paragraph id="par_idm1341049040" role="bascode" localize="false">        iVar(iCount) = iCount</paragraph>
+<paragraph id="par_idm1341047792" role="bascode" localize="false">    Next iCount</paragraph>
+<paragraph id="par_idm1341046560" role="bascode" localize="false">    ReDim iVar(10) As Integer</paragraph>
+<paragraph id="par_idm1341045312" role="bascode" localize="false">    For iCount = 1 To 10</paragraph>
+<paragraph id="par_idm1341044080" role="bascode" localize="false">        iVar(iCount) = iCount</paragraph>
+<paragraph id="par_idm1341042832" role="bascode" localize="false">    Next iCount</paragraph>
+<paragraph id="par_idm1341041600" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

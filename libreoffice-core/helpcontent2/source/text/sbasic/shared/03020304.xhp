@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03020304xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Seek Function</title>
+<filename>/text/sbasic/shared/03020304.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="seek">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154367"><bookmark_value>Seek function</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3154367" xml-lang="en-US" level="1"><link href="text/sbasic/shared/03020304.xhp" name="Seek Function">Seek Function</link></paragraph>
+<paragraph role="paragraph" id="par_id3156280" xml-lang="en-US">Returns the position for the next writing or reading in a file that was opened with the open statement.</paragraph>
+</section>
+<paragraph role="paragraph" id="par_id3153194" xml-lang="en-US">For random access files, the Seek function returns the number of the next record to be read.</paragraph>
+<paragraph role="paragraph" id="par_id3161831" xml-lang="en-US">For all other files, the function returns the byte position at which the next operation is to occur.</paragraph>
+<paragraph role="paragraph" id="par_id3155854" xml-lang="en-US">See also: <link href="text/sbasic/shared/03020103.xhp" name="Open">Open</link>, <link href="text/sbasic/shared/03020305.xhp" name="Seek">Seek</link>.</paragraph>
+<paragraph role="heading" id="hd_id3152460" xml-lang="en-US" level="2">Syntax:</paragraph>
+<bascode>
+<paragraph role="bascode" id="par_id3145365" xml-lang="en-US">Seek (FileNumber)</paragraph>
+</bascode>
+<paragraph role="heading" id="hd_id3148575" xml-lang="en-US" level="2">Return value:</paragraph>
+<paragraph role="paragraph" localize="false" id="par_id3159156" xml-lang="en-US">Long</paragraph>
+<paragraph role="heading" id="hd_id3149665" xml-lang="en-US" level="2">Parameters:</paragraph>
+<paragraph role="paragraph" id="par_id3148645" xml-lang="en-US">
+<emph>FileNumber:</emph> The data channel number used in the Open statement.</paragraph>
+</body>
+</helpdocument>

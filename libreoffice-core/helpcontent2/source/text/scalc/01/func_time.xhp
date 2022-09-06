@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalc01func_timexml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">TIME </title>
+<filename>/text/scalc/01/func_time.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154073"><bookmark_value>TIME function</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/SC_HID_FUNC_ZEIT" id="bm_id3150289" localize="false"/><h2 id="hd_id3154073"><variable id="time"><link href="text/scalc/01/func_time.xhp">TIME</link>
+</variable></h2>
+<paragraph role="paragraph" id="par_id3145762" xml-lang="en-US"><ahelp hid="HID_FUNC_ZEIT">TIME returns the current time value from values for hours, minutes and seconds.</ahelp> This function can be used to convert a time based on these three elements to a decimal time value.</paragraph>
+<embed href="text/scalc/01/ODFF.xhp#odff"/>
+<embed href="text/scalc/01/common_func.xhp#sectionsyntax"/>
+<paragraph role="code" id="par_id3154584" xml-lang="en-US">TIME(Hour; Minute; Second)</paragraph>
+<paragraph role="paragraph" id="par_id3152904" xml-lang="en-US">Use an integer to set the <emph>Hour</emph>.</paragraph>
+<paragraph role="paragraph" id="par_id3151346" xml-lang="en-US">Use an integer to set the <emph>Minute</emph>.</paragraph>
+<paragraph role="paragraph" id="par_id3151366" xml-lang="en-US">Use an integer to set the <emph>Second</emph>.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionexample"/>
+<paragraph role="paragraph" id="par_id3156076" xml-lang="en-US">
+<item type="input">=TIME(0;0;0)</item> returns 00:00:00</paragraph>
+<paragraph role="paragraph" id="par_id3156090" xml-lang="en-US">
+<item type="input">=TIME(4;20;4)</item> returns 04:20:04</paragraph>
+<section id="relatedtopics">
+    <embed href="text/scalc/01/04060102.xhp#datetimefunctions"/>
+</section>
+</body>
+</helpdocument>

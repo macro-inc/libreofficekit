@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textshared01guidesxml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Snap Guides</title>
+    <filename>/text/shared/01/guides.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="snap_lines">
+
+<bookmark xml-lang="en-US" branch="index" id="bm_id1441999">
+  <bookmark_value>guides;display options (Impress/Draw)</bookmark_value>
+</bookmark>
+
+<bookmark xml-lang="en-US" branch="hid/.uno:SnapLinesMenu" id="bm_id2510147" localize="false"/>
+
+<h1 id="par_idN10562" xml-lang="en-US"><link href="text/shared/01/guides.xhp">Snap Guides</link></h1>
+<paragraph id="par_id3146313" role="paragraph" xml-lang="en-US"><ahelp hid=".">Specifies the display options for snap guides.</ahelp></paragraph>
+</section>
+
+<section id="howtoget">
+<embed href="text/shared/00/00000403.xhp#guides"/>
+</section>
+
+<h2 id="par_idN1057B" xml-lang="en-US">Display Snap Guides</h2>
+<paragraph id="par_idN1057F" role="paragraph" xml-lang="en-US">Displays or hides snap guides that you can use to align objects on a page.</paragraph>
+
+
+<h2 id="par_idN105C6" xml-lang="en-US">Snap Guides to Front</h2>
+<paragraph id="par_idN105CA" role="paragraph" xml-lang="en-US"><ahelp hid=".">Displays the snap guides in front of the objects on the <switchinline select="appl"><caseinline  select="DRAW">page</caseinline><caseinline select="IMPRESS">slide</caseinline><defaultinline>page</defaultinline></switchinline>.</ahelp></paragraph>
+<embed href="text/sdraw/main0213.xhp#Snap_to_Grid_and_Guides"/>
+<embed href="text/sdraw/main0213.xhp#Snap_to_Border_and_Points"/>
+<embed href="text/sdraw/main0213.xhp#Snap_to_Page"/>
+</body>
+
+</helpdocument>

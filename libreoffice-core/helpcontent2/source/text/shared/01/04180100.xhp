@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textshared0104180100xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Data Sources</title>
+    <filename>/text/shared/01/04180100.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="data_sources">
+<bookmark xml-lang="en-US" branch="hid/.uno:DataImport" id="bm_id8802771" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:ViewDataSourceBrowser" id="bm_id750714" localize="false"/>
+
+<paragraph id="hd_id3156053" role="heading" level="1" xml-lang="en-US"><link href="text/shared/01/04180100.xhp" name="Data Sources">Data Sources</link></paragraph>
+<paragraph id="par_id3149495" role="paragraph" xml-lang="en-US"><ahelp hid=".">Lists the databases that are registered in <item type="productname">%PRODUCTNAME</item> and lets you manage the contents of the databases.</ahelp></paragraph>
+</section>
+
+<section id="howtoget">
+<embed href="text/shared/00/00000403.xhp#data_sources"/>
+</section>
+<embed href="text/shared/guide/database_main.xhp#database_main"/>
+<paragraph id="par_id3156136" role="note" xml-lang="en-US">The <emph>Data sources</emph> command is only available when a text document or a spreadsheet is open.</paragraph>
+<paragraph id="par_id3154823" role="paragraph" xml-lang="en-US">You can insert fields from a database into your file or you can create forms to access the database.</paragraph>
+
+<section id="relatedtopics">
+<paragraph id="par_id3156427" role="paragraph" xml-lang="en-US"><link href="text/shared/main0212.xhp" name="Table Data bar">Table Data bar</link></paragraph>
+<embed href="text/shared/guide/dragdrop_beamer.xhp#dragdrop_beamer"/>
+<paragraph id="par_id3153311" role="paragraph" xml-lang="en-US"><link href="text/shared/02/01170000.xhp" name="Forms">Forms</link></paragraph>
+</section>
+</body>
+
+</helpdocument>

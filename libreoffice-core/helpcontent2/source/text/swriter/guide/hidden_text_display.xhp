@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+      <topic id="textswriterguidehidden_text_displayxhp" indexer="include" status="PUBLISH">
+         <title xml-lang="en-US" id="tit">Displaying Hidden Text</title>
+         <filename>/text/swriter/guide/hidden_text_display.xhp</filename>
+      </topic>
+   </meta>
+   <body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3148856"><bookmark_value>hidden text; displaying</bookmark_value>
+      <bookmark_value>displaying;hidden text</bookmark_value>
+</bookmark><comment>MW copied two entries from hidden_text.xhp</comment>
+<h1 xml-lang="en-US" id="hd_id3148856"><variable id="hidden_text_display"><link href="text/swriter/guide/hidden_text_display.xhp" name="Displaying Hidden Text">Displaying Hidden Text</link>
+</variable></h1><comment>MW created this guide from splitting hidden_text.xhp</comment>
+<paragraph xml-lang="en-US" id="par_id5659962" role="paragraph">If you have a text that was hidden by defining a condition with a variable, you have several options to display the hidden text. Do one of the following:</paragraph>
+      <list type="unordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3152777" role="listitem">Check the <emph>Hidden Paragraphs</emph> box in the dialog <switchinline select="sys"><caseinline select="MAC"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline> - <menuitem>%PRODUCTNAME Writer - View</menuitem>.</paragraph>
+         </listitem>
+      </list>
+      <list type="unordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3153902" role="listitem">Double-click in front of the variable that you used to define the condition for hiding the text, and enter a different value for the variable.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3147114" role="listitem">Double-click in front of the hidden text field or the hidden paragraph field, and change the condition statement.</paragraph>
+         </listitem>
+      </list>
+      <section id="relatedtopics">
+         <paragraph xml-lang="en-US" id="par_id1865901" role="paragraph"><link href="text/swriter/guide/hidden_text.xhp" name="Hiding Text">Hiding Text</link></paragraph>
+         <embed href="text/swriter/guide/conditional_text.xhp#conditional_text"/>
+         <paragraph xml-lang="en-US" id="par_id3147029" role="paragraph"><link href="text/swriter/02/14020000.xhp" name="List of Operators">List of Operators</link></paragraph>
+      </section>
+   </body>
+</helpdocument>

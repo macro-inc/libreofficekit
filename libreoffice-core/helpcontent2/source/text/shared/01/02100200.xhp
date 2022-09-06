@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0102100200xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Attributes</title>
+    <filename>/text/shared/01/02100200.xhp</filename>
+  </topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/searchattrdialog/SearchAttrDialog" id="bm_id3152474" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/searchattrdialog/@@nowidget@@" id="bm_id3152474" localize="false"/>
+<h1 id="hd_id3154422" xml-lang="en-US">Attributes</h1>
+   <paragraph role="paragraph" id="par_id3153331" xml-lang="en-US"><variable id="attributetext"><ahelp hid="cui/ui/searchattrdialog/SearchAttrDialog">Choose the text attributes that you want to search for. For example, if you select the <emph>Outline</emph> attribute, then all characters formatted manually with an Outline effect are found. If you also want to find characters with an Outline effect as part of a style, then select <emph>Including styles</emph> in the <emph>Other Options</emph> section, before searching.</ahelp></variable></paragraph>
+
+<h2 id="hd_id3150944" xml-lang="en-US">Options</h2>
+  <paragraph role="paragraph" id="par_id3151384" xml-lang="en-US">Select the attributes that you want to search for.</paragraph>
+<sort order="asc" descendant="h3">
+    <section id="Section1">
+<h3 id="hd_id3149245" xml-lang="en-US">Keep with Next Paragraph</h3>
+  <paragraph role="paragraph" id="par_id3154760" xml-lang="en-US">Finds the <emph>Keep With Next Paragraph</emph> attribute.</paragraph>
+</section>
+<section id="Section2">
+<h3 id="hd_id3145068" xml-lang="en-US">Do not split paragraph</h3>
+  <paragraph role="paragraph" id="par_id3147560" xml-lang="en-US">Finds paragraphs with the <emph>Do not split paragraph</emph> attribute enabled.</paragraph>
+</section>
+<section id="Section3">
+<h3 id="hd_id3156435" xml-lang="en-US">Spacing</h3>
+  <paragraph role="paragraph" id="par_id3150866" xml-lang="en-US">Finds the <emph>Spacing</emph> (top, bottom) attribute.</paragraph>
+</section>
+<section id="Section4">
+<h3 id="hd_id3154071" xml-lang="en-US">Alignment</h3>
+  <paragraph role="paragraph" id="par_id3154365" xml-lang="en-US">Finds the <emph>Alignment</emph> (left, right, centered, justified) attribute.</paragraph>
+</section>
+<section id="Section5">
+<h3 id="hd_id3145171" xml-lang="en-US">Effects</h3>
+  <paragraph role="paragraph" id="par_id3149203" xml-lang="en-US">Finds characters that use a <emph>Case</emph> effect (Uppercase, Lowercase, Capitalize every word, or Small capitals).</paragraph>
+</section>
+<section id="Section6">
+<h3 id="hd_id3148676" xml-lang="en-US">Blinking</h3>
+  <paragraph role="paragraph" id="par_id3153193" xml-lang="en-US">Finds characters use the <emph>Blinking</emph> attribute.</paragraph>
+</section>
+<section id="Section7">
+<h3 id="hd_id3153968" xml-lang="en-US">Strikethrough</h3>
+  <paragraph role="paragraph" id="par_id3145746" xml-lang="en-US">Finds characters formatted with the <emph>Strikethrough</emph> attribute.</paragraph>
+</section>
+<section id="Section8">
+<h3 id="hd_id3156422" xml-lang="en-US">Indent</h3>
+  <paragraph role="paragraph" id="par_id3150449" xml-lang="en-US">Finds the <emph>Indent</emph> (from left, from right, first line) attribute.</paragraph>
+</section>
+<section id="Section9">
+<h3 id="hd_id3145203" xml-lang="en-US">Widows</h3>
+  <paragraph role="paragraph" id="par_id3153105" xml-lang="en-US">Finds the <emph>Widow Control</emph> attribute.</paragraph>
+</section>
+<section id="Section10">
+<h3 id="hd_id3149560" xml-lang="en-US">Kerning</h3>
+  <paragraph role="paragraph" id="par_id3155132" xml-lang="en-US">Finds <emph>Spacing</emph> (standard, expanded, condensed) attributes and pair kerning.</paragraph>
+</section>
+<section id="Section11">
+<h3 id="hd_id3145261" xml-lang="en-US">Outline</h3>
+  <paragraph role="paragraph" id="par_id3153143" xml-lang="en-US">Finds characters formatted with the <emph>Outline</emph> attribute.</paragraph>
+</section>
+<section id="Section12">
+<h3 id="hd_id3148575" xml-lang="en-US">Position</h3>
+  <paragraph role="paragraph" id="par_id3146922" xml-lang="en-US">Finds characters using the <emph>Normal</emph>, <emph>Superscript</emph> or <emph>Subscript</emph> attributes.</paragraph>
+</section>
+<section id="Section13">
+<h3 id="hd_id3156062" xml-lang="en-US">Page line-spacing</h3>
+  <paragraph role="paragraph" id="par_id3152886" xml-lang="en-US">Finds paragraphs with the <emph>Activate page line-spacing</emph> attribute enabled.</paragraph>
+</section>
+<section id="Section14">
+<h3 id="hd_id3159196" xml-lang="en-US">Relief</h3>
+  <paragraph role="paragraph" id="par_id3146120" xml-lang="en-US">Finds characters formatted with the <emph>Relief</emph> attribute.</paragraph>
+</section>
+<section id="Section15">
+<h3 id="hd_id3154014" xml-lang="en-US">Rotation</h3>
+  <paragraph role="paragraph" id="par_id3150873" xml-lang="en-US">Finds the <emph>Rotation</emph> attribute.</paragraph>
+</section>
+<section id="Section16">
+<h3 id="hd_id3152576" xml-lang="en-US">Shadowed</h3>
+  <paragraph role="paragraph" id="par_id3150104" xml-lang="en-US">Finds characters formatted with the <emph>Shadowed</emph> attribute.</paragraph>
+</section>
+<section id="Section17">
+<h3 id="hd_id3159156" xml-lang="en-US">Font</h3>
+  <paragraph role="paragraph" id="par_id3154320" xml-lang="en-US">Finds any instance where the default font was changed.</paragraph>
+</section>
+<section id="Section18">
+<h3 id="hd_id3151113" xml-lang="en-US">Font Color</h3>
+  <paragraph role="paragraph" id="par_id3149664" xml-lang="en-US">Finds any instance where the default font color was changed.</paragraph>
+</section>
+<section id="Section19">
+<h3 id="hd_id3152794" xml-lang="en-US">Font Size</h3>
+  <paragraph role="paragraph" id="par_id3150962" xml-lang="en-US">Finds the <emph>Font size/Font height</emph> attribute.</paragraph>
+</section>
+<section id="Section20">
+<h3 id="hd_id3163717" xml-lang="en-US">Font Weight</h3>
+  <paragraph role="paragraph" id="par_id3150593" xml-lang="en-US">Finds the <emph>Bold</emph> or the <emph>Bold and Italic</emph> attribute.</paragraph>
+</section>
+<section id="Section21">
+<h3 id="hd_id3146928" xml-lang="en-US">Font Posture</h3>
+  <paragraph role="paragraph" id="par_id3154097" xml-lang="en-US">Finds the <emph>Italic</emph> or the <emph>Bold and Italic</emph> attribute.</paragraph>
+</section>
+<section id="Section22">
+<h3 id="hd_id3148388" xml-lang="en-US">Orphans</h3>
+  <paragraph role="paragraph" id="par_id3156737" xml-lang="en-US">Finds the <link href="text/shared/00/00000005.xhp#widows_and_orphans"><emph>Orphan Control</emph></link> attribute.</paragraph>
+</section>
+<section id="Section23">
+<h3 id="hd_id3153159" xml-lang="en-US">Page Style</h3>
+  <paragraph role="paragraph" id="par_id3147045" xml-lang="en-US">Finds the <emph>Break With Page Style</emph> attribute.</paragraph>
+</section>
+<section id="Section24">
+<h3 id="hd_id3147124" xml-lang="en-US">Hyphenation</h3>
+  <paragraph role="paragraph" id="par_id3153877" xml-lang="en-US">Finds the <emph>Hyphenation</emph> attribute.</paragraph>
+</section>
+<section id="Section25">
+<h3 id="hd_id3148773" xml-lang="en-US">Character scaling</h3>
+  <paragraph role="paragraph" id="par_id3147396" xml-lang="en-US">Finds characters formatted with <emph>Scale width</emph>.</paragraph>
+</section>
+<section id="Section26">
+<h3 id="hd_id3148455" xml-lang="en-US">Language</h3>
+  <paragraph role="paragraph" id="par_id3150716" xml-lang="en-US">Finds the <emph>Language</emph> attribute (for spelling).</paragraph>
+</section>
+<section id="Section27">
+<h3 id="hd_id3154511" xml-lang="en-US">Tab Stops</h3>
+  <paragraph role="paragraph" id="par_id3151037" xml-lang="en-US">Finds paragraphs that use an additional tab set.</paragraph>
+</section>
+<section id="Section28">
+<h3 id="hd_id3154164" xml-lang="en-US">Underline</h3>
+  <paragraph role="paragraph" id="par_id3148566" xml-lang="en-US">Finds characters formatted with <emph>Underlining</emph>.</paragraph>
+</section>
+<section id="Section29">
+<h3 id="hd_id3153099" xml-lang="en-US">Vertical text alignment</h3>
+  <paragraph role="paragraph" id="par_id3145650" xml-lang="en-US">Finds the <emph>Vertical text alignment</emph> attribute.</paragraph>
+</section>
+<section id="Section30">
+<h3 id="hd_id3147259" xml-lang="en-US">Individual Words</h3>
+  <paragraph role="paragraph" id="par_id3156438" xml-lang="en-US">Finds characters formatted with <emph>Underlining</emph> or <emph>Strikethrough</emph> as <emph>Individual words</emph>.</paragraph>
+</section>
+<section id="Section31">
+<h3 id="hd_id3153948" xml-lang="en-US">Character background</h3>
+  <paragraph role="paragraph" id="par_id3145300" xml-lang="en-US">Finds characters that use the <emph>Background</emph> attribute.</paragraph>
+</section>
+<section id="Section32">
+<h3 id="hd_id3146791" xml-lang="en-US">Line Spacing</h3>
+  <paragraph role="paragraph" id="par_id3146912" xml-lang="en-US">Finds the <emph>Line spacing</emph> (single line, 1.5 lines, double, proportional, at least, lead) attribute.</paragraph>
+</section>
+<section id="Section33">
+<h3 id="hd_id901610234753125">Overline</h3>
+ <paragraph role="paragraph" id="par_id921610234834028">Finds characters formatted with <emph>Overlining</emph>.</paragraph>
+</section>
+
+</sort>
+<section id="relatedtopics">
+<embed href="text/shared/guide/find_attributes.xhp#find_attributes"/>
+<embed href="text/shared/01/02100000.xhp#02100000"/>
+</section>
+</body>
+</helpdocument>

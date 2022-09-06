@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+<topic id="textshared0105200300xml" indexer="include">
+<title id="tit" xml-lang="en-US">Arrow Styles</title>
+<filename>/text/shared/01/05200300.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="arrow_styles">
+<bookmark xml-lang="en-US" branch="hid/cui/ui/lineendstabpage/LineEndPage" id="bm_id3152942" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/lineendstabpage/@@nowidget@@" id="bm_id3152942" localize="false"/>
+<h1 id="hd_id3156045" xml-lang="en-US"><link href="text/shared/01/05200300.xhp" name="Arrow Styles">Arrow Styles</link></h1>
+<paragraph role="paragraph" id="par_id3149031" xml-lang="en-US"><ahelp hid="cui/ui/lineendstabpage/LineEndPage">Edit or create arrow styles.</ahelp></paragraph>
+</section>
+<paragraph role="paragraph" id="par_id711654765705735">You can add arrow styles to the start or end of a line using the <link href="text/shared/01/05200100.xhp" name="Line tab"><menuitem>Line</menuitem></link> tab of the <menuitem>Line</menuitem> dialog.</paragraph>
+<section id="howtoget">
+<embed href="text/shared/00/00040502.xhp#ArrowStyle"/>
+</section>
+<h2 id="hd_id3153551" xml-lang="en-US">Manage Arrow Styles</h2>
+<paragraph role="paragraph" id="par_id3154398" xml-lang="en-US">Lets you add, rename, delete, save and load arrow styles.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/lineendstabpage/EDT_NAME" id="bm_id3152426" localize="false"/>
+<h3 id="hd_id3155552" xml-lang="en-US">Style name</h3>
+<paragraph role="paragraph" id="par_id3147399" xml-lang="en-US"><ahelp hid="cui/ui/lineendstabpage/EDT_NAME">Displays the name of the selected arrow style.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/lineendstabpage/LB_LINEENDS" id="bm_id3153578" localize="false"/>
+<h3 id="hd_id3155892" xml-lang="en-US">Arrow style</h3>
+<paragraph role="paragraph" id="par_id3149827" xml-lang="en-US"><ahelp hid="cui/ui/lineendstabpage/LB_LINEENDS">Choose a predefined arrow style symbol from the list box.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/lineendstabpage/BTN_ADD" id="bm_id3153346" localize="false"/>
+<h2 id="hd_id3145313" xml-lang="en-US">Add</h2>
+<paragraph role="paragraph" id="par_id3154288" xml-lang="en-US"><ahelp hid="cui/ui/lineendstabpage/BTN_ADD">To define a custom arrow style, select a drawing object in the document, and then click here.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/lineendstabpage/BTN_MODIFY" id="bm_id3159158" localize="false"/>
+<h2 id="hd_id3156346" xml-lang="en-US">Rename</h2>
+<paragraph role="paragraph" id="par_id3154897" xml-lang="en-US"><ahelp hid="cui/ui/lineendstabpage/BTN_MODIFY">Changes the name of the selected arrow style.</ahelp></paragraph>
+<embed href="text/shared/00/00000001.xhp#delete"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/lineendstabpage/BTN_LOAD" id="bm_id3148992" localize="false"/>
+<h2 id="hd_id3153332" xml-lang="en-US">Load Arrow Styles</h2>
+<paragraph role="paragraph" id="par_id3146137" xml-lang="en-US"><ahelp hid="cui/ui/lineendstabpage/BTN_LOAD">Imports a list of arrow styles.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/lineendstabpage/BTN_SAVE" id="bm_id3150772" localize="false"/>
+<h2 id="hd_id3158432" xml-lang="en-US">Save Arrow Styles</h2>
+<paragraph role="paragraph" id="par_id3152944" xml-lang="en-US"><ahelp hid="cui/ui/lineendstabpage/BTN_SAVE">Saves the current list of arrow styles, so that you can load it later.</ahelp></paragraph>
+<embed href="text/shared/00/00000001.xhp#preview_field"/>
+<section id="relatedtopics">
+<embed href="text/shared/guide/lineend_define.xhp#lineend_define"/>
+</section>
+</body>
+</helpdocument>

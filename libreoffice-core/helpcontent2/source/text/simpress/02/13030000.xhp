@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpress0213030000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Allow Effects</title>
+<filename>/text/simpress/02/13030000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149666"><bookmark_value>allowing; effects</bookmark_value>
+<bookmark_value>effects; preview</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/.uno:AnimationMode" id="bm_id3146121" localize="false"/>
+<paragraph role="heading" id="hd_id3149666" xml-lang="en-US" level="1"><link href="text/simpress/02/13030000.xhp" name="Allow Effects">Allow Effects</link></paragraph>
+<paragraph role="paragraph" id="par_id3145251" xml-lang="en-US"><ahelp hid=".uno:AnimationMode">Plays a preview of an animation effect that is assigned to an object, when you click the object in the slide. To select an object for editing, hold down the <switchinline select="sys"><caseinline select="MAC">Option</caseinline><defaultinline>Alt</defaultinline></switchinline> key when you click.</ahelp></paragraph>
+<table id="tbl_id3154756">
+<tablerow>
+<tablecell colspan="" rowspan="">
+<paragraph role="paragraph" id="par_id3154704" xml-lang="en-US">
+<image id="img_id3149129" src="cmd/sc_animationmode.png" width="5.64mm" height="5.64mm"><alt id="alt_id3149129" xml-lang="en-US">Icon</alt>
+	</image></paragraph>
+</tablecell>
+<tablecell colspan="" rowspan="">
+<paragraph role="paragraph" id="par_id3159236" xml-lang="en-US">Allow Effects</paragraph>
+</tablecell>
+</tablerow>
+</table>
+
+<embed href="text/shared/00/00000004.xhp#related"/>
+<embed href="text/simpress/guide/animated_slidechange.xhp#animated_slidechange"/>
+<embed href="text/simpress/guide/animated_objects.xhp#animated_objects"/>
+</body>
+</helpdocument>

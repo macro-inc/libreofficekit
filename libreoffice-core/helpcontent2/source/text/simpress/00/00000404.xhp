@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpress0000000404xml" indexer="exclude" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Insert Menu</title>
+<filename>/text/simpress/00/00000404.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<h1 id="hd_id3143219">Insert Menu</h1>
+<paragraph role="paragraph" id="par_id3155064" xml-lang="en-US"><variable id="seiteduplizieren">Choose <emph>Insert - Duplicate Slide</emph>
+</variable><comment>UFI: will be changed "SO later" to Page (for Draw)</comment></paragraph>
+<paragraph role="paragraph" id="par_id3153711" xml-lang="en-US"><variable id="seitegliederung">Choose <emph>Insert - Expand Slide</emph>
+</variable></paragraph>
+<paragraph role="paragraph" id="par_id3154254" xml-lang="en-US"><variable id="uebersicht">Choose <emph>Insert - Summary Slide</emph>
+</variable></paragraph>
+<section id="insert_layer">
+<paragraph role="paragraph" id="par_id3147002" xml-lang="en-US">Choose <emph>Insert - Layer</emph> (<item type="productname">%PRODUCTNAME</item> Draw only)</paragraph>
+<paragraph role="paragraph" id="par_id3150363" xml-lang="en-US">Open context menu of layer tabs - choose <emph>Insert Layer</emph> (<item type="productname">%PRODUCTNAME</item> Draw only)</paragraph>
+</section>
+<section id="insert_snap_point_line">
+<paragraph role="paragraph" id="par_id3155376" xml-lang="en-US">Choose <emph>Insert - Insert Snap Point/Line</emph> (<item type="productname">%PRODUCTNAME</item> Draw only)</paragraph>
+<paragraph role="paragraph" id="par_id3154372" xml-lang="en-US">Open a context menu and choose <emph>Insert Snap Point/Line</emph>
+</paragraph>
+</section>
+<paragraph role="paragraph" id="par_id3145388" xml-lang="en-US"><variable id="efglbe">Select a snap point or line, open the context menu, and choose <emph>Edit Snap Point/Line</emph>
+</variable></paragraph>
+<section id="insert_table">
+<paragraph role="paragraph" id="par_id3151239" xml-lang="en-US">Choose <emph>Insert - Table</emph>
+</paragraph>
+<paragraph role="paragraph" id="par_id3144769" xml-lang="en-US">On the <emph>Insert</emph> toolbar, click</paragraph>
+<section id="syinsert_table">
+<table id="tbl_id3159208">
+<tablerow>
+<tablecell>
+<paragraph role="paragraph" id="par_id3163703" xml-lang="en-US">
+<image id="img_id3145361" src="cmd/sc_grid.png" width="1cm" height="1cm"><alt id="alt_id3145361" xml-lang="en-US">Icon Insert Table</alt></image></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="paragraph" id="par_id3146963" xml-lang="en-US">Table</paragraph>
+</tablecell>
+</tablerow>
+</table>
+</section>
+</section>
+<section id="insert_page">
+    <paragraph role="paragraph" id="par_id3153075" xml-lang="en-US">Choose <switchinline select="appl"><caseinline select="IMPRESS"><menuitem>Slide - Insert Slide from File</menuitem></caseinline><defaultinline><menuitem>Page - Insert Page from File</menuitem></defaultinline></switchinline></paragraph>
+<paragraph role="paragraph" id="par_id3153958" xml-lang="en-US">On the <emph>Insert</emph> toolbar, click</paragraph>
+<section id="syfile">
+<table id="tbl_id3147295">
+<tablerow>
+<tablecell>
+<paragraph role="paragraph" id="par_id3156397" xml-lang="en-US">
+<image id="img_id3145237" src="cmd/sc_inserttoolbox.png" width="0.222inch" height="0.222inch"><alt id="alt_id3145237" xml-lang="en-US">Icon</alt>
+	</image></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="paragraph" id="par_id3157900" xml-lang="en-US"><switchinline select="appl"><caseinline select="IMPRESS">Insert Slide from File</caseinline><defaultinline>Insert Page from File</defaultinline></switchinline></paragraph>
+</tablecell>
+</tablerow>
+</table>
+
+</section>
+</section>
+<paragraph role="paragraph" id="par_id3149351" xml-lang="en-US"><variable id="feldbf">Choose <emph>Insert - Field</emph></variable></paragraph>
+<paragraph role="paragraph" id="par_id3150477" xml-lang="en-US"><variable id="feldbf1">Choose <emph>Insert - Field - Date (fixed)</emph></variable></paragraph>
+<paragraph role="paragraph" id="par_id3146879" xml-lang="en-US"><variable id="feldbf2">Choose <emph>Insert - Field - Date (variable)</emph></variable></paragraph>
+<paragraph role="paragraph" id="par_id3153036" xml-lang="en-US"><variable id="feldbf3">Choose <emph>Insert - Field - Time (fixed)</emph></variable></paragraph>
+<paragraph role="paragraph" id="par_id3145590" xml-lang="en-US"><variable id="feldbf4">Choose <emph>Insert - Field - Time (variable)</emph></variable></paragraph>
+<paragraph role="paragraph" id="par_id3153935" xml-lang="en-US"><variable id="feldbf5">Choose <emph>Insert - Field - Page Number</emph></variable></paragraph>
+<paragraph role="paragraph" id="par_id3148583" xml-lang="en-US"><variable id="feldbf6">Choose <emph>Insert - Field - Author</emph></variable></paragraph>
+<paragraph role="paragraph" id="par_id3155951" xml-lang="en-US"><variable id="feldbf7">Choose <emph>Insert - Field - File Name</emph></variable></paragraph>
+</body>
+</helpdocument>

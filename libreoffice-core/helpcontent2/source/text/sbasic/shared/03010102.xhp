@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03010102xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">MsgBox Function</title>
+    <filename>/text/sbasic/shared/03010102.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="msgbox">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153379">
+  <bookmark_value>MsgBox function</bookmark_value>
+</bookmark>
+
+
+<h1 id="hd_id3153379"><link href="text/sbasic/shared/03010102.xhp" name="MsgBox Function">MsgBox Function</link></h1>
+<paragraph id="par_id3145171" role="paragraph" xml-lang="en-US">Displays a dialog box containing a message and returns a value.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3148664" role="bascode" localize="false">MsgBox (Prompt As String [,Buttons = MB_OK [,Title As String]]) As Integer</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/03010101.xhp#MsgBox_statement"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3146985" role="paragraph" xml-lang="en-US">Integer</paragraph>
+<table id="tbl_051220170325378371">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id051220170330379805" role="tablehead" xml-lang="en-US">Named constant</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id051220170330387072" role="tablehead" xml-lang="en-US">Integer value</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id051220170330387973" role="tablehead" xml-lang="en-US">Definition</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id051220170330388585" role="tablecontent" localize="false" xml-lang="en-US">IDOK</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id051220170330389516" role="tablecontent" localize="false" xml-lang="en-US">1</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3145230" role="paragraph" xml-lang="en-US"> OK</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id051220170330381793" role="tablecontent" localize="false" xml-lang="en-US">IDCANCEL</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id051220170330388083" role="tablecontent" localize="false" xml-lang="en-US">2</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3149567" role="paragraph" xml-lang="en-US"> Cancel</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id051220170330387992" role="tablecontent" localize="false" xml-lang="en-US">IDABORT</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id05122017033038256" role="tablecontent" localize="false" xml-lang="en-US">3</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id4056825" role="paragraph" xml-lang="en-US"> Abort</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id051220170330383300" role="tablecontent" localize="false" xml-lang="en-US">IDRETRY</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id051220170330382200" role="tablecontent" localize="false" xml-lang="en-US">4</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3155335" role="paragraph" xml-lang="en-US"> Retry</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id0512201703303859" role="tablecontent" localize="false" xml-lang="en-US">IDIGNORE</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id051220170330388644" role="tablecontent" localize="false" xml-lang="en-US">5</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3146918" role="paragraph" xml-lang="en-US"> Ignore</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id051220170330386652" role="tablecontent" localize="false" xml-lang="en-US">IDYES</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id051220170330387211" role="tablecontent" localize="false" xml-lang="en-US">6</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3155961" role="paragraph" xml-lang="en-US"> Yes</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id051220170330381656" role="tablecontent" localize="false" xml-lang="en-US">IDNO</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id051220170330383819" role="tablecontent" localize="false" xml-lang="en-US">7</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3148488" role="paragraph" xml-lang="en-US"> No</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<paragraph id="hd_id3150090" role="heading" level="2" xml-lang="en-US">Example:</paragraph>
+<bascode>
+<paragraph id="par_idm1340837456" role="bascode" localize="false" xml-lang="en-US">Sub ExampleMsgBox</paragraph>
+<paragraph id="par_idm1340836224" role="bascode" localize="false" xml-lang="en-US">Dim sVar As Integer</paragraph>
+<paragraph id="par_id3151278" role="bascode" xml-lang="en-US"> sVar = MsgBox("Las Vegas")</paragraph>
+<paragraph id="par_id3149034" role="bascode" xml-lang="en-US"> sVar = MsgBox("Las Vegas",1)</paragraph>
+<paragraph id="par_id3166424" role="bascode" xml-lang="en-US"> sVar = MsgBox( "Las Vegas",256 + 16 + 2,"Dialog title")</paragraph>
+<paragraph id="par_id051220170242005479" role="bascode" xml-lang="en-US"> sVar = MsgBox("Las Vegas", MB_DEFBUTTON2 + MB_ICONSTOP + MB_ABORTRETRYIGNORE, "Dialog title")</paragraph>
+<paragraph id="par_idm1340829728" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

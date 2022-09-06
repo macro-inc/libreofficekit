@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+    <!--
+    * This file is part of the LibreOffice project.
+    *
+    * This Source Code Form is subject to the terms of the Mozilla Public
+    * License, v. 2.0. If a copy of the MPL was not distributed with this
+    * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+    *
+    -->
+    <meta>
+        <topic id="pythonmain0000" indexer="include" status="PUBLISH">
+            <title id="tit" xml-lang="en-US">Python Scripts</title>
+            <filename>/text/sbasic/python/main0000.xhp</filename>
+        </topic>
+    </meta>
+    <body>
+    <bookmark xml-lang="en-US" branch="index" id="bm_id491543348147708">
+        <bookmark_value>macros;Python scripts</bookmark_value>
+        <bookmark_value>Python;macros</bookmark_value>
+        <bookmark_value>scripts;Python</bookmark_value>
+    </bookmark>
+    <h1 id="hd_id3154232"><variable id="pythonscriptshelp"><link href="text/sbasic/python/main0000.xhp" name="mainpython">%PRODUCTNAME Python Scripts Help</link></variable></h1>
+
+    <section id="pythonold">
+        <paragraph id="par_id3153894" role="paragraph" xml-lang="en-US">%PRODUCTNAME provides an Application Programming Interface (API) that allows controlling the $[officename] components with different programming languages by using the $[officename] Software Development Kit (SDK). For more information about the $[officename] API and the Software Development Kit, visit <link href="https://api.libreoffice.org/" name="api.libreoffice.org">https://api.libreoffice.org</link></paragraph>
+        <paragraph id="par_id3147226" role="paragraph" xml-lang="en-US">This help section explains the most common Python script functions for %PRODUCTNAME. For more in-depth information please refer to the <link href="https://wiki.documentfoundation.org/Macros/Python_Design_Guide" name="wiki.documentfoundation.org PYTHON Guide">Designing &amp; Developing Python Applications</link> on the Wiki.</paragraph>
+    </section>
+    <h2 id="hd_id3146957">Working with Python Scripts in %PRODUCTNAME</h2>
+    <paragraph role="paragraph" id="N0102">You can execute Python scripts choosing <menuitem>Tools - Macros - Run Macro</menuitem>. Editing scripts can be done with your preferred text editor. Python scripts are present in various locations detailed hereafter. You can refer to Programming examples for macros illustrating how to run the Python interactive console from %PRODUCTNAME.</paragraph>
+    <switch select="sys">
+        <case select="UNIX">
+            <warning id="par_id131568902936659">The %PRODUCTNAME scripting framework for Python is optional on some GNU/Linux distributions. If it is installed, selecting <menuitem>Tools - Macros - Run Macro</menuitem> and checking <literal>Application Macros</literal> for the presence of <literal>HelloWorld – HelloWorldPython</literal> macro is sufficient. If absent, please refer to your distribution documentation in order to install the %PRODUCTNAME scripting framework for Python.</warning>
+        </case>
+    </switch>
+    <embed href="text/shared/guide/scripting.xhp#scripting"/>
+    <embed href="text/sbasic/python/python_ide.xhp#pythonideh1"/>
+    <embed href="text/sbasic/python/python_locations.xhp#pythonlocations1"/>
+    <embed href="text/sbasic/python/python_shell.xhp#pythonshell1"/>
+    <embed href="text/sbasic/python/python_programming.xhp#pythonprogrammingheading"/>
+    <embed href="text/sbasic/python/python_examples.xhp#pythonexamples2"/>
+    <embed href="text/sbasic/shared/03/sf_intro.xhp#title"/>
+
+    <h2 id="hd_id901655365903313">%PRODUCTNAME Python Modules</h2>
+    <paragraph role="paragraph" id="par_id801655368030968"><link href="text/sbasic/shared/03/lib_ScriptForge.xhp" name="CHANGE ME"><literal>scriptforge</literal> module</link></paragraph>
+    <paragraph role="paragraph" id="par_id21655367848705"><link href="text/sbasic/python/python_screen.xhp" name="msgbox module"><literal>msgbox</literal> module</link></paragraph>
+
+    <embed href="text/swriter/main0000.xhp#helpabouthelp"/>
+</body>
+</helpdocument>

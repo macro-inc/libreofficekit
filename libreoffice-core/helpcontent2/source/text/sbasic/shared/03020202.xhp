@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03020202xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Input# Statement</title>
+    <filename>/text/sbasic/shared/03020202.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="input">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154908">
+  <bookmark_value>Input statement</bookmark_value>
+</bookmark>
+
+<paragraph id="hd_id3154908" role="heading" level="1" xml-lang="en-US"><variable id="Input_h1"><link href="text/sbasic/shared/03020202.xhp" name="Input# Statement">Input# Statement</link></variable></paragraph>
+<paragraph id="par_id3156424" role="paragraph" xml-lang="en-US">Reads data from an open sequential file.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<paragraph role="paragraph" id="par_id971587473488701">
+  <image src="media/helpimg/sbasic/Input_statement.svg" id="img_id4156296484514"><alt xml-lang="en-US" id="alt_id15152796484514">Input Statement diagram</alt></image>
+</paragraph>
+<bascode>
+<paragraph id="par_id3150440" role="bascode" xml-lang="en-US">Input #fileNum {,|;} var1 [, var2 [, ...]]</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3145749" role="paragraph"> <emph>fileNum</emph>: Number of the file that contains the data that you want to read. The file must be opened with the Open statement using the key word INPUT.</paragraph>
+<paragraph id="par_id3150011" role="paragraph"> <emph>var</emph>: A numeric or string variable that you assign the values read from the opened file to.</paragraph>
+<paragraph id="par_id3159153" role="paragraph">The <emph>Input#</emph> statement reads numeric values or strings from an open file and assigns the data to one or more variables. A numeric variable is read up to the first carriage return (Asc=13), line feed (Asc=10), space, or comma. String variables are read to up to the first carriage return (Asc=13), line feed (Asc=10), or comma.</paragraph>
+<paragraph id="par_id3146984" role="paragraph">Data and data types in the opened file must appear in the same order as the variables that are passed in the "var" parameter. If you assign non-numeric values to a numeric variable, "var" is assigned a value of "0".</paragraph>
+<paragraph id="par_id3156442" role="paragraph">Records that are separated by commas cannot be assigned to a string variable. Quotation marks (") in the file are disregarded as well. If you want to read these characters from the file, use the <emph>Line Input#</emph> statement to read pure text files (files containing only printable characters) line by line.</paragraph>
+<paragraph id="par_id3147349" role="paragraph">If the end of the file is reached while reading a data element, an error occurs and the process is aborted.</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm871097888" role="bascode" localize="false">Sub ExampleWorkWithAFile</paragraph>
+<paragraph id="par_idm871096912" role="bascode" localize="false">    Dim iCount As Integer, sFileName As String</paragraph>
+<paragraph id="par_idm871095952" role="bascode" localize="false">    Dim sName As String, sValue As Integer</paragraph>
+<paragraph id="par_idm871092096" role="bascode" localize="false">    sFileName = "C:\Users\ThisUser\data.txt"</paragraph>
+<paragraph id="par_idm871091120" role="bascode" localize="false">    iCount = Freefile</paragraph>
+<paragraph id="par_id4144765" role="bascode" xml-lang="en-US">    ' Write data ( which we will read later with Input ) to file</paragraph>
+<paragraph id="par_idm871087952" role="bascode" localize="false">    Open sFileName For Output As iCount</paragraph>
+<paragraph id="par_idm871086976" role="bascode" localize="false">    sName = "Hamburg" : sValue = 200</paragraph>
+<paragraph id="par_idm871085056" role="bascode" localize="false">    Write #iCount, sName, sValue</paragraph>
+<paragraph id="par_idm871084080" role="bascode" localize="false">    sName = "New York" : sValue = 300</paragraph>
+<paragraph id="par_idm871082160" role="bascode" localize="false">    Write #iCount; sName, sValue</paragraph>
+<paragraph id="par_idm871081184" role="bascode" localize="false">    sName = "Miami" : sValue = 459</paragraph>
+<paragraph id="par_idm871079264" role="bascode" localize="false">    Write #iCount, sName, sValue</paragraph>
+<paragraph id="par_idm871078288" role="bascode" localize="false">    Close #iCount</paragraph>
+<paragraph id="par_id4144766" role="bascode" xml-lang="en-US">    ' Read data file using Input</paragraph>
+<paragraph id="par_idm871076400" role="bascode" localize="false">    iCount = Freefile</paragraph>
+<paragraph id="par_idm871074192" role="bascode" localize="false">    Open sFileName For Input As iCount</paragraph>
+<paragraph id="par_idm871073216" role="bascode" localize="false">    Input #iCount, sName, sValue</paragraph>
+<paragraph id="par_idm871072240" role="bascode" localize="false">    MsgBox sName &amp; " " &amp; sValue</paragraph>
+<paragraph id="par_idm871071264" role="bascode" localize="false">    Input #iCount; sName, sValue</paragraph>
+<paragraph id="par_idm871070288" role="bascode" localize="false">    MsgBox sName &amp; " " &amp; sValue</paragraph>
+<paragraph id="par_idm871069312" role="bascode" localize="false">    Input #iCount, sName, sValue</paragraph>
+<paragraph id="par_idm871068336" role="bascode" localize="false">    MsgBox sName &amp; " " &amp; sValue</paragraph>
+<paragraph id="par_idm871067360" role="bascode" localize="false">    Close #iCount</paragraph>
+<paragraph id="par_idm871066400" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+<section id="relatedtopics" >
+   <embed href="text/sbasic/shared/03020101.xhp#Close_h1"/>
+   <embed href="text/sbasic/shared/03020103.xhp#Open_h1"/>
+   <embed href="text/sbasic/shared/03010103.xhp#Print_h1"/>
+   <embed href="text/sbasic/shared/03020205.xhp#Write_h1"/>
+</section>
+</body>
+</helpdocument>

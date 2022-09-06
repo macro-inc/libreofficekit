@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03080601xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Abs Function</title>
+    <filename>/text/sbasic/shared/03080601.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="abs">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3159201">
+  <bookmark_value>Abs function</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3159201" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03080601.xhp" name="Abs Function">Abs Function</link></paragraph>
+<paragraph id="par_id3153394" role="paragraph" xml-lang="en-US">Returns the absolute value of a numeric expression.</paragraph>
+</section>
+
+<paragraph id="hd_id3149233" role="heading" level="2" xml-lang="en-US">Syntax:</paragraph>
+<bascode>
+<paragraph id="par_id3147573" role="bascode" xml-lang="en-US">Abs (Number)</paragraph>
+</bascode>
+
+<paragraph id="hd_id3156152" role="heading" level="2" xml-lang="en-US">Return value:</paragraph>
+<paragraph id="par_id3149670" localize="false" role="paragraph">Double</paragraph>
+
+<paragraph id="hd_id3154924" role="heading" level="2" xml-lang="en-US">Parameters:</paragraph>
+<paragraph id="par_id3154347" role="paragraph" xml-lang="en-US"> <emph>Number:</emph> Any numeric expression that you want to return the absolute value for. Positive numbers, including 0, are returned unchanged, whereas negative numbers are converted to positive numbers.</paragraph>
+<paragraph id="par_id3153381" role="paragraph" xml-lang="en-US">The following example uses the Abs function to calculate the difference between two values. It does not matter which value you enter first.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<paragraph id="hd_id3148451" role="heading" level="2" xml-lang="en-US">Example:</paragraph>
+<bascode>
+<paragraph id="par_idm1341574768" role="bascode" localize="false" xml-lang="en-US">Sub ExampleDifference</paragraph>
+<paragraph id="par_idm1341573536" role="bascode" localize="false" xml-lang="en-US">Dim siW1 As Single</paragraph>
+<paragraph id="par_idm1341572304" role="bascode" localize="false" xml-lang="en-US">Dim siW2 As Single</paragraph>
+<paragraph id="par_id3145786" role="bascode" xml-lang="en-US">    siW1 = Int(InputBox("Please enter the first amount","Value Input"))</paragraph>
+<paragraph id="par_id3149561" role="bascode" xml-lang="en-US">    siW2 = Int(InputBox("Please enter the second amount","Value Input"))</paragraph>
+<paragraph id="par_id3145750" role="bascode" xml-lang="en-US">    Print "The difference is "; Abs(siW1 - siW2)</paragraph>
+<paragraph id="par_idm1341565744" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

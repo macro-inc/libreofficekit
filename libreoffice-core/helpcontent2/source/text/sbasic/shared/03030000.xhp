@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03030000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Date and Time Functions</title>
+<filename>/text/sbasic/shared/03030000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+  
+  
+  <section id="date_time">
+  <paragraph id="hd_id3150502" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03030000.xhp" name="Date and Time Functions">Date and Time Functions</link></paragraph>
+  <paragraph role="paragraph" id="par_id3153255" xml-lang="en-US">Use the statements and functions described here to perform date and time calculations.</paragraph>
+  </section>
+  <paragraph role="paragraph" id="par_id3152363" xml-lang="en-US"><item type="productname">%PRODUCTNAME</item> Basic lets you calculate time or date differences by converting the time and date values to continuous numeric values. After the difference is calculated, special functions are used to reconvert the values to the standard time or date formats.</paragraph>
+  <paragraph xml-lang="en-US" role="tip" id="par_id3151054">You can combine date and time values into a single floating-decimal number. Dates are converted to integers, and times to decimal values. <item type="productname">%PRODUCTNAME</item> Basic also supports the variable type Date, which can contain a time specification consisting of both a date and time.</paragraph>
+  <embed href="text/sbasic/shared/03030100.xhp#datevalues"/>
+  <embed href="text/sbasic/shared/03030200.xhp#timevalues"/>
+  <embed href="text/sbasic/shared/03030300.xhp#determine"/>
+ </body>
+</helpdocument>

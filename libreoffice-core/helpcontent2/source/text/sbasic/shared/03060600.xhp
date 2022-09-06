@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03060600xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">XOR Operator</title>
+    <filename>/text/sbasic/shared/03060600.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="xor">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3156024">
+  <bookmark_value>XOR operator (logical)</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3156024" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03060600.xhp" name="XOR Operator">XOR Operator</link></paragraph>
+<paragraph id="par_id3159414" role="paragraph" xml-lang="en-US">Performs a logical Exclusive-Or combination of two expressions.</paragraph>
+</section>
+
+<paragraph id="hd_id3153381" role="heading" level="2" xml-lang="en-US">Syntax:</paragraph>
+<bascode>
+<paragraph id="par_id3150400" role="bascode" xml-lang="en-US">Result = Expression1 XOR Expression2</paragraph>
+</bascode>
+
+<paragraph id="hd_id3153968" role="heading" level="2" xml-lang="en-US">Parameters:</paragraph>
+<paragraph id="par_id3150448" role="paragraph" xml-lang="en-US"> <emph>Result:</emph> Any numeric variable that contains the result of the combination.</paragraph>
+<paragraph id="par_id3125864" role="paragraph" xml-lang="en-US"> <emph>Expression1, Expression2:</emph> Any numeric expressions that you want to combine.</paragraph>
+<paragraph id="par_id3150439" role="paragraph" xml-lang="en-US">A logical Exclusive-Or conjunction of two Boolean expressions returns the value True only if both expressions are different from each other.</paragraph>
+<paragraph id="par_id3153770" role="paragraph" xml-lang="en-US">A bitwise Exclusive-Or conjunction returns a bit if the corresponding bit is set in only one of the two expressions.</paragraph>
+
+<paragraph id="hd_id3153366" role="heading" level="2" xml-lang="en-US">Example:</paragraph>
+<bascode>
+<paragraph id="par_idm1341575648" role="bascode" localize="false" xml-lang="en-US">Sub ExampleXOR</paragraph>
+<paragraph id="par_idm1341574416" role="bascode" localize="false" xml-lang="en-US">Dim vA As Variant, vB As Variant, vC As Variant, vD As Variant</paragraph>
+<paragraph id="par_idm1341573136" role="bascode" localize="false" xml-lang="en-US">Dim vOut As Variant</paragraph>
+<paragraph id="par_idm1341571904" role="bascode" localize="false" xml-lang="en-US">    vA = 10: vB = 8: vC = 6: vD = Null</paragraph>
+<paragraph id="par_id3156442" role="bascode" xml-lang="en-US">    vOut = vA &gt; vB XOR vB &gt; vC ' returns 0</paragraph>
+<paragraph id="par_id3153191" role="bascode" xml-lang="en-US">    vOut = vB &gt; vA XOR vB &gt; vC ' returns -1</paragraph>
+<paragraph id="par_id3153144" role="bascode" xml-lang="en-US">    vOut = vA &gt; vB XOR vB &gt; vD ' returns -1</paragraph>
+<paragraph id="par_id3154944" role="bascode" xml-lang="en-US">    vOut = (vB &gt; vD XOR vB &gt; vA) ' returns 0</paragraph>
+<paragraph id="par_id3148455" role="bascode" xml-lang="en-US">    vOut = vB XOR vA ' returns 2</paragraph>
+<paragraph id="par_idm1341561664" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+<topic id="textscalc0104060111xml" indexer="include">
+<title id="tit" xml-lang="en-US">Add-in Functions</title>
+<filename>/text/scalc/01/04060111.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150870"><bookmark_value>add-ins; functions</bookmark_value>
+<bookmark_value>functions; add-in functions</bookmark_value>
+<bookmark_value>Function Wizard; add-ins</bookmark_value>
+</bookmark>
+<h1 id="hd_id3150870"><variable id="head_addin"><link href="text/scalc/01/04060111.xhp" name="Add-in Functions">Add-in Functions</link></variable></h1>
+<paragraph role="paragraph" id="par_id3147427" xml-lang="en-US"><variable id="addintext">The following describes and lists some of the available add-in functions.
+</variable></paragraph>
+<paragraph role="paragraph" id="par_id3163713" xml-lang="en-US"><link href="text/scalc/01/04060112.xhp#addinconcept">Add-in concept</link></paragraph>
+<paragraph role="paragraph" id="par_id3146120" xml-lang="en-US">You will also find a <link href="text/scalc/01/04060112.xhp">description of the $[officename] Calc add-in interface</link> in the Help. In addition, important functions and their parameters are described in the Help for the <switchinline select="sys"><caseinline select="UNIX">Shared Library
+</caseinline><defaultinline>$[officename] Calc add-in DLL</defaultinline></switchinline>.</paragraph>
+<h2 id="hd_id3151075">Add-ins supplied</h2>
+<paragraph role="paragraph" id="par_id3156285" xml-lang="en-US">$[officename] contains examples for the add-in interface of $[officename] Calc.</paragraph>
+<paragraph role="paragraph" id="par_id3159267" xml-lang="en-US"><link href="text/scalc/01/04060115.xhp">Analysis Functions Part One</link></paragraph>
+<paragraph role="paragraph" id="par_id3154703" xml-lang="en-US"><link href="text/scalc/01/04060116.xhp">Analysis Functions Part Two</link></paragraph>
+<sort order="asc" descendant="h2">
+<section id="isleapyear">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149566"><bookmark_value>ISLEAPYEAR function</bookmark_value>
+<bookmark_value>leap year determination</bookmark_value>
+</bookmark><comment>mw added one entry</comment>
+<h2 id="hd_id3149566">ISLEAPYEAR</h2>
+<paragraph role="paragraph" id="par_id3150297" xml-lang="en-US"><ahelp hid=".">Determines whether a year is a leap year.</ahelp> If yes, the function will return the value 1 (TRUE); if not, it will return 0 (FALSE).</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionsyntax"/>
+<paragraph role="code" id="par_id3150205" xml-lang="en-US">ISLEAPYEAR(Date)</paragraph>
+<paragraph role="paragraph" id="par_id3159239" xml-lang="en-US">
+<emph>Date</emph> specifies whether a given date falls within a leap year. The Date parameter must be a valid date.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionexample"/>
+<paragraph role="paragraph" id="par_id3150786" xml-lang="en-US">=ISLEAPYEAR(A1) returns 1, if A1 contains 1968-02-29, the valid date 29th of February 1968 in your locale setting.</paragraph>
+<paragraph role="paragraph" id="par_idN107E7" xml-lang="en-US">You may also use =ISLEAPYEAR(DATE(1968;2;29)) or =ISLEAPYEAR("1968-02-29") giving the date string in the ISO 8601 notation.</paragraph>
+<paragraph role="paragraph" id="par_idN107EA" xml-lang="en-US">Never use =ISLEAPYEAR(2/29/68), because this would first evaluate 2 divided by 29 divided by 68, and then calculate the ISLEAPYEAR function from this small number as a serial date number.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectiontechinfo"/>
+<embed href="text/scalc/01/common_func.xhp#notODFF"/>
+<paragraph role="paragraph" id="par_id311600873986703" localize="false"><literal>ORG.OPENOFFICE.ISLEAPYEAR</literal></paragraph>
+</section>
+<section id="years">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154656"><bookmark_value>YEARS function</bookmark_value>
+<bookmark_value>number of years between two dates</bookmark_value>
+</bookmark><comment>mw added one entry</comment>
+<bookmark xml-lang="en-US" branch="hid/SC_HID_DAI_FUNC_DIFFYEARS" id="bm_id3150368" localize="false"/>
+<h2 id="hd_id3154656">YEARS</h2>
+<paragraph role="paragraph" id="par_id3150886" xml-lang="en-US"><ahelp hid="HID_DAI_FUNC_DIFFYEARS">Calculates the difference in years between two dates.</ahelp></paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionsyntax"/>
+<paragraph role="code" id="par_id3146114" xml-lang="en-US">YEARS(StartDate; EndDate; Type)</paragraph>
+<paragraph role="paragraph" id="par_id3145387" xml-lang="en-US">
+<emph>StartDate</emph> is the first date</paragraph>
+<paragraph role="paragraph" id="par_id3156290" xml-lang="en-US">
+<emph>EndDate</emph> is the second date</paragraph>
+<paragraph role="paragraph" id="par_id3152893" xml-lang="en-US">
+<emph>Type</emph> calculates the type of difference. Possible values are 0 (interval) and 1 (in calendar years).</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectiontechinfo"/>
+<embed href="text/scalc/01/common_func.xhp#notODFF"/>
+<paragraph role="paragraph" id="par_id311640873086703" localize="false"><literal>ORG.OPENOFFICE.YEARS</literal></paragraph>
+</section>
+<section id="months">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3152898"><bookmark_value>MONTHS function</bookmark_value>
+<bookmark_value>number of months between two dates</bookmark_value>
+</bookmark><comment>mw added one entry</comment>
+<bookmark xml-lang="en-US" branch="hid/SC_HID_DAI_FUNC_DIFFMONTHS" id="bm_id3148839" localize="false"/>
+<h2 id="hd_id3152898">MONTHS</h2>
+<paragraph role="paragraph" id="par_id3153066" xml-lang="en-US"><ahelp hid="HID_DAI_FUNC_DIFFMONTHS">Calculates the difference in months between two dates.</ahelp></paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionsyntax"/>
+<paragraph role="code" id="par_id3146869" xml-lang="en-US">MONTHS(StartDate; EndDate; Type)</paragraph>
+<paragraph role="paragraph" id="par_id3145075" xml-lang="en-US">
+<emph>StartDate</emph> is the first date</paragraph>
+<paragraph role="paragraph" id="par_id3157981" xml-lang="en-US">
+<emph>EndDate</emph> is the second date</paragraph>
+<paragraph role="paragraph" id="par_id3150111" xml-lang="en-US">
+<emph>Type</emph> calculates the type of difference. Possible values include 0 (interval) and 1 (in calendar months).</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectiontechinfo"/>
+<embed href="text/scalc/01/common_func.xhp#notODFF"/>
+<paragraph role="paragraph" id="par_id321640873986703" localize="false"><literal>ORG.OPENOFFICE.MONTHS</literal></paragraph>
+</section>
+<section id="rot13">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3159094"><bookmark_value>ROT13 function</bookmark_value>
+<bookmark_value>encrypting text</bookmark_value>
+</bookmark><comment>mw added one entry</comment>
+<bookmark xml-lang="en-US" branch="hid/SC_HID_DAI_FUNC_ROT13" id="bm_id3153283" localize="false"/>
+<h2 id="hd_id3159094">ROT13</h2>
+<paragraph role="paragraph" id="par_id3146781" xml-lang="en-US"><ahelp hid="HID_DAI_FUNC_ROT13">Encrypts a character string by moving the characters 13 positions in the alphabet.</ahelp> After the letter Z, the alphabet begins again (Rotation). By applying the encryption function again to the resulting code, you can decrypt the text.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionsyntax"/>
+<paragraph role="code" id="par_id3159205" xml-lang="en-US">ROT13(Text)</paragraph>
+<paragraph role="paragraph" id="par_id3153249" xml-lang="en-US">
+<emph>Text</emph> is the character string to be encrypted. ROT13(ROT13(Text)) decrypts the code.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionexample"/>
+<paragraph id="par_id151626469224135" role="paragraph"><input>=ROT13("Gur Qbphzrag Sbhaqngvba jnf sbhaqrq va Frcgrzore 2010.")</input> returns the string "The Document Foundation was founded in September 2010.". Notice how spaces, digits, and full stops are unaffected by ROT13.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectiontechinfo"/>
+<embed href="text/scalc/01/common_func.xhp#notODFF"/>
+<paragraph role="paragraph" id="par_id314640873986703" localize="false"><literal>ORG.OPENOFFICE.ROT13</literal></paragraph>
+<tip id="par_id221626469509161">Refer to the <link href="https://wiki.documentfoundation.org/Documentation/Calc_Functions/ROT13" name="ROT13_Wiki">ROT13</link> wiki page for more details about this function.</tip>
+</section>
+<section id="daysinyear">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3151300"><bookmark_value>DAYSINYEAR function</bookmark_value>
+<bookmark_value>number of days; in a specific year</bookmark_value>
+</bookmark><comment>mw added one entry</comment>
+<bookmark xml-lang="en-US" branch="hid/SC_HID_DAI_FUNC_DAYSINYEAR" id="bm_id3153972" localize="false"/>
+<h2 id="hd_id3151300">DAYSINYEAR</h2>
+<paragraph role="paragraph" id="par_id3143220" xml-lang="en-US"><ahelp hid="HID_DAI_FUNC_DAYSINYEAR">Calculates the number of days of the year in which the date entered occurs.</ahelp></paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionsyntax"/>
+<paragraph role="code" id="par_id3154651" xml-lang="en-US">DAYSINYEAR(Date)</paragraph>
+<paragraph role="paragraph" id="par_id3153803" xml-lang="en-US">
+<emph>Date</emph> is any date in the respective year. The Date parameter must be a valid date according to the locale settings of %PRODUCTNAME.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionexample"/>
+<paragraph role="paragraph" id="par_id3153811" xml-lang="en-US">=DAYSINYEAR(A1) returns 366 days if A1 contains 1968-02-29, a valid date for the year 1968.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectiontechinfo"/>
+<embed href="text/scalc/01/common_func.xhp#notODFF"/>
+<paragraph role="paragraph" id="par_id311640873586703" localize="false"><literal>ORG.OPENOFFICE.DAYSINYEAR</literal></paragraph>
+</section>
+<section id="daysinmonth">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3154737"><bookmark_value>DAYSINMONTH function</bookmark_value>
+<bookmark_value>number of days;in a specific month of a year</bookmark_value>
+</bookmark><comment>mw added one entry</comment>
+<bookmark xml-lang="en-US" branch="hid/SC_HID_DAI_FUNC_DAYSINMONTH" id="bm_id3155593" localize="false"/>
+<h2 id="hd_id3154737">DAYSINMONTH</h2>
+<paragraph role="paragraph" id="par_id3149316" xml-lang="en-US"><ahelp hid="HID_DAI_FUNC_DAYSINMONTH">Calculates the number of days of the month in which the date entered occurs.</ahelp></paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionsyntax"/>
+<paragraph role="code" id="par_id3150955" xml-lang="en-US">DAYSINMONTH(Date)</paragraph>
+<paragraph role="paragraph" id="par_id3147501" xml-lang="en-US">
+<emph>Date</emph> is any date in the respective month of the desired year. The Date parameter must be a valid date according to the locale settings of %PRODUCTNAME.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionexample"/>
+<paragraph role="paragraph" id="par_id3155742" xml-lang="en-US">=DAYSINMONTH(A1) returns 29 days if A1 contains 1968-02-17, a valid date for February 1968.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectiontechinfo"/>
+<embed href="text/scalc/01/common_func.xhp#notODFF"/>
+<paragraph role="paragraph" id="par_id311640873986700" localize="false"><literal>ORG.OPENOFFICE.DAYSINMONTH</literal></paragraph>
+</section>
+<section id="weeks">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149048"><bookmark_value>WEEKS function</bookmark_value>
+<bookmark_value>number of weeks;between two dates</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/SC_HID_DAI_FUNC_DIFFWEEKS" id="bm_id3150435" localize="false"/>
+<h2 id="hd_id3149048">WEEKS</h2>
+<paragraph role="paragraph" id="par_id3153340" xml-lang="en-US"><ahelp hid="HID_DAI_FUNC_DIFFWEEKS">Calculates the difference in weeks between two dates.</ahelp></paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionsyntax"/>
+<paragraph role="code" id="par_id3147402" xml-lang="en-US">WEEKS(StartDate; EndDate; Type)</paragraph>
+<paragraph role="paragraph" id="par_id3151387" xml-lang="en-US">
+<emph>StartDate</emph> is the start date in the interval.</paragraph>
+<paragraph role="paragraph" id="par_id3146324" xml-lang="en-US">
+<emph>EndDate</emph> is the end date in the interval. The end date must be greater than the start date, or else an error is returned.</paragraph>
+<paragraph role="paragraph" id="par_id3166467" xml-lang="en-US">
+<emph>Type</emph> specifies the type of difference to be calculated. Possible values are 0 (time interval) or 1 (calendar weeks).</paragraph>
+<paragraph role="paragraph" id="par_id81641990941192">If <emph>Type = 0</emph> the function will assume that 7 days is equivalent to one week without considering any specific day to mark the beginning of a week.</paragraph>
+<paragraph role="paragraph" id="par_id31641991010650">If <emph>Type = 1</emph> the function will consider Monday to be the first day of the week. Therefore, except for the start date, each occurrence of a Monday in the interval is counted as an additional week.</paragraph>
+<note id="par_id971641990480242">This function considers Monday to be the first day of the week regardless of the current locale settings.</note>
+<embed href="text/scalc/01/common_func.xhp#sectionexample"/>
+<paragraph role="paragraph" id="par_id671641994821992">In the following examples, dates are passed as strings. However, they can also be stored in separate cells and be passed as references.</paragraph>
+<paragraph role="paragraph" id="par_id71641991391639"><input>=WEEKS("01/12/2022","01/17/2022",0)</input> returns 0 because <emph>Type</emph> was set to 0 and there are only 5 days in the interval.</paragraph>
+<paragraph role="paragraph" id="par_id71641991390039"><input>=WEEKS("01/12/2022","01/19/2022",0)</input> returns 1 because <emph>Type</emph> was set to 0 and there are 7 days in the interval.</paragraph>
+<paragraph role="paragraph" id="par_id71641991391123"><input>=WEEKS("01/12/2022","01/17/2022",1)</input> returns 1 because <emph>Type</emph> was set to 1 and the interval contains a Monday, since 01/12/2022 is a Wednesday and 01/17/2022 is a Monday.</paragraph>
+<paragraph role="paragraph" id="par_id71641991332523"><input>=WEEKS("01/10/2022","01/15/2022",1)</input> returns 0 because <emph>Type</emph> was set to 1 and the interval does not contain any Mondays, except for the start date.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectiontechinfo"/>
+<embed href="text/scalc/01/common_func.xhp#notODFF"/>
+<paragraph role="paragraph" id="par_id311640873986703" localize="false"><literal>ORG.OPENOFFICE.WEEKS</literal></paragraph>
+</section>
+<section id="weeksinyear">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3145237"><bookmark_value>WEEKSINYEAR function</bookmark_value>
+<bookmark_value>number of weeks;in a specific year</bookmark_value>
+</bookmark><comment>mw added one entry</comment>
+<bookmark xml-lang="en-US" branch="hid/SC_HID_DAI_FUNC_WEEKSINYEAR" id="bm_id3146883" localize="false"/>
+<h2 id="hd_id3145237">WEEKSINYEAR</h2>
+<paragraph role="paragraph" id="par_id3147410" xml-lang="en-US"><ahelp hid="HID_DAI_FUNC_WEEKSINYEAR">Calculates the number of weeks of the year in which the date entered occurs.</ahelp> The number of weeks is defined as follows: a week that spans two years is added to the year in which most days of that week occur.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionsyntax"/>
+<paragraph role="code" id="par_id3145638" xml-lang="en-US">WEEKSINYEAR(Date)</paragraph>
+<paragraph role="paragraph" id="par_id3149946" xml-lang="en-US">
+<emph>Date</emph> is any date in the respective year. The Date parameter must be a valid date according to the locale settings of %PRODUCTNAME.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionexample"/>
+<paragraph role="paragraph" id="par_id3147614" xml-lang="en-US">WEEKSINYEAR(A1) returns 53 if A1 contains 1970-02-17, a valid date for the year 1970.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectiontechinfo"/>
+<embed href="text/scalc/01/common_func.xhp#notODFF"/>
+<paragraph role="paragraph" id="par_id311540873986703" localize="false"><literal>ORG.OPENOFFICE.WEEKSINYEAR</literal></paragraph>
+</section>
+</sort>
+<h2 id="hd_id3157901">Add-ins through %PRODUCTNAME API</h2>
+<paragraph role="paragraph" id="par_id3149351" xml-lang="en-US">Add-ins can also be implemented through the %PRODUCTNAME <link href="https://api.libreoffice.org/" name="api.libreoffice.org">API</link>.</paragraph>
+<section id="relatedtopics">
+<embed href="text/scalc/01/04060100.xhp#drking"/>
+</section>
+</body>
+</helpdocument>

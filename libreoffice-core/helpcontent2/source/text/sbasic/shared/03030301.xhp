@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03030301xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Date Function</title>
+    <filename>/text/sbasic/shared/03030301.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="date">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3156027">
+  <bookmark_value>Date function</bookmark_value>
+</bookmark>
+
+
+<h1 id="hd_id3156027"><link href="text/sbasic/shared/03030301.xhp" name="Date Function">Date Function</link></h1>
+<paragraph id="par_id3147291" role="paragraph">Returns the current system date as a string, or date variant.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3146794" role="bascode" localize="false">Date[$][()]</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341306160" role="bascode" localize="false">Sub ExampleDate</paragraph>
+<paragraph id="par_id3156424" role="bascode" xml-lang="en-US">    MsgBox "The date is " &amp; Date</paragraph>
+<paragraph id="par_idm1341303136" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

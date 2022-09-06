@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03080104xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Tan Function</title>
+    <filename>/text/sbasic/shared/03080104.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="tan">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3148550">
+  <bookmark_value>Tan function</bookmark_value>
+</bookmark>
+
+
+<h1 id="hd_id3148550"><variable id="Tan_h1"><link href="text/sbasic/shared/03080104.xhp" name="Tan Function">Tan Function</link></variable></h1>
+<paragraph id="par_id3148663" role="paragraph" xml-lang="en-US">Determines the tangent of an angle. The angle is specified in radians.<comment>i71396</comment></paragraph>
+</section>
+<paragraph id="par_id3153379" role="paragraph" xml-lang="en-US">Using the angle Alpha, the <literal>Tan</literal> function calculates the ratio of the length of the side opposite the angle to the length of the side adjacent to the angle in a right-angled triangle.</paragraph>
+<paragraph id="par_id3154366" role="paragraph" xml-lang="en-US"><literal>Tan</literal>(Alpha) = side opposite the angle/side adjacent to angle</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3151042" role="bascode" xml-lang="en-US">Tan (Number As Double) As Double</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3156281" localize="false" role="paragraph">Double</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3145786" role="paragraph" xml-lang="en-US"> <emph>Number:</emph> Any numeric expression that you want to calculate the tangent for (in radians).</paragraph>
+<paragraph id="par_id3153728" role="paragraph" xml-lang="en-US">To convert degrees to radians, multiply by <literal>Pi</literal>/180. To convert radians to degrees, multiply by 180/<literal>Pi</literal>.</paragraph>
+<paragraph id="par_id3155414" role="paragraph" xml-lang="en-US">degrees=(radians*180)/<literal>Pi</literal></paragraph>
+<paragraph id="par_id3146975" role="paragraph" xml-lang="en-US">radians=(degrees*<literal>Pi</literal>)/180</paragraph>
+<paragraph id="par_id3147434" role="paragraph" xml-lang="en-US"><literal>Pi</literal> is approximately 3.141593.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_id3148646" role="bascode" xml-lang="en-US">' In this example, the following entry is possible for a right-angled triangle:</paragraph>
+<paragraph id="par_id3150012" role="bascode" xml-lang="en-US">' The side opposite the angle and the angle (in degrees) to calculate the length of the side adjacent to the angle:</paragraph>
+<paragraph id="par_idm1340786736" role="bascode" localize="false" xml-lang="en-US">Sub ExampleTangens</paragraph>
+<paragraph id="par_id3153158" role="bascode" xml-lang="en-US">' Pi = 3.1415926 is a pre-defined variable</paragraph>
+<paragraph id="par_idm1340783712" role="bascode" localize="false" xml-lang="en-US">Dim d1 As Double</paragraph>
+<paragraph id="par_idm1340782480" role="bascode" localize="false" xml-lang="en-US">Dim dAlpha As Double</paragraph>
+<paragraph id="par_id3145252" role="bascode" xml-lang="en-US">    d1 = InputBox("Enter the length of the side opposite the angle: ","opposite")</paragraph>
+<paragraph id="par_id3149582" role="bascode" xml-lang="en-US">    dAlpha = InputBox("Enter the Alpha angle (in degrees): ","Alpha")</paragraph>
+<paragraph id="par_id3154016" role="bascode" xml-lang="en-US">    Print "the length of the side adjacent the angle is"; (d1 / tan (dAlpha * Pi / 180))</paragraph>
+<paragraph id="par_idm1340775872" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+
+<section id="relatedtopics">
+   <embed href="text/sbasic/shared/03080101.xhp#Atn_h1"/>
+   <embed href="text/sbasic/shared/03080102.xhp#Cos_h1"/>
+   <embed href="text/sbasic/shared/03080103.xhp#Sin_h1"/>
+</section>  
+
+</body>
+</helpdocument>

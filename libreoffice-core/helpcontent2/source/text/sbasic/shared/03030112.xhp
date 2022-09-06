@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03030112xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">CDateFromUnoDate Function</title>
+    <filename>/text/sbasic/shared/03030112.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="cdatefromunodate">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150620">
+  <bookmark_value>CDateFromUnoDate function</bookmark_value>
+</bookmark>
+
+
+<paragraph id="hd_id3150620" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03030112.xhp" name="CDateFromUnoDate Function">CDateFromUnoDate Function</link></paragraph>
+<paragraph id="par_id3151097" role="paragraph" xml-lang="en-US">Converts a UNO com.sun.star.util.Date struct to a Date value.</paragraph>
+</section>
+
+<paragraph id="hd_id3159224" role="heading" level="2" xml-lang="en-US">Syntax:</paragraph>
+<bascode>
+<paragraph id="par_id3149497" localize="false" role="bascode">CDateFromUnoDate(aDate)</paragraph>
+</bascode>
+
+<paragraph id="hd_id3152347" role="heading" level="2" xml-lang="en-US">Return value:</paragraph>
+<paragraph id="par_id3154422" role="paragraph" xml-lang="en-US">Date</paragraph>
+
+<paragraph id="hd_id3147303" role="heading" level="2" xml-lang="en-US">Parameters:</paragraph>
+<paragraph id="par_id3145136" role="paragraph" xml-lang="en-US"> <emph>aDate:</emph> Date to convert</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<paragraph id="hd_id3147243" role="heading" level="2" xml-lang="en-US">Example:</paragraph>
+<bascode>
+<paragraph id="par_idm1341052400" role="bascode" localize="false" xml-lang="en-US">Sub ExampleCDateFromUnoDate</paragraph>
+<paragraph id="par_id3153126" role="bascode" localize="false" xml-lang="en-US">    MsgBox(CDateFromUnoDate(aDatabaseRow.getDate(3)))</paragraph>
+<paragraph id="par_id3153127" role="bascode" localize="false" xml-lang="en-US">    MsgBox(CDateFromUnoDate(aDateControl.Date))</paragraph>
+<paragraph id="par_idm1341047600" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

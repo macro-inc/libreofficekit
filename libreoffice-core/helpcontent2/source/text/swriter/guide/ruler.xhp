@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+      <topic id="textswriterguiderulerxhp" indexer="include">
+         <title xml-lang="en-US" id="tit">Using Rulers</title>
+         <filename>/text/swriter/guide/ruler.xhp</filename>
+      </topic>
+   </meta>
+   <body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id8186284"><bookmark_value>rulers;using rulers</bookmark_value>
+<bookmark_value>horizontal rulers</bookmark_value>
+<bookmark_value>vertical rulers</bookmark_value>
+<bookmark_value>indents; setting on rulers</bookmark_value>
+<bookmark_value>page margins on rulers</bookmark_value>
+<bookmark_value>table cells;adjusting the width on rulers</bookmark_value>
+<bookmark_value>showing;rulers</bookmark_value>
+<bookmark_value>hiding;rulers</bookmark_value>
+<bookmark_value>adjusting page margins</bookmark_value>
+</bookmark>
+<h1 xml-lang="en-US" id="par_idN1065F"><variable id="ruler"><link href="text/swriter/guide/ruler.xhp">Using Rulers</link>
+</variable></h1>
+      <paragraph xml-lang="en-US" id="par_idN1067D" role="paragraph">To show or hide rulers, choose <emph>View - Ruler</emph>. To show the vertical ruler, choose <switchinline select="sys"><caseinline select="MAC">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - <link href="text/shared/optionen/01040200.xhp" name="Writer - View"><emph>%PRODUCTNAME Writer - View</emph></link>, and then select <emph>Vertical ruler</emph> in the <emph>Ruler</emph> area.</paragraph>
+      <h2 xml-lang="en-US" id="hd_id3149686">Adjusting Page Margins</h2>
+      <paragraph xml-lang="en-US" id="par_id3155175" role="paragraph">The margins of a page are indicated by the filled areas at the ends of the rulers.</paragraph>
+      <h2 xml-lang="en-US" id="hd_id3149038">Changing Indents</h2>
+      <paragraph xml-lang="en-US" id="par_id3153631" role="paragraph">Indents are adjusted with the three small triangles on the horizontal ruler.</paragraph>
+      <list type="ordered">
+        <listitem>
+           <paragraph xml-lang="en-US" id="par_id3145769" role="listitem">To change the first line indent of a selected paragraph, drag the top left triangle on the horizontal ruler to a new location.</paragraph>
+        </listitem>
+        <listitem>
+            <paragraph xml-lang="en-US" id="par_id3152776" role="listitem">To change the left or the right paragraph indent, select the paragraph(s) that you want change the indent for, drag the bottom left or the bottom right triangle on the horizontal ruler to a new location.</paragraph>
+        </listitem>
+      </list>
+      <paragraph role="paragraph" id="par_id91610715353328">For example, to change the left indent starting with the second line of a paragraph, hold down the <switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline> key, click the triangle on the bottom left, and drag it to the right</paragraph>
+      <paragraph xml-lang="en-US" id="par_id3149164" role="paragraph">You can also double-click anywhere on the horizontal ruler, and adjust the indents in the <link href="text/shared/01/05030000.xhp" name="Paragraph"><emph>Paragraph</emph></link> dialog.</paragraph>
+      <section id="relatedtopics">
+        <embed href="text/swriter/guide/table_sizing.xhp#table_sizing"/>
+        <embed href="text/shared/guide/tabs.xhp#tabs"/>
+        <embed href="text/shared/guide/measurement_units.xhp#measurement_units"/>
+        <embed href="text/shared/02/13020000.xhp#setting_margins"/>
+      </section>
+   </body>
+</helpdocument>

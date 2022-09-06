@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared0211120000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Find Parentheses</title>
+<filename>/text/sbasic/shared/02/11120000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+
+
+  <section id="parentheses">
+<bookmark branch="hid/.uno:MatchGroup" xml-lang="en-US" id="bm_id3148520" localize="false"/>
+<h1 id="hd_id3149497"><link href="text/sbasic/shared/02/11120000.xhp" name="Find Parentheses">Find Parentheses</link></h1>
+  <paragraph role="paragraph" id="par_id3155150" xml-lang="en-US"><ahelp hid=".uno:MatchGroup" visibility="visible">Highlights the text that is enclosed by two corresponding brackets. Place the text cursor in front of an opening or closing bracket, and then click this icon.</ahelp></paragraph>
+  </section>
+  <section id="syparentheses">
+  <table id="tbl_id3147226">
+
+
+
+    <tablerow>
+     <tablecell>
+      <paragraph role="paragraph" id="par_id3149182" xml-lang="en-US"><image src="cmd/sc_matchgroup.png" id="img_id3155892" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3155892">Icon Find Parentheses</alt></image></paragraph>
+     </tablecell>
+     <tablecell>
+      <paragraph role="paragraph" id="par_id3147276" xml-lang="en-US">Find Parentheses</paragraph>
+     </tablecell>
+    </tablerow>
+
+  </table>
+  </section>
+
+ </body>
+</helpdocument>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriter0104220000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Header</title>
+    <filename>/text/swriter/01/04220000.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="header">
+<bookmark xml-lang="en-US" branch="hid/.uno:InsertPageHeader" id="bm_id3155625" localize="false"/>
+
+<paragraph id="hd_id3146320" role="heading" level="1" xml-lang="en-US"><link href="text/swriter/01/04220000.xhp" name="Header">Header</link></paragraph>
+<paragraph id="par_id3145827" role="paragraph" xml-lang="en-US"><ahelp hid=".">Adds or removes a header from the page style that you select in the submenu. The header is added to all of the pages that use the same page style.</ahelp> In a new document, only the "Default" page style is listed. Other page styles are added to the list after you apply them in the document.</paragraph>
+</section>
+
+<section id="howtoget">
+<embed href="text/swriter/00/00000404.xhp#kopfzeile"/>
+</section>
+<paragraph id="par_id2326425" role="note" xml-lang="en-US">The headers are visible only when you view the document in print layout (enable <emph>View - Normal</emph>).</paragraph>
+<paragraph id="par_id3150570" role="paragraph" xml-lang="en-US">A check mark is displayed in front of the page styles that have headers.</paragraph>
+<paragraph id="par_id3153921" role="paragraph" xml-lang="en-US">To remove a header, choose <emph>Insert - Header and Footer - Header</emph>, and then select the page style containing the header. The header is removed from all of the pages that use this page style.</paragraph>
+<paragraph id="par_id3150761" role="paragraph" xml-lang="en-US">To add or remove headers from all of the page styles that are in use in the document, choose <emph>Insert - Header and Footer - Header - All</emph>.</paragraph>
+<paragraph id="par_id3156410" role="paragraph" xml-lang="en-US">To format a header, choose <link href="text/shared/01/05040300.xhp" name="Format - Page - Header"><emph>Format - Page - Header</emph></link>.</paragraph>
+</body>
+
+</helpdocument>

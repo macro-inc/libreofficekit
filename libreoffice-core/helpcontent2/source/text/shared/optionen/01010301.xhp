@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+<topic id="textsharedoptionen01010301xml" indexer="include">
+<title id="tit" xml-lang="en-US">Edit Paths</title>
+<filename>/text/shared/optionen/01010301.xhp</filename>
+</topic>
+</meta>
+<body>
+<h1 id="hd_id3150772">Edit Paths</h1>
+<paragraph role="paragraph" id="par_id3149762" xml-lang="en-US">In the <emph>Edit Paths </emph>dialog, you can select some folders that are available in $[officename].</paragraph>
+<section id="howtoget">
+<embed href="text/shared/00/00000406.xhp#paths"/>
+</section>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/selectpathdialog/@@nowidget@@" id="bm_id3154938" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/selectpathdialog/paths" id="bm_id3154938" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/multipathdialog/@@nowidget@@" id="bm_id31549381" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/multipathdialog/paths" id="bm_id31549381" localize="false"/>
+<h2 id="hd_id3147559">Paths</h2>
+<paragraph role="paragraph" id="par_id3153524" xml-lang="en-US"><ahelp hid="cui/ui/selectpathdialog/paths">Contains a list of the paths that have already been added. Mark the default path for new files.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/selectpathdialog/add" id="bm_id3150768" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/multipathdialog/add" id="bm_id31507681" localize="false"/>
+<h2 id="hd_id3148798">Add</h2>
+<paragraph role="paragraph" id="par_id3153106" xml-lang="en-US"><ahelp hid="cui/ui/selectpathdialog/add">Opens the <emph>Select Path</emph> dialog to select another folder or the <emph>Open</emph> dialog to select another file.</ahelp></paragraph>
+<embed href="text/shared/00/00000001.xhp#delete2"/>
+<section id="relatedtopics">
+<embed href="text/shared/optionen/01010300.xhp#pathsh1"/>
+</section>
+</body>
+</helpdocument>

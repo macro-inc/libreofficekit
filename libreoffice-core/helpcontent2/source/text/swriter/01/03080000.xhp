@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriter0103080000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Field Shadings</title>
+    <filename>/text/swriter/01/03080000.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="field_shadings">
+<bookmark xml-lang="en-US" branch="hid/.uno:Marks" id="bm_id9217820" localize="false"/>
+
+<paragraph id="hd_id3151177" role="heading" level="1" xml-lang="en-US"><link href="text/swriter/01/03080000.xhp" name="Field Shadings">Field Shadings</link></paragraph>
+<paragraph id="par_id3147513" role="paragraph" xml-lang="en-US"><ahelp hid=".">Shows or hides shadings around fields in your document like non-breaking spaces, soft hyphens, indexes, and footnotes.</ahelp></paragraph>
+</section>
+
+<section id="howtoget">
+<embed href="text/swriter/00/00000403.xhp#field_shadings"/>
+</section>
+
+<section id="relatedtopics">
+<paragraph id="par_id3153540" role="paragraph" xml-lang="en-US"><link href="text/swriter/01/03100000.xhp" name="Formatting Marks On/Off">Formatting Marks On/Off</link></paragraph>
+</section>
+</body>
+
+</helpdocument>

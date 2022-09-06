@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalc0102190100xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Row Break</title>
+<filename>/text/scalc/01/02190100.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="row_break">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3156326"><bookmark_value>spreadsheets; deleting row breaks</bookmark_value>
+<bookmark_value>deleting;manual row breaks</bookmark_value>
+<bookmark_value>row breaks; deleting</bookmark_value>
+</bookmark><comment>MW deleted "removing;..." and changed "deleting;...!</comment>
+<bookmark xml-lang="en-US" branch="hid/.uno:DeleteRowbreak" id="bm_id6936520" localize="false"/>
+<paragraph role="heading" id="hd_id3156326" xml-lang="en-US" level="1"><link href="text/scalc/01/02190100.xhp" name="Row Break">Row Break</link></paragraph>
+<paragraph role="paragraph" id="par_id3154366" xml-lang="en-US"><ahelp hid=".uno:DeleteRowbreak">Removes the manual row break above the active cell.</ahelp></paragraph>
+</section>
+<paragraph role="paragraph" id="par_id3151041" xml-lang="en-US">Position the cursor in a cell directly below the row break indicated by a horizontal line and choose <emph>Sheet - Delete Page Break - Row Break</emph>. The manual row break is removed.</paragraph>
+<section id="howtoget">
+  <embed href="text/scalc/00/sheet_menu.xhp#delete_page_break_row"/>
+</section>
+</body>
+</helpdocument>

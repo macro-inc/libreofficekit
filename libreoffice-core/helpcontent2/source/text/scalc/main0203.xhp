@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalcmain0203xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Drawing Object Properties Bar</title>
+<filename>/text/scalc/main0203.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="drawing_object_properties_bar">
+<bookmark xml-lang="en-US" branch="hid/HID_SC_TOOLBOX_DRAW" id="bm_id3150400" localize="false"/>
+<h1 id="hd_id3154346"><link href="text/scalc/main0203.xhp" name="Drawing Object Properties Bar">Drawing Object Properties Bar</link></h1>
+<paragraph role="paragraph" id="par_id3149656" xml-lang="en-US"><ahelp hid="HID_SC_TOOLBOX_DRAW">The <emph>Drawing Object Properties</emph> Bar for objects that you select in the sheet contains formatting and alignment commands.</ahelp></paragraph>
+</section>
+<embed href="text/shared/01/05200000.xhp#line"/>
+<embed href="text/shared/00/00040502.xhp#syline"/>
+<embed href="text/shared/02/05020000.xhp#arrow_style"/>
+<embed href="text/shared/02/05020000.xhp#syarrow_style"/>
+<h2 id="hd_id3145748"><link href="text/shared/01/05200100.xhp" name="Line Style">Line Style</link></h2>
+<embed href="text/shared/01/05200100.xhp#stiltext"/>
+<embed href="text/shared/00/00000004.xhp#syline_style"/>
+<h2 id="hd_id3151073"><link href="text/shared/01/05200100.xhp" name="Line Width">Line Width</link></h2>
+<embed href="text/shared/01/05200100.xhp#breitetext"/>
+<embed href="text/shared/00/00000004.xhp#syline_width"/>
+<h2 id="hd_id3153417"><link href="text/shared/01/05200100.xhp" name="Line Color">Line Color</link></h2>
+<embed href="text/shared/01/05200100.xhp#farbetext"/>
+<embed href="text/shared/00/00000004.xhp#syline_color"/>
+<embed href="text/shared/01/05210000.xhp#area"/>
+<embed href="text/shared/00/00040502.xhp#syarea"/>
+<h2 id="hd_id3147338"><link href="text/shared/01/05210100.xhp" name="Background Color">Background Color</link></h2>
+<embed href="text/shared/01/05210100.xhp#sytext"/>
+<embed href="text/shared/00/00000004.xhp#syarea_style"/>
+<embed href="text/shared/02/05090000.xhp#rotate"/>
+<embed href="text/shared/02/05090000.xhp#syrotate"/>
+<embed href="text/shared/02/03200000.xhp#anchoring"/>
+<embed href="text/shared/02/03200000.xhp#verankerungtext"/>
+<embed href="text/shared/00/00040501.xhp#anchorcalc"/>
+<embed href="text/shared/01/05250100.xhp#bring_to_front"/>
+<embed href="text/shared/00/00040501.xhp#sybring_to_front"/>
+<embed href="text/shared/01/05250400.xhp#send_to_back"/>
+<embed href="text/shared/00/00040501.xhp#sysend_to_back"/>
+<embed href="text/shared/01/05250500.xhp#to_foreground"/>
+<embed href="text/shared/00/00040501.xhp#syto_foreground"/>
+<embed href="text/shared/01/05250600.xhp#to_background"/>
+<embed href="text/shared/00/00040501.xhp#syto_background"/>
+<embed href="text/shared/02/05110000.xhp#alignment"/>
+<embed href="text/shared/02/05110000.xhp#syalignment"/>
+</body>
+</helpdocument>

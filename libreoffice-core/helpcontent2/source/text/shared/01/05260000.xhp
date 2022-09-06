@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<meta>
+<topic id="textshared0105260000xml" indexer="include">
+<title id="tit" xml-lang="en-US">Anchor</title>
+<filename>/text/shared/01/05260000.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="anchoring">
+<bookmark xml-lang="en-US" branch="hid/.uno:AnchorMenu" id="bm_id9715262" localize="false"/>
+<h1 id="hd_id3155913" xml-lang="en-US"><variable id="anchorh1"><link href="text/shared/01/05260000.xhp" name="Anchoring">Anchor</link></variable></h1>
+<paragraph role="paragraph" id="par_id3145356" xml-lang="en-US"><ahelp hid=".">Shows anchoring options for the selected object.</ahelp></paragraph>
+</section>
+<section id="howtoget">
+<embed href="text/shared/00/00040501.xhp#anchoring"/>
+</section>
+<switch select="appl">
+<case select="CALC"><embed href="text/shared/01/05260400.xhp#to_cell"/>
+</case>
+</switch>
+<embed href="text/shared/01/05260100.xhp#to_page"/>
+<switch select="appl">
+<case select="WRITER"><embed href="text/shared/01/05260200.xhp#to_paragraph"/>
+</case>
+</switch>
+<switch select="appl">
+<case select="WRITER"><embed href="text/shared/01/05260300.xhp#to_character"/>
+</case>
+</switch>
+<switch select="appl">
+<case select="WRITER"><embed href="text/shared/01/05260600.xhp#as_character"/>
+</case>
+</switch>
+<switch select="appl">
+<case select="WRITER"><embed href="text/shared/01/05260500.xhp#to_frame"/>
+<note id="par_id3150789" xml-lang="en-US">If the selected object is in a frame, you can also anchor the object to the frame.</note>
+<section id="relatedtopics">
+<embed href="text/swriter/guide/anchor_object.xhp#anchor_object"/>
+</section>
+</case>
+</switch>
+</body>
+</helpdocument>

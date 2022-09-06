@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsmathmain0100xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Menus</title>
+<filename>/text/smath/main0100.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+  
+  
+  <section id="menus">
+  <h1 id="hd_id3149021"><variable id="main0100"><link href="text/smath/main0100.xhp" name="Menus">Menus</link></variable></h1>
+  <paragraph role="paragraph" id="par_id3154702" xml-lang="en-US">The menu bar contains all the commands for working with $[officename] Math. It contains a list of all the available operators as well as the commands for editing, viewing, arranging, formatting and printing formula documents and the objects contained in them. Most of the menu commands are only available when you are creating or editing a formula.</paragraph>
+  </section>
+  <embed href="text/shared/00/00000011.xhp#menu_commands_text"/>
+  
+  <embed href="text/smath/main0101.xhp#file"/>
+  
+  <embed href="text/smath/main0102.xhp#edit"/>
+  
+  <embed href="text/smath/main0103.xhp#view"/>
+  
+  <embed href="text/smath/main0105.xhp#format"/>
+  
+  <embed href="text/smath/main0106.xhp#tools"/>
+  
+  <embed href="text/smath/main0107.xhp#window"/>
+  
+  <embed href="text/shared/main0108.xhp#help"/>
+  
+ </body>
+</helpdocument>

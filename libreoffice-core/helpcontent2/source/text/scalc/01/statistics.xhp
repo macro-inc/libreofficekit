@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+<topic id="statisticsmenu" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Data Statistics in Calc</title>
+<filename>/text/scalc/01/statistics.xhp</filename>
+</topic>
+</meta>
+<body>
+
+<section id="analysistoolpack">
+<h1 id="hd_id1000010"><link href="text/scalc/01/statistics.xhp" name="Data Statistics in Calc">Statistics</link></h1>
+<paragraph id="par_id1000010" role="paragraph" xml-lang="en-US">Use the data statistics in Calc to perform complex data analysis</paragraph>
+</section>
+
+<paragraph id="par_id1000020" role="paragraph" xml-lang="en-US">To work on a complex statistical or engineering analysis, you can save steps and time by using Calc Data Statistics. You provide the data and parameters for each analysis, and the set of tools uses the appropriate statistical or engineering functions to calculate and display the results in an output table.</paragraph>
+<embed href="text/scalc/01/statistics_sampling.xhp#datasampling"/>
+<embed href="text/scalc/01/statistics_descriptive.xhp#descriptivestatistics"/>
+<embed href="text/scalc/01/statistics_anova.xhp#anova"/>
+<embed href="text/scalc/01/statistics_correlation.xhp#correlation"/>
+<embed href="text/scalc/01/statistics_covariance.xhp#covariance"/>
+<embed href="text/scalc/01/statistics_exposmooth.xhp#exponentialsmoothing"/>
+<embed href="text/scalc/01/statistics_movingavg.xhp#movingaverage"/>
+<embed href="text/scalc/01/statistics_regression.xhp#regression"/>
+<embed href="text/scalc/01/statistics_test_t.xhp#ttest"/>
+<embed href="text/scalc/01/statistics_test_f.xhp#ftest"/>
+<embed href="text/scalc/01/statistics_test_z.xhp#ztest"/>
+<embed href="text/scalc/01/statistics_test_chisqr.xhp#chisqtest"/>
+<embed href="text/scalc/01/statistics_fourier.xhp#fourieranalysis"/>
+</body>
+</helpdocument>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textschart0105040100xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Axes</title>
+<filename>/text/schart/01/05040100.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153768"><bookmark_value>axes;formatting</bookmark_value>
+</bookmark><comment>mw changed "X axes;" to "axes;"</comment>
+<bookmark xml-lang="en-US" branch="hid/.uno:DiagramAxisX" id="bm_id3153728" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:DiagramAxisZ" id="bm_id3146976" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:DiagramAxisAll" id="bm_id3146121" localize="false"/><h1 id="hd_id3153768">Axes</h1>
+<paragraph role="paragraph" id="par_id3154319" xml-lang="en-US"><variable id="achsen"><ahelp hid=".">Opens a dialog, where you can edit the properties of the selected axis.</ahelp>
+</variable> The name of the dialog depends on the selected axis.</paragraph>
+<section id="howtoget">
+  <embed href="text/schart/00/00000004.xhp#frtaa"/>
+</section>
+<paragraph role="paragraph" id="par_id3149667" xml-lang="en-US">The <link href="text/schart/01/05040200.xhp" name="Y axis">Y axis</link> has an enhanced dialog. For X-Y charts, the X axis chart is also enhanced by the <link href="text/schart/01/05040201.xhp" name="Scaling"><emph>Scaling</emph></link> tab.</paragraph>
+<note id="par_id3159266">Scaling the X axis is only possible in the X-Y chart type.</note>
+<embed href="text/shared/01/05200100.xhp#line"/>
+<embed href="text/shared/01/05020100.xhp#characters"/>
+<embed href="text/schart/01/05020201.xhp#alignment"/>
+</body>
+</helpdocument>

@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriter0102110000xml" indexer="include">
+    <title id="tit" xml-lang="en-US">Navigator</title>
+    <filename>/text/swriter/01/02110000.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="navigator">
+<bookmark xml-lang="en-US" branch="hid/.uno:Navigator" id="bm_id4232254" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/SW_HID_NAVIGATOR_TREELIST" id="bm_id4232255" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/@@nowidget@@" id="@@nowidget@@" localize="false"/>
+
+<h1 id="hd_id3151177"><variable id="Navigator"><link href="text/swriter/01/02110000.xhp" name="Navigator">Navigator</link></variable></h1>
+<paragraph id="par_id3149802" role="paragraph" xml-lang="en-US"><ahelp hid=".">Shows or hides the Navigator window, where you can quickly jump to different parts of your document. Navigator is also available as a deck of the Sidebar. You can also use the Navigator to insert elements from the current document or other open documents, and to organize master documents.</ahelp> To edit an item in the Navigator, right-click the item, and then choose a command from the context menu. If you want, you can <link href="text/shared/00/00000005.xhp#docking" name="dock">dock</link> the Navigator at the edge of your workspace.</paragraph>
+</section>
+<section id="howtoget">
+<embed href="text/shared/00/edit_menu.xhp#navigator"/>
+</section>
+<paragraph id="par_id3154475" role="paragraph" xml-lang="en-US">To open the Navigator, choose <menuitem>View - Navigator</menuitem> (<keycode>F5</keycode>). To move the Navigator, drag its title bar. To dock the Navigator, drag its title bar to the left, right or bottom edge of the workspace. To undock the Navigator, hold down the <switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline> key and double-click on a grey area of the Navigator.</paragraph>
+<paragraph id="par_id3149490" role="paragraph" xml-lang="en-US">Click the expander icon next to a category in the Navigator to view the items in the category. To view the number of items in a category, rest your mouse pointer over the category in the Navigator. To jump to an item in the document, double-click the item in the Navigator.</paragraph>
+<paragraph id="par_id3149106" role="paragraph" xml-lang="en-US">To jump to the next or previous item in a document, use the <emph>Navigate by</emph> box to select the item category, and then click the up or down arrows.</paragraph>
+
+<paragraph role="paragraph" id="par_id571655653825780">The navigator shows what corresponds to the editing location in the navigator view. This can be according to different categories: Headings, Tables, Hyperlinks and so on. When the "Content Navigation View" button is pressed and headings are selected, the heading belonging to the current editing position is displayed and highlighted in the Navigator. When tables are selected, the associated table is displayed, and so on. If the element is located in a collapsed layer, the required layers above it are automatically expanded and remain expanded afterwards.</paragraph>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/contenttoggle" id="bm_id3155911" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/globaltoggle" id="bm_id3155912" localize="false"/>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/root" id="bm_id3145591" localize="false"/>
+
+<h2 id="hd_id321603114930016">Navigate By</h2>
+<paragraph role="paragraph" id="par_id171603114951991">Use selection box to choose which type of item should be navigated, when using the Previous and Next buttons.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/back" id="bm_id3148779" localize="false"/>
+
+<h2 id="hd_id3150096">Previous</h2>
+<paragraph id="par_id3148784" role="paragraph" xml-lang="en-US">Jumps to the previous item in the document. To specify the type of item to jump to, click the <emph>Navigate By</emph> list, and then click an item category - for example, "Images".</paragraph>
+
+<table id="tbl_id3150044">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3154616" role="paragraph" xml-lang="en-US"> <image id="img_id3154622" src="cmd/lc_upsearch.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3154622">Icon Previous Object</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3150659" role="paragraph" xml-lang="en-US">Previous Item</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/forward" id="bm_id3154022" localize="false"/>
+
+<h2 id="hd_id3150675">Next</h2>
+<paragraph id="par_id3154028" role="paragraph" xml-lang="en-US">Jumps to the next item in the document. To specify the type of item to jump to, click the <emph>Navigate By</emph> list, and then click an item category - for example, "Images".</paragraph>
+
+<table id="tbl_id3149971">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3150767" role="paragraph" xml-lang="en-US"> <image id="img_id3150773" src="cmd/lc_downsearch.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3150773">Icon Next Object</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3155359" role="paragraph" xml-lang="en-US">Next Item</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/numericfield" id="bm_id3148726" localize="false"/>
+<h2 id="hd_id3148715">Page number</h2>
+<paragraph id="par_id3155548" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/numericfield">Type the number of the page that you want to jump to, and then press Enter. Use the spin buttons to navigate.</ahelp></paragraph>
+
+<h2 id="hd_id3146891">Content Navigation View</h2>
+<paragraph id="par_id3145596" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/root">Switches between the display of all categories in the Navigator and the selected category.</ahelp></paragraph>
+<paragraph id="par_id471603110016087" role="paragraph">Context menus use a selection of commands found on this help page. The commands in a context menu change, depending on which category or item is selected.</paragraph>
+<table id="tbl_id3145616">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3154133" role="paragraph" xml-lang="en-US"> <image id="img_id3154140" src="sw/res/sc20244.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3154140">Icon Switch Content Navigation View</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3156067" role="paragraph" xml-lang="en-US">Switch Content Navigation View</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+ <table id="tab_id681603287134620">
+      <tablerow>
+      <tablecell>
+        <paragraph id="par_id531603287134620" role="tablehead">Icon</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id911603287134620" role="tablehead">Category</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id31603287134620" role="tablehead">Context Menu</paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="image" id="par_id721603290925895"><image src="sw/res/nc20000.svg" id="img_id1001603290925895" width="1cm" height="1cm"><alt id="alt_id591603290925895">Headings Icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id581603287134620" role="tablecontent">Headings</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id431603287134620" role="tablecontent">Collapse/Expand All, <link href="text/swriter/01/01160200.xhp" name="clipboard">Send Outline to Clipboard</link>, <link href="text/swriter/01/outlinecontent_visibility.xhp" name="outlinecontent1">Outline Folding</link>, <link href="text/swriter/01/02110000.xhp#outlinetracking" name="outlinetrck1">Outline Tracking</link>, <link href="text/swriter/01/02110000.xhp#outlinelvl" name="OutlineLvl1">Outline Level</link></paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell></tablecell>
+      <tablecell>
+         <paragraph id="par_id151603291732283" role="tablecontent">Heading item</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id611603291783875" role="tablecontent">Collapse/Expand All, Go to, Select, Delete, <link href="text/swriter/01/02110000.xhp#promotechap" name="promotechap">Promote Chapter</link>, <link href="text/swriter/01/02110000.xhp#demotechap" name="demotechap">Demote Chapter</link>, <link href="text/swriter/01/02110000.xhp#promotelevel" name="promotelvl">Promote Level</link>, <link href="text/swriter/01/02110000.xhp#demotelevel" name="demotelvl">Demote Level</link>, <link href="text/swriter/01/outlinecontent_visibility.xhp" name="outlinecontent2">Outline Content Visibility</link>, <link href="text/swriter/01/02110000.xhp#outlinetracking" name="outlinetrck2">Outline Tracking</link>, <link href="text/swriter/01/02110000.xhp#outlinelvl" name="OutlineLvl2">Outline Level</link></paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="image" id="par_id721603287623090">
+<image src="cmd/sc_inserttable.svg" id="img_id301603287623090" width="1cm" height="1cm"><alt id="alt_id861603287623090">Tables Icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id611603290378376" role="tablecontent">Tables</paragraph>
+      </tablecell>
+      <tablecell></tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell></tablecell>
+      <tablecell>
+        <paragraph id="par_id531603530756147" role="tablecontent">Table items</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id291603290382271" role="tablecontent">Go to, Select, Edit, Delete, Rename</paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="image" id="par_id771603291076318"><image src="cmd/sc_insertframe.svg" id="img_id861603291076318" width="1cm" height="1cm"><alt id="alt_id861603291076318">Frames icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id191603290368002" role="tablecontent">Frames</paragraph>
+      </tablecell>
+      <tablecell></tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id801603532799021">
+<image src="cmd/sc_imagebutton.svg" id="img_id1001603532799021" width="1cm" height="1cm"><alt id="alt_id171603532799021">Images Icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id581603532733359">Images</paragraph>
+      </tablecell>
+      <tablecell></tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id8016035394621021">
+<image src="cmd/sc_insertobject.svg" id="img_id1001603543299021" width="1cm" height="1cm"><alt id="alt_id171603532799021">OLE Objects Icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id581603532723769">OLE Objects</paragraph>
+      </tablecell>
+      <tablecell></tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id801636822799021">
+<image src="cmd/sc_insertbookmark.svg" id="img_id1001660982799021" width="1cm" height="1cm"><alt id="alt_id171603532799021">Bookmarks Icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id581603532733956">Bookmarks</paragraph>
+      </tablecell>
+      <tablecell></tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell></tablecell>
+      <tablecell>
+        <paragraph id="par_id411603531074035" role="tablecontent">Frame, Image, OLE Objects, Bookmark items</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id611603290373033" role="tablecontent">Go to, Edit, Delete, Rename</paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id741603570764762">
+<image src="cmd/sc_insertsection.svg" id="img_id641603570764762" width="1cm" height="1cm"><alt id="alt_id821603570764762">Sections Icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id621603570764762" role="tablecontent">Sections</paragraph>
+      </tablecell>
+      <tablecell></tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell></tablecell>
+      <tablecell>
+        <paragraph id="par_id111603570764762" role="tablecontent">Section items</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id291694280382271" role="tablecontent">Go to, Select, Edit, Rename</paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id461603570542532">
+<image src="cmd/sc_inserthyperlink.svg" id="img_id721603570542532" width="1cm" height="1cm"><alt id="alt_id911603570542532">Hyperlinks Icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id801603570516284" role="tablecontent">Hyperlinks</paragraph>
+      </tablecell>
+      <tablecell></tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell></tablecell>
+      <tablecell>
+        <paragraph id="par_id81603570505590" role="tablecontent">Hyperlink items</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id961603570483539" role="tablecontent">Go to, Edit, Delete, Rename</paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id901603571492300">
+<image src="cmd/sc_insertreferencefield.svg" id="img_id771603571492300" width="1cm" height="1cm"><alt id="alt_id271603571492300">References Icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id91603571492300" role="tablecontent">References</paragraph>
+      </tablecell>
+      <tablecell></tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell><paragraph role="paragraph" id="par_id121603573019324">
+<image src="cmd/sc_insertindexesentry.svg" id="img_id901603573019324" width="1cm" height="1cm"><alt id="alt_id341603573019324">Indexes Icon</alt></image></paragraph></tablecell>
+      <tablecell>
+        <paragraph id="par_id591603573019324" role="tablecontent">Indexes</paragraph>
+      </tablecell>
+      <tablecell></tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell></tablecell>
+      <tablecell>
+        <paragraph id="par_id911603571492300" role="tablecontent">References, Indexes items</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id29160996782271" role="tablecontent">Go to</paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id741603572161942">
+<image src="cmd/lc_shownote.svg" id="img_id521603572161942" width="1cm" height="1cm"><alt id="alt_id521603572161942">Comments Icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id41603572161942" role="tablecontent">Comments</paragraph>
+      </tablecell>
+      <tablecell><paragraph role="paragraph" id="par_id711603572473016">Show All, Hide All, Delete All</paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id751603572161943" role="tablecontent">Comments items</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id291604453382271" role="tablecontent">Go to, Edit, Delete</paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id951603571856944">
+<image src="cmd/lc_insertdraw.svg" id="img_id221603571856944" width="1cm" height="1cm"><alt id="alt_id751603571856944">Drawing objects Icon</alt></image></paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id351603571856944" role="tablecontent">Drawing objects</paragraph>
+      </tablecell>
+      <tablecell></tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell></tablecell>
+      <tablecell>
+        <paragraph id="par_id461603571856945" role="tablecontent">Drawing objects items</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph id="par_id291603347382271" role="tablecontent">Go to, Delete, Rename</paragraph>
+      </tablecell>
+      </tablerow>
+      <tablerow>
+      <tablecell></tablecell>
+      <tablecell>
+        <paragraph id="par_id781603291428300" role="tablecontent">All</paragraph>
+      </tablecell>
+      <tablecell>
+        <paragraph role="paragraph" id="par_id711603291482148"><link href="text/swriter/01/02110000.xhp#dragmode" name="Drag Mode">Drag Mode</link>, <link href="text/swriter/01/02110000.xhp#display" name="display">Display</link></paragraph>
+      </tablecell>
+      </tablerow>
+</table>
+<note id="par_id3155136" xml-lang="en-US">A hidden section in a document appears gray in the Navigator, and displays the text "hidden" when you rest the mouse pointer over it. The same applies to header and footer contents of Page Styles that are not used in a document, and hidden contents in tables, frames, graphics, OLE objects, and indexes.</note>
+<h2 id="hd_id3149176"> Toggle Master View</h2>
+<paragraph id="par_id3155917" role="paragraph" xml-lang="en-US"><ahelp hid="." visibility="hidden">Switches between master view and normal view if a master document is open.</ahelp> Switches between <link href="text/shared/01/02110000.xhp" name="master view">master view</link> and normal view if a <link href="text/shared/01/01010001.xhp" name="master document">master document</link> is open.</paragraph>
+
+<table id="tbl_id3155861">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3150689" role="paragraph" xml-lang="en-US"> <image id="img_id3150695" src="sw/res/sc20244.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3150695">Icon Toggle Master View</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3149568" role="paragraph" xml-lang="en-US">Toggle Master View</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/header" id="bm_id3159237" localize="false"/>
+
+<h2 id="hd_id3153070">Header</h2>
+<paragraph id="par_id3159242" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/header">Moves the cursor to the header, or from the header to the document text area.</ahelp></paragraph>
+
+<table id="tbl_id3159262">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3153900" role="paragraph" xml-lang="en-US"> <image id="img_id3153911" src="sw/res/sc20179.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3153911">Icon Header</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3147104" role="paragraph" xml-lang="en-US">Header</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/footer" id="bm_id3147131" localize="false"/>
+
+<h2 id="hd_id3147120">Footer</h2>
+<paragraph id="par_id3147137" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/footer">Moves the cursor to the footer, or from the footer to the document text area.</ahelp></paragraph>
+
+<table id="tbl_id3149777">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3150217" role="paragraph" xml-lang="en-US"> <image id="img_id3150224" src="sw/res/sc20177.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3150224">Icon Footer</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3145220" role="paragraph" xml-lang="en-US">Footer</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/anchor" id="bm_id3150309" localize="false"/>
+
+<h2 id="hd_id3145237">Anchor &lt;-&gt; Text</h2>
+<paragraph id="par_id3150314" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/anchor">Jumps between the footnote text and the footnote anchor.</ahelp></paragraph>
+
+<table id="tbl_id3150333">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3153100" role="paragraph" xml-lang="en-US"> <image id="img_id3153108" src="sw/res/sc20182.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3153108">Icon Anchor &lt;-&gt; Text</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3150650" role="paragraph" xml-lang="en-US">Anchor &lt;-&gt; Text</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/reminder" id="bm_id3155392" localize="false"/>
+
+<h2 id="hd_id3155381">Set Reminder</h2>
+<paragraph id="par_id3153011" role="paragraph" xml-lang="en-US"><ahelp hid="." visibility="hidden">Click here to set a reminder at the current cursor position. You can define up to five reminders. To jump to a reminder, click the <link href="text/swriter/01/02110100.xhp" name="Navigation"><emph>Navigation</emph></link> icon, in the <emph>Navigation</emph> window click the <emph>Reminder</emph> icon, and then click the <emph>Previous</emph> or <emph>Next</emph> button.</ahelp> Click here to set a reminder at the current cursor position. You can define up to five reminders. To jump to a reminder, click the <link href="text/swriter/01/02110100.xhp" name="Navigation">Navigation</link> icon, in the Navigation window click the Reminder icon, and then click the Previous or Next button.</paragraph>
+
+<table id="tbl_id3154577">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3154608" role="paragraph" xml-lang="en-US"> <image id="img_id3154904" src="sw/res/sr20014.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3154904">Icon Set Reminder</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3153054" role="paragraph" xml-lang="en-US">Set Reminder</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+<note id="par_id3495381" xml-lang="en-US">Reminders are navigated in the order in which they are set. Reminders are not saved when a document is closed.</note>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/headings" id="bm_id3150519" localize="false"/>
+
+<h2 id="hd_id3150507"><variable id="outlinelvl">Outline Level</variable></h2>
+<table id="tbl_id3147535">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3153588" role="paragraph" xml-lang="en-US"> <image id="img_id3153595" src="sw/res/sc20236.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3153595">Icon Outline level</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3145554" role="paragraph" xml-lang="en-US">Outline level</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<paragraph id="par_id3150529" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/headings">Click this icon, and then choose the number of heading outline levels that you want to view in the Navigator window.</ahelp> You can also access this command by right-clicking a heading in the Navigator window.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/SW_HID_NAVI_OUTLINES" id="bm_id3148820" localize="false"/>
+
+<h3 id="hd_id3148808">1-10</h3>
+<paragraph id="par_id3148826" role="paragraph" xml-lang="en-US"><ahelp hid="HID_NAVI_OUTLINES">Click <emph>1 </emph>to only view the top level headings (chapter heading) in the Navigator window, and <emph>10</emph> to view all of the headings.</ahelp></paragraph>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/listbox" id="bm_id3155319" localize="false"/>
+
+<h2 id="hd_id3155308">List Box</h2>
+<paragraph id="par_id3155325" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/listbox">Shows or hides the <emph>Navigator </emph>list.</ahelp></paragraph>
+
+<table id="tbl_id3154409">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3154949" role="paragraph" xml-lang="en-US"> <image id="img_id3154955" src="sw/res/sc20233.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3154955">Icon List box on/off</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3146874" role="paragraph" xml-lang="en-US">List box on/off</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/promote" id="bm_id3151349" localize="false"/>
+
+<h2 id="hd_id3151338"><variable id="promotelevel">Promote Level</variable></h2>
+<paragraph id="par_id3151354" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/promote">Increases the outline level of the selected heading, and the headings that occur below the heading, by one. To only increase the outline level of the selected heading, hold down <switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>, and then click this icon.</ahelp></paragraph>
+
+<table id="tbl_id3148898">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3155414" role="paragraph" xml-lang="en-US"> <image id="img_id3155420" src="sw/res/sc20172.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3155420">Icon Promote level</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3153697" role="paragraph" xml-lang="en-US">Promote level</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/demote" id="bm_id3153724" localize="false"/>
+
+<h2 id="hd_id3153714"><variable id="demotelevel">Demote Level</variable></h2>
+<paragraph id="par_id3150707" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/demote">Decreases the outline level of the selected heading, and the headings that occur below the heading, by one. To only decrease the outline level of the selected heading, hold down <switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>, and then click this icon.</ahelp></paragraph>
+
+<table id="tbl_id3150746">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3148414" role="paragraph" xml-lang="en-US"> <image id="img_id3148420" src="sw/res/sc20173.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3148420">Icon Demote level</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3147324" role="paragraph" xml-lang="en-US">Demote level</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/chapterup" id="bm_id3145582" localize="false"/>
+
+<h2 id="hd_id3145571"><variable id="promotechap">Promote Chapter</variable></h2>
+<paragraph id="par_id3145587" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/chapterup">Moves the selected heading, and the text below the heading, up one heading position in the Navigator and in the document. To move only the selected heading and not the text associated with the heading, hold down <switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>, and then click this icon.</ahelp></paragraph>
+
+<table id="tbl_id3151301">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3153268" role="paragraph" xml-lang="en-US"> <image id="img_id3153275" src="cmd/lc_upsearch.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3153275">Icon Chapter Up</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3149147" role="paragraph" xml-lang="en-US">Chapter Up</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/chapterdown" id="bm_id3154435" localize="false"/>
+
+<h2 id="hd_id3154424"><variable id="demotechap">Demote Chapter</variable></h2>
+<paragraph id="par_id3154440" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/chapterdown">Moves the selected heading, and the text below the heading, down one heading position in the Navigator and in the document. To move only the selected heading and not the text associated with the heading, hold down <switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>, and then click this icon.</ahelp></paragraph>
+
+<table id="tbl_id3153737">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3153768" role="paragraph" xml-lang="en-US"> <image id="img_id3150828" src="cmd/lc_downsearch.svg" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3150828">Icon Chapter down</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3150870" role="paragraph" xml-lang="en-US">Chapter down</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<tip id="par_id3155932" xml-lang="en-US">To quickly reorder headings and their associated text in your document, select the "Headings" category in the list, and then click the<emph> Content View</emph> icon. Now you can use drag-and-drop to reorder contents.</tip>
+
+<bookmark xml-lang="en-US" branch="hid/modules/swriter/ui/navigatorpanel/dragmode" id="bm_id3154303" localize="false"/>
+
+<h2 id="hd_id3154292"><variable id="dragmode">Drag Mode</variable></h2>
+<paragraph id="par_id3155828" role="paragraph" xml-lang="en-US"><ahelp hid="modules/swriter/ui/navigatorpanel/dragmode">Sets the drag and drop options for inserting items from the Navigator into a document, for example, as a hyperlink. Click this icon, and then choose the option that you want to use.</ahelp></paragraph>
+
+<table id="tbl_id3155849">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_id3155120" role="paragraph" xml-lang="en-US"> <image id="img_id3155126" src="sw/res/sc20235.png" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3155126">Icon Drag mode</alt></image></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_id3147042" role="paragraph" xml-lang="en-US">Drag mode</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+<bookmark xml-lang="en-US" branch="hid/SW_HID_NAVI_DRAG_HYP" id="bm_id3150949" localize="false"/>
+
+<h3 id="hd_id3150938">Insert As Hyperlink</h3>
+<paragraph id="par_id3150954" role="paragraph" xml-lang="en-US"><ahelp hid="HID_NAVI_DRAG_HYP">Creates a hyperlink when you drag and drop an item into the current document. Click the hyperlink in the document to jump to the item that the hyperlink points to.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/SW_HID_NAVI_DRAG_LINK" id="bm_id3154365" localize="false"/>
+
+<h3 id="hd_id3154354">Insert As Link</h3>
+<paragraph id="par_id3154371" role="paragraph" xml-lang="en-US"><ahelp hid="HID_NAVI_DRAG_LINK">Inserts the selected item as a link where you drag and drop in the current document. Text is inserted as protected sections. The contents of the link are automatically updated when the source is changed. To manually update the links in a document, choose <emph>Tools - Update - Links</emph>. You cannot create links for graphics, OLE objects, references and indexes.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/SW_HID_NAVI_DRAG_COPY" id="bm_id3155583" localize="false"/>
+
+<h3 id="hd_id3155572">Insert As Copy</h3>
+<paragraph id="par_id3155589" role="paragraph" xml-lang="en-US"><ahelp hid="HID_NAVI_DRAG_COPY">Inserts a copy of the selected item where you drag and drop in the current document. You cannot drag and drop copies of graphics, OLE objects, references and indexes.</ahelp></paragraph>
+
+<bookmark xml-lang="en-US" branch="hid/SW_HID_NAVIGATOR_LISTBOX" id="bm_id3148994" localize="false"/>
+
+<h2 id="hd_id3147340"><variable id="display">Open Documents</variable></h2>
+<paragraph id="par_id3148999" role="paragraph" xml-lang="en-US"><ahelp hid="HID_NAVIGATOR_LISTBOX">Lists the names of all open text documents. To view the contents of a document in the Navigator window, select the name of the document in the list. The current document displayed in the Navigator is indicated by the word "active" after its name in the list.</ahelp></paragraph>
+<paragraph id="par_id3149025" role="paragraph" xml-lang="en-US">You can also right-click an item in the Navigator, choose <emph>Display</emph>, and then click the document that you want to view.</paragraph>
+
+<h2 id="hd_id541603882412689"><variable id="outlinetracking">Outline Tracking</variable></h2>
+<paragraph role="paragraph" id="par_id501603882441409">Set Navigator&#x2019;s mode of outline tracking. This feature applies only to outline entries under <menuitem>Headings</menuitem> in the Content View frame of Navigator. To see, enable, or change the mode, right-click on <menuitem>Headings</menuitem> or an item under Headings and choose <menuitem>Outline Tracking</menuitem>. The selected mode is applied to the entire document.</paragraph>
+<paragraph role="paragraph" id="par_id161603966072360">In <menuitem>Default</menuitem> and <menuitem>Focus</menuitem> mode, Navigator will automatically select the nearest heading before the current cursor position in the document.</paragraph>
+<paragraph role="paragraph" id="par_id571603887044019"> In <menuitem>Default</menuitem> mode, the display of outline entries in Navigator is never changed, only an outline entry is selected.</paragraph>
+<paragraph role="paragraph" id="par_id201603965501777">In <menuitem>Focus</menuitem> mode, Navigator shows only the headings for the selected outline level, relative to the next higher outline level. For example, if a level 2 heading is selected, then all level 2 headings under the same level 1 heading are shown, while any level 3-10 headings (under the same level 1 heading) are collapsed.  Other headings, not under the same level 1 heading, are also collapsed.</paragraph>
+<paragraph role="paragraph" id="par_id81603965538425">Choose <menuitem>Off</menuitem> to disable Outline Tracking.</paragraph>
+<section id="relatedtopics">
+<embed href="text/shared/guide/navigator.xhp#navigator"/>
+<paragraph role="paragraph" id="par_id1001603575103843"><link href="text/swriter/guide/arrange_chapters.xhp" name="chapnavigation">Using Navigator to Arrange Headings</link></paragraph>
+<embed href="text/swriter/guide/hyperlinks.xhp#hyperlinks"/>
+<embed href="text/shared/guide/autohide.xhp#autohide"/>
+</section>
+</body>
+</helpdocument>

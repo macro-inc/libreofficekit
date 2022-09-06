@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0102230400xml" indexer="include" status="PUBLISH">
+    <title xml-lang="en-US" id="tit">Manage changes</title>
+    <filename>/text/shared/01/02230400.xhp</filename>
+  </topic>
+  <history>
+    <created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+  </history>
+</meta>
+<body>
+  <bookmark branch="hid/.uno:AcceptChanges" xml-lang="en-US" id="bm_id3149991" localize="false"/>
+  <bookmark xml-lang="en-US" branch="hid/svx/ui/redlinecontrol/tabcontrol/@@nowidget@@" id="bm_id3154025" localize="false"/>
+  <bookmark xml-lang="en-US" branch="hid/svx/ui/redlinecontrol/tabcontrol" id="bm_id3154025" localize="false"/>
+  <bookmark xml-lang="en-US" branch="hid/SW_HID_REDLINE_CTRL" id="bm_id2513258" localize="false"/>
+
+  <section id="managechangeshead">
+      <h1 id="hd_id3145138"><variable id="Manage changesh1"><link href="text/shared/01/02230400.xhp" name="Manage changes">Manage changes</link></variable></h1>
+  <paragraph role="paragraph" id="par_id3147240" xml-lang="en-US"><variable id="redlining"><ahelp hid=".">Accept or reject recorded changes.</ahelp></variable></paragraph>
+  </section>
+
+  <section id="howtoget">
+    <embed href="text/shared/00/edit_menu.xhp#rotlinie"/>
+    <paragraph role="paragraph" id="par_id251647262886504">On the <emph>Track Changes</emph> toolbar, click</paragraph>
+    <embed href="text/swriter/track_changes_toolbar.xhp#icon_manage_changes"/>
+</section>
+  <embed href="text/shared/01/02230401.xhp#list"/>
+  <embed href="text/shared/01/02230402.xhp#filter"/>
+</body>
+</helpdocument>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03020101xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Close Statement</title>
+    <filename>/text/sbasic/shared/03020101.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="close">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3157896">
+  <bookmark_value>Close statement</bookmark_value>
+</bookmark>
+
+
+<h1 id="hd_id3157896"><variable id="Close_h1"><link href="text/sbasic/shared/03020101.xhp" name="Close Statement">Close Statement</link></variable></h1>
+<paragraph id="par_id3147573" role="paragraph" xml-lang="en-US">Closes a specified file that was opened with the Open statement.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<paragraph role="paragraph" id="par_id971587473488701">
+  <image src="media/helpimg/sbasic/Close_statement.svg" id="img_id4156296484514"><alt xml-lang="en-US" id="alt_id15152796484514">Close Statement diagram</alt></image>
+</paragraph>
+<bascode>
+<paragraph id="par_id3147265" role="bascode" xml-lang="en-US">Close [[#]fileNum [, [#]fileNum2 [,...]]]</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3150791" role="paragraph" xml-lang="en-US"> <emph>fileNum:</emph> Any integer expression that specifies the number of the data channel that was opened with the <emph>Open</emph> statement.</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<embed href="text/sbasic/shared/03020103.xhp#FileExample"/>
+
+<section id="relatedtopics" >
+   <embed href="text/sbasic/shared/03020103.xhp#Open_h1"/>
+   <embed href="text/sbasic/shared/03020102.xhp#FreeFile_h1"/>
+</section>
+</body>
+</helpdocument>

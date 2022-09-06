@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpress0213190000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Select Text Area Only</title>
+<filename>/text/simpress/02/13190000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+
+
+  <h1 id="hd_id3150439"><link href="text/simpress/02/13190000.xhp" name="Select Text Area Only">Select Text Area Only</link></h1>
+  <embed href="text/shared/optionen/01070500.xhp#textbereich"/>
+  <embed href="text/shared/optionen/01070500.xhp#textbereich2"/>
+  <section id="syselect_text_area_only">
+  <table id="tbl_id3154319">
+
+
+
+    <tablerow>
+     <tablecell>
+      <paragraph role="paragraph" id="par_id3154510" xml-lang="en-US"><image src="cmd/sc_pickthrough.png" id="img_id3154015" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3154015">Icon Select Text Area Only</alt></image></paragraph>
+     </tablecell>
+     <tablecell>
+      <paragraph role="paragraph" id="par_id3154254" xml-lang="en-US">Select Text Area Only</paragraph>
+     </tablecell>
+    </tablerow>
+
+  </table>
+  </section>
+
+ </body>
+</helpdocument>

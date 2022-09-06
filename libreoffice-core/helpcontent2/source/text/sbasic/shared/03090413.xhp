@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textsbasicshared03090413xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Type Statement</title>
+    <filename>/text/sbasic/shared/03090413.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+  <section id="type">
+    <bookmark xml-lang="en-US" branch="index" id="bm_id3153311">
+      <bookmark_value>Type statement</bookmark_value>
+    </bookmark>
+    <h1 id="hd_id3153311"><variable id="Type_h1"><link href="text/sbasic/shared/03090413.xhp" name="Type Statement">Type Statement</link></variable></h1>
+    <paragraph role="paragraph" id="par_id3159158" xml-lang="en-US">Define non-UNO data structures.</paragraph>
+  </section>
+     <paragraph role="paragraph" id="par_id311512206747401" xml-lang="en-US">A Type structure is an ordered collection of data fields, that can be manipulated as a single item.</paragraph>
+     <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+     <paragraph role="paragraph" id="par_id491585753339474"><image src="media/helpimg/sbasic/Type_statement.svg" id="img_id4156296484514"><alt xml-lang="en-US" id="alt_id15152796484514">Type statement diagram</alt></image></paragraph>
+     <bascode>
+         <paragraph role="bascode" id="par_id3145609" xml-lang="en-US" localize="false">Type struct_name</paragraph>
+         <paragraph role="bascode" id="par_id951512205849777" xml-lang="en-US" localize="false">    DataField1 As TypeName1</paragraph>
+         <paragraph role="bascode" id="par_id951512205849778" xml-lang="en-US" localize="false">    DataField2 As TypeName2</paragraph>
+         <paragraph role="bascode" id="par_id951512205849779" xml-lang="en-US" localize="false">    (...)</paragraph>
+         <paragraph role="bascode" id="par_id841512205903256" xml-lang="en-US" localize="false">End Type &apos; struct_name</paragraph>
+     </bascode>
+     <embed href="text/sbasic/shared/fragments.xhp#array"/>
+     <embed href="text/sbasic/shared/fragments.xhp#typename"/>
+       <note id="par_id701574739564765">Extended types such as <literal>Type</literal> statement structures, UNO objects or <link href="text/sbasic/shared/classmodule.xhp" name="ClassModule">ClassModule</link> objects are valid typenames.</note>
+      <embed href="text/sbasic/shared/fragments.xhp#char"/>
+     <note id="par_id351573639548645">A Type structure scope is that of the module it belongs to.</note>
+     <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+     <bascode>
+         <paragraph role="bascode" id="par_id981512211072701" xml-lang="en-US" localize="false">Type Customer</paragraph>
+         <paragraph role="bascode" id="par_id171512211067797" xml-lang="en-US" localize="false">    Name1 As String</paragraph>
+         <paragraph role="bascode" id="par_id541512211063461" xml-lang="en-US" localize="false">    City As String</paragraph>
+         <paragraph role="bascode" id="par_id481512211058930" xml-lang="en-US" localize="false">End Type &apos; Customer structure</paragraph>
+         <paragraph role="bascode" id="par_id841512211054689" xml-lang="en-US" localize="false">Sub setCustomer</paragraph>
+         <paragraph role="bascode" id="par_id471512211049777" xml-lang="en-US" localize="false">    Dim oCustomer as New Customer</paragraph>
+         <paragraph role="bascode" id="par_id881512211042456" xml-lang="en-US" localize="false">    oCustomer.Name1 = "The Document Foundation"</paragraph>
+         <paragraph role="bascode" id="par_id461512211038180" xml-lang="en-US" localize="false">    oCustomer.City = "Berlin"</paragraph>
+         <paragraph role="bascode" id="par_id21512211032617" xml-lang="en-US" localize="false">End Sub</paragraph>
+     </bascode>
+     <tip id="par_id701573639564765"><link href="text/sbasic/shared/enum.xhp" name ="enumerations">Enumerations</link> can be created using Type statement definitions. <link href="text/sbasic/guide/basic_2_python.xhp" name ="Calling Python Scripts from Basic">Calling Python Scripts from Basic</link> illustrates that mechanism.</tip>
+     <section id="relatedtopics">
+         <embed href="text/sbasic/shared/classmodule.xhp#classmodulestatement"/>
+         <paragraph role="paragraph" id="par_id211512215755793" xml-lang="en-US"><link href="text/sbasic/shared/03132400.xhp" name="CreateObject function">CreateObject function</link></paragraph>
+     </section>
+ </body>
+</helpdocument>

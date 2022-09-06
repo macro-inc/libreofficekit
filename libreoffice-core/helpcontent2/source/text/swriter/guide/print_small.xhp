@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<meta>
+      <topic id="textswriterguideprint_smallxml" indexer="include" status="PUBLISH">
+         <title xml-lang="en-US" id="tit">Printing Multiple Pages on One Sheet</title>
+         <filename>/text/swriter/guide/print_small.xhp</filename>
+      </topic>
+   </meta>
+   <body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149694"><bookmark_value>multi-page view of documents</bookmark_value>
+      <bookmark_value>pages;printing multiple on one sheet</bookmark_value>
+      <bookmark_value>overviews;printing multi-page view</bookmark_value>
+      <bookmark_value>printing;multiple pages per sheet</bookmark_value>
+      <bookmark_value>reduced printing of multiple pages</bookmark_value>
+</bookmark><comment> MW changed "overviews;"</comment>
+<h1 xml-lang="en-US" id="hd_id3149694"><variable id="print_small"><link href="text/swriter/guide/print_small.xhp" name="Printing Multiple Pages on One Sheet">Printing Multiple Pages on One Sheet</link>
+</variable></h1>
+      <paragraph xml-lang="en-US" id="par_id3149829" role="paragraph">In the <emph>Page Layout</emph> section of the <menuitem>File - Print</menuitem> dialog, you have the option to print multiple pages on one sheet.</paragraph>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3156098" role="listitem">Choose <menuitem>File - Print</menuitem></paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3155055" role="listitem">In the <emph>Page Layout</emph> section, do one of the following:</paragraph>
+         </listitem>
+      </list>
+      <list type="ordered">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3149603" role="listitem">To print two pages side by side on the same sheet, select "2" in the <emph>Pages per sheet</emph> box.</paragraph>
+         </listitem>
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3153388" role="listitem">To print multiple pages on the same sheet, select the number of pages per sheet and optionally set the order of pages. The small preview shows the arrangement of pages. </paragraph>
+         </listitem>
+      </list>
+      <list type="ordered" startwith="3">
+         <listitem>
+            <paragraph xml-lang="en-US" id="par_id3154841" role="listitem">Click <emph>Print</emph>.</paragraph>
+         </listitem>
+      </list>
+      <section id="relatedtopics">
+         <embed href="text/swriter/guide/print_preview.xhp#print_preview"/>
+         <paragraph xml-lang="en-US" id="par_id3150004" role="paragraph"><link href="text/swriter/main0210.xhp" name="File - Print Preview">File - Print Preview</link></paragraph>
+      </section>
+   </body>
+</helpdocument>

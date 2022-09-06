@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicguideinsert_controlxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Creating Controls in the Dialog Editor</title>
+<filename>/text/sbasic/guide/insert_control.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149182"><bookmark_value>controls; creating in the dialog editor</bookmark_value>
+<bookmark_value>dialog editor;creating controls</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3149182" xml-lang="en-US" level="1"><variable id="insert_control"><link href="text/sbasic/guide/insert_control.xhp" name="Creating Controls in the Dialog Editor">Creating Controls in the Dialog Editor</link>
+</variable></paragraph>
+<paragraph role="paragraph" id="par_id3146797" xml-lang="en-US">Use the tools on the <emph>Toolbox </emph>of the BASIC dialog editor to add controls to your dialog.</paragraph>
+<list type="ordered">
+<listitem>
+<paragraph role="listitem" id="par_id3150276" xml-lang="en-US">To open the <emph>Toolbox</emph>, click the arrow next to the <emph>Insert Controls</emph> icon on the <emph>Macro</emph> toolbar.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3145068" xml-lang="en-US">Click a tool on the toolbar, for example, <emph>Button</emph>.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3153360" xml-lang="en-US">On the dialog, drag the button to the size you want.</paragraph>
+</listitem>
+</list>
+<section id="relatedtopics">
+<embed href="text/sbasic/guide/control_properties.xhp#control_properties"/>
+<embed href="text/sbasic/guide/create_dialog.xhp#create_dialog"/>
+<embed href="text/sbasic/guide/show_dialog.xhp#show_dialog"/>
+<embed href="text/sbasic/guide/sample_code.xhp#sample_code"/>
+</section>
+</body>
+</helpdocument>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared0211110000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Modules</title>
+<filename>/text/sbasic/shared/02/11110000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+
+
+  <section id="module">
+<bookmark branch="hid/.uno:ModuleDialog" xml-lang="en-US" id="bm_id3157898" localize="false"/>
+<h1 id="hd_id3148520"><link href="text/sbasic/shared/02/11110000.xhp" name="Modules">Modules</link></h1>
+  <paragraph role="paragraph" id="par_id3156414" xml-lang="en-US"><ahelp visibility="visible" hid=".uno:ModuleDialog">Click here to open the <link href="text/sbasic/shared/01/06130000.xhp" name="Macro Organizer"><emph>Macro Organizer</emph></link> dialog.</ahelp></paragraph>
+  </section>
+  <section id="symodule">
+  <table id="tbl_id3153311">
+
+
+
+    <tablerow>
+     <tablecell>
+      <paragraph role="paragraph" id="par_id3157958" xml-lang="en-US"><image src="cmd/sc_moduledialog.png" id="img_id3155535" width="1cm" height="1cm"><alt xml-lang="en-US" id="alt_id3155535">Icon Modules</alt></image></paragraph>
+     </tablecell>
+     <tablecell>
+      <paragraph role="paragraph" id="par_id3145383" xml-lang="en-US">Modules</paragraph>
+     </tablecell>
+    </tablerow>
+
+  </table>
+  </section>
+
+ </body>
+</helpdocument>

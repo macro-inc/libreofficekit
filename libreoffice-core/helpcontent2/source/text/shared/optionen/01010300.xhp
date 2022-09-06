@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedoptionen01010300xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Paths</title>
+<filename>/text/shared/optionen/01010300.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="paths">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149514"><bookmark_value>paths; defaults</bookmark_value>
+<bookmark_value>variables; for paths</bookmark_value>
+<bookmark_value>directories;directory structure</bookmark_value>
+<bookmark_value>files and folders in $[officename]</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/optpathspage/OptPathsPage" id="bm_id3159399" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/optpathspage/@@nowidget@@" id="bm_id3159399" localize="false"/>
+<h1 id="hd_id3149514"><variable id="pathsh1"><link href="text/shared/optionen/01010300.xhp" name="Paths">Paths</link></variable></h1>
+<paragraph role="paragraph" id="par_id3151384" xml-lang="en-US"><ahelp hid="cui/ui/optpathspage/OptPathsPage">This section contains the default paths to important folders in $[officename]. These paths can be edited by the user.</ahelp></paragraph>
+</section>
+<section id="howtoget">
+<embed href="text/shared/00/00000406.xhp#paths"/>
+</section>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/optpathspage/paths" id="bm_id3146795" localize="false"/><h2 id="hd_id3149810">Paths used by %PRODUCTNAME</h2>
+<paragraph role="paragraph" id="par_id3154923" xml-lang="en-US"><ahelp hid="cui/ui/optpathspage/paths">To modify an entry in this list, click the entry and click <emph>Edit</emph>. You can also double click the entry.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/optpathspage/default" id="bm_id3154216" localize="false"/><h2 id="hd_id3151210">Default</h2>
+<paragraph role="paragraph" id="par_id3153968" xml-lang="en-US"><ahelp hid="cui/ui/optpathspage/default">The<emph> Default </emph>button resets the predefined paths for all selected entries.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/cui/ui/optpathspage/edit" id="bm_id3150448" localize="false"/><h2 id="hd_id3147229">Edit</h2>
+<paragraph role="paragraph" id="par_id3151177" xml-lang="en-US"><ahelp hid="cui/ui/optpathspage/edit">Click to display the <emph>Select Path</emph> or <emph>Edit Paths</emph> dialog.</ahelp></paragraph>
+<paragraph role="paragraph" id="par_id3153193" xml-lang="en-US">You can change the sequence of entries by clicking the bar in the <emph>Type</emph> column. The column width can be changed by moving the separator between the columns with the mouse.</paragraph>
+<paragraph role="paragraph" id="par_id691607812924039">The <emph>{user profile}</emph> directory and its subdirectories contain user data.<variable id="userprofile_location">The location of the <emph>{user profile}</emph> directory is determined when %PRODUCTNAME is installed. See the <link href="https://wiki.documentfoundation.org/UserProfile#Default_locations" name="Default_location">Default location</link> section in the Wiki page about <emph>LibreOffice user profile</emph> for more information about typical locations of the <emph>user profile</emph> in different operating systems.</variable></paragraph>  
+<paragraph role="paragraph" id="par_id601607813017831"> The following list shows the default predefined paths for storing user data, and explains what type of user data is stored in each path. Use the <emph>Edit</emph> dialog to change, add, or delete paths for the different types.</paragraph>  
+  
+<table id="tbl_id3145364">
+<tablerow>
+<tablecell>
+<paragraph role="tablehead" id="par_id3149260" xml-lang="en-US">Type</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablehead" id="par_id3146974" xml-lang="en-US">Default Path</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablehead" id="par_id3152938" xml-lang="en-US">Description</paragraph>
+</tablecell>
+</tablerow>
+<tablerow>
+<tablecell>
+<paragraph role="tablecontent" id="par_id8316599" xml-lang="en-US">AutoCorrect</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3753776" xml-lang="en-US"><switchinline select="sys"><caseinline select="UNIX">{user profile}/user/autocorr</caseinline>
+<caseinline select="MAC">{user profile}/user/autocorr</caseinline>
+<defaultinline>{user profile}\user\autocorr</defaultinline></switchinline></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id5284279" xml-lang="en-US">This folder stores your own AutoCorrect texts.</paragraph>
+</tablecell>
+</tablerow>
+<tablerow>
+<tablecell>
+<paragraph role="tablecontent" id="par_id4494766" xml-lang="en-US">AutoText</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id7858516" xml-lang="en-US"><switchinline select="sys"><caseinline select="UNIX">{user profile}/user/autotext</caseinline>
+<caseinline select="MAC">{user profile}/user/autotext
+</caseinline><defaultinline>{user profile}\user\autotext</defaultinline></switchinline></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id973540" xml-lang="en-US">This folder stores your own AutoText texts.</paragraph>
+</tablecell>
+</tablerow>
+<tablerow>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3146891" xml-lang="en-US">Backups</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3154915" xml-lang="en-US"><switchinline select="sys"><caseinline select="UNIX">{user profile}/user/backup
+</caseinline>
+<caseinline select="MAC">{user profile}/user/backup
+</caseinline><defaultinline>{user profile}\user\backup</defaultinline></switchinline></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3154603" xml-lang="en-US">Automatic backup copies of documents are stored here.</paragraph>
+</tablecell>
+</tablerow>
+<tablerow>
+<tablecell>
+<paragraph id="par_id271607721701065" role="tablecontent">Dictionaries</paragraph>
+</tablecell>
+<tablecell>
+<paragraph id="par_id651607721812472" role="tablecontent"><switchinline select="sys"><caseinline select="UNIX">{user profile}/user/wordbook
+</caseinline><caseinline select="MAC">{user profile}/user/wordbook
+</caseinline><defaultinline>{user profile}\user\wordbook</defaultinline></switchinline></paragraph>
+</tablecell>
+<tablecell>
+<paragraph id="par_id491607721838854" role="tablecontent">This folder stores files with words in your custom dictionaries.</paragraph>
+</tablecell>
+</tablerow>
+<tablerow>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3154493" xml-lang="en-US">Gallery</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3154484" xml-lang="en-US"><switchinline select="sys"><caseinline select="UNIX">{user profile}/user/gallery
+</caseinline><caseinline select="MAC">{user profile}/user/gallery
+</caseinline><defaultinline>{user profile}\user\gallery</defaultinline></switchinline></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3156289" xml-lang="en-US">New Gallery themes are stored in this folder.</paragraph>
+</tablecell>
+</tablerow>
+<tablerow>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3151333" xml-lang="en-US">Images</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3152890" xml-lang="en-US"><switchinline select="sys"><caseinline select="UNIX">{user profile}/user/gallery
+</caseinline><caseinline select="MAC">{user profile}/user/gallery
+</caseinline><defaultinline>{user profile}\user\gallery</defaultinline></switchinline></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3148597" xml-lang="en-US">This folder is displayed when you first call the dialog for opening or saving a graphic object.</paragraph>
+</tablecell>
+</tablerow>
+<tablerow>
+<tablecell>
+<paragraph role="tablecontent" id="par_id4680928" xml-lang="en-US">Templates</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id9014252" xml-lang="en-US"><switchinline select="sys"><caseinline select="UNIX">{user profile}/user/template
+</caseinline><caseinline select="MAC">{user profile}/user/template
+</caseinline><defaultinline>{user profile}\user\template</defaultinline></switchinline></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id6011841" xml-lang="en-US">In this folder you can store your own templates.</paragraph>
+</tablecell>
+</tablerow>
+<tablerow>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3154606" xml-lang="en-US">Temporary files</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3149343" xml-lang="en-US"><switchinline select="sys"><caseinline select="UNIX">{user profile}/user/temp
+</caseinline><caseinline select="MAC">{user profile}/user/temp
+</caseinline><defaultinline>{user profile}\user\temp</defaultinline></switchinline></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3154650" xml-lang="en-US">This is where $[officename] puts its temporary files.</paragraph>
+</tablecell>
+</tablerow>
+<tablerow>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3151073" xml-lang="en-US">My Documents</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3149400" xml-lang="en-US">Default document folder of your system</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3153418" xml-lang="en-US">You can see this folder when you first call the <emph>Open</emph> or <emph>Save</emph> dialog.</paragraph>
+</tablecell>
+</tablerow>
+<tablerow>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3154607" xml-lang="en-US">Classification</paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3149344" xml-lang="en-US"><switchinline select="sys"><caseinline select="UNIX">{install}/share/classification/example.xml</caseinline><caseinline select="MAC">{install}/share/classification/example.xml</caseinline><defaultinline>{install}\share\classification\example.xml</defaultinline></switchinline></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="tablecontent" id="par_id3154651" xml-lang="en-US">$[officename] reads the TSCP BAF policy from this file.</paragraph>
+</tablecell>
+</tablerow>
+</table>
+<paragraph role="paragraph" id="par_id3150439" xml-lang="en-US"><emph>Internal Paths</emph> shows the paths where predefined content for %PRODUCTNAME is installed. These paths cannot be edited in this dialog box.</paragraph>
+<paragraph role="paragraph" id="par_id131608971415763">The paths refer to subdirectories in <literal>{install}</literal><switchinline select="sys"><caseinline select="WIN">\</caseinline><defaultinline>/</defaultinline></switchinline><literal>share</literal>. These subdirectories are read-only and contain content shown to all users. The location of the <literal>{install}</literal> directory is determined when %PRODUCTNAME is installed.</paragraph>
+</body>
+</helpdocument>

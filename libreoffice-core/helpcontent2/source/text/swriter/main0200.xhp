@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textswritermain0200xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Toolbars</title>
+<filename>/text/swriter/main0200.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="toolbars">
+<h1 id="hd_id3145782"><variable id="main0200"><link href="text/swriter/main0200.xhp" name="Toolbars">Toolbars</link>
+</variable></h1>
+<paragraph role="paragraph" id="par_id3145481" xml-lang="en-US">This section provides an overview of the toolbars available in $[officename] Writer. <embedvar href="text/shared/00/00000007.xhp#symbolleistenneu"/>
+</paragraph>
+</section>
+
+<embed href="text/swriter/main0206.xhp#bullets_and_numbering_bar"/>
+<embed href="text/simpress/main0210.xhp#drawingbar"/>
+<embed href="text/swriter/main0205.xhp#drawing_object_properties_bar"/>
+<embed href="text/shared/find_toolbar.xhp#Find_Bar"/>
+<embed href="text/swriter/main0202.xhp#formatting_bar"/>
+
+<embed href="text/swriter/main0215.xhp#frame_bar"/>
+
+<embed href="text/swriter/main0203.xhp#image_bar"/>
+<embed href="text/swriter/02/18010000.xhp#insert"/>
+
+<embed href="text/swriter/mailmergetoolbar.xhp#mail_merge_toolbar"/>
+<embed href="text/shared/mediaplay_toolbar.xhp#mediaplaybacktoolbarHead"/>
+<embed href="text/shared/01/03050000.xhp#toolsbar"/>
+<embed href="text/swriter/navigate_toolbar.xhp#navigatetoolbarHead"/>
+<embed href="text/swriter/main0216.xhp#OLE_object_bar"/>
+<embed href="text/shared/main0201.xhp#standardbar"/>
+
+<embed href="text/swriter/main0204.xhp#table_bar"/>
+<embed href="text/swriter/main0220.xhp#text_object_bar"/>
+<embed href="text/shared/01/03050000.xhp#toolsbar"/>
+<embed href="text/swriter/track_changes_toolbar.xhp#trackcahangestoolbarHead"/>
+<section id="Section11">
+<embed href="text/shared/01/classificationbar.xhp#toolbar"/>
+</section>
+</body>
+</helpdocument>

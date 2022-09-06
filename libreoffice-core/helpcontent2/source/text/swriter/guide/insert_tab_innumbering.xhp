@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+<topic id="textswriterguideinsert_tab_innumberingxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Changing the List Level of a List Paragraph</title>
+<filename>/text/swriter/guide/insert_tab_innumbering.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3145078">
+<bookmark_value>tab stops; inserting in lists</bookmark_value>
+<bookmark_value>numbering; changing the level of</bookmark_value>
+<bookmark_value>lists;changing levels</bookmark_value>
+<bookmark_value>levels;changing chapter levels</bookmark_value>
+<bookmark_value>bullet lists;changing levels</bookmark_value>
+<bookmark_value>lowering chapter levels</bookmark_value>
+<bookmark_value>rising chapter levels</bookmark_value>
+<bookmark_value>changing;chapter levels</bookmark_value>
+<bookmark_value>promote level;in lists</bookmark_value>
+<bookmark_value>demote level;in lists</bookmark_value>
+</bookmark>
+<section id="promotedemote">
+<h1 id="hd_id3145078" xml-lang="en-US"><variable id="insert_tab_innumbering"><link href="text/swriter/guide/insert_tab_innumbering.xhp" name="Changing the Outline Level of Numbered and Bulleted Lists">Changing the List Level of a List Paragraph</link>
+</variable></h1>
+<list type="unordered">
+<listitem>
+    <paragraph role="listitem" id="par_id3155909" xml-lang="en-US">To move a numbered or bulleted list paragraph down one list level, click at the beginning of the paragraph, and then press <keycode>Tab</keycode>.</paragraph>
+</listitem>
+<listitem>
+    <paragraph role="listitem" id="par_id3155859" xml-lang="en-US">To move a numbered or bulleted list paragraph up one list level, click at the beginning of the paragraph, and then press <keycode>Shift+Tab</keycode>.</paragraph>
+</listitem>
+<listitem>
+    <paragraph role="listitem" id="par_id3153403" xml-lang="en-US">To insert a tab between the number or bullet and the paragraph text for all list paragraphs at a given list level, use the <menuitem>Numbering followed by</menuitem> option in the <link href="text/shared/01/06050600.xhp" name="Position"><menuitem>Position</menuitem></link> tab in the <menuitem>Bullets and Numbering</menuitem> dialog. For an individual list paragraph, a tab can be copied and then pasted at the beginning of the list paragraph.</paragraph>
+</listitem>
+</list>
+</section>
+<section id="relatedtopics">
+    <embed href="text/swriter/guide/chapter_numbering.xhp#chapter_numbering"/>
+    <embed href="text/shared/01/06050600.xhp#positionh1"/>
+</section>
+</body>
+</helpdocument>

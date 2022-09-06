@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+
+		<helpdocument version="1.0">
+<meta>
+<topic id="textsdrawguidegraphic_insertxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Inserting Graphics</title>
+<filename>/text/sdraw/guide/graphic_insert.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3156443"><bookmark_value>pictures; inserting</bookmark_value>
+<bookmark_value>images; inserting</bookmark_value>
+<bookmark_value>files; inserting pictures</bookmark_value>
+<bookmark_value>inserting;pictures</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3156443" xml-lang="en-US" level="1"><variable id="graphic_insert"><link href="text/sdraw/guide/graphic_insert.xhp" name="Inserting Graphics">Inserting Pictures</link>
+</variable></paragraph>
+<list type="ordered">
+<listitem>
+<paragraph role="listitem" id="par_id3155600" xml-lang="en-US">Choose <emph>Insert - Image</emph>.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3150749" xml-lang="en-US">Locate the image you want to insert. Select the <emph>Link</emph> check box to insert only a link to the image. If you want to see the image before you insert it, select <emph>Preview</emph>.</paragraph>
+<paragraph role="note" id="par_id3155764" xml-lang="en-US">After you insert a linked image, do not change the name of the source image or move the source image to another directory.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3150044" xml-lang="en-US">Click <emph>Open</emph> to insert the image.</paragraph>
+</listitem>
+</list>
+<section id="relatedtopics">
+<embed href="text/shared/guide/dragdrop_graphic.xhp#dragdrop_graphic"/>
+<embed href="text/shared/guide/dragdrop_fromgallery.xhp#dragdrop_fromgallery"/>
+<switch select="appl">
+<case select="WRITER"><embed href="text/swriter/guide/insert_graphic.xhp#insert_graphic"/>
+</case>
+</switch>
+<switch select="appl">
+<case select="WRITER"><embed href="text/swriter/guide/insert_graphic_gallery.xhp#insert_graphic_gallery"/>
+</case>
+</switch></section>
+</body>
+</helpdocument>

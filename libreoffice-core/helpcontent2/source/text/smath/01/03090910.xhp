@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsmath0103090910xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Attributes</title>
+<filename>/text/smath/01/03090910.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="attribute">
+<paragraph role="heading" id="hd_id3154702" xml-lang="en-US" level="1"><link href="text/smath/01/03090910.xhp" name="Attributes">Attributes</link></paragraph>
+<paragraph role="paragraph" id="par_id3150301" xml-lang="en-US">This section contains an example of how you can use different attributes in a formula in <emph>$[officename] Math</emph>.</paragraph>
+</section>
+<paragraph role="paragraph" id="par_id3148703" xml-lang="en-US">
+<image id="img_id3151242" src="media/helpimg/smzb10.png" width="295px" height="40px"><alt id="alt_id3151242" xml-lang="en-US">Icon</alt>
+	</image></paragraph>
+<paragraph role="smathcode" id="par_id3150048" xml-lang="en-US" localize="false">%rho(font sans bold q","%omega) = int func e^{i %omega t}%rho(font sans bold q","t)"d"t</paragraph>
+</body>
+</helpdocument>

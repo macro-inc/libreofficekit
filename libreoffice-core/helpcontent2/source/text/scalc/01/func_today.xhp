@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalc01func_todayxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">TODAY</title>
+<filename>/text/scalc/01/func_today.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3145659"><bookmark_value>TODAY function</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/SC_HID_FUNC_HEUTE" id="bm_id3147267" localize="false"/><h2 id="hd_id3145659"><variable id="today"><link href="text/scalc/01/func_today.xhp">TODAY</link>
+</variable></h2>
+<paragraph role="paragraph" id="par_id3153759" xml-lang="en-US"><ahelp hid="HID_FUNC_HEUTE">Returns the current computer system date.</ahelp> The value is updated when you reopen the document or modify the values of the document.</paragraph>
+<embed href="text/scalc/01/ful_func.xhp#func_volatile"/>
+<embed href="text/scalc/01/ODFF.xhp#odff"/>
+<embed href="text/scalc/01/common_func.xhp#sectionsyntax"/>
+<paragraph role="code" id="par_id3153154" xml-lang="en-US">TODAY()</paragraph>
+<paragraph role="paragraph" id="par_id3154741" xml-lang="en-US"> TODAY is a function without arguments.</paragraph>
+<embed href="text/scalc/01/common_func.xhp#sectionexample"/>
+<paragraph role="paragraph" id="par_id3156106" xml-lang="en-US">
+<item type="input">TODAY()</item> returns the current computer system date.</paragraph>
+<section id="relatedtopics">
+    <embed href="text/scalc/01/04060102.xhp#datetimefunctions"/>
+</section>
+</body>
+</helpdocument>

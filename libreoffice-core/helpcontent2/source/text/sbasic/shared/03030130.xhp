@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03030130xhp" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">DatePart Function</title>
+    <filename>/text/sbasic/shared/03030130.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="datepart">
+<bookmark xml-lang="en-US" branch="index" id="bm_id249946">
+  <bookmark_value>DatePart function</bookmark_value>
+</bookmark>
+
+<h1 id="par_idN10542" xml-lang="en-US"><link href="text/sbasic/shared/03030130.xhp">DatePart Function</link></h1>
+<paragraph id="par_idN10546" role="paragraph" xml-lang="en-US">The DatePart function returns a specified part of a date.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_idN105E8" role="bascode" xml-lang="en-US">DatePart (interval As String, date As Date [, firstDayOfWeek As Integer [, firstWeekOfYear As Integer]]) As Long</paragraph>
+</bascode>
+
+<paragraph id="par_idN105EB" role="heading" level="3" xml-lang="en-US">Return value:</paragraph>
+<paragraph id="par_idN105EF" role="paragraph" xml-lang="en-US">The extracted part for the given date.</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_idN105F6" role="paragraph" xml-lang="en-US"> <emph>interval</emph> - A string expression from the following table, specifying the date interval.</paragraph>
+<embed href="text/sbasic/shared/03030110.xhp#datetable"/>
+<paragraph id="par_idN10604" role="paragraph" xml-lang="en-US"> <emph>date</emph> - The date from which the result is calculated.</paragraph>
+<embed href="text/sbasic/shared/01020100.xhp#DateLiterals"/>
+<embed href="text/sbasic/shared/03030120.xhp#weekyear"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/><bascode>
+<paragraph id="par_idm1341577504" role="bascode" localize="false">Sub example_datepart</paragraph>
+<paragraph id="par_idm1341576272" role="bascode" localize="false">    MsgBox DatePart("ww", #12/31/2005#)</paragraph>
+<paragraph id="par_idm1347516272" role="bascode" localize="false">    MsgBox DatePart(date:=#1999-12-30#, interval:="q")</paragraph>
+<paragraph id="par_idm1341575024" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+
+</body>
+</helpdocument>

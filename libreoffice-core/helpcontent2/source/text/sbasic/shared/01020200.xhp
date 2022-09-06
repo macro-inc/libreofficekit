@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared01020200xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Using Objects</title>
+<filename>/text/sbasic/shared/01020200.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="objects">
+<paragraph role="heading" id="hd_id3145645" xml-lang="en-US" level="1"><variable id="01020200"><link href="text/sbasic/shared/01020200.xhp">Using the Object Catalog</link>
+</variable></paragraph>
+<paragraph role="paragraph" id="par_id3153707" xml-lang="en-US">The object catalog provides an overview of all modules and dialogs you have created in $[officename].</paragraph>
+</section>
+<section id="object_catalog">
+<paragraph role="paragraph" id="par_id3147346" xml-lang="en-US">Click the <emph>Object Catalog</emph> icon 
+<image id="img_id3147341" src="cmd/sc_objectcatalog.png" width="0.564cm" height="0.564cm"><alt id="alt_id3147341" xml-lang="en-US">Icon</alt>
+	</image> in the Macro toolbar to display the object catalog.</paragraph>
+<paragraph role="paragraph" id="par_id3155114" xml-lang="en-US">The dialog shows a list of all existing objects in a hierarchical representation. Double-clicking a list entry opens its subordinate objects.</paragraph>
+<paragraph role="paragraph" id="par_id3150786" xml-lang="en-US">To display a certain module in the Editor or to position the cursor in a selected SUB or FUNCTION, double click on the corresponding entry.</paragraph>
+</section>
+</body>
+</helpdocument>

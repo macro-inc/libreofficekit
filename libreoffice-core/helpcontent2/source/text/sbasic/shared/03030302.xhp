@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03030302xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Time Function</title>
+    <filename>/text/sbasic/shared/03030302.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="time">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3145090">
+  <bookmark_value>Time function</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3145090"><link href="text/sbasic/shared/03030302.xhp" name="Time Function">Time Function</link></h1>
+<paragraph id="par_id3150984" role="paragraph">This function returns the current system time as a string in the format "HH:MM:SS".</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_id3149670" role="bascode" localize="false">Time[$][()]</paragraph>
+</bascode>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341324032" role="bascode" localize="false">Sub ExampleTime</paragraph>
+<paragraph id="par_id3150870" role="bascode" xml-lang="en-US">    MsgBox Time,0,"The time is"</paragraph>
+<paragraph id="par_idm1341321024" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>
+

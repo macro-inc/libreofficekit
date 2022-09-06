@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0220050000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Selection Mode</title>
+    <filename>/text/shared/02/20050000.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+<section id="selection_mode">
+  <bookmark xml-lang="en-US" branch="index" id="bm_id3148668">
+    <bookmark_value>selection modes in text</bookmark_value>
+    <bookmark_value>text; selection modes</bookmark_value>
+    <bookmark_value>extending selection mode</bookmark_value>
+    <bookmark_value>adding selection mode</bookmark_value>
+    <bookmark_value>block selection mode</bookmark_value>
+  </bookmark>
+  <bookmark xml-lang="en-US" branch="hid/.uno:SelectionMode" id="bm_id7365159" localize="false"/>
+  <bookmark xml-lang="en-US" branch="hid/.uno:StatusSelectionMode" id="bm_id2039489" localize="false"/>
+  <h1 id="hd_id3148668"><link href="text/shared/02/20050000.xhp" name="Selection Mode">Selection Mode</link></h1>
+  <paragraph role="paragraph" id="par_id3146130" xml-lang="en-US"><ahelp hid=".">Switches between different selection modes.</ahelp></paragraph>
+</section>
+<paragraph role="paragraph" id="par_id3153894" xml-lang="en-US">Click this field to open a popup menu with the following options:</paragraph>
+<table id="tbl_id3157991">
+  <tablerow>
+    <tablecell>
+      <paragraph role="tablehead" id="par_id3149095" xml-lang="en-US"><emph>Mode</emph></paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph role="tablehead" id="par_id3155941" xml-lang="en-US"><emph>Effect</emph></paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph role="tablecontent" id="par_id3152780" xml-lang="en-US">Standard selection</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph role="tablecontent" id="par_id3147209" xml-lang="en-US">This is the default selection mode for text documents. With the keyboard, selections can be performed by <emph>Shift</emph>+navigation key (<item type="keycode">arrows, Home, End, Page Up, Page Down</item>). With the mouse, click in the text where the selection is to start, hold the left mouse button and move to the end of the selection. Release the mouse key to end selection.</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph role="tablecontent" id="par_id3149580" xml-lang="en-US">Extending selection</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph role="tablecontent" id="par_id3153717" xml-lang="en-US">Use the mouse, arrow keys or the <keycode>Home</keycode> and <keycode>End</keycode> keys to extend or crop the current selection. Clicking anywhere in the text selects the region between the current cursor position and the click position.</paragraph>
+      <paragraph role="tablecontent" id="par_id821630330412209">Hold the <keycode>Shift</keycode> key to temporarily activate the Extending selection mode.</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph role="tablecontent" id="par_id3147620" xml-lang="en-US">Adding selection (<keycode>Shift+F8</keycode>)</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph role="tablecontent" id="par_id3154307" xml-lang="en-US">Use this mode to select multiple ranges of text. Each new selection using the mouse or keyboard is added as a new selection.</paragraph>
+      <paragraph role="paragraph" id="par_id941630331257314">Hold the <keycode>Ctrl</keycode> key to temporarily activate the Adding selection mode.</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph role="tablecontent" id="par_id6971037" xml-lang="en-US">Block selection (<switchinline select="sys"><caseinline select="MAC"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline><keycode>+Shift+F8</keycode>)</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph role="tablecontent" id="par_id5258644" xml-lang="en-US">Use this mode to select a non-contiguous block of text.</paragraph>
+      <paragraph role="tablecontent" id="par_id41630331461837">Hold the <keycode>Alt</keycode> key to temporarily activate the Block selection mode.</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+<section id="relatedtopics">
+  <embed href="text/swriter/guide/text_nav_keyb.xhp#text_nav_keyb"/>
+</section>
+</body>
+</helpdocument>

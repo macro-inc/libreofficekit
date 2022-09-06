@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpress0104120000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Duplicate Slide</title>
+<filename>/text/simpress/01/04120000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+  
+  
+  <section id="duplicate_slide">
+<bookmark branch="hid/.uno:DuplicatePage" xml-lang="en-US" id="bm_id3147436" localize="false"/>
+<paragraph id="hd_id3148576" role="heading" level="1" xml-lang="en-US"><link href="text/simpress/01/04120000.xhp" name="Duplicate Slide">Duplicate Slide</link></paragraph>
+  <paragraph role="paragraph" id="par_id3153190" xml-lang="en-US"><ahelp hid=".uno:DuplicatePage" visibility="visible">Inserts a copy of the current slide after the current slide.</ahelp></paragraph>
+  </section>
+  <section id="howtoget">
+  <embed href="text/simpress/00/00000404.xhp#seiteduplizieren"/>
+</section>
+ </body>
+</helpdocument>

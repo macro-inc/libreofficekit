@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+<topic id="textsharedmain0204xml" indexer="include">
+<title id="tit" xml-lang="en-US">Table Bar</title>
+<filename>/text/shared/main0204.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="tablebar">
+<bookmark xml-lang="en-US" branch="hid/.HelpId:tableobjectbar" id="bm_id3154243" localize="false"/>
+<h1 id="hd_id3145587"><link href="text/shared/main0204.xhp" name="Table Bar">Table Bar</link></h1>
+<paragraph role="paragraph" id="par_id3154252" xml-lang="en-US"><ahelp hid=".">The <emph>Table</emph> Bar contains functions you need when working with tables. It appears when you move the cursor into a table.</ahelp></paragraph>
+</section>
+<embed href="text/simpress/01/04080100.xhp#inserttable"/>
+<embed href="text/swriter/00/00000404.xhp#syinsert_table"/>
+<embed href="text/shared/02/03140000.xhp#line_style"/>
+<embed href="text/shared/02/03140000.xhp#syline_style"/>
+<embed href="text/shared/02/03150000.xhp#border_color"/>
+<embed href="text/shared/02/03150000.xhp#syborder_color"/>
+<embed href="text/shared/02/03130000.xhp#borders"/>
+<embed href="text/shared/02/03130000.xhp#syborders"/>
+<h2 id="hd_id319945759"><link href="text/shared/01/05210100.xhp" name="Area Style / Filling">Area Style / Filling</link></h2>
+<embed href="text/shared/01/05210100.xhp#sytext"/>
+<h2 id="hd_id3147592"><link href="text/shared/01/05100100.xhp" name="Merge Cells">Merge Cells</link></h2>
+<embed href="text/shared/01/05100100.xhp#verbindentext"/>
+<embed href="text/swriter/00/00000405.xhp#symerge_cells"/>
+<embed href="text/swriter/00/00000405.xhp#sysplit_cells"/>
+<embed href="text/shared/02/04210000.xhp#optimize"/>
+<embed href="text/shared/02/04210000.xhp#syoptimize"/>
+<embed href="text/shared/01/05100500.xhp#top"/>
+<embed href="text/shared/01/05100600.xhp#center_vertical"/>
+<embed href="text/shared/01/05100700.xhp#bottom"/>
+<embed href="text/swriter/02/04090000.xhp#insert_rows"/>
+<embed href="text/swriter/02/04090000.xhp#syinsert_rows"/>
+<embed href="text/swriter/02/04100000.xhp#insert_column"/>
+<embed href="text/swriter/02/04100000.xhp#syinsert_column"/>
+<h2 id="hd_id3147820"><link href="text/swriter/01/05110500.xhp" name="Delete Row">Delete Row</link></h2>
+<embed href="text/swriter/01/05110500.xhp#loeschentext"/>
+<embed href="text/swriter/00/00000405.xhp#sydelete_row"/>
+<h2 id="hd_id3147231"><link href="text/swriter/01/05120500.xhp" name="Delete Column">Delete Column</link></h2>
+<embed href="text/swriter/01/05120500.xhp#loeschentext"/>
+<embed href="text/swriter/00/00000405.xhp#sydelete_columns"/>
+<comment>following only optional, ext.help is available: Select Table Select Column Select Row</comment>
+<bookmark xml-lang="en-US" branch="hid/.uno:TableDesign" id="bm_id091620081221536" localize="false"/>
+<h2 id="hd_id3134447820">Table Design</h2>
+<paragraph role="paragraph" id="par_id16200812240344" xml-lang="en-US"><ahelp hid=".uno:TableDesign">Opens the Table Design. Double-click a preview to format the table.</ahelp></paragraph>
+<section id="sytabledesign">
+<table id="tbl_id3153978">
+<tablerow>
+<tablecell colspan="" rowspan="">
+<paragraph role="paragraph" id="par_id3153752" xml-lang="en-US">
+<image id="img_id3147292" src="cmd/sc_tabledesign.png" width="1cm" height="1cm"><alt id="alt_id3147292" xml-lang="en-US">Icon</alt></image></paragraph>
+</tablecell>
+<tablecell>
+<paragraph role="paragraph" id="par_id3156429" xml-lang="en-US">Table Design</paragraph>
+</tablecell>
+</tablerow>
+</table>
+</section>
+<h2 id="hd_id947820"><link href="text/simpress/01/05090000m.xhp" name="Table Properties">Table Properties</link></h2>
+<embed href="text/simpress/01/05090000m.xhp#tabelletext"/>
+</body>
+</helpdocument>

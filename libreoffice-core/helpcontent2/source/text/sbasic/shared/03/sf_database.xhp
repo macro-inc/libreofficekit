@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+-->
+
+<meta>
+  <topic id="SF_Database" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">SFDatabases.Database service</title>
+    <filename>/text/sbasic/shared/03/sf_database.xhp</filename>
+  </topic>
+</meta>
+<body>
+<section id="ScriptForge-sf_database">
+   <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id151587913266190">
+      <bookmark_value>Database service</bookmark_value>
+   </bookmark>
+</section>
+
+<section id="abstract">
+    <h1 id="hd_id371587913266310" xml-lang="en-US"><variable id="DatabaseService"><link href="text/sbasic/shared/03/sf_database.xhp" name="Database service"><literal>SFDatabases</literal>.<literal>Database</literal> service</link></variable></h1>
+    <paragraph role="paragraph" id="par_id891599407198144" xml-lang="en-US">The <literal>Database</literal> service provides access to databases either embedded or described in Base documents. This service provides methods to:</paragraph>
+    <list type="unordered">
+      <listitem>
+        <paragraph id="par_id551615386924481" role="listitem">Get access to data in database tables.</paragraph>
+      </listitem>
+      <listitem>
+        <paragraph id="par_id551615386924285" role="listitem">Run <literal>SELECT</literal> queries and perform aggregate functions.</paragraph>
+      </listitem>
+      <listitem>
+        <paragraph id="par_id551615386924111" role="listitem">Run SQL action statements such as <literal>INSERT</literal>, <literal>UPDATE</literal>, <literal>DELETE</literal>, etc.</paragraph>
+      </listitem>
+    </list>
+</section>
+    <paragraph role="paragraph" id="par_id811599407236602" xml-lang="en-US">Each instance of the <literal>Database</literal> service represents a single database and gives access to its tables, queries and data.</paragraph>
+    <paragraph role="paragraph" id="par_id111625692871642">This service does not provide access to forms or reports in the Base document that contains the database. To access forms in a Base document, refer to the method <link href="text/sbasic/shared/03/sf_base.xhp#FormDocuments" name="FormDocuments"><literal>FormDocuments</literal></link> of the <literal>Base</literal> service.</paragraph>
+    <note id="par_id231615386789950">All exchanges between this service and the database are done using SQL only.</note>
+    <paragraph role="paragraph" id="par_id121599407322804" xml-lang="en-US">SQL statements may be run in <emph>direct</emph> or <emph>indirect</emph> mode. In direct mode the statement is transferred to the database engine without any syntax checking or review.</paragraph>
+    <paragraph role="paragraph" id="par_id681599407189019" xml-lang="en-US">The provided interfaces include simple tables and queries lists, as well as access to database data.</paragraph>
+    <tip id="par_id891599407280007" xml-lang="en-US">To make SQL statements more readable, you may use square brackets "[ ]" to enclose names of tables, queries and fields instead of using other enclosing characters that may be exclusive to certain Relational Database Management Systems (RDBMS). But beware that enclosing characters are mandatory in this context.</tip>
+
+    <h2 id="hd_id91587913266988" xml-lang="en-US">Service invocation</h2>
+    <paragraph role="paragraph" id="par_id141609955500101">Before using the <literal>Database</literal> service the <literal>ScriptForge</literal> library needs to be loaded or imported:</paragraph>
+    <embed href="text/sbasic/shared/03/lib_ScriptForge.xhp#importLibs"/>
+
+    <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+    <paragraph role="paragraph" id="par_id541599408159668" xml-lang="en-US">To create a instance of the <literal>Database</literal> service you can use the <literal>CreateScriptService</literal> method:</paragraph>
+    <paragraph role="paragraph" localize="false" id="par_id251625693098616">
+      <input>CreateScriptService("SFDatabases.Database", [filename: str], [registrationname], [readonly], [user, [password]]): svc</input>
+    </paragraph>
+    <note id="par_id551625693442959">In the syntax described above you can use either "SFDatabases.Database" or simply "Database" as the first argument of the <literal>CreateScriptService</literal> method.</note>
+    <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+    <paragraph role="paragraph" id="par_id111615146818256"><emph>filename</emph>: The name of the Base file. Must be expressed using <literal>SF_FileSystem.FileNaming</literal> notation.</paragraph>
+    <paragraph role="paragraph" id="par_id771615146944307"><emph>registrationname</emph>: The name of a registered database. If <literal>filename</literal> is provided, this argument should not be used.</paragraph>
+    <paragraph role="paragraph" id="par_id491615147048748">Conversely, if a <literal>registrationname</literal> is specified, the <literal>filename</literal> parameter should not be defined.</paragraph>
+    <paragraph role="paragraph" id="par_id841615147168279"><emph>readonly</emph>: Determines if the database will be opened as readonly (Default = <literal>True</literal>).</paragraph>
+    <paragraph role="paragraph" id="par_id291615147236001"><emph>user, password</emph>: Additional connection parameters to the database server.</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+    <bascode>
+      <paragraph role="bascode" localize="false" id="bas_id451625698094586">GlobalScope.BasicLibraries.LoadLibrary("ScriptForge")</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id191625698094873">Dim myDatabase as Object</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id181625698095184">Set myDatabase = CreateScriptService("Database", "/home/user/Documents/myDB.odb")</paragraph>
+      <paragraph role="bascode" id="bas_id871625698095504">' Run queries, SQL statements, ...</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id501625698095793">myDatabase.CloseDatabase()</paragraph>
+    </bascode>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+    <pycode>
+      <paragraph role="pycode" localize="false" id="pyc_id291625698186091">from scriptforge import CreateScriptService</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id141625698186499">myDatabase = CreateScriptService("Database", "/home/user/Documents/myDB.odb")</paragraph>
+      <paragraph role="pycode" id="pyc_id791625698186675"># Run queries, SQL statements, ...</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id521625698186867">myDatabase.CloseDatabase()</paragraph>
+    </pycode>
+
+    <h2 id="hd_id771615147491563">Accessing Databases with the UI Service</h2>
+    <paragraph role="paragraph" id="par_id901599408410712" xml-lang="en-US">It is also possible to access the database associated with a Base document using the <link href="text/sbasic/shared/03/sf_ui.xhp" name="UI Service"><literal>ScriptForge.UI</literal></link> service, as shown in the examples below:</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+    <bascode>
+      <paragraph role="bascode" localize="false" id="bas_id1001599408773502">Dim myDoc As Object, myDatabase As Object, ui As Object</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id631599408779968">Set ui = CreateScriptService("UI")</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id801599408784337">Set myDoc = ui.OpenBaseDocument("/home/user/Documents/myDB.odb")</paragraph>
+      <paragraph role="bascode" id="bas_id631615147843278">' User and password are supplied below, if needed</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id741599408788321">Set myDatabase = myDoc.GetDatabase()</paragraph>
+      <paragraph role="bascode" id="bas_id921599408791887">' Run queries, SQL statements, ...</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id971625699354855">myDatabase.CloseDatabase()</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id251599408799447">myDoc.CloseDocument()</paragraph>
+    </bascode>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+    <pycode>
+      <paragraph role="pycode" localize="false" id="pyc_id881625699438103">ui = CreateScriptService("UI")</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id111625699438354">doc = ui.OpenBaseDocument("/home/user/Documents/myDB.odb")</paragraph>
+      <paragraph role="pycode" id="pyc_id731625699527917"># User and password are supplied below, if needed</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id741625699438527">myDatabase = doc.GetDatabase()</paragraph>
+      <paragraph role="pycode" id="pyc_id201625699438702"># Run queries, SQL statements, ...</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id171625699438887">myDatabase.CloseDatabase()</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id231625699570502">doc.CloseDocument()</paragraph>
+    </pycode>
+    <tip id="par_id361619188184750">The <link href="text/sbasic/shared/03/sf_base.xhp#GetDatabase" name="GetDatabase method">GetDatabase</link> method used in the example above is part of ScriptForge's <literal>Base</literal> service.</tip>
+
+    <bookmark xml-lang="en-US" branch="index" id="bm_id771615387442357" localize="false">
+        <bookmark_value>Database Service;Queries</bookmark_value>
+        <bookmark_value>Database Service;Tables</bookmark_value>
+    </bookmark>
+    <h2 id="hd_id841587913266618" xml-lang="en-US">Properties</h2>
+    <table id="tab_id291587913266435">
+      <tablerow>
+          <tablecell>
+              <paragraph id="par_id521587913266568" role="tablehead" xml-lang="en-US">Name</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id421587913266368" role="tablehead" xml-lang="en-US">Readonly</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id631587914939732" role="tablehead" xml-lang="en-US">Type</paragraph>
+              </tablecell>
+          <tablecell>
+              <paragraph id="par_id951587913266220" role="tablehead" xml-lang="en-US">Description</paragraph>
+          </tablecell>
+      </tablerow>
+      <tablerow>
+          <tablecell>
+              <paragraph id="par_id161587913266162" role="tablecontent" xml-lang="en-US" localize="false">Queries</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id651587913266754" role="tablecontent" xml-lang="en-US">Yes</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id421587914989890" role="tablecontent" xml-lang="en-US">Array of strings</paragraph>
+              </tablecell>
+          <tablecell>
+              <paragraph id="par_id351587913266349" role="tablecontent" xml-lang="en-US">The list of stored queries.</paragraph>
+          </tablecell>
+      </tablerow>
+      <tablerow>
+          <tablecell>
+              <paragraph id="par_id851599409717318" role="tablecontent" xml-lang="en-US" localize="false">Tables</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id931599409717463" role="tablecontent" xml-lang="en-US">Yes</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id71599409717945" role="tablecontent" xml-lang="en-US">Array of strings</paragraph>
+          </tablecell>
+          <tablecell>
+              <paragraph id="par_id341599409717612" role="tablecontent" xml-lang="en-US">The list of stored tables.</paragraph>
+          </tablecell>
+        </tablerow>
+        <tablerow>
+            <tablecell>
+                <paragraph id="par_id561599409777730" role="tablecontent" xml-lang="en-US" localize="false">XConnection</paragraph>
+            </tablecell>
+            <tablecell>
+                <paragraph id="par_id741599409777967" role="tablecontent" xml-lang="en-US">Yes</paragraph>
+            </tablecell>
+            <tablecell>
+                <paragraph id="par_id101599409777906" role="tablecontent" xml-lang="en-US" localize="false"><link href="https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1sdbc_1_1XConnection.html" name="XConnection API">XConnection</link></paragraph>
+            </tablecell>
+            <tablecell>
+                <paragraph id="par_id551599409777759" role="tablecontent" xml-lang="en-US">The UNO object representing the current database connection.</paragraph>
+            </tablecell>
+        </tablerow>
+        <tablerow>
+            <tablecell>
+                <paragraph id="par_id361599409887831" role="tablecontent" xml-lang="en-US" localize="false">XMetaData</paragraph>
+            </tablecell>
+            <tablecell>
+                <paragraph id="par_id271599409887585" role="tablecontent" xml-lang="en-US">Yes</paragraph>
+            </tablecell>
+            <tablecell>
+                <paragraph id="par_id701599409887579" role="tablecontent" xml-lang="en-US" localize="false"><link href="https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1sdbc_1_1XDatabaseMetaData.html" name="XDatabaseMetaData API">XDatabaseMetaData</link></paragraph>
+            </tablecell>
+            <tablecell>
+                <paragraph id="par_id861599409887284" role="tablecontent" xml-lang="en-US">The UNO object representing the metadata describing the database system attributes.</paragraph>
+            </tablecell>
+        </tablerow>
+    </table>
+
+<table id="tab_id551614360519973">
+   <tablerow>
+       <tablecell colspan="3">
+           <paragraph id="par_id231614360519973" role="tablehead">List of Methods in the Database Service</paragraph>
+       </tablecell>
+   </tablerow>
+   <tablerow>
+       <tablecell>
+         <paragraph id="par_id611614360519255" role="tablecontent" localize="false">
+           <link href="text/sbasic/shared/03/sf_database.xhp#CloseDatabase" name="CloseDatabase">CloseDatabase</link><br/>
+           <link href="text/sbasic/shared/03/sf_database.xhp#DFunctions" name="DAvg">DAvg</link><br/>
+           <link href="text/sbasic/shared/03/sf_database.xhp#DFunctions" name="DCount">DCount</link>
+         </paragraph>
+       </tablecell>
+       <tablecell>
+         <paragraph id="par_id611614360519104" role="tablecontent" localize="false">
+           <link href="text/sbasic/shared/03/sf_database.xhp#DFunctions" name="DMin">DMin</link><br/>
+           <link href="text/sbasic/shared/03/sf_database.xhp#DFunctions" name="DMax">DMax</link><br/>
+           <link href="text/sbasic/shared/03/sf_database.xhp#DFunctions" name="DSum">DSum</link>
+         </paragraph>
+       </tablecell>
+       <tablecell>
+         <paragraph id="par_id611614360518452" role="tablecontent" localize="false">
+           <link href="text/sbasic/shared/03/sf_database.xhp#DLookup" name="DLookup">DLookup</link><br/>
+           <link href="text/sbasic/shared/03/sf_database.xhp#GetRows" name="GetRows">GetRows</link><br/>
+           <link href="text/sbasic/shared/03/sf_database.xhp#RunSql" name="RunSql">RunSql</link>
+         </paragraph>
+       </tablecell>
+   </tablerow>
+</table>
+
+<section id="CloseDatabase">
+  <comment> CloseDatabase ---------------------------------------------------------------------------------- </comment>
+     <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id991587913266189">
+         <bookmark_value>Database Service;CloseDatabase</bookmark_value>
+     </bookmark>
+  <h2 id="hd_id76158791326673" localize="false">CloseDatabase</h2>
+  <paragraph role="paragraph" id="par_id201587913266596">Closes the current database connection.</paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+  <paragraph role="paragraph" localize="false" id="par_id821625699786747">
+    <input>db.CloseDatabase()</input>
+  </paragraph>
+  <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+  <bascode>
+    <paragraph role="bascode" localize="false" id="bas_id191625699910447">myDatabase.CloseDatabase() ' Basic</paragraph>
+  </bascode>
+  <pycode>
+    <paragraph role="pycode" localize="false" id="pyc_id591625699936578">myDatabase.CloseDatabase() # Python</paragraph>
+  </pycode>
+</section>
+
+<section id="DFunctions">
+  <comment> DFunctions ----------------------------------------------------------------------------------- </comment>
+    <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id861599488343584">
+        <bookmark_value>Database Service;DAvg</bookmark_value>
+    </bookmark>
+    <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id221599488343636">
+        <bookmark_value>Database Service;DCount</bookmark_value>
+    </bookmark>
+    <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id261599488343619">
+        <bookmark_value>Database Service;DMax</bookmark_value>
+    </bookmark>
+    <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id231599488343876">
+        <bookmark_value>Database Service;DMin</bookmark_value>
+    </bookmark>
+    <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id831599488343138">
+        <bookmark_value>Database Service;DSum</bookmark_value>
+    </bookmark>
+    <h2 id="hd_id281596554849363" localize="false">DAvg, DCount, DMin, DMax, DSum</h2>
+    <paragraph role="paragraph" id="par_id13159655484952">Computes the given aggregate function on a field or expression belonging to a table.</paragraph>
+    <paragraph role="paragraph" id="par_id101615148468548">Optionally, a SQL <literal>WHERE</literal> clause can be specified as a filter that will be applied prior to the aggregate function.</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+    <paragraph role="paragraph" localize="false" id="par_id481625700732942">
+      <input>db.DAvg(expression: str, tablename: str, [criteria: str]): any</input>
+    </paragraph>
+    <paragraph role="paragraph" localize="false" id="par_id481625700732113">
+      <input>db.DCount(expression: str, tablename: str, [criteria: str]): any</input>
+    </paragraph>
+    <paragraph role="paragraph" localize="false" id="par_id481625700730298">
+      <input>db.DMin(expression: str, tablename: str, [criteria: str]): any</input>
+    </paragraph>
+    <paragraph role="paragraph" localize="false" id="par_id481625700720177">
+      <input>db.DMax(expression: str, tablename: str, [criteria: str]): any</input>
+    </paragraph>
+    <paragraph role="paragraph" localize="false" id="par_id481625700731179">
+      <input>db.DSum(expression: str, tablename: str, [criteria: str]): any</input>
+    </paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+    <paragraph role="paragraph" id="par_id441596554849949"><emph>expression</emph>: A SQL expression in which the field names are surrounded with square brackets.</paragraph>
+    <paragraph role="paragraph" id="par_id381596554849698" xml-lang="en-US"><emph>tablename</emph>: A table name (without square brackets).</paragraph>
+    <paragraph role="paragraph" id="par_id521596554849185" xml-lang="en-US"><emph>criteria</emph>: A <literal>WHERE</literal> clause without the "WHERE" keyword, in which field names are surrounded with square brackets.</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+    <paragraph role="paragraph" id="par_id781615150306678">The example below assumes the file <literal>Employees.odb</literal> has a table named <literal>EmployeeData</literal>.</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+    <bascode>
+      <paragraph role="bascode" localize="false" id="bas_id921596554849612">GlobalScope.BasicLibraries.LoadLibrary("ScriptForge")</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id561615149909875">Dim myDB as Variant</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id211615149928005">Set myDB = CreateScriptService("Database", "/home/user/Databases/Employees.odb")</paragraph>
+      <paragraph role="bascode" id="bas_id871615150277916">' Counts the number of employees in the table</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id31615149929509">MsgBox myDB.DCount("[ID]", "EmployeeData")</paragraph>
+      <paragraph role="bascode" id="bas_id291615150373387">' Returns the sum of all salaries in the table</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id881615150162528">MsgBox myDB.DSum("[Salary]", "EmployeeData")</paragraph>
+      <paragraph role="bascode" id="bas_id931615150423062">' Below are some examples of how tables can be filtered</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id241615149929870">MsgBox myDB.DCount("[ID]", "EmployeeData", "[Position] = 'Manager'")</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id241615149929145">MsgBox myDB.DCount("[ID]", "EmployeeData", "[Position] = 'Sales' AND [City] = 'Chicago'")</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id311615150740276">MsgBox myDB.DCount("[ID]", "EmployeeData", "[FirstName] LIKE 'Paul%'")</paragraph>
+    </bascode>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+    <pycode>
+      <paragraph role="pycode" localize="false" id="pyc_id641625700473857">myDB = CreateScriptService("Database", "/home/user/Databases/Employees.odb")</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id611625700474124">bas = CreateScriptService("Basic")</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id991625700474287">bas.MsgBox(myDB.DCount("[ID]", "EmployeeData"))</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id321625700474470">bas.MsgBox(myDB.DSum("[Salary]", "EmployeeData"))</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id811625700474663">bas.MsgBox(myDB.DCount("[ID]", "EmployeeData", "[Position] = 'Manager'"))</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id421625700474895">bas.MsgBox(myDB.DCount("[ID]", "EmployeeData", "[Position] = 'Sales' AND [City] = 'Chicago'"))</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id441625700475239">bas.MsgBox(myDB.DCount("[ID]", "EmployeeData", "[FirstName] LIKE 'Paul%'"))</paragraph>
+    </pycode>
+</section>
+
+<section id="DLookup">
+  <comment> DLookup -------------------------------------------------------------------------------------------- </comment>
+    <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id161599488113736">
+        <bookmark_value>Database Service;DLookup</bookmark_value>
+    </bookmark>
+    <h2 id="hd_id151599488113565" localize="false">DLookup</h2>
+    <paragraph role="paragraph" id="par_id41599488113961">Computes a SQL expression on a single record returned by a <literal>WHERE</literal> clause defined by the <literal>Criteria</literal> parameter.</paragraph>
+    <paragraph role="paragraph" id="par_id601615381471954">If the query returns multiple records, only the first one is considered. Use the <literal>OrderClause</literal> parameter to determine how query results are sorted.</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+    <paragraph role="paragraph" localize="false" id="par_id41625701240138">
+      <input>db.DLookup(expression: str, tablename: str, [criteria:str], [orderclause: str]): any</input>
+    </paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+    <paragraph role="paragraph" id="par_id671599488113986"><emph>expression</emph>: A SQL expression in which the field names are surrounded with square brackets.</paragraph>
+    <paragraph role="paragraph" id="par_id441599488113247" xml-lang="en-US"><emph>tablename</emph>: A table name (without square brackets).</paragraph>
+    <paragraph role="paragraph" id="par_id40159948811316" xml-lang="en-US"><emph>criteria</emph>: A <literal>WHERE</literal> clause without the "WHERE" keyword, in which field names are surrounded with square brackets.</paragraph>
+    <paragraph role="paragraph" id="par_id71599488689029" xml-lang="en-US"><emph>orderclause</emph>: An <literal>ORDER BY</literal> clause without the "ORDER BY" keywords. Field names should be surrounded with square brackets.</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+    <bascode>
+      <paragraph role="bascode" localize="false" id="bas_id311599488264597">MsgBox myDB.DLookup("[FirstName]", "EmployeeData", Criteria := "[LastName] LIKE 'Smith'", OrderClause := "[FirstName] DESC")</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id311599488113597">MsgBox myDB.DLookup("[Salary]", "EmployeeData", Criteria := "[ID] = '3'")</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id21599488808504">MsgBox myDB.DLookup("[Quantity] * [Value]", "Sales", Criteria := "[SaleID] = '5014'")</paragraph>
+    </bascode>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+    <pycode>
+      <paragraph role="pycode" localize="false" id="pyc_id151625701420880">bas = CreateScriptService("Basic")</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id181625701421328">bas.MsgBox(myDB.DLookup("[FirstName]", "EmployeeData", criteria = "[LastName] LIKE 'Smith'", orderclause = "[FirstName] DESC"))</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id801625701421784">bas.MsgBox(myDB.DLookup("[Salary]", "EmployeeData", criteria = "[ID] = '3'"))</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id551625701422176">bas.MsgBox(myDB.DLookup("[Quantity] * [Value]", "Sales", criteria = "[SaleID] = '5014'"))</paragraph>
+    </pycode>
+</section>
+
+<section id="GetRows">
+  <comment> GetRows ---------------------------------------------------------------------------------------- </comment>
+    <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id91599489278645">
+        <bookmark_value>Database Service;GetRows</bookmark_value>
+    </bookmark>
+    <h2 id="hd_id79159948927847" localize="false">GetRows</h2>
+    <paragraph role="paragraph" id="par_id481599489278579">Stores the contents of a table or the results of a <literal>SELECT</literal> query or of an SQL statement in a two-dimensional array. The first index in the array corresponds to the rows and the second index refers to the columns.</paragraph>
+    <paragraph role="paragraph" id="par_id821615384762425">An upper limit can be specified to the number of returned rows. Optionally column names may be inserted in the first row of the array.</paragraph>
+    <paragraph role="paragraph" id="par_id271599490209915" xml-lang="en-US">The returned array will be empty if no rows are returned and the column headers are not required.</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+    <paragraph role="paragraph" localize="false" id="par_id121625701537873">
+      <input>db.GetRows(sqlcommand: str, directsql: bool = False, header: bool = False, maxrows: int = 0): any</input>
+    </paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+    <paragraph role="paragraph" id="par_id451599489278429"><emph>sqlcommand</emph>: A table or query name (without square brackets) or a <literal>SELECT</literal> SQL statement.</paragraph>
+    <paragraph role="paragraph" id="par_id271599489278141" xml-lang="en-US"><emph>directsql</emph>: When <literal>True</literal>, the SQL command is sent to the database engine without pre-analysis. Default is <literal>False</literal>. This argument is ignored for tables. For queries, the applied option is the one set when the query was defined.</paragraph>
+    <paragraph role="paragraph" id="par_id941599489278747" xml-lang="en-US"><emph>header</emph>: When <literal>True</literal>, the first row of the returned array contains the column headers.</paragraph>
+    <paragraph role="paragraph" id="par_id591599489278926" xml-lang="en-US"><emph>maxrows</emph>: The maximum number of rows to return. The default is zero, meaning there is no limit to the number of returned rows.</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+    <paragraph role="paragraph" id="par_id721615385125947">Below are a few examples of how the <literal>GetRows</literal> method can be used:</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+    <bascode>
+      <paragraph role="bascode" localize="false" id="bas_id821599489278193">Dim queryResults as Variant</paragraph>
+      <paragraph role="bascode" id="bas_id171615385196045">' Returns all rows in the table with column headers</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id261599489278488">queryResults = myDB.GetRows("EmployeeData", Header := True)</paragraph>
+      <paragraph role="bascode" id="bas_id371615385230721">' Returns the first 50 employee records ordered by the 'FirstName' field</paragraph>
+      <paragraph role="bascode" localize="false" id="bas_id871615385264078">queryResults = myDB.GetRows("SELECT * FROM EmployeeData ORDER BY [FirstName]", MaxRows := 50)</paragraph>
+    </bascode>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+    <pycode>
+      <paragraph role="pycode" localize="false" id="pyc_id41625701996174">queryResults = myDB.GetRows("EmployeeData", header = True)</paragraph>
+      <paragraph role="pycode" localize="false" id="pyc_id871625701996504">queryResults = myDB.GetRows("SELECT * FROM EmployeeData ORDER BY [FirstName]", maxrows = 50)</paragraph>
+    </pycode>
+</section>
+
+<section id="RunSql">
+  <comment> RunSql -------------------------------------------------------------------------------------------- </comment>
+    <bookmark xml-lang="en-US" localize="false" branch="index" id="bm_id781599490609499">
+        <bookmark_value>Database Service;RunSql</bookmark_value>
+    </bookmark>
+    <h2 id="hd_id80159949060917" localize="false">RunSql</h2>
+    <paragraph role="paragraph" id="par_id31599490609759">Executes an action query of an SQL statement such as creating a table, as well as inserting, updating and deleting records.</paragraph>
+    <paragraph role="paragraph" id="par_id331615385491925">The method returns <literal>True</literal> when successful.</paragraph>
+    <tip id="par_id21599490810021" xml-lang="en-US">The <literal>RunSql</literal> method is rejected with an error message in case the database was previously opened in read-only mode.</tip>
+    <embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+    <paragraph role="paragraph" localize="false" id="par_id421625701780046">
+      <input>db.RunSql(sqlcommand: str, directsql: bool = False): bool</input>
+    </paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+    <paragraph role="paragraph" id="par_id701599490609473"><emph>sqlcommand</emph>: A query name (without square brackets) or a SQL statement.</paragraph>
+    <paragraph role="paragraph" id="par_id51599490609377" xml-lang="en-US"><emph>directsql</emph>: When <literal>True</literal>, the SQL command is sent to the database engine without pre-analysis. (Default = <literal>False</literal>). For queries, the applied option is the one set when the query was defined.</paragraph>
+    <embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Basic"/>
+    <bascode>
+      <paragraph role="bascode" localize="false" id="bas_id47159949060973">myDatabase.RunSql("INSERT INTO [EmployeeData] VALUES(25, 'Smith', 'John')", DirectSQL := True)</paragraph>
+    </bascode>
+    <embed href="text/sbasic/shared/00000003.xhp#In_Python"/>
+    <pycode>
+      <paragraph role="pycode" localize="false" id="pyc_id331625701876367">myDatabase.RunSql("INSERT INTO [EmployeeData] VALUES(25, 'Smith', 'John')", directsql = True)</paragraph>
+    </pycode>
+</section>
+
+    <embed href="text/sbasic/shared/03/lib_ScriptForge.xhp#SF_InternalUse"/>
+    <section id="relatedtopics">
+      <embed href="text/sbasic/shared/03/sf_document.xhp#DocumentService"/>
+      <embed href="text/sbasic/shared/03/sf_form.xhp#FormService"/>
+      <embed href="text/sbasic/shared/03/sf_ui.xhp#UIService"/>
+    </section>
+</body>
+</helpdocument>

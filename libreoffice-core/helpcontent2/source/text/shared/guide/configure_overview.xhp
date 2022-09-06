@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+
+		<helpdocument version="1.0">
+<meta>
+<topic id="textsharedguideconfigure_overviewxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Configuring $[officename]</title>
+<filename>/text/shared/guide/configure_overview.xhp</filename>
+</topic>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3152801"><bookmark_value>configuring; $[officename]</bookmark_value>
+<bookmark_value>customizing; $[officename]</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3152801" xml-lang="en-US" level="1"><variable id="configure_overview"><link href="text/shared/guide/configure_overview.xhp" name="Configuring $[officename]">Configuring $[officename]</link>
+</variable></paragraph>
+<section id="conftext">
+<paragraph role="paragraph" id="par_id3153345" xml-lang="en-US">You can customize your $[officename] to suit your needs.</paragraph>
+<list type="unordered">
+<listitem>
+<paragraph role="listitem" id="par_id3145071" xml-lang="en-US">You are free to change the items on the menu bar. You can delete items, add new ones, copy items from one menu to another, rename them, and so on.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3149811" xml-lang="en-US">The toolbars may be freely configured.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3150443" xml-lang="en-US">You can change the shortcut keys.</paragraph>
+</listitem>
+</list>
+<paragraph role="paragraph" id="par_id3155421" xml-lang="en-US">To change these, choose <link href="text/shared/01/06140000.xhp" name="Tools - Customize"><emph>Tools - Customize</emph></link> to open the <emph>Customize</emph> dialog.</paragraph>
+</section>
+<section id="relatedtopics">
+<paragraph role="paragraph" id="par_id3155388" xml-lang="en-US"><link href="text/shared/01/06140000.xhp" name="Tools - Customize">Tools - Customize</link></paragraph>
+</section>
+</body>
+</helpdocument>

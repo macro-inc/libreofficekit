@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textsharedexplorerdatabasedabawiz03authxml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Set up user authentication</title>
+<filename>/text/sdatabase/dabawiz03auth.xhp</filename>
+</topic>
+<history>
+<created date="2004-07-28T16:40:10">UFI: Database Wizard Authentication page</created>
+</history>
+</meta>
+<body>
+<h1 id="par_idN1053A">Set up user authentication</h1>
+<paragraph role="paragraph" id="par_idN1053E" xml-lang="en-US">Some databases require a user name and password.</paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/authentificationpage/generalUserNameEntry" id="bm_id5520493" localize="false"/>
+<h2 id="par_idN10541">User name</h2>
+<paragraph role="paragraph" id="par_idN10545" xml-lang="en-US"><ahelp hid=".">Enter the user name to access the database.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/authentificationpage/passRequiredCheckbutton" id="bm_id6467787" localize="false"/>
+<h3 id="par_idN10548">Password required</h3>
+<paragraph role="paragraph" id="par_idN1054C" xml-lang="en-US"><ahelp hid=".">Select to prompt a user for a password to access the database.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/authentificationpage/testConnectionButton" id="bm_id6467788" localize="false"/>
+<h3 id="par_idN10549">Test Connection</h3>
+<paragraph role="paragraph" id="par_idN10546" xml-lang="en-US"><ahelp hid=".">Check if the configured connection can be used to access the database.</ahelp></paragraph>
+<paragraph role="paragraph" id="par_idN1054F" xml-lang="en-US"><link href="text/sdatabase/dabawiz02.xhp">Save and proceed</link></paragraph>
+<paragraph role="paragraph" localize="false" id="par_idN1061A" xml-lang="en-US"><embedvar href="text/sdatabase/dabawiz00.xhp#databasewizardh1"/></paragraph>
+</body>
+</helpdocument>

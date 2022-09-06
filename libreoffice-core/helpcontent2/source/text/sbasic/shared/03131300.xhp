@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03131300xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">TwipsPerPixelX Function</title>
+    <filename>/text/sbasic/shared/03131300.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="twipsperpixelx">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153539">
+  <bookmark_value>TwipsPerPixelX function</bookmark_value>
+</bookmark>
+
+<paragraph id="hd_id3153539" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03131300.xhp" name="TwipsPerPixelX Function">TwipsPerPixelX Function</link></paragraph>
+<paragraph id="par_id3153394" role="paragraph" xml-lang="en-US">Returns the number of twips that represent the width of a pixel.</paragraph>
+</section>
+
+<paragraph id="hd_id3153527" role="heading" level="2" xml-lang="en-US">Syntax:</paragraph>
+<bascode>
+<paragraph id="par_id3151110" role="bascode" localize="false" xml-lang="en-US">n = TwipsPerPixelX</paragraph>
+</bascode>
+
+<paragraph id="hd_id3150669" role="heading" level="2" xml-lang="en-US">Return value:</paragraph>
+<paragraph id="par_id3150503" role="paragraph" xml-lang="en-US">Integer</paragraph>
+
+<paragraph id="hd_id3159176" role="heading" level="2" xml-lang="en-US">Example:</paragraph>
+<bascode>
+<paragraph id="par_idm1341056448" role="bascode" localize="false" xml-lang="en-US">Sub ExamplePixelTwips</paragraph>
+<paragraph id="par_id3153061" role="bascode" xml-lang="en-US">    MsgBox "" &amp; TwipsPerPixelX() &amp; " Twips * " &amp; TwipsPerPixelY() &amp; " Twips",0,"Pixel size"</paragraph>
+<paragraph id="par_idm1341053376" role="bascode" localize="false" xml-lang="en-US">End Sub</paragraph>
+</bascode>
+</body>
+
+</helpdocument>

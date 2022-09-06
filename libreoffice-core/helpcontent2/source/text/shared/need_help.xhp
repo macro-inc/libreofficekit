@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<meta>
+  <topic id="topic_2507201510192393">
+    <title id="tit" xml-lang="en-US">We Need Your Help</title>
+    <filename>/text/shared/need_help.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+<section id="needhelp">
+    <paragraph id="hd_id1000010" role="warning" xml-lang="en-US">This help page needs further work for correctness and completion. Please join the LibreOffice project and help us out to write the missing information. Visit our <link href="https://documentation.libreoffice.org/en/join-community/update-help-contents"><emph>web page on writing Help contents</emph></link>.</paragraph>
+</section>
+</body>
+
+</helpdocument>

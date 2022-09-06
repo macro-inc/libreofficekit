@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03030110xhp" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">DateAdd Function</title>
+    <filename>/text/sbasic/shared/03030110.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+
+<section id="dateadd">
+<bookmark xml-lang="en-US" branch="index" id="bm_id6269417">
+  <bookmark_value>DateAdd function</bookmark_value>
+</bookmark>
+
+
+<h1 id="par_idN10548" xml-lang="en-US"><link href="text/sbasic/shared/03030110.xhp">DateAdd Function</link></h1>
+<paragraph id="par_idN10558" role="paragraph" xml-lang="en-US">Adds a date or time interval to a given date a number of times and returns the resulting date.</paragraph>
+</section>
+
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+<bascode>
+<paragraph id="par_idN1055F" role="bascode" xml-lang="en-US">DateAdd (interval As String, number As Long, date As Date) As Date</paragraph>
+</bascode>
+
+<paragraph id="par_idN1061E" role="heading" level="3" xml-lang="en-US">Return value:</paragraph>
+<paragraph id="par_idN10622" role="paragraph" xml-lang="en-US">A Variant containing a date.</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+  <paragraph id="par_idN10629" role="paragraph" xml-lang="en-US"><emph>interval</emph> - A string expression from the following table, specifying the date or time interval.</paragraph>
+
+<section id="datetable">
+
+<table id="tbl_id7568285">
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10636" role="tablehead" xml-lang="en-US">interval (string value)</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN1063C" role="tablehead" xml-lang="en-US">Explanation</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10643" role="tablecontent" xml-lang="en-US">yyyy</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN10649" role="tablecontent" xml-lang="en-US">Year</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10650" role="tablecontent" xml-lang="en-US">q</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN10656" role="tablecontent" xml-lang="en-US">Quarter</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN1065D" role="tablecontent" xml-lang="en-US">m</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN10663" role="tablecontent" xml-lang="en-US">Month</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN1066A" role="tablecontent" xml-lang="en-US">y</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN10670" role="tablecontent" xml-lang="en-US">Day of year</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10677" role="tablecontent" xml-lang="en-US">w</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN1067D" role="tablecontent" xml-lang="en-US">Weekday</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10684" role="tablecontent" xml-lang="en-US">ww</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN1068A" role="tablecontent" xml-lang="en-US">Week of year</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN10691" role="tablecontent" xml-lang="en-US">d</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN10697" role="tablecontent" xml-lang="en-US">Day</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN1069E" role="tablecontent" xml-lang="en-US">h</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN106A4" role="tablecontent" xml-lang="en-US">Hour</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN106AB" role="tablecontent" xml-lang="en-US">n</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN106B1" role="tablecontent" xml-lang="en-US">Minute</paragraph>
+    </tablecell>
+  </tablerow>
+  <tablerow>
+    <tablecell>
+      <paragraph id="par_idN106B8" role="tablecontent" xml-lang="en-US">s</paragraph>
+    </tablecell>
+    <tablecell>
+      <paragraph id="par_idN106BE" role="tablecontent" xml-lang="en-US">Second</paragraph>
+    </tablecell>
+  </tablerow>
+</table>
+
+</section>
+<paragraph id="par_idN106C1" role="paragraph" xml-lang="en-US"><emph>number</emph> - A numerical expression specifying how many times the <literal>interval</literal> value will be added when positive or subtracted when negative.</paragraph>
+<paragraph id="par_idN106C4" role="paragraph" xml-lang="en-US"><emph>date</emph> - A given date or the name of a Variant variable containing a date. The <literal>interval</literal> value will be added <literal>number</literal> times to this date.</paragraph>
+<embed href="text/sbasic/shared/01020100.xhp#DateLiterals"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/><bascode>
+<paragraph id="par_idm1340825424" role="bascode" localize="false">Sub example_dateadd</paragraph>
+<paragraph id="par_idm1340824192" role="bascode" localize="false">    MsgBox DateAdd("m", 1, #1/31/2004#) &amp;" - "&amp; DateAdd(date:=#2005-01-31#, interval:="m", number:=1)</paragraph>
+<paragraph id="par_idm1340822896" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+
+</body>
+</helpdocument>

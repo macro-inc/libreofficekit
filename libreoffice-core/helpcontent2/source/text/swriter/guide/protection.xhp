@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriterguideprotectionxhp" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Protecting Content in %PRODUCTNAME Writer</title>
+    <filename>/text/swriter/guide/protection.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150620">
+  <bookmark_value>indexes;unprotecting</bookmark_value>
+  <bookmark_value>tables of contents;unprotecting</bookmark_value>
+  <bookmark_value>tables;protecting/unprotecting cells</bookmark_value>
+  <bookmark_value>sections;protecting/unprotecting</bookmark_value>
+  <bookmark_value>unprotecting tables of contents and indexes</bookmark_value>
+  <bookmark_value>protecting;tables and sections</bookmark_value>
+  <bookmark_value>cells;protecting/unprotecting</bookmark_value>
+  <bookmark_value>document;protection from changes</bookmark_value>
+</bookmark>
+
+
+<h1 id="hd_id6007263"><variable id="protection"><link href="text/swriter/guide/protection.xhp" name="Protecting Content in %PRODUCTNAME Writer">Protecting Contents in %PRODUCTNAME Writer</link></variable></h1>
+<paragraph id="par_id1924802" role="paragraph" xml-lang="en-US">The following is an overview of the different ways of protecting contents in <item type="productname">%PRODUCTNAME</item> Writer from being modified or deleted.</paragraph>
+
+<h2 id="hd_id3150114">Protecting Sections in <item type="productname">%PRODUCTNAME</item> Writer</h2>
+<paragraph id="par_id3150592" role="paragraph" xml-lang="en-US">Any section of a <item type="productname">%PRODUCTNAME</item> Writer text document can be protected against changes, and with an optional password.</paragraph>
+<warning id="par_id4545426"><variable id="protwarn">Protection is not intended to be an information security protection, it is a switch to prevent accidental changes.</variable></warning>
+
+<h3 id="hd_id1811201610293"><variable id="turnon">Turning on protection</variable></h3>
+<paragraph id="par_id1811201645676" role="paragraph" xml-lang="en-US">Information to protect must be in a section. To create or select a section:</paragraph>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id181120161920589" role="paragraph" xml-lang="en-US">If the section does not exist: Select the text, then choose menu <item type="menuitem">Insert - Section...</item> .</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id181120164739204" role="paragraph" xml-lang="en-US">If the section already exists: <variable id="gotosection">Choose menu <item type="menuitem">Format - Sections...</item> and select the section in the list <emph>Section</emph>, or right-click on the section in the Navigator and choose <item type="menuitem">Edit...</item>.</variable></paragraph>
+  </listitem>
+</list>
+<paragraph id="par_id1811201645678" role="paragraph" xml-lang="en-US">To enable protection</paragraph>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id181120164720479" role="paragraph" xml-lang="en-US">If you want to protect the contents without a password, choose the <emph>Protect</emph> check box under the <emph>Write protection</emph>.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id181120164720412" role="paragraph" xml-lang="en-US">If you want the protection with a password, choose <emph>Protect</emph> and <emph>With password</emph> check boxes and click on the <emph>Password…</emph> button. Enter and confirm a password of at least five characters.</paragraph>
+  </listitem>
+</list>
+
+<h3 id="hd_id1811201610294">Modification of protection</h3>
+<paragraph id="par_id18112016456789" role="paragraph" localize="false" xml-lang="en-US"><embedvar href="text/swriter/guide/protection.xhp#gotosection"/></paragraph>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id18112016456780" role="paragraph" xml-lang="en-US">If the protection does not have a password and you would like to use one, choose the <emph>With password</emph> checkbox, click the <emph>Password</emph> button, and enter and confirm a password of at least five characters.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id18112016234567" role="paragraph" xml-lang="en-US">If the protection has a password and you want to clear it, uncheck the <emph>With password</emph> box under <emph>Write protection</emph> and enter the correct password.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id18112016234566" role="paragraph" xml-lang="en-US">If the section is protected with a password and you want to change it, click on the <emph>Password</emph> button in the <emph>Edit Sections</emph> window and enter the correct password twice.</paragraph>
+  </listitem>
+</list>
+
+<h3 id="hd_id1811201610295"><variable id="turnoff">Turning off protection</variable></h3>
+<paragraph id="par_id18112016456781" role="tablecontent" localize="false" xml-lang="en-US"><embedvar href="text/swriter/guide/protection.xhp#gotosection"/></paragraph>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id18112016345678" role="tablecontent" xml-lang="en-US">If the protection does not have a password, uncheck the <emph>Protect</emph> box under <emph>Write protection</emph>.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id19112016123456" role="tablecontent" xml-lang="en-US">If the protection has a password, uncheck the <emph>Protect</emph> box under <emph>Write protection</emph> and enter the correct password.</paragraph>
+  </listitem>
+</list>
+
+<h2 id="hd_id3146081">Protecting Cells in a <item type="productname">%PRODUCTNAME</item> Writer Table</h2>
+<paragraph id="par_id3154480" role="paragraph" xml-lang="en-US">You can protect the contents of individual cells of tables or whole table in <item type="productname">%PRODUCTNAME</item> Writer from changes.</paragraph>
+<warning id="par_id363170" localize="false"><embedvar href="text/swriter/guide/protection.xhp#protwarn"/></warning>
+
+<h3 id="par_id3154360" localize="false"><embedvar href="text/swriter/guide/protection.xhp#turnon"/></h3>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id3145643" role="paragraph" xml-lang="en-US">For one or several cells, place the cursor in a cell or select needed several cells. Choose the <item type="menuitem">Table - Protect Cells</item> in menu bar.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id1911201610283" role="paragraph" xml-lang="en-US">For whole table, select the table, and choose the <item type="menuitem">Table - Protect Cells</item> in menu bar.</paragraph>
+  </listitem>
+</list>
+
+<h3 id="par_id3150042" localize="false"><embedvar href="text/swriter/guide/protection.xhp#turnoff"/></h3>
+<note id="par_id3155178"><variable id="firstof">If necessary, choose <switchinline select="sys"><caseinline select="MAC"><item type="menuitem">%PRODUCTNAME - Preferences</item>
+</caseinline><defaultinline><item type="menuitem">Tools - Options</item></defaultinline></switchinline><item type="menuitem"> - %PRODUCTNAME Writer - Formatting Aids</item> and select <emph>Enable cursor</emph> under the <emph>Protected Areas</emph>.</variable></note>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id1711201619364829" role="paragraph" xml-lang="en-US">Place the cursor in the cell or in the selected cells and choose the <item type="menuitem">Table - Unprotect Cells</item> in menu bar.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3151189" role="paragraph" xml-lang="en-US">For whole table, right-click on the table in the Navigator, and choose <emph>Table - Unprotect</emph> in the context menu or select the whole table and choose <item type="menuitem">Table - Unprotect Cells</item> in menu bar.</paragraph>
+  </listitem>
+</list>
+
+<h2 id="hd_id3149259">Contents Protection in Tables of Contents and Indexes</h2>
+<paragraph id="par_id3153966" role="paragraph" xml-lang="en-US">Tables of contents and indexes created in <item type="productname">%PRODUCTNAME</item> Writer, are automatically protected against accidental changes.</paragraph>
+<warning id="par_id814539" localize="false"><embedvar href="text/swriter/guide/protection.xhp#protwarn"/></warning>
+
+<h3 id="par_id3145767" localize="false"><embedvar href="text/swriter/guide/protection.xhp#turnon"/></h3>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id3159088" role="paragraph" xml-lang="en-US">Right-click in the index or table of contents. Choose <item type="menuitem">Edit Index...</item> in the context menu. Choose <emph>Protected against manual changes</emph> on the <emph>Type</emph> tab.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id181120162840123" role="paragraph" xml-lang="en-US">Right-click on the index or table of contents in the Navigator and choose <emph>Index - Read-only</emph> item.</paragraph>
+  </listitem>
+</list>
+
+<h3 id="par_id3154118" localize="false"><embedvar href="text/swriter/guide/protection.xhp#turnoff"/></h3>
+<note id="par_id3148463" localize="false"><embedvar href="text/swriter/guide/protection.xhp#firstof"/></note>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id3152968" role="paragraph" xml-lang="en-US">Right-click in the index or table of contents. Choose <item type="menuitem">Edit Index...</item> in the context menu. Uncheck <emph>Protected against manual changes</emph> on the <emph>Type</emph> tab.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3152774" role="paragraph" xml-lang="en-US">Right-click in the index or table of contents in the Navigator and uncheck <emph>Index - Read-only</emph>.</paragraph>
+  </listitem>
+</list>
+
+<h2 id="hd_id641630957309611">Protecting fields and bookmarks from changes</h2>
+<paragraph role="paragraph" id="par_id621630957319188">Choose <menuitem>Tools - Protect Document - Protect Fields</menuitem> to protect all fields against changes. Use this protection to prevent accidental changes in fields.</paragraph>
+<paragraph role="paragraph" id="par_id111630957324575">Choose <menuitem>Tools - Protect Document - Protect Bookmarks</menuitem> to protect all bookmarks against changes. Use this protection to prevent accidental bookmark changes.</paragraph>
+
+<h2 id="hd_id1811201623985">Protection of the whole <item type="productname">%PRODUCTNAME</item> Writer document from changes.</h2>
+<paragraph id="par_id31544811" role="paragraph" xml-lang="en-US">You can protect the contents of <item type="productname">%PRODUCTNAME</item> Writer document from changes, with one of the following file formats: .doc, .docx, .odt, .ott.</paragraph>
+<warning id="par_id18112016398104" localize="false"><embedvar href="text/swriter/guide/protection.xhp#protwarn"/></warning>
+<paragraph id="par_id18112016812973" role="paragraph" xml-lang="en-US">To enable the protection of the whole document, go to <switchinline select="sys"><caseinline select="MAC"><emph>%PRODUCTNAME - Preferences</emph>
+</caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - %PRODUCTNAME Writer - Compatibility</emph> and choose <emph>Protect form</emph>. To disable protection, uncheck it.</paragraph>
+<embed href="text/shared/00/00000004.xhp#related"/>
+<embed href="text/shared/guide/redlining_protect.xhp#redlining_protect"/>
+<paragraph id="par_idN10B8C" role="paragraph" localize="false" xml-lang="en-US"> <embedvar href="text/shared/guide/digital_signatures.xhp#digital_signatures"/> </paragraph>
+<paragraph id="par_id7858516" role="paragraph" xml-lang="en-US"><link href="text/shared/guide/protection.xhp">Protecting Other Contents</link></paragraph>
+</body>
+
+</helpdocument>

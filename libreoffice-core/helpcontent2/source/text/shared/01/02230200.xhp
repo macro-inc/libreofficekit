@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<meta>
+  <topic id="textshared0102230200xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Show Changes</title>
+    <filename>/text/shared/01/02230200.xhp</filename>
+  </topic>
+  <history>
+    <created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+  </history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149988"><bookmark_value>changes; showing</bookmark_value>
+<bookmark_value>hiding;changes</bookmark_value>
+<bookmark_value>showing; changes</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/.uno:ShowTrackedChanges" id="bm_id9726954" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/showchangesdialog/ShowChangesDialog" id="bm_id3154349" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/showchangesdialog/@@nowidget@@" id="bm_id3154349" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:ShowChanges" id="bm_id3147240" localize="false"/>
+<section id="showchanges">
+<h1 id="hd_id3149988"><link href="text/shared/01/02230200.xhp" name="Show Changes">Show Track Changes</link></h1>
+<paragraph role="paragraph" id="par_id3153323" xml-lang="en-US"><variable id="text"><ahelp hid=".">Shows or hides recorded changes.</ahelp>
+</variable></paragraph>
+</section>
+<section id="howtoget">
+  <embed href="text/shared/00/edit_menu.xhp#anzeigen"/>
+  <paragraph role="paragraph" id="par_id251647262886504">On the <emph>Track Changes</emph> toolbar, click</paragraph>
+  <embed href="text/swriter/track_changes_toolbar.xhp#icon_show_changes"/>
+</section>
+<paragraph role="paragraph" id="par_id3152425" xml-lang="en-US">You can change the display properties of the markup elements by choosing <switchinline select="appl"><caseinline select="WRITER"><link href="text/shared/optionen/01060600.xhp" name="Writer - Changes"><emph>%PRODUCTNAME Writer - Changes</emph></link></caseinline></switchinline> <switchinline select="appl"><caseinline select="CALC"><link href="text/shared/optionen/01060600.xhp" name="Calc - Changes"><emph>%PRODUCTNAME Calc - Changes</emph></link></caseinline></switchinline> in the <emph>Options</emph> dialog box.</paragraph>
+
+<paragraph role="paragraph" id="par_id3155356" xml-lang="en-US">When you rest the mouse pointer over a change markup in the document, a <emph>Tip</emph> displays the author and the date and time that the change was made.<switchinline select="appl"><caseinline select="CALC"> If the <emph>Extended Tips</emph> are activated, the type of change and any attached comments are also displayed.</caseinline></switchinline></paragraph>
+<bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/showchangesdialog/showchanges" id="bm_id3152551" localize="false"/>
+
+<switch select="appl">
+    <case select="CALC">
+        <h2 id="hd_id3153681">Show changes in spreadsheet</h2>
+        <paragraph role="paragraph" id="par_id3149150" xml-lang="en-US"><ahelp hid="modules/scalc/ui/showchangesdialog/showchanges">Shows or hides recorded changes.</ahelp></paragraph>
+        <embed href="text/shared/01/02230402.xhp#calc"/>
+        <bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/showchangesdialog/showaccepted" id="bm_id3154810" localize="false"/>
+        <h2 id="hd_id3147336">Show accepted changes</h2>
+        <paragraph role="paragraph" id="par_id3153541" xml-lang="en-US"><ahelp hid="modules/scalc/ui/showchangesdialog/showaccepted">Shows or hides the changes that were accepted.</ahelp></paragraph>
+        <bookmark xml-lang="en-US" branch="hid/modules/scalc/ui/showchangesdialog/showrejected" id="bm_id3155829" localize="false"/>
+        <h2 id="hd_id3149956">Show rejected changes</h2>
+        <paragraph role="paragraph" id="par_id3159166" xml-lang="en-US"><ahelp hid="modules/scalc/ui/showchangesdialog/showrejected">Shows or hides the changes that were rejected.</ahelp></paragraph>
+    </case>
+</switch>
+</body>
+</helpdocument>

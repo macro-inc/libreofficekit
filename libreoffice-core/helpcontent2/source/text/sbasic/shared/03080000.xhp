@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03080000xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Numeric Functions</title>
+<filename>/text/sbasic/shared/03080000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+  
+  
+  <section id="numeric">
+  <paragraph id="hd_id3153127" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03080000.xhp" name="Numeric Functions">Numeric Functions</link></paragraph>
+  <paragraph role="paragraph" id="par_id3148550" xml-lang="en-US">The following numeric functions perform calculations. Mathematical and Boolean operators are described in a separate section. Functions differ from operators in that functions pass arguments and return a result, instead of operators that return a result by combining two numeric expressions.</paragraph>
+  </section>
+  <embed href="text/sbasic/shared/03080100.xhp#trigo"/>
+  <embed href="text/sbasic/shared/03080200.xhp#loga"/>
+  <embed href="text/sbasic/shared/03080300.xhp#random"/>
+  <embed href="text/sbasic/shared/03080400.xhp#square"/>
+  <embed href="text/sbasic/shared/03080500.xhp#integer"/>
+  <embed href="text/sbasic/shared/03080600.xhp#absolute"/>
+  <embed href="text/sbasic/shared/03080700.xhp#sign"/>
+  <embed href="text/sbasic/shared/03080800.xhp#converting"/>
+ </body>
+</helpdocument>

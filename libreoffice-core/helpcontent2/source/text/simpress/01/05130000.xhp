@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+  <meta>
+    <topic id="textsimpress0105130000xml" indexer="include" status="PUBLISH">
+      <title id="tit" xml-lang="en-US">Layout</title>
+      <filename>/text/simpress/01/05130000.xhp</filename>
+    </topic>
+  </meta>
+  <body>
+    <bookmark xml-lang="en-US" branch="index" id="bm_id3154754">
+      <bookmark_value>changing; slide layouts</bookmark_value>
+      <bookmark_value>slide layouts</bookmark_value>
+    </bookmark>
+    <bookmark xml-lang="en-US" branch="hid/.uno:ModifyPage" id="bm_id8880655" localize="false"/>
+    <section id="slidelayout">
+      <paragraph role="heading" id="hd_id3154754" xml-lang="en-US" level="1"><link href="text/simpress/01/05130000.xhp" name="Layout">Layout</link></paragraph>
+      <paragraph role="paragraph" id="par_id3149126" xml-lang="en-US"><variable id="seite"><ahelp hid=".uno:ModifyPage">Opens a submenu with slide layouts.</ahelp></variable></paragraph>
+    </section>
+    <section id="howtoget">
+      <embed href="text/simpress/00/slide_menu.xhp#adnsei"/>
+    </section>
+    <paragraph role="paragraph" id="par_id31469757" xml-lang="en-US">
+      <switchinline select="appl">
+        <caseinline select="IMPRESS">The icon in the Presentation toolbar opens a submenu. Select the slide layout for the slide.</caseinline>
+      </switchinline>
+    </paragraph>
+    <embed href="text/simpress/guide/masterpage.xhp#masterpage"/>
+  </body>
+</helpdocument>

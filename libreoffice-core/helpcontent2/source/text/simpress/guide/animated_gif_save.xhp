@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textsimpressguideanimated_gif_savexml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Exporting Animations in GIF Format</title>
+<filename>/text/simpress/guide/animated_gif_save.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<bookmark xml-lang="en-US" branch="index" id="bm_id3149666"><bookmark_value>animations; saving as GIFs</bookmark_value>
+<bookmark_value>exporting; animations to GIF format</bookmark_value>
+</bookmark>
+<paragraph role="heading" id="hd_id3149666" xml-lang="en-US" level="1"><variable id="animated_gif_save"><link href="text/simpress/guide/animated_gif_save.xhp" name="Exporting Animations in GIF Format">Exporting Animations in GIF Format</link>
+</variable></paragraph>
+<list type="ordered">
+<listitem>
+<paragraph role="listitem" id="par_id3150202" xml-lang="en-US">Select an animated object on your slide.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3145802" xml-lang="en-US">Choose <emph>File - Export</emph>.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3155064" xml-lang="en-US">Select <emph>GIF - Graphics Interchange Format (.gif)</emph> in the <emph>File type </emph>list.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3153963" xml-lang="en-US">Click the <emph>Selection</emph> check box to export the selected object, and not the entire slide.</paragraph>
+</listitem>
+<listitem>
+<paragraph role="listitem" id="par_id3150206" xml-lang="en-US">Locate where you want to save the animated GIF, enter a name, and then click <emph>Save</emph>.</paragraph>
+</listitem>
+</list>
+<embed href="text/shared/00/00000004.xhp#related"/>
+<embed href="text/simpress/guide/animated_gif_create.xhp#animated_gif_create"/>
+</body>
+</helpdocument>

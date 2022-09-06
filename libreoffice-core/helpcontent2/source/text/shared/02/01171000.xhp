@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+<helpdocument version="1.0">
+<meta>
+<topic id="textshared0201171000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Open in Design Mode</title>
+<filename>/text/shared/02/01171000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="open_in_design_mode">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3156211"><bookmark_value>forms; opening in design mode</bookmark_value>
+<bookmark_value>controls; activating in forms</bookmark_value>
+<bookmark_value>design mode after saving</bookmark_value>
+<bookmark_value>documents; opening in design mode</bookmark_value>
+<bookmark_value>edit mode; after opening</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/.uno:OpenReadOnly" id="bm_id3148520" localize="false"/>
+<h1 id="hd_id3156211"><link href="text/shared/02/01171000.xhp" name="Open in Design Mode">Open in Design Mode</link></h1>
+<paragraph role="paragraph" id="par_id3146130" xml-lang="en-US"><ahelp hid=".uno:OpenReadOnly">Opens forms in <link href="text/sdatabase/04030000.xhp" name="Design Mode">Design Mode</link> so that the form can be edited.</ahelp></paragraph>
+</section>
+<paragraph role="paragraph" id="par_id3155805" xml-lang="en-US">You cannot activate the controls of the form or edit contents of database records in Design Mode. However, you can change the position and size of the controls, edit other properties, and add or delete controls in Design Mode.</paragraph>
+<section id="howtoget">
+  <embed href="text/shared/00/00040501.xhp#open_in_design_mode"/>
+</section>
+<paragraph role="paragraph" id="par_id3147089" xml-lang="en-US">After you have finished editing your form, right-click "Forms" in the <emph>Form Navigator</emph> and deselect <emph>Open in Design Mode</emph>. Save your form when you are finished.</paragraph>
+<note id="par_id3154749">If the form document is write-protected, the <emph>Open in Design Mode</emph> command is ignored.</note>
+</body>
+</helpdocument>

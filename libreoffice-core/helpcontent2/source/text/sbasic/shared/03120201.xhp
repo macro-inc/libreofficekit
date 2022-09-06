@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textsbasicshared03120201xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Space and Spc Function</title>
+    <filename>/text/sbasic/shared/03120201.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<section id="space">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3150499">
+  <bookmark_value>Space function</bookmark_value>
+  <bookmark_value>Spc function</bookmark_value>
+</bookmark>
+
+<h1 id="hd_id3150499"><link href="text/sbasic/shared/03120201.xhp" name="Space Function">Space and Spc Functions</link></h1>
+<paragraph id="par_id3154927" role="paragraph" xml-lang="en-US">Returns a string that consists of a specified amount of spaces.</paragraph>
+</section>
+<note id="par_id681546202842979">The Spc function works the same as the Space function.</note>
+<embed href="text/sbasic/shared/00000003.xhp#functsyntax"/>
+
+<paragraph id="par_id3143267" role="code" localize="false">Space (n As Long)<br/></paragraph>
+<paragraph role="code" id="par_id631546202894380" localize="false">Spc (n As Long)</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functvalue"/>
+<paragraph id="par_id3149233" role="paragraph" xml-lang="en-US">String</paragraph>
+
+<embed href="text/sbasic/shared/00000003.xhp#functparameters"/>
+<paragraph id="par_id3143228" role="paragraph" xml-lang="en-US"> <emph>n:</emph> Numeric expression that defines the number of spaces in the string. The maximum allowed value of <emph>n</emph> is 2,147,483,648.</paragraph>
+<embed href="text/sbasic/shared/00000003.xhp#errorcode"/>
+<embed href="text/sbasic/shared/00000003.xhp#err5"/>
+
+<embed href="text/sbasic/shared/00000003.xhp#functexample"/>
+<bascode>
+<paragraph id="par_idm1341576672" role="bascode" localize="false">Sub ExampleSpace</paragraph>
+<paragraph id="par_idm1341575440" role="bascode" localize="false">Dim sText As String, sOut As String</paragraph>
+<paragraph id="par_idm1341574192" role="bascode" localize="false">Dim iLen As Integer</paragraph>
+<paragraph id="par_idm1341572960" role="bascode" localize="false">    iLen = 10</paragraph>
+<paragraph id="par_idm1341571728" role="bascode" localize="false">    sText = "Las Vegas"</paragraph>
+<paragraph id="par_idm1341570496" role="bascode" localize="false">    sOut = sText &amp; Space(iLen) &amp; sText &amp; Chr(13) &amp;_</paragraph>
+<paragraph id="par_idm1341569184" role="bascode" localize="false">    sText &amp; Space(iLen*2) &amp; sText &amp; Chr(13) &amp;_</paragraph>
+<paragraph id="par_idm1341567888" role="bascode" localize="false">    sText &amp; Space(iLen*4) &amp; sText &amp; Chr(13)</paragraph>
+<paragraph id="par_id3154216" role="bascode">    MsgBox sOut,0,"Info:"</paragraph>
+<paragraph id="par_idm1341564864" role="bascode" localize="false">End Sub</paragraph>
+</bascode>
+</body>
+</helpdocument>

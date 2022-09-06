@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+	
+<helpdocument version="1.0">
+<meta>
+<topic id="textscalc0210060000xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Zoom Out</title>
+<filename>/text/scalc/02/10060000.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+<section id="zoom_out">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3153561"><bookmark_value>page views;reducing scales</bookmark_value>
+<bookmark_value>zooming;reducing page views</bookmark_value>
+</bookmark><comment>mw deleted "scaling;"</comment>
+<bookmark xml-lang="en-US" branch="hid/.uno:ZoomOut" id="bm_id5729287" localize="false"/>
+<paragraph role="heading" id="hd_id3153561" xml-lang="en-US" level="1"><link href="text/scalc/02/10060000.xhp" name="Zoom Out">Zoom Out</link></paragraph>
+<paragraph role="paragraph" id="par_id3151246" xml-lang="en-US"><ahelp hid=".uno:ZoomOut">Reduces the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp></paragraph>
+</section>
+<paragraph role="paragraph" id="par_id3150398" xml-lang="en-US">The minimum zoom factor is 20%.</paragraph>
+<section id="syzoom_out">
+<table id="tbl_id3125863">
+<tablerow>
+<tablecell colspan="" rowspan="">
+<paragraph role="paragraph" id="par_id3153770" xml-lang="en-US">
+<image id="img_id3155131" src="cmd/sc_zoomout.png" width="0.222inch" height="0.222inch"><alt id="alt_id3155131" xml-lang="en-US">Icon</alt>
+	</image></paragraph>
+</tablecell>
+<tablecell colspan="" rowspan="">
+<paragraph role="paragraph" id="par_id3150440" xml-lang="en-US">Zooming Out</paragraph>
+</tablecell>
+</tablerow>
+</table>
+
+</section>
+</body>
+</helpdocument>

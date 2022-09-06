@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+<helpdocument version="1.0">
+<meta>
+<topic id="textsbasicshared03090200xml" indexer="include" status="PUBLISH">
+<title xml-lang="en-US" id="tit">Loops</title>
+<filename>/text/sbasic/shared/03090200.xhp</filename>
+</topic>
+<history>
+<created date="2003-10-31T00:00:00">Sun Microsystems, Inc.</created>
+</history>
+</meta>
+<body>
+  
+  
+  <section id="loops">
+  <paragraph id="hd_id3153990" role="heading" level="1" xml-lang="en-US"><link href="text/sbasic/shared/03090200.xhp" name="Loops">Loops</link></paragraph>
+  <paragraph role="paragraph" id="par_id3147226" xml-lang="en-US">The following statements execute loops.</paragraph>
+  </section>
+  <embed href="text/sbasic/shared/03090201.xhp#doloop"/>
+  <embed href="text/sbasic/shared/03090202.xhp#fornext"/>
+  <embed href="text/sbasic/shared/03090203.xhp#whilewend"/>
+ </body>
+</helpdocument>

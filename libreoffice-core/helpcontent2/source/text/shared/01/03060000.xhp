@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textshared0103060000xml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Status Bar</title>
+    <filename>/text/shared/01/03060000.xhp</filename>
+  </topic>
+</meta>
+<body>
+<section id="status_bar">
+<bookmark xml-lang="en-US" branch="index" id="bm_id3152823">
+  <bookmark_value>status bar on/off</bookmark_value>
+</bookmark>
+<bookmark xml-lang="en-US" branch="hid/.uno:TaskBarVisible" id="bm_id5089973" localize="false"/>
+<bookmark xml-lang="en-US" branch="hid/.uno:StatusBarVisible" id="bm_id9749388" localize="false"/>
+<h1 id="hd_id3152823" xml-lang="en-US"><link href="text/shared/01/03060000.xhp" name="Status Bar">Status Bar</link></h1>
+  <paragraph id="par_id3147000" role="paragraph" xml-lang="en-US"><ahelp hid=".">Shows or hides the <emph>Status</emph> bar at the bottom edge of the window.</ahelp></paragraph>
+</section>
+<section id="howtoget">
+  <embed href="text/shared/00/00000403.xhp#task"/>
+</section>
+
+<switch select="appl"><comment>can remove this switch when there are related topics for BASE and DRAW</comment>
+<case select="DRAW"/>
+<case select="BASE"/>
+<default>
+<section id="relatedtopics"/>
+</default>
+</switch>
+<switch select="appl">
+  <case select="WRITER"><paragraph role="paragraph" id="par_id621603817886869"><link href="text/swriter/main0208.xhp" name="writerstatusbar">Status Bar - Overview</link></paragraph></case>
+  <case select="CALC"><paragraph role="paragraph" id="par_id971603817903925"><link href="text/scalc/main0208.xhp" name="calcstatusbar">Status Bar - Overview</link></paragraph></case>
+  <case select="IMPRESS"><paragraph role="paragraph" id="par_id441603817913885"><link href="text/simpress/main0206.xhp" name="impressstatusbar">Status Bar - Overview</link></paragraph></case>
+  <case select="MATH"><paragraph role="paragraph" id="par_id111603817924684"><link href="text/smath/main0202.xhp" name="mathstatusbar">Status Bar - Overview</link></paragraph></case>
+</switch>
+</body>
+</helpdocument>

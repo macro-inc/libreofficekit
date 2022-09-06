@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="textswriterguidetext_animationxml" indexer="include" status="PUBLISH">
+    <title id="tit" xml-lang="en-US">Animating Text</title>
+    <filename>/text/swriter/guide/text_animation.xhp</filename>
+  </topic>
+</meta>
+
+<body>
+
+<bookmark xml-lang="en-US" branch="index" id="bm_id3151182">
+  <bookmark_value>text animation</bookmark_value>
+  <bookmark_value>effects; text animation</bookmark_value>
+  <bookmark_value>animations;text</bookmark_value>
+</bookmark>
+<comment>mw made "animating text" a two level entry</comment>
+
+<paragraph id="hd_id3151182" role="heading" level="1" xml-lang="en-US"><variable id="text_animation"><link href="text/swriter/guide/text_animation.xhp" name="Animating Text">Animating Text</link></variable></paragraph>
+<paragraph id="par_id3145080" role="paragraph" xml-lang="en-US">You can only animate text that is contained in a drawing object, such as rectangles, lines, or text objects. For example, draw a rectangle, then double-click the rectangle and enter your text.</paragraph>
+
+<list type="ordered">
+  <listitem>
+    <paragraph id="par_id3149811" role="listitem" xml-lang="en-US">Select the drawing object containing the text that you want to animate.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3155178" role="listitem" xml-lang="en-US">Choose <item type="menuitem">Format - Object - Text Attributes</item>, and then click the <item type="menuitem">Text Animation</item> tab.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3149819" role="listitem" xml-lang="en-US">In the <item type="menuitem">Effect</item> box, select the animation that you want.</paragraph>
+  </listitem>
+  <listitem>
+    <paragraph id="par_id3145786" role="listitem" xml-lang="en-US">Set the properties of the effect, and then click <emph>OK</emph>.</paragraph>
+  </listitem>
+</list>
+</body>
+
+</helpdocument>

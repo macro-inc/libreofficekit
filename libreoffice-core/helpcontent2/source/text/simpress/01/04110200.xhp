@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+	
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+ 
+	
+<meta>
+<topic id="textsimpress0104110200xml" indexer="include" status="PUBLISH">
+<title id="tit" xml-lang="en-US">Insert Text</title>
+<filename>/text/simpress/01/04110200.xhp</filename>
+</topic>
+</meta>
+<body><comment>mw deleted "text documents;" and moved "inserting;" to the impress guide html_import.xhp</comment>
+<h1 id="hd_id3145252">Insert Text</h1>
+<paragraph role="paragraph" id="par_id3150716" xml-lang="en-US">Inserts text from an ASCII, RTF, or HTML file into the active slide.</paragraph>
+<section id="howtoget">
+<embed href="text/simpress/00/00000404.xhp#insert_page"/>
+</section>
+<paragraph role="paragraph" id="par_id3149018" xml-lang="en-US">The inserted text uses the default text formatting of the active slide. If you want, you can drag a text box in your slide, and then insert the text. The box automatically extends downwards for longer text passages.</paragraph>
+<h2 id="hd_id3156382">Display list</h2>
+<paragraph role="paragraph" id="par_id3154702" xml-lang="en-US">Select the text you want to insert from the list.</paragraph>
+<h2 id="hd_id3150200">Link</h2>
+<paragraph role="paragraph" id="par_id3155333" xml-lang="en-US">Inserts the text as a link. Links are updated automatically when the source file changes.</paragraph>
+</body>
+</helpdocument>

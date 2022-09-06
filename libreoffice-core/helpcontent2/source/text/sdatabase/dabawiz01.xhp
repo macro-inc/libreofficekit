@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+ -->
+
+
+<meta>
+<topic id="textsharedexplorerdatabasedabawiz01xml" indexer="include">
+<title id="tit" xml-lang="en-US">Database Selection</title>
+<filename>/text/sdatabase/dabawiz01.xhp</filename>
+</topic>
+</meta>
+<body>
+<section id="dabaselection">
+<bookmark xml-lang="en-US" branch="index" id="bm_id2082583"><bookmark_value>databases; connecting (Base)</bookmark_value>
+</bookmark>
+<h1 id="par_idN1054D"><variable id="databaseselectionh1"><link href="text/sdatabase/dabawiz01.xhp">Select Database</link></variable></h1>
+<paragraph role="paragraph" id="par_idN1055D" xml-lang="en-US"><ahelp hid=".">Creates a new database, opens a database file, or connects to an existing database.</ahelp></paragraph>
+</section>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/generalpagewizard/createDatabase" id="bm_id2482985" localize="false"/>
+<h2 id="par_idN10585">Create a new database</h2>
+<paragraph role="paragraph" id="par_idN10589" xml-lang="en-US"><ahelp hid=".">Select to create a new database. </ahelp>This option uses the HSQL database engine with default settings. The final page of the wizard appears next.</paragraph>
+<paragraph role="paragraph" id="par_id8584246" xml-lang="en-US"><link href="http://hsqldb.org/">External web page about HSQL</link>.</paragraph>
+
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/generalpagewizard/openExistingDatabase" id="bm_id2400585" localize="false"/>
+<h2 id="par_idN105F9">Open an existing database file</h2>
+<paragraph role="paragraph" id="par_idN105FD" xml-lang="en-US"><ahelp hid=".">Select to open a database file from a list of recently used files or from a file selection dialog.</ahelp></paragraph>
+
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/generalpagewizard/docListBox" id="bm_id5958128" localize="false"/>
+<h3 id="par_idN10614">Recently used</h3>
+<paragraph role="paragraph" id="par_idN10618" xml-lang="en-US"><ahelp hid=".">Select a database file to open from the list of recently used files. Click Finish to open the file immediately and to exit the wizard.</ahelp></paragraph>
+
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/generalpagewizard/openDatabase" id="bm_id6427198" localize="false"/>
+<h3 id="par_idN1062F">Open</h3>
+<paragraph role="paragraph" id="par_idN10633" xml-lang="en-US"><ahelp hid=".">Opens a file selection dialog where you can select a database file. Click Open or OK in the file selection dialog to open the file immediately and to exit the wizard.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/generalpagewizard/connectDatabase" id="bm_id5028229" localize="false"/>
+<h2 id="par_idN1058C">Connect to an existing database</h2>
+<paragraph role="paragraph" id="par_idN10590" xml-lang="en-US"><ahelp hid=".">Select to create a database document for an existing database connection.</ahelp></paragraph>
+<bookmark xml-lang="en-US" branch="hid/dbaccess/ui/generalpagewizard/datasourceType" id="bm_id763267" localize="false"/>
+<h3 id="par_idN10593">Database type</h3>
+<paragraph role="paragraph" id="par_idN10597" xml-lang="en-US"><ahelp hid=".">Select the database type for the existing database connection.</ahelp></paragraph>
+<note id="par_idN1059A">The Outlook, Evolution, KDE Address Book, and Seamonkey database types do not need additional information. For other database types, the wizard contains additional pages to specify the required information.</note>
+<paragraph role="paragraph" id="par_idN10611" xml-lang="en-US">The next wizard page is one of the following pages:</paragraph>
+<embed href="text/sdatabase/dabawiz02.xhp#nextsteps"/>
+<paragraph role="paragraph" id="par_idN1061C" xml-lang="en-US"><link href="text/sdatabase/dabawiz02text.xhp">Set up text file connection</link></paragraph>
+<paragraph role="paragraph" id="par_idN1062B" xml-lang="en-US"><link href="text/sdatabase/dabawiz02access.xhp">Set up Microsoft Access or Microsoft Access 2007 connection</link></paragraph>
+<paragraph role="paragraph" id="par_idN10658" xml-lang="en-US"><link href="text/sdatabase/dabawiz02ado.xhp">Set up ADO connection</link></paragraph>
+<paragraph role="paragraph" id="par_idN10667" xml-lang="en-US"><link href="text/sdatabase/dabawiz02jdbc.xhp">Set up JDBC connection</link></paragraph>
+<paragraph role="paragraph" id="par_idN10676" xml-lang="en-US"><link href="text/sdatabase/dabawiz02oracle.xhp">Set up Oracle database connection</link></paragraph>
+<embed href="text/sdatabase/dabawiz02mysql.xhp#mysql"/>
+<embed href="text/sdatabase/dabawiz02pgsql.xhp#pgsqlh1"/>
+<paragraph role="paragraph" id="par_idN10694" xml-lang="en-US"><link href="text/sdatabase/dabawiz02odbc.xhp">ODBC settings</link></paragraph>
+<paragraph role="paragraph" id="par_idN106A3" xml-lang="en-US"><link href="text/sdatabase/dabawiz02spreadsheet.xhp">Set up Spreadsheet connection</link></paragraph>
+</body>
+</helpdocument>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+<!--
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * This file incorporates work covered by the following license notice:
+ *
+ *   Licensed to the Apache Software Foundation (ASF) under one or more
+ *   contributor license agreements. See the NOTICE file distributed
+ *   with this work for additional information regarding copyright
+ *   ownership. The ASF licenses this file to you under the Apache
+ *   License, Version 2.0 (the "License"); you may not use this file
+ *   except in compliance with the License. You may obtain a copy of
+ *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
+-->
+
+<meta>
+  <topic id="topic_2507201510192393">
+    <title xml-lang="en-US" localize="false" id="tit">BasicCodeStubs</title>
+    <filename>/text/sbasic/shared/code-stubs.xhp</filename>
+  </topic>
+</meta>
+<body>
+
+<section id="BasicIDEOption01">
+  <bascode>
+    <paragraph id="hd_id1000010" role="bascode" xml-lang="en-US" localize="false">Dim aPicker As com.sun.star.ui.dialogs.XFilePicker</paragraph>
+  </bascode>
+</section>
+<section id="BasicIDEOption02">
+  <bascode>
+    <paragraph id="hd_id1000020" role="bascode" xml-lang="en-US" localize="false">aPicker.getDisplayDirectory()</paragraph>
+  </bascode>
+</section>
+<section id="BasicIDEOption03">
+  <bascode>
+    <paragraph id="hd_id1000030" role="bascode" xml-lang="en-US" localize="false">Dim intVar as Integer</paragraph>
+  </bascode>
+</section>
+<section id="BasicIDEOption04">
+  <bascode>
+    <paragraph id="hd_id10000400" role="bascode" xml-lang="en-US" localize="false">Sub Some_Calc_UNO_Types</paragraph>
+    <paragraph id="hd_id10000410" role="bascode" xml-lang="en-US" localize="true">REM A spreadsheet object</paragraph>
+    <paragraph id="hd_id10000420" role="bascode" xml-lang="en-US" localize="false">    Dim oSheet As com.sun.star.sheet.XSpreadsheet</paragraph>
+    <paragraph id="hd_id10000430" role="bascode" xml-lang="en-US" localize="false">    oSheet = ThisComponent.getSheets().getByIndex(0)</paragraph>
+    <paragraph id="hd_id10000470" role="bascode" xml-lang="en-US" localize="true">REM A cell object</paragraph>
+    <paragraph id="hd_id10000480" role="bascode" xml-lang="en-US" localize="false">    Dim oCell As com.sun.star.table.XCell</paragraph>
+    <paragraph id="hd_id10000490" role="bascode" xml-lang="en-US" localize="false">    oCell = oSheet.getCellByPosition(0,0)</paragraph>
+    <paragraph id="hd_id10000500" role="bascode" xml-lang="en-US" localize="false">End Sub</paragraph>
+  </bascode>
+</section>
+</body>
+
+</helpdocument>
