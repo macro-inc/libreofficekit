@@ -191,4 +191,7 @@ LibreOffice.VC.VC.opendb
 
 # Clangd
 /.cache
-/dictionaries
+
+# Dictionaries
+/dictionaries/*
+!/dictionaries/Module_dictionaries.mk
