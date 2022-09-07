@@ -1,0 +1,152 @@
+name: Windows Nightly Release
+on:
+  workflow_dispatch:
+  schedule:
+    -  cron: '0 0 * * *'
+    
+# Cancel previous build if it is still running
+concurrency:
+  group: '${{ github.workflow }}'
+  cancel-in-progress: true
+
+jobs:
+  check_date:
+    runs-on: ubuntu-latest
+    name: Check latest commit
+    outputs:
+      should_run: ${{ steps.should_run.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: print latest_commit
+        run: echo ${{ github.sha }}
+      - id: should_run
+        continue-on-error: true
+        name: check latest commit is less than a day
+        if: ${{ github.event_name == 'schedule' }}
+        run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "::set-output name=should_run::false" 
+  fetch:
+    needs: [check_date]
+    if: ${{ needs.check_date.outputs.should_run != 'false' }}
+    runs-on: windows-2019
+    name: Fetch external projects
+    steps:
+      - name: Turn off line ending conversion in git
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Speed up cache restore on Windows
+        shell: cmd
+        run: |
+          echo "Adding GNU tar to PATH"
+          echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
+      - name: Cache cygwin packages
+        id: cache-cygwin-packages
+        uses: actions/cache@v3
+        with:
+          path: C:\cygwin-packages
+          key: cygwin-packages
+      - name: Fetch Cygwin installer
+        run: |
+          Invoke-WebRequest https://cygwin.com/setup-x86_64.exe -OutFile C:\setup.exe
+        shell: powershell
+      - name: Install Cygwin
+        run: |
+          C:\setup.exe -BNqdDLXgnO -s http://mirrors.kernel.org/sourceware/cygwin/ -l C:\cygwin-packages -R C:\cygwin -P ^
+          autoconf,automake,bison,cabextract,doxygen,flex,gettext-devel,^
+          git,gnupg,gperf,libxml2-devel,libpng12-devel,make,mintty,openssh,^
+          openssl,patch,perl,pkg-config,readline,rsync,unzip,wget,^
+          zip,perl-Archive-Zip,perl-Font-TTF,perl-IO-String,python,python3
+        shell: cmd
+      - name: Install MSVC make v4.2.1 and nasm v2.11.06
+        run: |
+          Invoke-WebRequest https://dev-www.libreoffice.org/bin/cygwin/make-4.2.1-msvc.exe -OutFile C:\cygwin\usr\local\bin\make.exe
+          Invoke-WebRequest https://www.nasm.us/pub/nasm/releasebuilds/2.11.06/win32/nasm-2.11.06-win32.zip -OutFile $env:RUNNER_TEMP\nasm.zip
+          Expand-Archive -LiteralPath $env:RUNNER_TEMP\nasm.zip -DestinationPath $env:RUNNER_TEMP
+          Move-Item -Path $env:RUNNER_TEMP\nasm-2.11.06\nasm.exe -Destination C:\cygwin\usr\local\bin\nasm.exe
+        shell: powershell
+      - name: Cache external tarballs
+        id: cache-external-tar
+        uses: actions/cache@v3
+        with:
+          path: C:\external-tar
+          key: external-tar-${{ hashFiles('libreoffice-core/download.list') }}-${{ hashFiles('libreoffice-core/external/**/*') }}
+          restore-keys: external-tar-
+      - name: Configure LOKit and Fetch Tarballs
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cd libreoffice-core
+          C:\cygwin\bin\bash.exe --login
+          set CHERE_INVOKING=1
+          set PARALLELISM=4
+          C:\cygwin\bin\bash.exe --login -c './autogen.sh --with-distro=CPWin64-LOKit --with-external-tar="C:\external-tar"'
+          C:\cygwin\bin\bash.exe --login -c 'make fetch'
+        shell: cmd
+  build:
+    needs: [check_date, fetch]
+    if: ${{ needs.check_date.outputs.should_run != 'false' }}
+    runs-on: windows-2019
+    name: Build
+    steps:
+      - name: Turn off line ending conversion in git
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Speed up cache restore on Windows
+        shell: cmd
+        run: |
+          echo "Adding GNU tar to PATH"
+          echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
+      - name: Cache cygwin packages
+        id: cache-cygwin-packages
+        uses: actions/cache@v3
+        with:
+          path: C:\cygwin-packages
+          key: cygwin-packages
+      - name: Fetch Cygwin installer
+        run: |
+          Invoke-WebRequest https://cygwin.com/setup-x86_64.exe -OutFile C:\setup.exe
+        shell: powershell
+      - name: Install Cygwin
+        run: |
+          C:\setup.exe -BNqdDLXgnO -s http://mirrors.kernel.org/sourceware/cygwin/ -l C:\cygwin-packages -R C:\cygwin -P ^
+          autoconf,automake,bison,cabextract,doxygen,flex,gettext-devel,^
+          git,gnupg,gperf,libxml2-devel,libpng12-devel,make,mintty,openssh,^
+          openssl,patch,perl,pkg-config,readline,rsync,unzip,wget,^
+          zip,perl-Archive-Zip,perl-Font-TTF,perl-IO-String,python,python3
+        shell: cmd
+      - name: Install MSVC make v4.2.1 and nasm v2.11.06
+        run: |
+          Invoke-WebRequest https://dev-www.libreoffice.org/bin/cygwin/make-4.2.1-msvc.exe -OutFile C:\cygwin\usr\local\bin\make.exe
+          Invoke-WebRequest https://www.nasm.us/pub/nasm/releasebuilds/2.11.06/win32/nasm-2.11.06-win32.zip -OutFile $env:RUNNER_TEMP\nasm.zip
+          Expand-Archive -LiteralPath $env:RUNNER_TEMP\nasm.zip -DestinationPath $env:RUNNER_TEMP
+          Move-Item -Path $env:RUNNER_TEMP\nasm-2.11.06\nasm.exe -Destination C:\cygwin\usr\local\bin\nasm.exe
+        shell: powershell
+      - name: Cache external tarballs
+        id: cache-external-tar
+        uses: actions/cache@v3
+        with:
+          path: C:\external-tar
+          key: external-tar-${{ hashFiles('libreoffice-core/download.list') }}-${{ hashFiles('libreoffice-core/external/**/*') }}
+          restore-keys: external-tar-
+      - name: Build
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cd libreoffice-core
+          C:\cygwin\bin\bash.exe --login
+          set CHERE_INVOKING=1
+          set PARALLELISM=4
+          C:\cygwin\bin\bash.exe --login -c './autogen.sh --with-distro=CPWin64-LOKit --with-external-tar="C:\external-tar"'
+          C:\cygwin\bin\bash.exe --login -c "make solenv zlib libpng freetype expat fontconfig cairo icu openssl libffi python3 nss boost"
+          C:\cygwin\bin\bash.exe --login -c "cd winaccessibility && make CustomTarget_winaccessibility/ia2/idl"
+          C:\cygwin\bin\bash.exe --login -c "make build-nocheck"
+          C:\Program Files\Git\usr\bin\tar.exe --zstd -cf ${{ runner.temp }}/instdir.tar.zst instdir
+        shell: cmd
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: instdir.tar.zst
+          path: ${{ runner.temp }}/instdir.tar.zst
