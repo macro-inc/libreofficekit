@@ -16,14 +16,14 @@ jobs:
     outputs:
       should_run: ${{ steps.should_run.outputs.should_run }}
     steps:
-      - uses: actions/checkout@v3
-      - name: print latest_commit
-        run: echo ${{ github.sha }}
       - id: should_run
         continue-on-error: true
         name: check latest commit is less than a day
         if: ${{ github.event_name == 'schedule' }}
-        run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "::set-output name=should_run::false" 
+        run:
+          git clone --no-checkout --depth=1 --filter=blob:none https://github.com/${{ github.repository }} lok
+          cd lok
+          test -z $(git rev-list  --after="24 hours" @) && echo "::set-output name=should_run::false" 
   fetch:
     needs: [check_date]
     if: ${{ needs.check_date.outputs.should_run != 'false' }}
@@ -34,24 +34,57 @@ jobs:
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Sparse Checkout
+        run: |
+          git clone --no-checkout --depth=1 --filter=blob:none --sparse https://github.com/${{ github.repository }} lok
+          cd lok
+          git config --local gc.auto 0
+          tee .git/info/sparse-checkout <<EOF
+          /*
+          !/*/
+          /libreoffice-core/
+          !/libreoffice-core/translations
+          !/libreoffice-core/helpcontent2
+          /libreoffice-core/dictionaries
+          !/libreoffice-core/dictionaries/*/
+          /libreoffice-core/dictionaries/en
+          /libreoffice-core/translations/source
+          !/libreoffice-core/translations/source/*/
+          /libreoffice-core/translations/source/en-GB/
+          /libreoffice-core/translations/source/en-ZA/
+          EOF
+          git -c protocol.version=2 checkout
+        shell: bash
       - name: Speed up cache restore on Windows
+        if: steps.cache-external-tar.outputs.cache-hit != 'true'
         shell: cmd
         run: |
           echo "Adding GNU tar to PATH"
           echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
+      - name: Cache external tarballs
+        id: cache-external-tar
+        uses: actions/cache@v3
+        with:
+          path: C:\external-tar
+          key: external-tar-${{ hashFiles('lok/libreoffice-core/download.lst') }}-${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+          restore-keys: |
+            external-tar--${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+            external-tar--
+            external-tar-
       - name: Cache cygwin packages
+        if: steps.cache-external-tar.outputs.cache-hit != 'true'
         id: cache-cygwin-packages
         uses: actions/cache@v3
         with:
           path: C:\cygwin-packages
           key: cygwin-packages
       - name: Fetch Cygwin installer
+        if: steps.cache-external-tar.outputs.cache-hit != 'true'
         run: |
           Invoke-WebRequest https://cygwin.com/setup-x86_64.exe -OutFile C:\setup.exe
         shell: powershell
       - name: Install Cygwin
+        if: steps.cache-external-tar.outputs.cache-hit != 'true'
         run: |
           C:\setup.exe -BNqdDLXgnO -s http://mirrors.kernel.org/sourceware/cygwin/ -l C:\cygwin-packages -R C:\cygwin -P ^
           autoconf,automake,bison,cabextract,doxygen,flex,gettext-devel,^
@@ -60,26 +93,22 @@ jobs:
           zip,perl-Archive-Zip,perl-Font-TTF,perl-IO-String,python,python3
         shell: cmd
       - name: Install MSVC make v4.2.1 and nasm v2.11.06
+        if: steps.cache-external-tar.outputs.cache-hit != 'true'
         run: |
           Invoke-WebRequest https://dev-www.libreoffice.org/bin/cygwin/make-4.2.1-msvc.exe -OutFile C:\cygwin\usr\local\bin\make.exe
           Invoke-WebRequest https://www.nasm.us/pub/nasm/releasebuilds/2.11.06/win32/nasm-2.11.06-win32.zip -OutFile $env:RUNNER_TEMP\nasm.zip
           Expand-Archive -LiteralPath $env:RUNNER_TEMP\nasm.zip -DestinationPath $env:RUNNER_TEMP
           Move-Item -Path $env:RUNNER_TEMP\nasm-2.11.06\nasm.exe -Destination C:\cygwin\usr\local\bin\nasm.exe
         shell: powershell
-      - name: Cache external tarballs
-        id: cache-external-tar
-        uses: actions/cache@v3
-        with:
-          path: C:\external-tar
-          key: external-tar-${{ hashFiles('libreoffice-core/download.list') }}-${{ hashFiles('libreoffice-core/external/**/*') }}
-          restore-keys: external-tar-
       - name: Configure LOKit and Fetch Tarballs
+        if: steps.cache-external-tar.outputs.cache-hit != 'true'
+        env:
+          CHERE_INVOKING: 1
+          PARALLELISM: 4
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cd libreoffice-core
+          cd lok/libreoffice-core
           C:\cygwin\bin\bash.exe --login
-          set CHERE_INVOKING=1
-          set PARALLELISM=4
           C:\cygwin\bin\bash.exe --login -c './autogen.sh --with-distro=CPWin64-LOKit --with-external-tar="C:\external-tar"'
           C:\cygwin\bin\bash.exe --login -c 'make fetch'
         shell: cmd
@@ -94,7 +123,11 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
       - name: Checkout
-        uses: actions/checkout@v3
+        run: |
+          git -c protocol.version=2 clone --depth=1 https://github.com/${{ github.repository }} /c/lok
+          cd /c/lok
+          git config --local gc.auto 0
+        shell: bash
       - name: Speed up cache restore on Windows
         shell: cmd
         run: |
@@ -130,20 +163,26 @@ jobs:
         uses: actions/cache@v3
         with:
           path: C:\external-tar
-          key: external-tar-${{ hashFiles('libreoffice-core/download.list') }}-${{ hashFiles('libreoffice-core/external/**/*') }}
-          restore-keys: external-tar-
+          key: external-tar-${{ hashFiles('C:\lok\libreoffice-core\download.lst') }}-${{ hashFiles('C:\lok\libreoffice-core\external\**\*') }}
+          restore-keys: |
+            external-tar--${{ hashFiles('C:\lok\libreoffice-core\external\**\*') }}
+            external-tar--
+            external-tar-
       - name: Build
+        env:
+          PARALLELISM: 4
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cd libreoffice-core
+          cd /d C:\lok\libreoffice-core
           C:\cygwin\bin\bash.exe --login
-          set CHERE_INVOKING=1
-          set PARALLELISM=4
-          C:\cygwin\bin\bash.exe --login -c './autogen.sh --with-distro=CPWin64-LOKit --with-external-tar="C:\external-tar"'
-          C:\cygwin\bin\bash.exe --login -c "make solenv zlib libpng freetype expat fontconfig cairo icu openssl libffi python3 nss boost"
-          C:\cygwin\bin\bash.exe --login -c "cd winaccessibility && make CustomTarget_winaccessibility/ia2/idl"
-          C:\cygwin\bin\bash.exe --login -c "make build-nocheck"
-          C:\Program Files\Git\usr\bin\tar.exe --zstd -cf ${{ runner.temp }}/instdir.tar.zst instdir
+          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && ./autogen.sh --with-distro=CPWin64-LOKit --with-external-tar='C:\external-tar'"
+          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make solenv zlib libpng freetype expat fontconfig cairo icu openssl libffi python3 nss boost"
+          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && cd winaccessibility && make CustomTarget_winaccessibility/ia2/idl"
+          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make build-nocheck"
+        shell: cmd
+      - name: Make artifact
+        run: |
+          "C:\Program Files\Git\usr\bin\tar.exe" --zstd -cf ${{ runner.temp }}\instdir.tar.zst C:\lok\libreoffice-core\instdir
         shell: cmd
       - name: Upload artifact
         uses: actions/upload-artifact@v3
