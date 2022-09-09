@@ -176,7 +176,10 @@ jobs:
           cd /d C:\lok\libreoffice-core
           C:\cygwin\bin\bash.exe --login
           C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && ./autogen.sh --with-distro=CPWin64-LOKit --with-external-tar='C:\external-tar'"
-          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make solenv zlib libpng freetype expat fontconfig cairo icu openssl libffi python3 nss boost"
+          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make solenv zlib libpng freetype expat fontconfig cairo icu openssl libffi python3"
+          echo "Making NSS"
+          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make nss || make nss"
+          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make boost"
           C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && cd winaccessibility && make CustomTarget_winaccessibility/ia2/idl"
           C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make build-nocheck"
         shell: cmd
