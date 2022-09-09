@@ -182,10 +182,15 @@ jobs:
         shell: cmd
       - name: Make artifact
         run: |
-          "C:\Program Files\Git\usr\bin\tar.exe" --zstd -cf ${{ runner.temp }}\instdir.tar.zst C:\lok\libreoffice-core\instdir
-        shell: cmd
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+          cd /c/lok/libreoffice-core
+          /usr/bin/tar --zstd -cf instdir.tar.zst instdir
+          cp instdir.tar.zst $GITHUB_WORKSPACE/instdir-win.tar.zst
+        shell: bash
+      - name: Create release
+        uses: ncipollo/release-action@v1
         with:
-          name: instdir.tar.zst
-          path: ${{ runner.temp }}/instdir.tar.zst
+          artifacts: "instdir-win.tar.zst"
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          omitBody: true
+          name: "Windows Nightly Release"
