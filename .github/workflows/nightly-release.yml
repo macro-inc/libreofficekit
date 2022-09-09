@@ -197,3 +197,4 @@ jobs:
           artifactErrorsFailBuild: true
           omitBody: true
           name: "Windows Nightly Release"
+          tag: ${{ github.sha }}
