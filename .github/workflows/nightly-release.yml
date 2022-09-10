@@ -20,7 +20,7 @@ jobs:
         continue-on-error: true
         name: check latest commit is less than a day
         if: ${{ github.event_name == 'schedule' }}
-        run:
+        run: |
           git clone --no-checkout --depth=1 --filter=blob:none https://github.com/${{ github.repository }} lok
           cd lok
           test -z $(git rev-list  --after="24 hours" @) && echo "::set-output name=should_run::false" 
@@ -195,6 +195,8 @@ jobs:
           artifacts: "instdir-win.tar.zst"
           allowUpdates: true
           artifactErrorsFailBuild: true
-          omitBody: true
           name: "Windows Nightly Release"
           tag: win-nightly-run-${{ github.run_number }}
+          body: |
+            This is a nightly release built from the `main` branch.
+            Compatible with Windows 10 and later.
