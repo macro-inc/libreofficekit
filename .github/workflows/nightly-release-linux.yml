@@ -72,7 +72,7 @@ jobs:
         env:
           PARALLELISM: 4
         run: |
-          ./autogen.sh --with-distro=CPWin64-LOKit --with-external-tar="C:\external-tar"
+          ./autogen.sh --with-distro=LOKit-Linux --with-external-tar="C:\external-tar"
           make fetch
   build:
     needs: [check_date, fetch]
@@ -108,7 +108,7 @@ jobs:
         env:
           PARALLELISM: 4
         run: |
-          ./autogen.sh --with-distro=CPWin64-LOKit --with-external-tar="C:\external-tar"
+          ./autogen.sh --with-distro=LOKit-Linux --with-external-tar="C:\external-tar"
           cd /lok/libreoffice-core
           make build-nocheck
       - name: Make artifact
