@@ -132,12 +132,15 @@ jobs:
       - name: Make artifact
         run: |
           cd /lok/libreoffice-core
-          /usr/bin/tar --zstd -cf instdir.tar.zst instdir
-          cp instdir.tar.zst $GITHUB_WORKSPACE/instdir-linux.tar.zst
+          mv instdir libreofficekit
+          /usr/bin/tar -cJf libreofficekit.tar.xz libreofficekit
+          cp libreofficekit.tar.xz $GITHUB_WORKSPACE/libreofficekit-linux.tar.xz
+          cd $GITHUB_WORKSPACE
+          sha256sum libreofficekit-linux.tar.xz > libreofficekit-linux.tar.xz.sha256sum
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "instdir-linux.tar.zst"
+          artifacts: "libreofficekit-linux.tar.xz,libreofficekit-linux.tar.xz.sha256sum"
           allowUpdates: true
           artifactErrorsFailBuild: true
           name: "Linux Nightly Release"

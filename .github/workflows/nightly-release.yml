@@ -109,7 +109,7 @@ jobs:
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cd lok/libreoffice-core
           C:\cygwin\bin\bash.exe --login
-          C:\cygwin\bin\bash.exe --login -c './autogen.sh --with-distro=CPWin64-LOKit --with-external-tar="C:\external-tar"'
+          C:\cygwin\bin\bash.exe --login -c './autogen.sh --with-distro=LOKit-Win64 --with-external-tar="C:\external-tar"'
           C:\cygwin\bin\bash.exe --login -c 'make fetch'
         shell: cmd
   build:
@@ -175,7 +175,7 @@ jobs:
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cd /d C:\lok\libreoffice-core
           C:\cygwin\bin\bash.exe --login
-          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && ./autogen.sh --with-distro=CPWin64-LOKit --with-external-tar='C:\external-tar'"
+          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && ./autogen.sh --with-distro=LOKit-Win64 --with-external-tar='C:\external-tar'"
           C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make solenv zlib libpng freetype expat fontconfig cairo icu openssl libffi python3"
           echo "Making NSS"
           C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make nss || make nss"
@@ -186,13 +186,16 @@ jobs:
       - name: Make artifact
         run: |
           cd /c/lok/libreoffice-core
-          /usr/bin/tar --zstd -cf instdir.tar.zst instdir
-          cp instdir.tar.zst $GITHUB_WORKSPACE/instdir-win.tar.zst
+          mv instdir libreofficekit
+          /usr/bin/tar -cJf instdir.tar.xz libreofficekit
+          cp libreofficekit.tar.xz $GITHUB_WORKSPACE/libreofficekit-win.tar.xz
+          cd $GITHUB_WORKSPACE
+          sha256sum libreofficekit-win.tar.xz > libreofficekit-win.tar.xz.sha256sum
         shell: bash
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "instdir-win.tar.zst"
+          artifacts: "libreofficekit-win.tar.xz,libreofficekit-win.tar.xz.sha256sum"
           allowUpdates: true
           artifactErrorsFailBuild: true
           name: "Windows Nightly Release"
