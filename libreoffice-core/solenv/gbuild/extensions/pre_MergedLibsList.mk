@@ -43,7 +43,7 @@ MERGE_LIBRARY_LIST := \
 	fwk \
 	$(if $(DISABLE_GUI),,$(if $(filter WNT,$(OS)),gdipluscanvas)) \
 	guesslang \
-    $(call gb_Helper_optionals_or,HELPTOOLS XMLHELP,helplinker) \
+	$(call gb_Helper_optionals_or,HELPTOOLS XMLHELP,helplinker) \
 	hyphen \
 	i18nsearch \
 	i18npool \

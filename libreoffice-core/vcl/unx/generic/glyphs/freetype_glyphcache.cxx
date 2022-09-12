@@ -17,7 +17,9 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#ifdef _WIN32
 #include "boost/winapi/get_last_error.hpp"
+#endif
 #include <sal/config.h>
 
 #include <o3tl/safeint.hxx>

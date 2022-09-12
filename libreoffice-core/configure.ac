@@ -877,6 +877,8 @@ linux-gnu*|k*bsd*-gnu*|linux-musl*)
     using_freetype_fontconfig=yes
     using_x11=yes
     build_skia=yes
+    DISABLE_PYTHON=TRUE
+    test_openldap=no
     test_gdb_index=yes
     test_split_debug=yes
     if test "$enable_fuzzers" = yes; then
@@ -13507,40 +13509,45 @@ dnl ===================================================================
 dnl Test whether to build cairo or rely on the system version
 dnl ===================================================================
 
+if test "$_os" == "WINNT"; then
+    BUILD_TYPE="$BUILD_TYPE CAIRO"
+    ENABLE_CAIRO_CANVAS=TRUE
+else
 if test "$test_cairo" = "yes"; then
     AC_MSG_CHECKING([whether to use the system cairo])
 
-#     : ${with_system_cairo:=$with_system_libs}
-#     if test "$with_system_cairo" = "yes"; then
-#         SYSTEM_CAIRO=TRUE
-#         AC_MSG_RESULT([yes])
+     : ${with_system_cairo:=$with_system_libs}
+     if test "$with_system_cairo" = "yes"; then
+         SYSTEM_CAIRO=TRUE
+         AC_MSG_RESULT([yes])
 
-#         PKG_CHECK_MODULES( CAIRO, cairo >= 1.8.0 )
-#         CAIRO_CFLAGS=$(printf '%s' "$CAIRO_CFLAGS" | sed -e "s/-I/${ISYSTEM?}/g")
-#         FilterLibs "${CAIRO_LIBS}"
-#         CAIRO_LIBS="${filteredlibs}"
+         PKG_CHECK_MODULES( CAIRO, cairo >= 1.8.0 )
+         CAIRO_CFLAGS=$(printf '%s' "$CAIRO_CFLAGS" | sed -e "s/-I/${ISYSTEM?}/g")
+         FilterLibs "${CAIRO_LIBS}"
+         CAIRO_LIBS="${filteredlibs}"
 
-#         if test "$test_xrender" = "yes"; then
-#             AC_MSG_CHECKING([whether Xrender.h defines PictStandardA8])
-#             AC_LANG_PUSH([C])
-#             AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <X11/extensions/Xrender.h>]],[[
-# #ifdef PictStandardA8
-# #else
-#       return fail;
-# #endif
-# ]])],[AC_MSG_RESULT([yes])],[AC_MSG_ERROR([no, X headers too old.])])
+         if test "$test_xrender" = "yes"; then
+             AC_MSG_CHECKING([whether Xrender.h defines PictStandardA8])
+             AC_LANG_PUSH([C])
+             AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <X11/extensions/Xrender.h>]],[[
+ #ifdef PictStandardA8
+ #else
+       return fail;
+ #endif
+ ]])],[AC_MSG_RESULT([yes])],[AC_MSG_ERROR([no, X headers too old.])])
 
-#             AC_LANG_POP([C])
-#         fi
-#     else
+             AC_LANG_POP([C])
+         fi
+     else
         AC_MSG_RESULT([no])
         BUILD_TYPE="$BUILD_TYPE CAIRO"
-    # fi
+     fi
 
-    # if test "$enable_cairo_canvas" != no; then
+     if test "$enable_cairo_canvas" != no; then
         AC_DEFINE(ENABLE_CAIRO_CANVAS)
         ENABLE_CAIRO_CANVAS=TRUE
-    # fi
+     fi
+fi
 fi
 
 AC_SUBST(CAIRO_CFLAGS)

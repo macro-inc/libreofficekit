@@ -11,11 +11,14 @@ $(eval $(call gb_Module_Module,expat))
 
 $(eval $(call gb_Module_add_targets,expat,\
 	UnpackedTarball_expat \
-))
-
-$(eval $(call gb_Module_add_targets,expat,\
 	StaticLibrary_expat \
 ))
+
+ifneq ($(OS),WNT)
+$(eval $(call gb_Module_add_targets,expat,\
+	ExternalProject_expat \
+))
+endif
 
 # ---------------- X64 stuff special ---------------------
 ifeq ($(BUILD_X64),TRUE)

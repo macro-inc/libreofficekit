@@ -556,6 +556,8 @@ $(if $(filter-out WNT,$(OS)), \
     vcl/unx/generic/fontmanager/helper \
     vcl/unx/generic/print/genpspgraphics \
 $(if $(filter-out WNT,$(OS)), \
+    vcl/unx/generic/print/bitmap_gfx \
+    vcl/unx/generic/print/common_gfx \
     vcl/unx/generic/print/GenPspGfxBackend \
     vcl/unx/generic/print/glyphset \
     vcl/unx/generic/print/printerjob \

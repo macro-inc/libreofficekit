@@ -1315,8 +1315,8 @@ $(call gb_LinkTarget_set_include,$(1),\
 
 ifeq ($(OS),WNT)
 $(call gb_LinkTarget_add_libs,$(1),\
-    $(call gb_UnpackedTarball_get_dir,cairo)/src/release/cairo.lib \
-    $(call gb_UnpackedTarball_get_dir,pixman)/pixman/release/pixman-1.lib \
+	$(call gb_UnpackedTarball_get_dir,cairo)/src/release/cairo.lib \
+	$(call gb_UnpackedTarball_get_dir,pixman)/pixman/release/pixman-1.lib \
 )
 else
 $(call gb_LinkTarget_add_libs,$(1),\
@@ -1365,7 +1365,7 @@ define gb_LinkTarget__use_freetype
 $(call gb_LinkTarget_use_external,$(1),freetype_headers)
 ifeq ($(OS),WNT)
 $(call gb_LinkTarget_add_libs,$(1),\
-    $(call gb_UnpackedTarball_get_dir,freetype)/instdir/lib/freetype.lib \
+	$(call gb_UnpackedTarball_get_dir,freetype)/instdir/lib/freetype.lib \
 )
 else
 $(call gb_LinkTarget_add_libs,$(1),$(FREETYPE_LIBS))
@@ -1397,7 +1397,7 @@ $(call gb_LinkTarget_set_include,$(1),\
 
 ifeq ($(OS),WNT)
 $(call gb_LinkTarget_add_libs,$(1),\
-    $(call gb_UnpackedTarball_get_dir,fontconfig)/src/.libs/fontconfig.lib \
+	$(call gb_UnpackedTarball_get_dir,fontconfig)/src/.libs/fontconfig.lib \
 )
 else
 $(call gb_LinkTarget_add_libs,$(1),\

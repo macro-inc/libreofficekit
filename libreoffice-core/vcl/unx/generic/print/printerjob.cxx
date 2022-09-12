@@ -40,6 +40,8 @@
 #include <osl/thread.h>
 #include <osl/security.hxx>
 
+#include <boost/filesystem/operations.hpp>
+
 #include <algorithm>
 #include <cstddef>
 #include <deque>
