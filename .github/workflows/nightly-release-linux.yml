@@ -58,10 +58,12 @@ jobs:
         id: cache-external-tar
         uses: actions/cache@v3
         with:
-          path: external-tar
+          path: /external-tar
           key: external-tar-linux-${{ hashFiles('lok/libreoffice-core/download.lst') }}-${{ hashFiles('lok/libreoffice-core/external/**/*') }}
           restore-keys: |
             external-tar-linux--${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+            external-tar-${{ hashFiles('lok/libreoffice-core/download.lst') }}-${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+            external-tar-${{ hashFiles('lok/libreoffice-core/external/**/*') }}
             external-tar--
             external-tar-
       - name: Install build dependencies
@@ -72,7 +74,8 @@ jobs:
         env:
           PARALLELISM: 4
         run: |
-          ./autogen.sh --with-distro=LOKit-Linux --with-external-tar="C:\external-tar"
+          cd lok/libreoffice-core
+          ./autogen.sh --with-distro=LOKit-Linux --with-external-tar="/external-tar"
           make fetch
   build:
     needs: [check_date, fetch]
@@ -98,18 +101,20 @@ jobs:
         id: cache-external-tar
         uses: actions/cache@v3
         with:
-          path: external-tar
-          key: external-tar-linux-${{ hashFiles('lok/libreoffice-core/download.lst') }}-${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+          path: /external-tar
+          key: external-tar-linux-${{ hashFiles('/lok/libreoffice-core/download.lst') }}-${{ hashFiles('/lok/libreoffice-core/external/**/*') }}
           restore-keys: |
             external-tar-linux--${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+            external-tar-${{ hashFiles('/lok/libreoffice-core/download.lst') }}-${{ hashFiles('/lok/libreoffice-core/external/**/*') }}
+            external-tar-${{ hashFiles('/lok/libreoffice-core/external/**/*') }}
             external-tar--
             external-tar-
       - name: Build
         env:
           PARALLELISM: 4
         run: |
-          ./autogen.sh --with-distro=LOKit-Linux --with-external-tar="C:\external-tar"
           cd /lok/libreoffice-core
+          ./autogen.sh --with-distro=LOKit-Linux --with-external-tar="/external-tar"
           make build-nocheck
       - name: Make artifact
         run: |
