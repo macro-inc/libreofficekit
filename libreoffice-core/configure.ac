@@ -13511,6 +13511,7 @@ dnl ===================================================================
 
 if test "$_os" == "WINNT"; then
     BUILD_TYPE="$BUILD_TYPE CAIRO"
+    AC_DEFINE(ENABLE_CAIRO_CANVAS)
     ENABLE_CAIRO_CANVAS=TRUE
 else
 if test "$test_cairo" = "yes"; then
