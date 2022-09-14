@@ -185,7 +185,7 @@ jobs:
         shell: cmd
       - name: Make artifact
         run: |
-          cd /c/lok/libreoffice-core
+          cd /c/lok/libreoffice-core/libreofficekit
           mv instdir libreofficekit
           /usr/bin/tar -cJf libreofficekit.tar.xz libreofficekit
           cp libreofficekit.tar.xz $GITHUB_WORKSPACE/libreofficekit-win.tar.xz

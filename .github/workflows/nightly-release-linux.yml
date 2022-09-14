@@ -131,7 +131,7 @@ jobs:
           make build-nocheck
       - name: Make artifact
         run: |
-          cd /lok/libreoffice-core
+          cd /lok/libreoffice-core/libreofficekit
           mv instdir libreofficekit
           /usr/bin/tar -cJf libreofficekit.tar.xz libreofficekit
           cp libreofficekit.tar.xz $GITHUB_WORKSPACE/libreofficekit-linux.tar.xz
