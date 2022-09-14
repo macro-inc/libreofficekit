@@ -187,7 +187,7 @@ jobs:
         run: |
           cd /c/lok/libreoffice-core
           mv instdir libreofficekit
-          /usr/bin/tar -cJf instdir.tar.xz libreofficekit
+          /usr/bin/tar -cJf libreofficekit.tar.xz libreofficekit
           cp libreofficekit.tar.xz $GITHUB_WORKSPACE/libreofficekit-win.tar.xz
           cd $GITHUB_WORKSPACE
           sha256sum libreofficekit-win.tar.xz > libreofficekit-win.tar.xz.sha256sum
