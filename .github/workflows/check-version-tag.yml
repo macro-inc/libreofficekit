@@ -26,4 +26,4 @@ jobs:
           cd lok
           git checkout
           echo "::set-output name=version::$(cat VERSION)"
-          git ls-remote --tags --exit-code -q https://github.com/${{ github.repository }} "refs/tags/$(cat VERSION)" || echo "::set-output name=should_run::false" 
+          git ls-remote --tags --exit-code -q https://github.com/${{ github.repository }} "refs/tags/$(cat VERSION)" && echo "::set-output name=should_run::false" 
