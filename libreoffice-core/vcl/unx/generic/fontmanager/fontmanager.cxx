@@ -185,19 +185,17 @@ std::vector<fontID> PrintFontManager::addFontFile( const OUString& rFileUrl )
 std::vector<PrintFontManager::PrintFont> PrintFontManager::analyzeFontFile( int nDirID, const OString& rFontFile, const char *pFormat ) const
 {
     std::vector<PrintFontManager::PrintFont> aNewFonts;
-
+#ifdef _WIN32
+    OString aFullPath = rFontFile;
+#else
     OString aDir( getDirectory( nDirID ) );
 
     OString aFullPath = aDir + "/" + rFontFile;
+#endif
 
     // #i1872# reject unreadable files
 #ifdef _WIN32
-    int fd = _open(aFullPath.getStr(), _O_RDONLY);
-    if (fd == 0)
-    {
-        _close(fd);
-    }
-    else
+    if (_open(aFullPath.getStr(), _O_RDONLY) == -1)
     {
         return aNewFonts;
     }
@@ -926,9 +924,13 @@ FontFamily PrintFontManager::matchFamilyName( std::u16string_view rFamily )
 
 OString PrintFontManager::getFontFile(const PrintFont& rFont) const
 {
+#ifdef _WIN32
+    return rFont.m_aFontFile;
+#else
     std::unordered_map< int, OString >::const_iterator it = m_aAtomToDir.find(rFont.m_nDirectory);
     OString aPath = it->second + "/" + rFont.m_aFontFile;
     return aPath;
+#endif
 }
 
 OUString PrintFontManager::getPSName( fontID nFontID )

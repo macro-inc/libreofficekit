@@ -1209,7 +1209,7 @@ SFErrCodes OpenTTFontFile(const char* fname, sal_uInt32 facenum, TrueTypeFont** 
         ret = SFErrCodes::Memory;
         goto cleanup;
     }
-    (*ttf)->ptr = static_cast<sal_uInt8 *>(hFileMapping);
+    (*ttf)->ptr = static_cast<sal_uInt8 *>(MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, st.st_size));
 #else
     if (((*ttf)->ptr = static_cast<sal_uInt8 *>(mmap(nullptr, (*ttf)->fsize, PROT_READ, MAP_SHARED, fd, 0))) == MAP_FAILED) {
         ret = SFErrCodes::Memory;

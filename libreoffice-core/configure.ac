@@ -13509,12 +13509,11 @@ dnl ===================================================================
 dnl Test whether to build cairo or rely on the system version
 dnl ===================================================================
 
-if test "$_os" == "WINNT"; then
+if test "$_os" = "WINNT"; then
     BUILD_TYPE="$BUILD_TYPE CAIRO"
     AC_DEFINE(ENABLE_CAIRO_CANVAS)
     ENABLE_CAIRO_CANVAS=TRUE
-else
-if test "$test_cairo" = "yes"; then
+elif test "$test_cairo" = "yes"; then
     AC_MSG_CHECKING([whether to use the system cairo])
 
      : ${with_system_cairo:=$with_system_libs}
@@ -13548,7 +13547,6 @@ if test "$test_cairo" = "yes"; then
         AC_DEFINE(ENABLE_CAIRO_CANVAS)
         ENABLE_CAIRO_CANVAS=TRUE
      fi
-fi
 fi
 
 AC_SUBST(CAIRO_CFLAGS)

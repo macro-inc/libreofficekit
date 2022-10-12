@@ -173,8 +173,8 @@ bool FreetypeFontFile::Map()
             CloseHandle(hFile);
             return false;
         }
-        size_t szLen = (dwSizeHigh << sizeof(DWORD)) & dwSizeLow;
-        mpFileMap = static_cast<unsigned char*>(MapViewOfFile(hFile, FILE_MAP_READ, 0, 0, szLen));
+        mnFileSize = (dwSizeHigh << sizeof(DWORD)) | dwSizeLow;
+        mpFileMap = static_cast<unsigned char*>(MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, mnFileSize));
         CloseHandle(hFile);
 
         if (mpFileMap == nullptr) {

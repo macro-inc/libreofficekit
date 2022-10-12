@@ -546,9 +546,9 @@ const void* GenPspGraphics::DoGetEmbedFontData(psp::fontID aFont, tools::Long* p
         CloseHandle(hFile);
         return nullptr;
     }
-    size_t szLen = (dwSizeHigh << sizeof(DWORD)) & dwSizeLow;
+    size_t szLen = (dwSizeHigh << sizeof(DWORD)) | dwSizeLow;
     *pDataLen = szLen;
-    void *pFile = static_cast<void *>(MapViewOfFile(hFile, FILE_MAP_READ, 0, 0, szLen));
+    void *pFile = static_cast<void *>(MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, szLen));
     CloseHandle(hFile);
 
     if (pFile == nullptr) {

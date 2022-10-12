@@ -565,7 +565,7 @@ $(if $(filter-out WNT,$(OS)), \
     vcl/unx/generic/print/genprnpsp \
     vcl/unx/generic/print/prtsetup \
     vcl/unx/generic/print/text_gfx \
-) \
+)
 
 vcl_headless_freetype_libs = \
     cairo \
@@ -764,12 +764,12 @@ $(eval $(call gb_Library_use_system_win32_libs,vcl,\
 
 $(eval $(call gb_Library_add_nativeres,vcl,vcl/salsrc))
 
-# HACK: dependency on icon themes so running unit tests don't
-# prevent delivering these by having open file handles on WNT
-$(eval $(call gb_Library_use_packages,vcl, \
-    vcl_opengl_denylist \
-    $(if $(filter host,$(gb_Side)),postprocess_images) \
-))
+# # HACK: dependency on icon themes so running unit tests don't
+# # prevent delivering these by having open file handles on WNT
+# $(eval $(call gb_Library_use_packages,vcl, \
+#     vcl_opengl_denylist \
+#     $(if $(filter host,$(gb_Side)),postprocess_images) \
+# ))
 endif # WNT
 
 # vim: set noet sw=4 ts=4:
