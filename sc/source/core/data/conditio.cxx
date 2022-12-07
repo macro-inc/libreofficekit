@@ -649,12 +649,15 @@ void ScConditionEntry::Interpret( const ScAddress& rPos )
     // Evaluate formulas
     bool bDirty = false; // 1 and 2 separate?
 
-    std::unique_ptr<ScFormulaCell> pTemp1;
+    std::optional<ScFormulaCell> oTemp;
     ScFormulaCell* pEff1 = pFCell1.get();
     if ( bRelRef1 )
     {
-        pTemp1.reset(pFormula1 ? new ScFormulaCell(*mpDoc, rPos, *pFormula1) : new ScFormulaCell(*mpDoc, rPos));
-        pEff1 = pTemp1.get();
+        if (pFormula1)
+            oTemp.emplace(*mpDoc, rPos, *pFormula1);
+        else
+            oTemp.emplace(*mpDoc, rPos);
+        pEff1 = &*oTemp;
         pEff1->SetFreeFlying(true);
     }
     if ( pEff1 )
@@ -678,14 +681,16 @@ void ScConditionEntry::Interpret( const ScAddress& rPos )
             }
         }
     }
-    pTemp1.reset();
+    oTemp.reset();
 
-    std::unique_ptr<ScFormulaCell> pTemp2;
     ScFormulaCell* pEff2 = pFCell2.get(); //@ 1!=2
     if ( bRelRef2 )
     {
-        pTemp2.reset(pFormula2 ? new ScFormulaCell(*mpDoc, rPos, *pFormula2) : new ScFormulaCell(*mpDoc, rPos));
-        pEff2 = pTemp2.get();
+        if (pFormula2)
+            oTemp.emplace(*mpDoc, rPos, *pFormula2);
+        else
+            oTemp.emplace(*mpDoc, rPos);
+        pEff2 = &*oTemp;
         pEff2->SetFreeFlying(true);
     }
     if ( pEff2 )
@@ -708,7 +713,7 @@ void ScConditionEntry::Interpret( const ScAddress& rPos )
             }
         }
     }
-    pTemp2.reset();
+    oTemp.reset();
 
     // If IsRunning, the last values remain
     if (bDirty && !bFirstRun)
@@ -1172,16 +1177,33 @@ bool ScConditionEntry::IsValidStr( const OUString& rArg, const ScAddress& rPos )
                 bValid = !bValid;
         break;
         case ScConditionMode::BeginsWith:
-            bValid = rArg.startsWith(aUpVal1);
+            bValid = ScGlobal::GetTransliteration().isMatch(aUpVal1, rArg);
         break;
         case ScConditionMode::EndsWith:
-            bValid = rArg.endsWith(aUpVal1);
+        {
+            sal_Int32 nStart = rArg.getLength();
+            const sal_Int32 nLen = aUpVal1.getLength();
+            if (nLen > nStart)
+                bValid = false;
+            else
+            {
+                nStart = nStart - nLen;
+                sal_Int32 nMatch1(0), nMatch2(0);
+                bValid = ScGlobal::GetTransliteration().equals(rArg, nStart, nLen, nMatch1,
+                                                               aUpVal1, 0, nLen, nMatch2);
+            }
+        }
         break;
         case ScConditionMode::ContainsText:
         case ScConditionMode::NotContainsText:
-            bValid = rArg.indexOf(aUpVal1) != -1;
+        {
+            const OUString aArgStr(ScGlobal::getCharClass().lowercase(rArg));
+            const OUString aValStr(ScGlobal::getCharClass().lowercase(aUpVal1));
+            bValid = aArgStr.indexOf(aValStr) != -1;
+
             if(eOp == ScConditionMode::NotContainsText)
                 bValid = !bValid;
+        }
         break;
         default:
         {

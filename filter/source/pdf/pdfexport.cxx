@@ -38,6 +38,7 @@
 #include <unotools/configmgr.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/basemutex.hxx>
+#include <basegfx/matrix/b2dhommatrix.hxx>
 
 #include "pdfexport.hxx"
 #include <strings.hrc>
@@ -106,6 +107,8 @@ PDFExport::PDFExport( const Reference< XComponent >& rxSrcDoc,
     mbRemoveTransparencies      ( false ),
 
     mbIsRedactMode              ( false ),
+    maWatermarkColor            ( COL_LIGHTGREEN ),
+    maWatermarkFontName         ( "Helvetica" ),
 
     mbHideViewerToolbar         ( false ),
     mbHideViewerMenubar         ( false ),
@@ -532,6 +535,38 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
                     rProp.Value >>= mbAddStream;
                 else if ( rProp.Name == "Watermark" )
                     rProp.Value >>= msWatermark;
+                else if ( rProp.Name == "WatermarkColor" )
+                {
+                    sal_Int32 nColor{};
+                    if (rProp.Value >>= nColor)
+                    {
+                        maWatermarkColor = Color(ColorTransparency, nColor);
+                    }
+                }
+                else if (rProp.Name == "WatermarkFontHeight")
+                {
+                    sal_Int32 nFontHeight{};
+                    if (rProp.Value >>= nFontHeight)
+                    {
+                        moWatermarkFontHeight = nFontHeight;
+                    }
+                }
+                else if (rProp.Name == "WatermarkRotateAngle")
+                {
+                    sal_Int32 nRotateAngle{};
+                    if (rProp.Value >>= nRotateAngle)
+                    {
+                        moWatermarkRotateAngle = Degree10(nRotateAngle);
+                    }
+                }
+                else if (rProp.Name == "WatermarkFontName")
+                {
+                    OUString aFontName{};
+                    if (rProp.Value >>= aFontName)
+                    {
+                        maWatermarkFontName = aFontName;
+                    }
+                }
                 else if ( rProp.Name == "TiledWatermark" )
                     rProp.Value >>= msTiledWatermark;
                 // now all the security related properties...
@@ -1118,7 +1153,7 @@ void PDFExport::ImplExportPage( vcl::PDFWriter& rWriter, vcl::PDFExtOutDevData& 
 
 void PDFExport::ImplWriteWatermark( vcl::PDFWriter& rWriter, const Size& rPageSize )
 {
-    vcl::Font aFont( "Helvetica", Size( 0, 3*rPageSize.Height()/4 ) );
+    vcl::Font aFont( maWatermarkFontName, Size( 0, moWatermarkFontHeight ? *moWatermarkFontHeight : 3*rPageSize.Height()/4 ) );
     aFont.SetItalic( ITALIC_NONE );
     aFont.SetWidthType( WIDTH_NORMAL );
     aFont.SetWeight( WEIGHT_NORMAL );
@@ -1130,25 +1165,43 @@ void PDFExport::ImplWriteWatermark( vcl::PDFWriter& rWriter, const Size& rPageSi
         aFont.SetOrientation( 2700_deg10 );
     }
 
+    if (moWatermarkRotateAngle)
+    {
+        aFont.SetOrientation(*moWatermarkRotateAngle);
+        if (rPageSize.Width() < rPageSize.Height())
+        {
+            // Set text width based on the shorter side, so rotation can't push text outside the
+            // page boundaries.
+            nTextWidth = rPageSize.Width();
+        }
+    }
+
     // adjust font height for text to fit
     OutputDevice* pDev = rWriter.GetReferenceDevice();
     pDev->Push();
     pDev->SetFont( aFont );
     pDev->SetMapMode( MapMode( MapUnit::MapPoint ) );
     int w = 0;
-    while( ( w = pDev->GetTextWidth( msWatermark ) ) > nTextWidth )
+    if (moWatermarkFontHeight)
     {
-        if (w == 0)
-            break;
-        tools::Long nNewHeight = aFont.GetFontHeight() * nTextWidth / w;
-        if( nNewHeight == aFont.GetFontHeight() )
+        w = pDev->GetTextWidth(msWatermark);
+    }
+    else
+    {
+        while( ( w = pDev->GetTextWidth( msWatermark ) ) > nTextWidth )
         {
-            nNewHeight--;
-            if( nNewHeight <= 0 )
+            if (w == 0)
                 break;
+            tools::Long nNewHeight = aFont.GetFontHeight() * nTextWidth / w;
+            if( nNewHeight == aFont.GetFontHeight() )
+            {
+                nNewHeight--;
+                if( nNewHeight <= 0 )
+                    break;
+            }
+            aFont.SetFontHeight( nNewHeight );
+            pDev->SetFont( aFont );
         }
-        aFont.SetFontHeight( nNewHeight );
-        pDev->SetFont( aFont );
     }
     tools::Long nTextHeight = pDev->GetTextHeight();
     // leave some maneuvering room for rounding issues, also
@@ -1159,7 +1212,7 @@ void PDFExport::ImplWriteWatermark( vcl::PDFWriter& rWriter, const Size& rPageSi
     rWriter.Push();
     rWriter.SetMapMode( MapMode( MapUnit::MapPoint ) );
     rWriter.SetFont( aFont );
-    rWriter.SetTextColor( COL_LIGHTGREEN );
+    rWriter.SetTextColor(maWatermarkColor);
     Point aTextPoint;
     tools::Rectangle aTextRect;
     if( rPageSize.Width() > rPageSize.Height() )
@@ -1176,6 +1229,25 @@ void PDFExport::ImplWriteWatermark( vcl::PDFWriter& rWriter, const Size& rPageSi
                             (rPageSize.Height()-w)/2 );
         aTextRect = tools::Rectangle( aTextPoint, Size( nTextHeight, w ) );
     }
+
+    if (moWatermarkRotateAngle)
+    {
+        // First set the text's starting point to the center of the page.
+        tools::Rectangle aPageRectangle(Point(0, 0), rPageSize);
+        aTextPoint = aPageRectangle.Center();
+        // Then adjust it so that the text remains centered, based on the rotation angle.
+        basegfx::B2DPolygon aTextPolygon
+            = basegfx::utils::createPolygonFromRect(basegfx::B2DRectangle(0, -nTextHeight, w, 0));
+        basegfx::B2DHomMatrix aMatrix;
+        aMatrix.rotate(-1 * toRadians(*moWatermarkRotateAngle));
+        aTextPolygon.transform(aMatrix);
+        basegfx::B2DPoint aPolygonCenter = aTextPolygon.getB2DRange().getCenter();
+        aTextPoint.AdjustX(-aPolygonCenter.getX());
+        aTextPoint.AdjustY(-aPolygonCenter.getY());
+
+        aTextRect = aPageRectangle;
+    }
+
     rWriter.SetClipRegion();
     rWriter.BeginTransparencyGroup();
     rWriter.DrawText( aTextPoint, msWatermark );

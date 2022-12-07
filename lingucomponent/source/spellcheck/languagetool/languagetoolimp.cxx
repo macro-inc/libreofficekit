@@ -53,6 +53,8 @@ using namespace linguistic;
 
 #define COL_ORANGE Color(0xD1, 0x68, 0x20)
 
+constexpr OUStringLiteral sDuden = u"duden";
+
 namespace
 {
 PropertyValue lcl_MakePropertyValue(const OUString& rName, uno::Any& rValue)
@@ -63,7 +65,7 @@ PropertyValue lcl_MakePropertyValue(const OUString& rName, uno::Any& rValue)
 Sequence<PropertyValue> lcl_GetLineColorPropertyFromErrorId(const std::string& rErrorId)
 {
     uno::Any aColor;
-    if (rErrorId == "TYPOS")
+    if (rErrorId == "TYPOS" || rErrorId == "orth")
     {
         aColor <<= COL_LIGHTRED;
     }
@@ -215,11 +217,28 @@ ProofreadingResult SAL_CALL LanguageToolGrammarChecker::doProofreading(
     }
 
     tools::Long http_code = 0;
+    std::string response_body;
     OUString langTag(aLocale.Language + "-" + aLocale.Country);
-    OString postData(OUStringToOString(
-        OUStringConcatenation("text=" + aText + "&language=" + langTag), RTL_TEXTENCODING_UTF8));
-    const std::string response_body
-        = makeHttpRequest(checkerURL, HTTP_METHOD::HTTP_POST, postData, http_code);
+
+    if (rLanguageOpts.getRestProtocol() == sDuden)
+    {
+        std::stringstream aStream;
+        boost::property_tree::ptree aTree;
+        aTree.put("text-language", langTag.toUtf8().getStr());
+        aTree.put("text", aText.toUtf8().getStr());
+        aTree.put("hyphenation", false);
+        aTree.put("spellchecking-level", 3);
+        aTree.put("correction-proposals", true);
+        boost::property_tree::write_json(aStream, aTree);
+        response_body = makeDudenHttpRequest(checkerURL, HTTP_METHOD::HTTP_POST,
+                                             aStream.str().c_str(), http_code);
+    }
+    else
+    {
+        OString postData(OUStringToOString(
+                         OUStringConcatenation("text=" + aText + "&language=" + langTag), RTL_TEXTENCODING_UTF8));
+        response_body = makeHttpRequest(checkerURL, HTTP_METHOD::HTTP_POST, postData, http_code);
+    }
 
     if (http_code != 200)
     {
@@ -231,11 +250,75 @@ ProofreadingResult SAL_CALL LanguageToolGrammarChecker::doProofreading(
         return xRes;
     }
 
-    parseProofreadingJSONResponse(xRes, response_body);
+    if (rLanguageOpts.getRestProtocol() == sDuden)
+    {
+        parseDudenResponse(xRes, response_body);
+    }
+    else
+    {
+        parseProofreadingJSONResponse(xRes, response_body);
+    }
     // cache the result
     mCachedResults.insert(
         std::pair<OUString, Sequence<SingleProofreadingError>>(aText, xRes.aErrors));
     return xRes;
+}
+
+void LanguageToolGrammarChecker::parseDudenResponse(ProofreadingResult& rResult,
+                                                    std::string_view aJSONBody)
+{
+    size_t nSize;
+    int nProposalSize;
+    boost::property_tree::ptree aRoot;
+    std::stringstream aStream(aJSONBody.data());
+    boost::property_tree::read_json(aStream, aRoot);
+
+    const boost::optional<boost::property_tree::ptree&> aPositions = aRoot.get_child_optional("check-positions");
+    if (!aPositions || !(nSize = aPositions.get().size()))
+    {
+        return;
+    }
+
+    Sequence<SingleProofreadingError> aChecks(nSize);
+    auto pChecks = aChecks.getArray();
+    size_t nIndex1 = 0, nIndex2 = 0;
+    auto itPos = aPositions.get().begin();
+    while (itPos != aPositions.get().end())
+    {
+        const boost::property_tree::ptree& rTree = itPos->second;
+        const std::string sType= rTree.get<std::string>("type", "");
+        const int nOffset = rTree.get<int>("offset", 0);
+        const int nLength = rTree.get<int>("length", 0);
+
+        pChecks[nIndex1].nErrorStart = nOffset;
+        pChecks[nIndex1].nErrorLength = nLength;
+        pChecks[nIndex1].nErrorType = PROOFREADING_ERROR;
+        //pChecks[nIndex1].aShortComment = ??
+        //pChecks[nIndex1].aFullComment = ??
+        pChecks[nIndex1].aProperties = lcl_GetLineColorPropertyFromErrorId(sType);
+
+        const boost::optional<const boost::property_tree::ptree&> aProposals =
+            rTree.get_child_optional("proposals");
+        if (aProposals && (nProposalSize = aProposals.get().size()))
+        {
+            pChecks[nIndex1].aSuggestions.realloc(std::min(nProposalSize, MAX_SUGGESTIONS_SIZE));
+
+            nIndex2 = 0;
+            auto itProp = aProposals.get().begin();
+            auto pSuggestions = pChecks[nIndex1].aSuggestions.getArray();
+            while (itProp != aProposals.get().end() && nIndex2 < MAX_SUGGESTIONS_SIZE)
+            {
+                pSuggestions[nIndex2++] =
+                    OStringToOUString(itProp->second.data(), RTL_TEXTENCODING_UTF8);
+                itProp++;
+            }
+        }
+
+        nIndex1++;
+        itPos++;
+    }
+
+    rResult.aErrors = aChecks;
 }
 
 /*
@@ -304,6 +387,57 @@ void LanguageToolGrammarChecker::parseProofreadingJSONResponse(ProofreadingResul
         }
     }
     rResult.aErrors = aErrors;
+}
+
+std::string LanguageToolGrammarChecker::makeDudenHttpRequest(std::string_view aURL, HTTP_METHOD method,
+                                                             const OString& aData,
+                                                             tools::Long& nCode)
+{
+    std::unique_ptr<CURL, std::function<void(CURL*)>> curl(curl_easy_init(),
+                                                           [](CURL* p) { curl_easy_cleanup(p); });
+    if (!curl)
+        return {}; // empty string
+
+    std::string sResponseBody;
+    struct curl_slist* pList = nullptr;
+    SvxLanguageToolOptions& rLanguageOpts = SvxLanguageToolOptions::Get();
+    OString sAccessToken = OString("access_token: ") +
+        OUStringToOString(rLanguageOpts.getApiKey(), RTL_TEXTENCODING_UTF8);
+
+    pList = curl_slist_append(pList, "Cache-Control: no-cache");
+    pList = curl_slist_append(pList, "Content-Type: application/json");
+    if (!sAccessToken.isEmpty())
+        pList = curl_slist_append(pList, sAccessToken.getStr());
+
+    curl_easy_setopt(curl.get(), CURLOPT_HTTPHEADER, pList);
+    curl_easy_setopt(curl.get(), CURLOPT_FAILONERROR, 1L);
+    curl_easy_setopt(curl.get(), CURLOPT_URL, aURL.data());
+    curl_easy_setopt(curl.get(), CURLOPT_TIMEOUT, CURL_TIMEOUT);
+    curl_easy_setopt(curl.get(), CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl.get(), CURLOPT_WRITEDATA, static_cast<void*>(&sResponseBody));
+
+    // allow unknown or self-signed certificates
+    if (rLanguageOpts.getSSLVerification() == false)
+    {
+        curl_easy_setopt(curl.get(), CURLOPT_SSL_VERIFYPEER, false);
+        curl_easy_setopt(curl.get(), CURLOPT_SSL_VERIFYHOST, false);
+    }
+
+    if (method == HTTP_METHOD::HTTP_POST)
+    {
+        curl_easy_setopt(curl.get(), CURLOPT_POST, 1L);
+        curl_easy_setopt(curl.get(), CURLOPT_POSTFIELDS, aData.getStr());
+    }
+
+    CURLcode cc = curl_easy_perform(curl.get());
+    if (cc != CURLE_OK)
+    {
+        SAL_WARN("languagetool", "CURL request returned with error: " << static_cast<sal_Int32>(cc));
+    }
+
+    curl_easy_getinfo(curl.get(), CURLINFO_RESPONSE_CODE, &nCode);
+    return sResponseBody;
+
 }
 
 std::string LanguageToolGrammarChecker::makeHttpRequest(std::string_view aURL, HTTP_METHOD method,

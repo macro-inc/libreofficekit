@@ -23,6 +23,7 @@
 #include <svx/svdpagv.hxx>
 #include <svx/svdpage.hxx>
 #include <svx/svdotable.hxx>
+#include <svx/svdomedia.hxx>
 
 #include <osl/diagnose.h>
 #include <osl/thread.h>
@@ -788,6 +789,14 @@ void SdrMarkView::SetMarkHandlesForLOKit(tools::Rectangle const & rRect, const S
                 if (pViewShellWindow && pViewShellWindow->IsAncestorOf(*pWin))
                 {
                     Point aOffsetPx = pWin->GetOffsetPixelFrom(*pViewShellWindow);
+                    if (mbNegativeX && AllSettings::GetLayoutRTL())
+                    {
+                        // mbNegativeX is set only for Calc in RTL mode.
+                        // If global RTL flag is set, vcl-window X offset of chart window is
+                        // mirrored w.r.t parent window rectangle. This needs to be reverted.
+                        aOffsetPx.setX(pViewShellWindow->GetOutOffXPixel() + pViewShellWindow->GetSizePixel().Width()
+                            - pWin->GetOutOffXPixel() - pWin->GetSizePixel().Width());
+                    }
                     Point aLogicOffset = pWin->PixelToLogic(aOffsetPx);
                     addLogicOffset = aLogicOffset;
                     aSelection.Move(aLogicOffset.getX(), aLogicOffset.getY());
@@ -1110,6 +1119,8 @@ void SdrMarkView::SetMarkHandlesForLOKit(tools::Rectangle const & rRect, const S
         {
             sSelectionText = "EMPTY";
             sSelectionTextView = "EMPTY";
+            if (!pOtherShell)
+                pViewShell->NotifyOtherViews(LOK_CALLBACK_TEXT_VIEW_SELECTION, "selection", OString());
         }
 
         if (bTableSelection)
@@ -1143,6 +1154,14 @@ void SdrMarkView::SetMarkHandlesForLOKit(tools::Rectangle const & rRect, const S
             // other views want to know about it.
             pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_GRAPHIC_SELECTION, sSelectionText.getStr());
             SfxLokHelper::notifyOtherViews(pViewShell, LOK_CALLBACK_GRAPHIC_VIEW_SELECTION, "selection", sSelectionTextView);
+        }
+
+        if (comphelper::LibreOfficeKit::isActive() && mpMarkedObj
+            && mpMarkedObj->GetObjIdentifier() == OBJ_MEDIA)
+        {
+            SdrMediaObj* mediaObj = dynamic_cast<SdrMediaObj*>(mpMarkedObj);
+            if (mediaObj)
+                mediaObj->notifyPropertiesForLOKit();
         }
     }
 }

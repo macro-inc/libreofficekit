@@ -66,7 +66,7 @@
 #include <fmtflcnt.hxx>
 #include <fmtcntnt.hxx>
 #include <numrule.hxx>
-#include <IGrammarContact.hxx>
+#include <GrammarContact.hxx>
 #include <calbck.hxx>
 #include <ftnidx.hxx>
 #include <ftnfrm.hxx>
@@ -1802,7 +1802,7 @@ static void lcl_SetWrong( SwTextFrame& rFrame, SwTextNode const& rNode,
     if ( !rFrame.IsFollow() )
     {
         SwTextNode* pTextNode = const_cast<SwTextNode*>(&rNode);
-        IGrammarContact* pGrammarContact = getGrammarContact( *pTextNode );
+        sw::GrammarContact* pGrammarContact = sw::getGrammarContactFor(*pTextNode);
         SwGrammarMarkUp* pWrongGrammar = pGrammarContact ?
             pGrammarContact->getGrammarCheck( *pTextNode, false ) :
             pTextNode->GetGrammarCheck();
@@ -1838,7 +1838,7 @@ static void lcl_SetWrong( SwTextFrame& rFrame, SwTextNode const& rNode,
             pTextNode->SetSmartTags( std::make_unique<SwWrongList>( WRONGLIST_SMARTTAG ) );
             pTextNode->GetSmartTags()->SetInvalid( nPos, nEnd );
         }
-        pTextNode->SetWrongDirty(SwTextNode::WrongState::TODO);
+        pTextNode->SetWrongDirty(sw::WrongState::TODO);
         pTextNode->SetGrammarCheckDirty( true );
         pTextNode->SetWordCountDirty( true );
         pTextNode->SetAutoCompleteWordDirty( true );

@@ -30,6 +30,10 @@
 #include <ucbhelper/content.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/storagehelper.hxx>
+#include <LibreOfficeKit/LibreOfficeKitEnums.h>
+#include <comphelper/lok.hxx>
+#include <sfx2/lokhelper.hxx>
+#include <boost/property_tree/json_parser.hpp>
 
 #include <vcl/svapp.hxx>
 
@@ -250,6 +254,16 @@ static OUString ret;
 #endif
 }
 
+const OUString& SdrMediaObj::getTempURL() const
+{
+#if HAVE_FEATURE_AVMEDIA
+    return m_xImpl->m_MediaProperties.getTempURL();
+#else
+static OUString ret;
+    return ret;
+#endif
+}
+
 void SdrMediaObj::setMediaProperties( const ::avmedia::MediaItem& rState )
 {
     mediaPropertiesChanged( rState );
@@ -426,6 +440,29 @@ void SdrMediaObj::mediaPropertiesChanged( const ::avmedia::MediaItem& rNewProper
         SetChanged();
         BroadcastObjectChange();
     }
+}
+
+void SdrMediaObj::notifyPropertiesForLOKit()
+{
+#if HAVE_FEATURE_AVMEDIA
+    if (!getTempURL().isEmpty())
+    {
+        const auto mediaId = reinterpret_cast<std::size_t>(this);
+
+        boost::property_tree::ptree json;
+        json.put("action", "update");
+        json.put("id", mediaId);
+        json.put("url", getTempURL());
+
+        const tools::Rectangle aRect = o3tl::convert(maRect, o3tl::Length::mm100, o3tl::Length::twip);
+        json.put("x", aRect.getX());
+        json.put("y", aRect.getY());
+        json.put("w", aRect.getWidth());
+        json.put("h", aRect.getHeight());
+
+        SfxLokHelper::notifyMediaUpdate(json);
+    }
+#endif
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

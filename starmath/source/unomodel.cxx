@@ -482,7 +482,7 @@ void SmModel::_setPropertyValues(const PropertyMapEntry** ppEntries, const Any* 
                 if(nVal < 1)
                     throw IllegalArgumentException();
                 Size aSize = aFormat.GetBaseSize();
-                aSize.setHeight( SmPtsTo100th_mm(nVal) );
+                aSize.setHeight(o3tl::convert(nVal, o3tl::Length::pt, SmO3tlLengthUnit()));
                 aFormat.SetBaseSize(aSize);
 
                 // apply base size to fonts
@@ -731,9 +731,8 @@ void SmModel::_getPropertyValues( const PropertyMapEntry **ppEntries, Any *pValu
             case HANDLE_BASE_FONT_HEIGHT                   :
             {
                 // Point!
-                *pValue <<= sal_Int16(
-                    SmRoundFraction(
-                        Sm100th_mmToPts(aFormat.GetBaseSize().Height())));
+                *pValue <<= sal_Int16(o3tl::convert(aFormat.GetBaseSize().Height(),
+                                                    SmO3tlLengthUnit(), o3tl::Length::pt));
             }
             break;
             case HANDLE_RELATIVE_FONT_HEIGHT_TEXT           :
@@ -988,7 +987,7 @@ void SAL_CALL SmModel::render(
     if (!pOut)
         throw RuntimeException();
 
-    pOut->SetMapMode(MapMode(MapUnit::Map100thMM));
+    pOut->SetMapMode(MapMode(SmMapUnit()));
 
     uno::Reference< frame::XModel > xModel;
     rSelection >>= xModel;

@@ -886,6 +886,14 @@ void DomainMapper_Impl::PopSdt()
         xCursor->goRight(1, /*bExpand=*/false);
     }
     xCursor->gotoRange(xEnd, /*bExpand=*/true);
+
+    std::optional<OUString> oData = m_pSdtHelper->getValueFromDataBinding();
+    if (oData.has_value())
+    {
+        // Data binding has a value for us, prefer that over the in-document value.
+        xCursor->setString(*oData);
+    }
+
     uno::Reference<text::XTextContent> xContentControl(
         m_xTextFactory->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
@@ -923,6 +931,23 @@ void DomainMapper_Impl::PopSdt()
                                                uno::Any(m_pSdtHelper->GetColor()));
     }
 
+    if (!m_pSdtHelper->GetAlias().isEmpty())
+    {
+        xContentControlProps->setPropertyValue("Alias",
+                                               uno::Any(m_pSdtHelper->GetAlias()));
+    }
+
+    if (!m_pSdtHelper->GetTag().isEmpty())
+    {
+        xContentControlProps->setPropertyValue("Tag",
+                                               uno::Any(m_pSdtHelper->GetTag()));
+    }
+
+    if (m_pSdtHelper->GetId())
+    {
+        xContentControlProps->setPropertyValue("Id", uno::Any(m_pSdtHelper->GetId()));
+    }
+
     if (m_pSdtHelper->getControlType() == SdtControlType::checkBox)
     {
         xContentControlProps->setPropertyValue("Checkbox", uno::makeAny(true));
@@ -936,7 +961,8 @@ void DomainMapper_Impl::PopSdt()
                                                uno::makeAny(m_pSdtHelper->GetUncheckedState()));
     }
 
-    if (m_pSdtHelper->getControlType() == SdtControlType::dropDown)
+    if (m_pSdtHelper->getControlType() == SdtControlType::dropDown
+        || m_pSdtHelper->getControlType() == SdtControlType::comboBox)
     {
         std::vector<OUString>& rDisplayTexts = m_pSdtHelper->getDropDownDisplayTexts();
         std::vector<OUString>& rValues = m_pSdtHelper->getDropDownItems();
@@ -953,6 +979,14 @@ void DomainMapper_Impl::PopSdt()
                 pItems[i] = aItem;
             }
             xContentControlProps->setPropertyValue("ListItems", uno::Any(aItems));
+            if (m_pSdtHelper->getControlType() == SdtControlType::dropDown)
+            {
+                xContentControlProps->setPropertyValue("DropDown", uno::Any(true));
+            }
+            else
+            {
+                xContentControlProps->setPropertyValue("ComboBox", uno::Any(true));
+            }
         }
     }
 
@@ -961,6 +995,7 @@ void DomainMapper_Impl::PopSdt()
         xContentControlProps->setPropertyValue("Picture", uno::Any(true));
     }
 
+    bool bDateFromDataBinding = false;
     if (m_pSdtHelper->getControlType() == SdtControlType::datePicker)
     {
         xContentControlProps->setPropertyValue("Date", uno::Any(true));
@@ -969,8 +1004,14 @@ void DomainMapper_Impl::PopSdt()
                                                uno::Any(aDateFormat.replaceAll("'", "\"")));
         xContentControlProps->setPropertyValue("DateLanguage",
                                                uno::Any(m_pSdtHelper->getLocale().makeStringAndClear()));
+        OUString aCurrentDate = m_pSdtHelper->getDate().makeStringAndClear();
+        if (oData.has_value())
+        {
+            aCurrentDate = *oData;
+            bDateFromDataBinding = true;
+        }
         xContentControlProps->setPropertyValue("CurrentDate",
-                                               uno::Any(m_pSdtHelper->getDate().makeStringAndClear()));
+                                               uno::Any(aCurrentDate));
     }
 
     if (m_pSdtHelper->getControlType() == SdtControlType::plainText)
@@ -979,6 +1020,13 @@ void DomainMapper_Impl::PopSdt()
     }
 
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
+
+    if (bDateFromDataBinding)
+    {
+        OUString aDateString;
+        xContentControlProps->getPropertyValue("DateString") >>= aDateString;
+        xCursor->setString(aDateString);
+    }
 
     m_pSdtHelper->clear();
 }
@@ -7239,7 +7287,6 @@ void DomainMapper_Impl::PopFieldContext()
         {
             try
             {
-                uno::Reference< text::XTextCursor > xCrsr = xTextAppend->createTextCursorByRange(pContext->GetStartRange());
                 uno::Reference< text::XTextContent > xToInsert( pContext->GetTOC(), uno::UNO_QUERY );
                 if( xToInsert.is() )
                 {
@@ -7301,30 +7348,38 @@ void DomainMapper_Impl::PopFieldContext()
                     }
                     else
                     {
+                        uno::Reference< text::XTextCursor > xCrsr = xTextAppend->createTextCursorByRange(pContext->GetStartRange());
                         FormControlHelper::Pointer_t pFormControlHelper(pContext->getFormControlHelper());
                         if (pFormControlHelper)
                         {
-                            uno::Reference< text::XFormField > xFormField( pContext->GetFormField() );
-                            assert(xCrsr.is());
-                            if (pFormControlHelper->hasFFDataHandler())
+                            // xCrsr may be empty e.g. when pContext->GetStartRange() is outside of
+                            // xTextAppend, like when a field started in a parent paragraph is being
+                            // closed inside an anchored text box. It could be possible to throw an
+                            // exception here, and abort import, but Word tolerates such invalid
+                            // input, so it makes sense to do the same (tdf#152200)
+                            if (xCrsr.is())
                             {
-                                xToInsert.set(xFormField, uno::UNO_QUERY);
-                                if (xFormField.is() && xToInsert.is())
+                                uno::Reference< text::XFormField > xFormField(pContext->GetFormField());
+                                if (pFormControlHelper->hasFFDataHandler())
                                 {
-                                    PopFieldmark(m_aTextAppendStack, xCrsr,
-                                        pContext->GetFieldId());
-                                    pFormControlHelper->processField( xFormField );
+                                    xToInsert.set(xFormField, uno::UNO_QUERY);
+                                    if (xFormField.is() && xToInsert.is())
+                                    {
+                                        PopFieldmark(m_aTextAppendStack, xCrsr,
+                                                     pContext->GetFieldId());
+                                        pFormControlHelper->processField(xFormField);
+                                    }
+                                    else
+                                    {
+                                        pFormControlHelper->insertControl(xCrsr);
+                                    }
                                 }
                                 else
                                 {
-                                    pFormControlHelper->insertControl(xCrsr);
-                                }
-                            }
-                            else
-                            {
-                                PopFieldmark(m_aTextAppendStack, xCrsr,
+                                    PopFieldmark(m_aTextAppendStack, xCrsr,
                                         pContext->GetFieldId());
-                                uno::Reference<lang::XComponent>(xFormField, uno::UNO_QUERY_THROW)->dispose(); // presumably invalid?
+                                    uno::Reference<lang::XComponent>(xFormField, uno::UNO_QUERY_THROW)->dispose(); // presumably invalid?
+                                }
                             }
                         }
                         else if (!pContext->GetHyperlinkURL().isEmpty() && xCrsr.is())

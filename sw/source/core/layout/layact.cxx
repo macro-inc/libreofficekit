@@ -1963,13 +1963,13 @@ bool SwLayIdle::DoIdleJob_( const SwContentFrame *pCnt, IdleJobType eJob )
     {
         switch ( eJob )
         {
-            case ONLINE_SPELLING :
+            case IdleJobType::ONLINE_SPELLING:
                 bProcess = pTextNode->IsWrongDirty(); break;
-            case AUTOCOMPLETE_WORDS :
+            case IdleJobType::AUTOCOMPLETE_WORDS:
                 bProcess = pTextNode->IsAutoCompleteWordDirty(); break;
-            case WORD_COUNT :
+            case IdleJobType::WORD_COUNT:
                 bProcess = pTextNode->IsWordCountDirty(); break;
-            case SMART_TAGS :
+            case IdleJobType::SMART_TAGS:
                 bProcess = pTextNode->IsSmartTagDirty(); break;
         }
         if (bProcess)
@@ -2024,25 +2024,25 @@ bool SwLayIdle::DoIdleJob_( const SwContentFrame *pCnt, IdleJobType eJob )
 
         switch ( eJob )
         {
-            case ONLINE_SPELLING :
+            case IdleJobType::ONLINE_SPELLING:
             {
                 SwRect aRepaint( const_cast<SwTextFrame*>(pTextFrame)->AutoSpell_(*pTextNode, nPos) );
                 // PENDING should stop idle spell checking
-                m_bPageValid = m_bPageValid && (SwTextNode::WrongState::TODO != pTextNode->GetWrongDirty());
+                m_bPageValid = m_bPageValid && (sw::WrongState::TODO != pTextNode->GetWrongDirty());
                 if ( aRepaint.HasArea() )
                     m_pImp->GetShell()->InvalidateWindows( aRepaint );
                 if (Application::AnyInput(VCL_INPUT_ANY & VclInputFlags(~VclInputFlags::TIMER)))
                     return true;
                 break;
             }
-            case AUTOCOMPLETE_WORDS :
+            case IdleJobType::AUTOCOMPLETE_WORDS:
                 const_cast<SwTextFrame*>(pTextFrame)->CollectAutoCmplWrds(*pTextNode, nPos);
                 // note: bPageValid remains true here even if the cursor
                 // position is skipped, so no PENDING state needed currently
                 if (Application::AnyInput(VCL_INPUT_ANY & VclInputFlags(~VclInputFlags::TIMER)))
                     return true;
                 break;
-            case WORD_COUNT :
+            case IdleJobType::WORD_COUNT:
             {
                 const sal_Int32 nEnd = pTextNode->GetText().getLength();
                 SwDocStat aStat;
@@ -2051,7 +2051,7 @@ bool SwLayIdle::DoIdleJob_( const SwContentFrame *pCnt, IdleJobType eJob )
                     return true;
                 break;
             }
-            case SMART_TAGS :
+            case IdleJobType::SMART_TAGS:
             {
                 try {
                     const SwRect aRepaint( const_cast<SwTextFrame*>(pTextFrame)->SmartTagScan(*pTextNode) );
@@ -2096,40 +2096,52 @@ bool SwLayIdle::DoIdleJob_( const SwContentFrame *pCnt, IdleJobType eJob )
     return false;
 }
 
-bool SwLayIdle::DoIdleJob( IdleJobType eJob, bool bVisAreaOnly )
+bool SwLayIdle::isJobEnabled(IdleJobType eJob, const SwViewShell* pViewShell)
+{
+    switch (eJob)
+    {
+        case IdleJobType::ONLINE_SPELLING:
+        {
+            const SwViewOption* pViewOptions = pViewShell->GetViewOptions();
+            return pViewOptions->IsOnlineSpell();
+        }
+
+        case IdleJobType::AUTOCOMPLETE_WORDS:
+        {
+            if (!SwViewOption::IsAutoCompleteWords() || SwDoc::GetAutoCompleteWords().IsLockWordLstLocked())
+                return false;
+            return true;
+        }
+
+        case IdleJobType::WORD_COUNT:
+        {
+            return pViewShell->getIDocumentStatistics().GetDocStat().bModified;
+        }
+
+        case IdleJobType::SMART_TAGS:
+        {
+            const SwDoc* pDoc = pViewShell->GetDoc();
+            if (!pDoc->GetDocShell()->IsHelpDocument() || pDoc->isXForms() || !SwSmartTagMgr::Get().IsSmartTagsEnabled())
+                return false;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool SwLayIdle::DoIdleJob(IdleJobType eJob, IdleJobArea eJobArea)
 {
     // Spellcheck all contents of the pages. Either only the
     // visible ones or all of them.
     const SwViewShell* pViewShell = m_pImp->GetShell();
-    const SwViewOption* pViewOptions = pViewShell->GetViewOptions();
-    const SwDoc* pDoc = pViewShell->GetDoc();
 
-    switch ( eJob )
-    {
-        case ONLINE_SPELLING :
-            if( !pViewOptions->IsOnlineSpell() )
-                return false;
-            break;
-        case AUTOCOMPLETE_WORDS :
-            if( !SwViewOption::IsAutoCompleteWords() ||
-                 SwDoc::GetAutoCompleteWords().IsLockWordLstLocked())
-                return false;
-            break;
-        case WORD_COUNT :
-            if ( !pViewShell->getIDocumentStatistics().GetDocStat().bModified )
-                return false;
-            break;
-        case SMART_TAGS :
-            if ( pDoc->GetDocShell()->IsHelpDocument() ||
-                 pDoc->isXForms() ||
-                !SwSmartTagMgr::Get().IsSmartTagsEnabled() )
-                return false;
-            break;
-        default: OSL_FAIL( "Unknown idle job type" );
-    }
+    // Check if job ius enabled and can run
+    if (!isJobEnabled(eJob, pViewShell))
+        return false;
 
     SwPageFrame *pPage;
-    if ( bVisAreaOnly )
+    if (eJobArea == IdleJobArea::VISIBLE)
         pPage = m_pImp->GetFirstVisPage(pViewShell->GetOut());
     else
         pPage = static_cast<SwPageFrame*>(m_pRoot->Lower());
@@ -2140,15 +2152,15 @@ bool SwLayIdle::DoIdleJob( IdleJobType eJob, bool bVisAreaOnly )
     while ( pPage )
     {
         m_bPageValid = true;
-        const SwContentFrame *pCnt = pPage->ContainsContent();
-        while( pCnt && pPage->IsAnLower( pCnt ) )
+        const SwContentFrame* pContentFrame = pPage->ContainsContent();
+        while (pContentFrame && pPage->IsAnLower(pContentFrame))
         {
-            if ( DoIdleJob_( pCnt, eJob ) )
+            if (DoIdleJob_(pContentFrame, eJob))
             {
-                SAL_INFO("sw.idle", "DoIdleJob " << eJob << " interrupted on page " << pPage->GetPhyPageNum());
+                SAL_INFO("sw.idle", "DoIdleJob " << sal_Int32(eJob) << " interrupted on page " << pPage->GetPhyPageNum());
                 return true;
             }
-            pCnt = pCnt->GetNextContentFrame();
+            pContentFrame = pContentFrame->GetNextContentFrame();
         }
         if ( pPage->GetSortedObjs() )
         {
@@ -2165,7 +2177,7 @@ bool SwLayIdle::DoIdleJob( IdleJobType eJob, bool bVisAreaOnly )
                         {
                             if ( DoIdleJob_( pC, eJob ) )
                             {
-                                SAL_INFO("sw.idle", "DoIdleJob " << eJob << " interrupted on page " << pPage->GetPhyPageNum());
+                                SAL_INFO("sw.idle", "DoIdleJob " << sal_Int32(eJob) << " interrupted on page " << pPage->GetPhyPageNum());
                                 return true;
                             }
                         }
@@ -2177,19 +2189,29 @@ bool SwLayIdle::DoIdleJob( IdleJobType eJob, bool bVisAreaOnly )
 
         if( m_bPageValid )
         {
-            switch ( eJob )
+            switch (eJob)
             {
-                case ONLINE_SPELLING : pPage->ValidateSpelling(); break;
-                case AUTOCOMPLETE_WORDS : pPage->ValidateAutoCompleteWords(); break;
-                case WORD_COUNT : pPage->ValidateWordCount(); break;
-                case SMART_TAGS : pPage->ValidateSmartTags(); break;
+                case IdleJobType::ONLINE_SPELLING:
+                    pPage->ValidateSpelling();
+                break;
+                case IdleJobType::AUTOCOMPLETE_WORDS:
+                    pPage->ValidateAutoCompleteWords();
+                break;
+                case IdleJobType::WORD_COUNT:
+                    pPage->ValidateWordCount();
+                break;
+                case IdleJobType::SMART_TAGS:
+                    pPage->ValidateSmartTags();
+                break;
             }
         }
 
         pPage = static_cast<SwPageFrame*>(pPage->GetNext());
-        if ( pPage && bVisAreaOnly &&
-             !pPage->getFrameArea().Overlaps( m_pImp->GetShell()->VisArea()))
+        if (pPage && eJobArea == IdleJobArea::VISIBLE &&
+            !pPage->getFrameArea().Overlaps( m_pImp->GetShell()->VisArea()))
+        {
              break;
+        }
     }
     return false;
 }
@@ -2236,9 +2258,9 @@ SwLayIdle::SwLayIdle( SwRootFrame *pRt, SwViewShellImp *pI ) :
 
     // First, spellcheck the visible area. Only if there's nothing
     // to do there, we trigger the IdleFormat.
-    if ( !DoIdleJob( SMART_TAGS, true ) &&
-         !DoIdleJob( ONLINE_SPELLING, true ) &&
-         !DoIdleJob( AUTOCOMPLETE_WORDS, true ) )
+    if ( !DoIdleJob(IdleJobType::SMART_TAGS, IdleJobArea::VISIBLE) &&
+         !DoIdleJob(IdleJobType::ONLINE_SPELLING, IdleJobArea::VISIBLE) &&
+         !DoIdleJob(IdleJobType::AUTOCOMPLETE_WORDS, IdleJobArea::VISIBLE) )
     {
         // Format, then register repaint rectangles with the SwViewShell if necessary.
         // This requires running artificial actions, so we don't get undesired
@@ -2350,10 +2372,10 @@ SwLayIdle::SwLayIdle( SwRootFrame *pRt, SwViewShellImp *pI ) :
 
         if (!bInterrupt)
         {
-            if ( !DoIdleJob( WORD_COUNT, false ) )
-                if ( !DoIdleJob( SMART_TAGS, false ) )
-                    if ( !DoIdleJob( ONLINE_SPELLING, false ) )
-                        DoIdleJob( AUTOCOMPLETE_WORDS, false );
+            if (!DoIdleJob(IdleJobType::WORD_COUNT, IdleJobArea::ALL))
+                if (!DoIdleJob(IdleJobType::SMART_TAGS, IdleJobArea::ALL))
+                    if (!DoIdleJob(IdleJobType::ONLINE_SPELLING, IdleJobArea::ALL))
+                        DoIdleJob(IdleJobType::AUTOCOMPLETE_WORDS, IdleJobArea::ALL);
         }
 
         bool bInValid = false;

@@ -308,6 +308,12 @@ interface BaseText
         StateMethod = NoState ;
         DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
     ]
+    FN_INSERT_COMBO_BOX_CONTENT_CONTROL  // status(final|play)
+    [
+        ExecMethod = ExecInsert ;
+        StateMethod = NoState ;
+        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
+    ]
     FN_CONTENT_CONTROL_PROPERTIES  // status(final|play)
     [
         ExecMethod = ExecInsert ;
@@ -1766,6 +1772,12 @@ interface BaseText
         StateMethod = StateField ;
     ]
 
+    FN_UPDATE_TEXT_FORMFIELDS
+    [
+        ExecMethod = ExecField ;
+        StateMethod = StateField ;
+    ]
+
     FN_PROTECT_FIELDS
     [
         ExecMethod = Execute ;
@@ -1797,6 +1809,12 @@ interface BaseText
     ]
 
     SID_SPELLCHECK_APPLY_SUGGESTION
+    [
+        ExecMethod = Execute ;
+        StateMethod = GetState ;
+    ]
+
+    SID_FM_TRANSLATE
     [
         ExecMethod = Execute ;
         StateMethod = GetState ;

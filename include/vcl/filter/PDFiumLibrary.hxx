@@ -33,6 +33,7 @@
 #include <vcl/pdf/PDFFillMode.hxx>
 #include <vcl/pdf/PDFFindFlags.hxx>
 #include <vcl/pdf/PDFErrorType.hxx>
+#include <vcl/pdf/PDFFormFieldType.hxx>
 
 class SvMemoryStream;
 
@@ -59,7 +60,8 @@ public:
                                                          const OString& rPassword)
         = 0;
     virtual PDFErrorType getLastErrorCode() = 0;
-    virtual std::unique_ptr<PDFiumBitmap> createBitmap(int nWidth, int nHeight, int nAlpha) = 0;
+    /// createBitmap can reduce requested size to possible value
+    virtual std::unique_ptr<PDFiumBitmap> createBitmap(int& nWidth, int& nHeight, int nAlpha) = 0;
 };
 
 class PDFiumPage;
@@ -100,6 +102,10 @@ public:
     virtual size_t getAttachmentPointsCount() = 0;
     virtual std::vector<basegfx::B2DPoint> getAttachmentPoints(size_t nIndex) = 0;
     virtual std::vector<basegfx::B2DPoint> getLineGeometry() = 0;
+    virtual PDFFormFieldType getFormFieldType(PDFiumDocument* pDoc) = 0;
+    virtual float getFormFontSize(PDFiumDocument* pDoc) = 0;
+    virtual OUString getFormFieldAlternateName(PDFiumDocument* pDoc) = 0;
+    virtual int getFormFieldFlags(PDFiumDocument* pDoc) = 0;
 };
 
 class PDFiumTextPage;

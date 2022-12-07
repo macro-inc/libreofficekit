@@ -318,6 +318,15 @@ CPPUNIT_TEST_FIXTURE(SwCoreUnocoreTest, testContentControlInsert)
         = static_cast<SwFormatContentControl&>(pTextContentControl->GetAttr());
     std::shared_ptr<SwContentControl> pContentControl = rFormatContentControl.GetContentControl();
     CPPUNIT_ASSERT(pContentControl->GetShowingPlaceHolder());
+
+    // Also verify that setText() and getText() works:
+    uno::Reference<text::XText> xContentControlText(xContentControl, uno::UNO_QUERY);
+    xContentControlText->setString("new");
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: new
+    // - Actual  :
+    // i.e. getString() always returned an empty string.
+    CPPUNIT_ASSERT_EQUAL(OUString("new"), xContentControlText->getString());
 }
 
 CPPUNIT_TEST_FIXTURE(SwCoreUnocoreTest, testContentControlTextPortionEnum)
@@ -563,6 +572,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreUnocoreTest, testContentControlDate)
     xContentControlProps->setPropertyValue(
         "DataBindingStoreItemID", uno::Any(OUString("{241A8A02-7FFD-488D-8827-63FBE74E8BC9}")));
     xContentControlProps->setPropertyValue("Color", uno::Any(OUString("008000")));
+    xContentControlProps->setPropertyValue("Alias", uno::Any(OUString("myalias")));
+    xContentControlProps->setPropertyValue("Tag", uno::Any(OUString("mytag")));
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // Then make sure that the specified properties are set:
@@ -586,6 +597,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreUnocoreTest, testContentControlDate)
     CPPUNIT_ASSERT_EQUAL(OUString("{241A8A02-7FFD-488D-8827-63FBE74E8BC9}"),
                          pContentControl->GetDataBindingStoreItemID());
     CPPUNIT_ASSERT_EQUAL(OUString("008000"), pContentControl->GetColor());
+    CPPUNIT_ASSERT_EQUAL(OUString("myalias"), pContentControl->GetAlias());
+    CPPUNIT_ASSERT_EQUAL(OUString("mytag"), pContentControl->GetTag());
 }
 
 CPPUNIT_TEST_FIXTURE(SwCoreUnocoreTest, testContentControlPlainText)
@@ -638,6 +651,109 @@ CPPUNIT_TEST_FIXTURE(SwCoreUnocoreTest, testContentControlPlainText)
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), pAttr->GetStart());
     CPPUNIT_ASSERT(pAttr->End());
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(6), *pAttr->End());
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreUnocoreTest, testContentControlComboBox)
+{
+    // Given an empty document:
+    SwDoc* pDoc = createSwDoc();
+
+    // When inserting a combobox content control:
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XText> xText = xTextDocument->getText();
+    uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
+    xText->insertString(xCursor, "test", /*bAbsorb=*/false);
+    xCursor->gotoStart(/*bExpand=*/false);
+    xCursor->gotoEnd(/*bExpand=*/true);
+    uno::Reference<text::XTextContent> xContentControl(
+        xMSF->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
+    {
+        uno::Sequence<beans::PropertyValues> aListItems = {
+            {
+                comphelper::makePropertyValue("DisplayText", uno::Any(OUString("red"))),
+                comphelper::makePropertyValue("Value", uno::Any(OUString("R"))),
+            },
+            {
+                comphelper::makePropertyValue("DisplayText", uno::Any(OUString("green"))),
+                comphelper::makePropertyValue("Value", uno::Any(OUString("G"))),
+            },
+            {
+                comphelper::makePropertyValue("DisplayText", uno::Any(OUString("blue"))),
+                comphelper::makePropertyValue("Value", uno::Any(OUString("B"))),
+            },
+        };
+        xContentControlProps->setPropertyValue("ListItems", uno::Any(aListItems));
+        // Without the accompanying fix in place, this test would have failed with:
+        // An uncaught exception of type com.sun.star.beans.UnknownPropertyException
+        xContentControlProps->setPropertyValue("ComboBox", uno::Any(true));
+    }
+    xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
+
+    // Then make sure that the specified properties are set:
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPoint()->nNode.GetNode().GetTextNode();
+    SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
+    auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
+    auto& rFormatContentControl
+        = static_cast<SwFormatContentControl&>(pTextContentControl->GetAttr());
+    std::shared_ptr<SwContentControl> pContentControl = rFormatContentControl.GetContentControl();
+    std::vector<SwContentControlListItem> aListItems = pContentControl->GetListItems();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), aListItems.size());
+    CPPUNIT_ASSERT_EQUAL(OUString("red"), aListItems[0].m_aDisplayText);
+    CPPUNIT_ASSERT_EQUAL(OUString("R"), aListItems[0].m_aValue);
+    CPPUNIT_ASSERT(pContentControl->GetComboBox());
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreUnocoreTest, testContentControls)
+{
+    // Given an empty document:
+    createSwDoc();
+    auto pXTextDocument = dynamic_cast<SwXTextDocument*>(mxComponent.get());
+    uno::Reference<container::XIndexAccess> xContentControls = pXTextDocument->getContentControls();
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), xContentControls->getCount());
+
+    // When inserting content controls:
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XText> xText = xTextDocument->getText();
+    uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
+    // First tag1.
+    xText->insertString(xCursor, "test1", /*bAbsorb=*/false);
+    xCursor->gotoStart(/*bExpand=*/false);
+    xCursor->gotoEnd(/*bExpand=*/true);
+    {
+        uno::Reference<text::XTextContent> xContentControl(
+            xMSF->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
+        uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
+        xContentControlProps->setPropertyValue("Tag", uno::Any(OUString("tag1")));
+        xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
+    }
+    xCursor->gotoStart(/*bExpand=*/false);
+    // Then tag2 before tag1.
+    xText->insertString(xCursor, "test2", /*bAbsorb=*/false);
+    xCursor->gotoStart(/*bExpand=*/false);
+    xCursor->goRight(5, /*bExpand=*/true);
+    {
+        uno::Reference<text::XTextContent> xContentControl(
+            xMSF->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
+        uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
+        xContentControlProps->setPropertyValue("Tag", uno::Any(OUString("tag2")));
+        xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
+    }
+
+    // Then make sure that XContentControls contains the items in a correct order:
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2), xContentControls->getCount());
+    uno::Reference<beans::XPropertySet> xContentControl;
+    xContentControls->getByIndex(0) >>= xContentControl;
+    OUString aTag;
+    xContentControl->getPropertyValue("Tag") >>= aTag;
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: tag2
+    // - Actual  : tag1
+    // i.e. the order of the items was sorted by insert time, not by their doc model position.
+    CPPUNIT_ASSERT_EQUAL(OUString("tag2"), aTag);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

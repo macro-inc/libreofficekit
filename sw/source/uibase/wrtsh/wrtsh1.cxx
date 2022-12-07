@@ -650,7 +650,7 @@ void SwWrtShell::LaunchOLEObj(sal_Int32 nVerb)
     if (comphelper::LibreOfficeKit::isActive())
     {
         const auto classId = xRef->getClassID();
-        if (!SotExchange::IsChart(classId) /* && !SotExchange::IsMath(classId) */)
+        if (!SotExchange::IsChart(classId) && !SotExchange::IsMath(classId))
             return;
     }
 
@@ -1057,8 +1057,18 @@ void SwWrtShell::InsertContentControl(SwContentControlType eType)
             aPlaceholder = u"\u2610";
             break;
         }
+        case SwContentControlType::COMBO_BOX:
         case SwContentControlType::DROP_DOWN_LIST:
         {
+            if (eType == SwContentControlType::COMBO_BOX)
+            {
+                pContentControl->SetComboBox(true);
+            }
+            else if (eType == SwContentControlType::DROP_DOWN_LIST)
+            {
+                pContentControl->SetDropDown(true);
+            }
+
             pContentControl->SetShowingPlaceHolder(true);
             if (!HasSelection())
             {

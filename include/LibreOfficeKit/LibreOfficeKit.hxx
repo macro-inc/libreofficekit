@@ -126,6 +126,11 @@ public:
         mpDoc->pClass->setPartMode(mpDoc, nMode);
     }
 
+    int getEditMode()
+    {
+        return mpDoc->pClass->getEditMode(mpDoc);
+    }
+
     /**
      * Renders a subset of the document to a pre-allocated buffer.
      *
@@ -206,6 +211,12 @@ public:
     void getDocumentSize(long* pWidth, long* pHeight)
     {
         mpDoc->pClass->getDocumentSize(mpDoc, pWidth, pHeight);
+    }
+
+    /// Get the data area (in Calc last row and column).
+    void getDataArea(long nPart, long* pCol, long* pRow)
+    {
+        mpDoc->pClass->getDataArea(mpDoc, nPart, pCol, pRow);
     }
 
     /**
@@ -598,6 +609,7 @@ public:
      */
     void paintPartTile(unsigned char* pBuffer,
                               const int nPart,
+                              const int nMode,
                               const int nCanvasWidth,
                               const int nCanvasHeight,
                               const int nTilePosX,
@@ -605,7 +617,7 @@ public:
                               const int nTileWidth,
                               const int nTileHeight)
     {
-        return mpDoc->pClass->paintPartTile(mpDoc, pBuffer, nPart,
+        return mpDoc->pClass->paintPartTile(mpDoc, pBuffer, nPart, nMode,
                                             nCanvasWidth, nCanvasHeight,
                                             nTilePosX, nTilePosY,
                                             nTileWidth, nTileHeight);

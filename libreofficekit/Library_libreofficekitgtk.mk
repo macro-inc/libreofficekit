@@ -31,6 +31,7 @@ $(eval $(call gb_Library_add_libs,libreofficekitgtk,\
 
 $(eval $(call gb_Library_add_defs,libreofficekitgtk,\
 	-DLOK_PATH="\"$(LIBDIR)/libreoffice/$(LIBO_LIB_FOLDER)\"" \
+	-DLOK_DOC_VIEW_IMPLEMENTATION \
 ))
 
 ifeq ($(OS),$(filter LINUX %BSD SOLARIS, $(OS)))
@@ -38,5 +39,9 @@ $(eval $(call gb_Library_add_libs,libreofficekitgtk,\
     $(DLOPEN_LIBS) -lm \
 ))
 endif
+
+$(eval $(call gb_Library_use_packages,libreofficekitgtk, \
+    libreofficekit_selectionhandles \
+))
 
 # vim: set noet sw=4 ts=4:

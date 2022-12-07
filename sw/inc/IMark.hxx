@@ -102,6 +102,10 @@ namespace sw::mark
             virtual void SetFieldname(const OUString& rFieldname) =0;
             virtual void SetFieldHelptext(const OUString& rFieldHelptext) =0;
             virtual void Invalidate() = 0;
+
+            virtual OUString GetContent() const { return OUString(); }
+            virtual void ReplaceContent(const OUString& /*sNewContent*/) {}
+
         private:
             IFieldmark(IFieldmark const &) = delete;
             IFieldmark &operator =(IFieldmark const&) = delete;
@@ -121,6 +125,25 @@ namespace sw::mark
             ICheckboxFieldmark &operator =(ICheckboxFieldmark const&) = delete;
     };
 
+    class SW_DLLPUBLIC IDropdownFieldmark
+        : virtual public IFieldmark
+    {
+        protected:
+            IDropdownFieldmark() = default;
+
+        public:
+            virtual OUString GetContent(sal_Int32* pIndex) const = 0;
+            virtual OUString GetContent() const override = 0;
+            virtual void AddContent(const OUString& rText, sal_Int32* pIndex = nullptr) = 0;
+            virtual void DelContent(sal_Int32 nDelIndex = -1) = 0;
+            virtual void ReplaceContent(const OUString* pText, sal_Int32* pIndex) = 0;
+            virtual void ReplaceContent(const OUString& sNewContent) override = 0;
+
+    private:
+            IDropdownFieldmark(IDropdownFieldmark const &) = delete;
+            IDropdownFieldmark &operator =(IDropdownFieldmark const&) = delete;
+    };
+
     class SW_DLLPUBLIC IDateFieldmark
         : virtual public IFieldmark
     {
@@ -128,8 +151,8 @@ namespace sw::mark
             IDateFieldmark() = default;
 
         public:
-            virtual OUString GetContent() const = 0;
-            virtual void ReplaceContent(const OUString& sNewContent) = 0;
+            virtual OUString GetContent() const override = 0;
+            virtual void ReplaceContent(const OUString& sNewContent) override = 0;
 
             virtual std::pair<bool, double> GetCurrentDate() const = 0;
             virtual void SetCurrentDate(double fDate) = 0;

@@ -1925,7 +1925,7 @@ public:
     bool                 SearchAndReplace( const SvxSearchItem& rSearchItem,
                                            SCCOL& rCol, SCROW& rRow, SCTAB& rTab,
                                            const ScMarkData& rMark, ScRangeList& rMatchedRanges,
-                                           OUString& rUndoStr, ScDocument* pUndoDoc = nullptr );
+                                           OUString& rUndoStr, ScDocument* pUndoDoc, bool& bMatchedRangesWereClamped );
     static bool          IsEmptyCellSearch( const SvxSearchItem& rSearchItem );
 
                     // determine Col/Row of subsequent calls
@@ -2655,9 +2655,6 @@ private:
         ScDocument& mrDoc;
     };
 
-    ScTable* FetchTable( SCTAB nTab );
-    const ScTable* FetchTable( SCTAB nTab ) const;
-
     void    MergeNumberFormatter(const ScDocument& rSrcDoc);
 
     void    ImplCreateOptions(); // Suggestion: switch to on-demand?
@@ -2682,6 +2679,9 @@ private:
     bool    HasPartOfMerged( const ScRange& rRange );
 
 public:
+    ScTable* FetchTable( SCTAB nTab );
+    const ScTable* FetchTable( SCTAB nTab ) const;
+
     ScRefCellValue GetRefCellValue( const ScAddress& rPos );
 private:
     ScRefCellValue GetRefCellValue( const ScAddress& rPos, sc::ColumnBlockPosition& rBlockPos );

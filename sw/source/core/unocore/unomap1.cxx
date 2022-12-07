@@ -1038,11 +1038,17 @@ const SfxItemPropertyMapEntry* SwUnoPropertyMapProvider::GetContentControlProper
         { u"" UNO_NAME_DATE_LANGUAGE, 0, cppu::UnoType<OUString>::get(), PROPERTY_NONE, 0 },
         { u"" UNO_NAME_CURRENT_DATE, 0, cppu::UnoType<OUString>::get(), PROPERTY_NONE, 0 },
         { u"" UNO_NAME_PLAIN_TEXT, 0, cppu::UnoType<bool>::get(), PROPERTY_NONE, 0 },
+        { u"" UNO_NAME_COMBO_BOX, 0, cppu::UnoType<bool>::get(), PROPERTY_NONE, 0 },
+        { u"" UNO_NAME_DROP_DOWN, 0, cppu::UnoType<bool>::get(), PROPERTY_NONE, 0 },
         { u"" UNO_NAME_PLACEHOLDER_DOC_PART, 0, cppu::UnoType<OUString>::get(), PROPERTY_NONE, 0 },
         { u"" UNO_NAME_DATA_BINDING_PREFIX_MAPPINGS, 0, cppu::UnoType<OUString>::get(), PROPERTY_NONE, 0 },
         { u"" UNO_NAME_DATA_BINDING_XPATH, 0, cppu::UnoType<OUString>::get(), PROPERTY_NONE, 0 },
         { u"" UNO_NAME_DATA_BINDING_STORE_ITEM_ID, 0, cppu::UnoType<OUString>::get(), PROPERTY_NONE, 0 },
         { u"" UNO_NAME_COLOR, 0, cppu::UnoType<OUString>::get(), PROPERTY_NONE, 0 },
+        { u"" UNO_NAME_ALIAS, 0, cppu::UnoType<OUString>::get(), PROPERTY_NONE, 0 },
+        { u"" UNO_NAME_TAG, 0, cppu::UnoType<OUString>::get(), PROPERTY_NONE, 0 },
+        { u"" UNO_NAME_ID, 0, cppu::UnoType<sal_Int32>::get(), PROPERTY_NONE, 0 },
+        { u"" UNO_NAME_DATE_STRING, 0, cppu::UnoType<OUString>::get(), PropertyAttribute::READONLY, 0 },
         { u"", 0, css::uno::Type(), 0, 0 }
     };
 

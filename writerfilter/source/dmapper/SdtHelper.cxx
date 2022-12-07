@@ -210,7 +210,8 @@ std::optional<OUString> SdtHelper::getValueFromDataBinding()
 
 void SdtHelper::createDropDownControl()
 {
-    assert(getControlType() == SdtControlType::dropDown);
+    assert(getControlType() == SdtControlType::dropDown
+           || getControlType() == SdtControlType::comboBox);
 
     const bool bDropDown
         = officecfg::Office::Writer::Filter::Import::DOCX::ImportComboBoxAsDropDown::get();
@@ -454,6 +455,11 @@ void SdtHelper::clear()
     m_bChecked = false;
     m_aCheckedState.clear();
     m_aUncheckedState.clear();
+    m_aPlaceholderDocPart.clear();
+    m_aColor.clear();
+    m_aAlias.clear();
+    m_aTag.clear();
+    m_nId = 0;
 }
 
 void SdtHelper::SetPlaceholderDocPart(const OUString& rPlaceholderDocPart)
@@ -466,6 +472,18 @@ OUString SdtHelper::GetPlaceholderDocPart() const { return m_aPlaceholderDocPart
 void SdtHelper::SetColor(const OUString& rColor) { m_aColor = rColor; }
 
 OUString SdtHelper::GetColor() const { return m_aColor; }
+
+void SdtHelper::SetAlias(const OUString& rAlias) { m_aAlias = rAlias; }
+
+const OUString& SdtHelper::GetAlias() const { return m_aAlias; }
+
+void SdtHelper::SetTag(const OUString& rTag) { m_aTag = rTag; }
+
+const OUString& SdtHelper::GetTag() const { return m_aTag; }
+
+void SdtHelper::SetId(sal_Int32 nId) { m_nId = nId; }
+
+sal_Int32 SdtHelper::GetId() const { return m_nId; }
 
 } // namespace writerfilter::dmapper
 

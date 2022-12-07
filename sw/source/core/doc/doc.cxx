@@ -130,6 +130,11 @@ sal_Int32 SwDoc::getReferenceCount() const
     return *m_pMetaFieldManager;
 }
 
+::SwContentControlManager& SwDoc::GetContentControlManager()
+{
+    return *m_pContentControlManager;
+}
+
 ::sw::UndoManager & SwDoc::GetUndoManager()
 {
     return *m_pUndoManager;
@@ -1119,14 +1124,14 @@ static bool lcl_SpellAndGrammarAgain( SwNode* pNd, void* pArgs )
         {
             if( pTextNode->GetWrong() &&
                 pTextNode->GetWrong()->InvalidateWrong() )
-                pTextNode->SetWrongDirty(SwTextNode::WrongState::TODO);
+                pTextNode->SetWrongDirty(sw::WrongState::TODO);
             if( pTextNode->GetGrammarCheck() &&
                 pTextNode->GetGrammarCheck()->InvalidateWrong() )
                 pTextNode->SetGrammarCheckDirty( true );
         }
         else
         {
-            pTextNode->SetWrongDirty(SwTextNode::WrongState::TODO);
+            pTextNode->SetWrongDirty(sw::WrongState::TODO);
             if( pTextNode->GetWrong() )
                 pTextNode->GetWrong()->SetInvalid( 0, COMPLETE_STRING );
             pTextNode->SetGrammarCheckDirty( true );

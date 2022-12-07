@@ -24,6 +24,8 @@
 #include <editeng/editobj.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertyvalue.hxx>
+#include <xmloff/odffields.hxx>
+#include <comphelper/string.hxx>
 
 #include <IDocumentContentOperations.hxx>
 #include <cmdid.h>
@@ -33,6 +35,8 @@
 #include <IDocumentDrawModelAccess.hxx>
 #include <drawdoc.hxx>
 #include <docsh.hxx>
+#include <bookmark.hxx>
+#include <ndtxt.hxx>
 
 constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/uibase/shells/data/";
 
@@ -236,6 +240,109 @@ CPPUNIT_TEST_FIXTURE(SwUibaseShellsTest, testContentControlPageBreak)
     // i.e. inline content control had its start and end in different text nodes, which is not
     // allowed.
     CPPUNIT_ASSERT_EQUAL(1, getPages());
+}
+
+CPPUNIT_TEST_FIXTURE(SwUibaseShellsTest, testInsertTextFormField)
+{
+    // Given an empty document:
+    SwDoc* pDoc = createSwDoc();
+
+    // When inserting an ODF_UNHANDLED fieldmark:
+    OUString aExpectedCommand("ADDIN ZOTERO_BIBL foo bar");
+    uno::Sequence<css::beans::PropertyValue> aArgs = {
+        comphelper::makePropertyValue("FieldType", uno::Any(OUString(ODF_UNHANDLED))),
+        comphelper::makePropertyValue("FieldCommand", uno::Any(aExpectedCommand)),
+        comphelper::makePropertyValue("FieldResult", uno::Any(OUString("<p>aaa</p><p>bbb</p>"))),
+    };
+    dispatchCommand(mxComponent, ".uno:TextFormField", aArgs);
+
+    // Then make sure that it's type/name is correct:
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    SwCursor* pCursor = pWrtShell->GetCursor();
+    pCursor->SttEndDoc(/*bSttDoc=*/true);
+    sw::mark::IFieldmark* pFieldmark
+        = pDoc->getIDocumentMarkAccess()->getFieldmarkAt(*pCursor->GetPoint());
+    CPPUNIT_ASSERT(pFieldmark);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: vnd.oasis.opendocument.field.UNHANDLED
+    // - Actual  : vnd.oasis.opendocument.field.FORMTEXT
+    // i.e. the custom type parameter was ignored.
+    CPPUNIT_ASSERT_EQUAL(OUString(ODF_UNHANDLED), pFieldmark->GetFieldname());
+
+    auto it = pFieldmark->GetParameters()->find(ODF_CODE_PARAM);
+    CPPUNIT_ASSERT(it != pFieldmark->GetParameters()->end());
+    OUString aActualCommand;
+    it->second >>= aActualCommand;
+    CPPUNIT_ASSERT_EQUAL(aExpectedCommand, aActualCommand);
+
+    SwPaM aPam(pFieldmark->GetMarkStart(), pFieldmark->GetMarkEnd());
+    // Ignore the leading field start + sep.
+    aPam.GetMark()->nContent = aPam.GetMark()->nContent.GetIndex() + 2;
+    // Ignore the trailing field end.
+    aPam.GetPoint()->nContent = aPam.GetPoint()->nContent.GetIndex() - 1;
+    CPPUNIT_ASSERT(aPam.HasMark());
+    OUString aActualResult = aPam.GetText();
+    CPPUNIT_ASSERT_EQUAL(OUString("aaa\nbbb"), aActualResult);
+}
+
+CPPUNIT_TEST_FIXTURE(SwUibaseShellsTest, testUpdateFieldmarks)
+{
+    // Given a document with 2 fieldmarks:
+    SwDoc* pDoc = createSwDoc();
+    {
+        uno::Sequence<css::beans::PropertyValue> aArgs = {
+            comphelper::makePropertyValue("FieldType", uno::Any(OUString(ODF_UNHANDLED))),
+            comphelper::makePropertyValue("FieldCommand",
+                                          uno::Any(OUString("ADDIN ZOTERO_ITEM old command 1"))),
+            comphelper::makePropertyValue("FieldResult", uno::Any(OUString("old result 1"))),
+        };
+        dispatchCommand(mxComponent, ".uno:TextFormField", aArgs);
+    }
+    {
+        uno::Sequence<css::beans::PropertyValue> aArgs = {
+            comphelper::makePropertyValue("FieldType", uno::Any(OUString(ODF_UNHANDLED))),
+            comphelper::makePropertyValue("FieldCommand",
+                                          uno::Any(OUString("ADDIN ZOTERO_ITEM old command 2"))),
+            comphelper::makePropertyValue("FieldResult", uno::Any(OUString("old result 2"))),
+        };
+        dispatchCommand(mxComponent, ".uno:TextFormField", aArgs);
+    }
+
+    // When updating those fieldmarks:
+    uno::Sequence<css::beans::PropertyValue> aField1{
+        comphelper::makePropertyValue("FieldType", uno::Any(OUString(ODF_UNHANDLED))),
+        comphelper::makePropertyValue("FieldCommand",
+                                      uno::Any(OUString("ADDIN ZOTERO_ITEM new command 1"))),
+        comphelper::makePropertyValue("FieldResult", uno::Any(OUString("new result 1"))),
+    };
+    uno::Sequence<css::beans::PropertyValue> aField2{
+        comphelper::makePropertyValue("FieldType", uno::Any(OUString(ODF_UNHANDLED))),
+        comphelper::makePropertyValue("FieldCommand",
+                                      uno::Any(OUString("ADDIN ZOTERO_ITEM new command 2"))),
+        comphelper::makePropertyValue("FieldResult", uno::Any(OUString("new result 2"))),
+    };
+    uno::Sequence<uno::Sequence<css::beans::PropertyValue>> aFields = { aField1, aField2 };
+    uno::Sequence<css::beans::PropertyValue> aArgs = {
+        comphelper::makePropertyValue("FieldType", uno::Any(OUString(ODF_UNHANDLED))),
+        comphelper::makePropertyValue("FieldCommandPrefix",
+                                      uno::Any(OUString("ADDIN ZOTERO_ITEM"))),
+        comphelper::makePropertyValue("Fields", uno::Any(aFields)),
+    };
+    dispatchCommand(mxComponent, ".uno:TextFormFields", aArgs);
+
+    // Then make sure that the document text contains the new field results:
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->SttEndDoc(/*bStt=*/true);
+    SwCursor* pCursor = pWrtShell->GetCursor();
+    OUString aActual = pCursor->Start()->nNode.GetNode().GetTextNode()->GetText();
+    static sal_Unicode const aForbidden[]
+        = { CH_TXT_ATR_FIELDSTART, CH_TXT_ATR_FIELDSEP, CH_TXT_ATR_FIELDEND, 0 };
+    aActual = comphelper::string::removeAny(aActual, aForbidden);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: new result 1new result 2
+    // - Actual  : old result 1old result 2
+    // i.e. the fieldmarks were not updated.
+    CPPUNIT_ASSERT_EQUAL(OUString("new result 1new result 2"), aActual);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

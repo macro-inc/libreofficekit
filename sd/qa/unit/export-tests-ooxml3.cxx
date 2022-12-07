@@ -24,6 +24,7 @@
 #include <svx/xlineit0.hxx>
 #include <svx/xlndsit.hxx>
 #include <svx/svdoole2.hxx>
+#include <svx/svdotable.hxx>
 #include <rtl/ustring.hxx>
 
 #include <com/sun/star/drawing/XDrawPage.hpp>
@@ -131,6 +132,8 @@ public:
     void testEnhancedPathViewBox();
     void testTdf109169_OctagonBevel();
     void testTdf109169_DiamondBevel();
+    void testTdf144092_emptyShapeTextProps();
+    void testTdf94122_autoColor();
 
     CPPUNIT_TEST_SUITE(SdOOXMLExportTest3);
 
@@ -210,6 +213,8 @@ public:
     CPPUNIT_TEST(testEnhancedPathViewBox);
     CPPUNIT_TEST(testTdf109169_OctagonBevel);
     CPPUNIT_TEST(testTdf109169_DiamondBevel);
+    CPPUNIT_TEST(testTdf144092_emptyShapeTextProps);
+    CPPUNIT_TEST(testTdf94122_autoColor);
     CPPUNIT_TEST_SUITE_END();
 
     virtual void registerNamespaces(xmlXPathContextPtr& pXmlXPathCtx) override
@@ -1978,6 +1983,83 @@ void SdOOXMLExportTest3::testTdf109169_DiamondBevel()
     auto aCoordinates(
         (aPath["Coordinates"]).get<uno::Sequence<drawing::EnhancedCustomShapeParameterPair>>());
     CPPUNIT_ASSERT_EQUAL(sal_Int32(20), aCoordinates.getLength());
+}
+
+void SdOOXMLExportTest3::testTdf144092_emptyShapeTextProps()
+{
+    // Document contains one shape and one table. Both without any text but with
+    // text properties contained inside endParaRPr - The import and export
+    // of endParaRPr for empty cells and shapes are tested here
+    ::sd::DrawDocShellRef xDocShRef = loadURL(
+        m_directories.getURLFromSrc(u"sd/qa/unit/data/pptx/tdf144092-emptyShapeTextProps.pptx"),
+        PPTX);
+    xDocShRef = saveAndReload(xDocShRef.get(), PPTX);
+
+    Color aColor;
+    // check text properties of empty shape
+    uno::Reference<beans::XPropertySet> xRectShapeProps(getShapeFromPage(1, 0, xDocShRef));
+    CPPUNIT_ASSERT_EQUAL(OUString("Calibri"),
+                         xRectShapeProps->getPropertyValue("CharFontName").get<OUString>());
+    CPPUNIT_ASSERT_EQUAL(float(196), xRectShapeProps->getPropertyValue("CharHeight").get<float>());
+    xRectShapeProps->getPropertyValue("CharColor") >>= aColor;
+    CPPUNIT_ASSERT_EQUAL(Color(0x70AD47), aColor);
+
+    const SdrPage* pPage = GetPage(1, xDocShRef);
+    sdr::table::SdrTableObj* pTableObj = dynamic_cast<sdr::table::SdrTableObj*>(pPage->GetObj(0));
+    CPPUNIT_ASSERT(pTableObj);
+    uno::Reference<table::XCellRange> xTable(pTableObj->getTable(), uno::UNO_QUERY_THROW);
+    uno::Reference<beans::XPropertySet> xCell;
+
+    // check text properties of empty cells
+    xCell.set(xTable->getCellByPosition(0, 0), uno::UNO_QUERY_THROW);
+    xCell->getPropertyValue("CharColor") >>= aColor;
+    CPPUNIT_ASSERT_EQUAL(Color(0xFFFFFF), aColor);
+
+    xCell.set(xTable->getCellByPosition(0, 1), uno::UNO_QUERY_THROW);
+    xCell->getPropertyValue("CharColor") >>= aColor;
+    CPPUNIT_ASSERT_EQUAL(Color(0x70AD47), aColor);
+    CPPUNIT_ASSERT_EQUAL(float(96), xCell->getPropertyValue("CharHeight").get<float>());
+    xDocShRef->DoClose();
+}
+
+void SdOOXMLExportTest3::testTdf94122_autoColor()
+{
+    // Document contains three pages, with different scenarios for automatic
+    // color export to pptx.
+    // - First page: Page background light, automatic colored text on a FillType_NONE shape
+    // - Second page: Page background dark, automatic colored text on a FillType_NONE shape
+    // - Third page: Page background light, automatic colored text on a dark colored fill
+    //   and another automatic colored text on a light colored fill
+    ::sd::DrawDocShellRef xDocShRef
+        = loadURL(m_directories.getURLFromSrc(u"sd/qa/unit/data/odp/tdf94122_autocolor.odp"), ODP);
+
+    utl::TempFile tempFile;
+    xDocShRef = saveAndReload(xDocShRef.get(), PPTX, &tempFile);
+    xDocShRef->DoClose();
+
+    // Without the accompanying fix in place, these tests would have failed with:
+    // - Expected: 1
+    // - Actual  : 0
+    // - In ..., XPath '/p:sld/p:cSld/p:spTree/p:sp/p:txBody/a:p/a:r/a:rPr/a:solidFill/a:srgbClr' number of nodes is incorrect
+    // i.e. automatic color wasn't resolved & exported
+
+    xmlDocUniquePtr pXmlDocContent1 = parseExport(tempFile, "ppt/slides/slide1.xml");
+    assertXPath(pXmlDocContent1,
+                "/p:sld/p:cSld/p:spTree/p:sp/p:txBody/a:p/a:r/a:rPr/a:solidFill/a:srgbClr", "val",
+                "000000");
+
+    xmlDocUniquePtr pXmlDocContent2 = parseExport(tempFile, "ppt/slides/slide2.xml");
+    assertXPath(pXmlDocContent2,
+                "/p:sld/p:cSld/p:spTree/p:sp/p:txBody/a:p/a:r/a:rPr/a:solidFill/a:srgbClr", "val",
+                "ffffff");
+
+    xmlDocUniquePtr pXmlDocContent3 = parseExport(tempFile, "ppt/slides/slide3.xml");
+    assertXPath(pXmlDocContent3,
+                "/p:sld/p:cSld/p:spTree/p:sp[1]/p:txBody/a:p/a:r/a:rPr/a:solidFill/a:srgbClr",
+                "val", "ffffff");
+    assertXPath(pXmlDocContent3,
+                "/p:sld/p:cSld/p:spTree/p:sp[2]/p:txBody/a:p/a:r/a:rPr/a:solidFill/a:srgbClr",
+                "val", "000000");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SdOOXMLExportTest3);

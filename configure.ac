@@ -9,7 +9,7 @@ dnl in order to create a configure script.
 # several non-alphanumeric characters, those are split off and used only for the
 # ABOUTBOXPRODUCTVERSIONSUFFIX in openoffice.lst. Why that is necessary, no idea.
 
-AC_INIT([Collabora Office],[22.05.5.3],[],[],[https://collaboraoffice.com/])
+AC_INIT([Collabora Office],[22.05.8.4],[],[],[https://collaboraoffice.com/])
 
 dnl libnumbertext needs autoconf 2.68, but that can pick up autoconf268 just fine if it is installed
 dnl whereas aclocal (as run by autogen.sh) insists on using autoconf and fails hard
@@ -46,19 +46,31 @@ FilterLibs()
     # Return value: $filteredlibs
 
     filteredlibs=
-    for f in $1; do
-        case "$f" in
-            # let's start with Fedora's paths for now
-            -L/lib|-L/lib/|-L/lib64|-L/lib64/|-L/usr/lib|-L/usr/lib/|-L/usr/lib64|-L/usr/lib64/)
-                # ignore it: on UNIXoids it is searched by default anyway
-                # but if it's given explicitly then it may override other paths
-                # (on macOS it would be an error to use it instead of SDK)
-                ;;
-            *)
+    if test "$COM" = "MSC"; then
+        for f in $1; do
+            if test "x$f" != "x${f#-L}"; then
+                filteredlibs="$filteredlibs -LIBPATH:${f:2}"
+            elif test "x$f" != "x${f#-l}"; then
+                filteredlibs="$filteredlibs ${f:2}.lib"
+            else
                 filteredlibs="$filteredlibs $f"
-                ;;
-        esac
-    done
+            fi
+        done
+    else
+        for f in $1; do
+            case "$f" in
+                # let's start with Fedora's paths for now
+                -L/lib|-L/lib/|-L/lib64|-L/lib64/|-L/usr/lib|-L/usr/lib/|-L/usr/lib64|-L/usr/lib64/)
+                    # ignore it: on UNIXoids it is searched by default anyway
+                    # but if it's given explicitly then it may override other paths
+                    # (on macOS it would be an error to use it instead of SDK)
+                    ;;
+                *)
+                    filteredlibs="$filteredlibs $f"
+                    ;;
+            esac
+        done
+    fi
 }
 
 PathFormat()
@@ -462,6 +474,8 @@ AC_DEFINE_UNQUOTED(LIBO_VERSION_PATCH,$LIBO_VERSION_PATCH)
 
 LIBO_THIS_YEAR=`date +%Y`
 AC_DEFINE_UNQUOTED(LIBO_THIS_YEAR,$LIBO_THIS_YEAR)
+
+AC_DEFINE_UNQUOTED([BUILDCONFIG],[["$ac_configure_args"]],[Options passed to configure script])
 
 dnl ===================================================================
 dnl Product version
@@ -1171,6 +1185,9 @@ if test "$using_freetype_fontconfig" = yes; then
         AC_DEFINE(ENABLE_HEADLESS)
         ENABLE_HEADLESS=TRUE
     fi
+else
+    test_fontconfig=no
+    test_freetype=no
 fi
 
 AC_SUBST(ENABLE_HEADLESS)
@@ -2620,6 +2637,11 @@ libo_FUZZ_ARG_WITH(latest-c++,
          published standard.]),,
         [with_latest_c__=no])
 
+AC_ARG_WITH(gtk3-build,
+    AS_HELP_STRING([--with-gtk3-build=<absolute path to GTK3 build>],
+        [(Windows-only) In order to build GtkTiledViewer on Windows, pass the path
+         to a GTK3 build, like '--with-gtk3-build=C:/gtk-build/gtk/x64/release'.]))
+
 dnl ===================================================================
 dnl Branding
 dnl ===================================================================
@@ -3280,7 +3302,7 @@ if test $_os = Darwin; then
     # The SDK in the currently selected Xcode should be found.
 
     AC_MSG_CHECKING([what macOS SDK to use])
-    for macosx_sdk in 12.3 12.1 12.0 11.3 11.1 11.0 10.15 10.14 10.13; do
+    for macosx_sdk in 13.0 12.3 12.1 12.0 11.3 11.1 11.0 10.15 10.14 10.13; do
         MACOSX_SDK_PATH=`xcrun --sdk macosx${macosx_sdk} --show-sdk-path 2> /dev/null`
         if test -d "$MACOSX_SDK_PATH"; then
             break
@@ -3296,7 +3318,7 @@ if test $_os = Darwin; then
     fi
 
     AC_MSG_RESULT([macOS SDK $macosx_sdk at $MACOSX_SDK_PATH])
-
+    MACOSX_SDK_BUILD_VERSION=$(xcodebuild -version -sdk "$MACOSX_SDK_PATH" ProductBuildVersion)
     case $macosx_sdk in
     10.13)
         MACOSX_SDK_VERSION=101300
@@ -3324,6 +3346,9 @@ if test $_os = Darwin; then
         ;;
     12.3)
         MACOSX_SDK_VERSION=120300
+        ;;
+    13.0)
+        MACOSX_SDK_VERSION=130000
         ;;
     *)
         AC_MSG_ERROR([macOS SDK $macosx_sdk is not supported])
@@ -3363,6 +3388,9 @@ if test $_os = Darwin; then
         AC_MSG_ERROR(["$my_xcode_ver1" is too old or unrecognized, must be at least Xcode 11.3])
     fi
 
+    my_xcode_ver1=$(xcrun xcodebuild -version | tail -n 1)
+    MACOSX_XCODE_BUILD_VERSION=${my_xcode_ver1#Build version }
+
     case "$with_macosx_version_min_required" in
     10.12)
         MAC_OS_X_VERSION_MIN_REQUIRED="101200"
@@ -3397,8 +3425,11 @@ if test $_os = Darwin; then
     12.3)
         MAC_OS_X_VERSION_MIN_REQUIRED="120300"
         ;;
+    13.0)
+        MAC_OS_X_VERSION_MIN_REQUIRED="130000"
+        ;;
     *)
-        AC_MSG_ERROR([with-macosx-version-min-required $with_macosx_version_min_required is not a supported value, supported values are 10.12--12.3])
+        AC_MSG_ERROR([with-macosx-version-min-required $with_macosx_version_min_required is not a supported value, supported values are 10.12--13.0])
         ;;
     esac
 
@@ -3468,8 +3499,11 @@ if test $_os = Darwin; then
     12.3)
         MAC_OS_X_VERSION_MAX_ALLOWED="120300"
         ;;
+    13.0)
+        MAC_OS_X_VERSION_MAX_ALLOWED="130000"
+        ;;
     *)
-        AC_MSG_ERROR([with-macosx-version-max-allowed $with_macosx_version_max_allowed is not a supported value, supported values are 10.12--12.3])
+        AC_MSG_ERROR([with-macosx-version-max-allowed $with_macosx_version_max_allowed is not a supported value, supported values are 10.12--13.0])
         ;;
     esac
 
@@ -3584,6 +3618,8 @@ AC_SUBST(ENABLE_MACOSX_SANDBOX)
 AC_SUBST(MACOSX_BUNDLE_IDENTIFIER)
 AC_SUBST(MACOSX_PROVISIONING_INFO)
 AC_SUBST(MACOSX_PROVISIONING_PROFILE)
+AC_SUBST(MACOSX_SDK_BUILD_VERSION)
+AC_SUBST(MACOSX_XCODE_BUILD_VERSION)
 
 dnl ===================================================================
 dnl Check iOS SDK and compiler
@@ -3591,14 +3627,14 @@ dnl ===================================================================
 
 if test $_os = iOS; then
     AC_MSG_CHECKING([what iOS SDK to use])
-    current_sdk_ver=15.5
-    older_sdk_vers="15.4 15.2 15.0"
+    current_sdk_ver=16.1
+    older_sdk_vers="16.0 15.6 15.5 15.4 15.2 15.0"
     if test "$enable_ios_simulator" = "yes"; then
         platform=iPhoneSimulator
-        versionmin=-mios-simulator-version-min=13.6
+        versionmin=-mios-simulator-version-min=14.5
     else
         platform=iPhoneOS
-        versionmin=-miphoneos-version-min=13.6
+        versionmin=-miphoneos-version-min=14.5
     fi
     xcode_developer=`xcode-select -print-path`
 
@@ -4473,6 +4509,18 @@ if test -n "$enable_dbgutil" -a "$enable_dbgutil" != "no"; then
         AC_MSG_ERROR([--with-system-graphite conflicts with --enable-dbgutil])
     else
         with_system_graphite=no
+        if test -z "$with_system_harfbuzz"; then
+            with_system_harfbuzz=no
+        fi
+        if test -z "$with_system_cairo"; then
+            with_system_cairo=no
+        fi
+        if test -z "$with_system_fontconfig"; then
+            with_system_fontconfig=no
+        fi
+        if test -z "$with_system_freetype"; then
+            with_system_freetype=no
+        fi
     fi
     if test "$with_system_orcus" = "yes"; then
         AC_MSG_ERROR([--with-system-orcus conflicts with --enable-dbgutil])
@@ -5634,6 +5682,7 @@ if test "$cross_compiling" = "yes"; then
         LibO
         LIBFFI
         LIBPN
+        LIBTIFF
         LIBXML2
         LIBXSLT
         MDDS
@@ -5863,23 +5912,7 @@ fi
 
 AC_SUBST(ENABLE_CUPS)
 
-# fontconfig checks
-if test "$using_freetype_fontconfig" = yes; then
-    AC_MSG_CHECKING([which fontconfig to use])
-fi
-if test "$using_freetype_fontconfig" = yes -a "$test_system_fontconfig" != no; then
-    AC_MSG_RESULT([external])
-    PKG_CHECK_MODULES([FONTCONFIG], [fontconfig >= 2.4.1])
-    SYSTEM_FONTCONFIG=TRUE
-    FilterLibs "${FONTCONFIG_LIBS}"
-    FONTCONFIG_LIBS="${filteredlibs}"
-elif test "$using_freetype_fontconfig" = yes; then
-    AC_MSG_RESULT([internal])
-    BUILD_TYPE="$BUILD_TYPE FONTCONFIG"
-fi
-AC_SUBST(FONTCONFIG_CFLAGS)
-AC_SUBST(FONTCONFIG_LIBS)
-AC_SUBST([SYSTEM_FONTCONFIG])
+libo_CHECK_SYSTEM_MODULE([fontconfig],[FONTCONFIG],[fontconfig >= 2.4.1],,,TRUE)
 
 dnl whether to find & fetch external tarballs?
 dnl ===================================================================
@@ -9511,38 +9544,25 @@ fi
 
 dnl ===================================================================
 dnl Check whether freetype is available
+dnl
+dnl FreeType has 3 different kinds of versions
+dnl * release, like 2.4.10
+dnl * libtool, like 13.0.7 (this what pkg-config returns)
+dnl * soname
+dnl FreeType's docs/VERSION.DLL provides a table mapping between the three
+dnl
+dnl 9.9.3 is 2.2.0
+dnl When the minimal version is at least 2.8.1, remove Skia's check down below.
 dnl ===================================================================
-if test "$using_freetype_fontconfig" = yes; then
-    AC_MSG_CHECKING([which freetype to use])
-fi
-if test "$using_freetype_fontconfig" = yes -a "$test_system_freetype" != no; then
-    AC_MSG_RESULT([external])
-    # FreeType has 3 different kinds of versions
-    # * release, like 2.4.10
-    # * libtool, like 13.0.7 (this what pkg-config returns)
-    # * soname
-    # FreeType's docs/VERSION.DLL provides a table mapping between the three
-    #
-    # 9.9.3 is 2.2.0
-    # When the minimal version is at least 2.8.1, remove Skia's check down below.
-    PKG_CHECK_MODULES(FREETYPE, freetype2 >= 9.9.3)
-    FREETYPE_CFLAGS=$(printf '%s' "$FREETYPE_CFLAGS" | sed -e "s/-I/${ISYSTEM?}/g")
-    FilterLibs "${FREETYPE_LIBS}"
-    FREETYPE_LIBS="${filteredlibs}"
-    SYSTEM_FREETYPE=TRUE
-elif test "$using_freetype_fontconfig" = yes; then
-    AC_MSG_RESULT([internal])
-    FREETYPE_CFLAGS="${ISYSTEM}${WORKDIR}/UnpackedTarball/freetype/include"
+if test "$test_freetype" != no; then
     if test "x$ac_config_site_64bit_host" = xYES; then
-        FREETYPE_LIBS="-L${WORKDIR}/UnpackedTarball/freetype/instdir/lib64 -lfreetype"
+        FREETYPE_LIBS_INTERNAL="-L${WORKDIR}/UnpackedTarball/freetype/instdir/lib64 -lfreetype"
     else
-        FREETYPE_LIBS="-L${WORKDIR}/UnpackedTarball/freetype/instdir/lib -lfreetype"
+        FREETYPE_LIBS_INTERNAL="-L${WORKDIR}/UnpackedTarball/freetype/instdir/lib -lfreetype"
     fi
-    BUILD_TYPE="$BUILD_TYPE FREETYPE"
 fi
-AC_SUBST(FREETYPE_CFLAGS)
-AC_SUBST(FREETYPE_LIBS)
-AC_SUBST([SYSTEM_FREETYPE])
+libo_CHECK_SYSTEM_MODULE([freetype],[FREETYPE],[freetype2 >= 9.9.3],
+    ["${ISYSTEM}${WORKDIR}/UnpackedTarball/freetype/include"],["$FREETYPE_LIBS_INTERNAL"],TRUE)
 
 # ===================================================================
 # Check for system libxslt
@@ -9651,7 +9671,7 @@ else
         LIBXML_LIBS="${WORKDIR}/UnpackedTarball/libxml2/win32/bin.msvc/libxml2.lib"
     else
         LIBXML_LIBS="-L${WORKDIR}/UnpackedTarball/libxml2/.libs -lxml2"
-        if test "$_os" = Android; then
+        if test "$DISABLE_DYNLOADING" = TRUE; then
             LIBXML_LIBS="$LIBXML_LIBS -lm"
         fi
     fi
@@ -9881,7 +9901,7 @@ internal)
     SYSTEM_PYTHON=
     PYTHON_VERSION_MAJOR=3
     PYTHON_VERSION_MINOR=8
-    PYTHON_VERSION=${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.10
+    PYTHON_VERSION=${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.15
     if ! grep -q -i python.*${PYTHON_VERSION} ${SRC_ROOT}/download.lst; then
         AC_MSG_ERROR([PYTHON_VERSION ${PYTHON_VERSION} but no matching file in download.lst])
     fi
@@ -10505,15 +10525,14 @@ dnl ===================================================================
 dnl Check for system NSS
 dnl ===================================================================
 if test "$enable_fuzzers" != "yes" -a "$enable_nss" = "yes"; then
-    libo_CHECK_SYSTEM_MODULE([nss],[NSS],[nss >= 3.9.3 nspr >= 4.8],,,[
-        case "$_os" in
-            Linux)
-                with_system_nss=yes
-            ;;
-            *)
-                with_system_nss=no
-            ;;
-        esac])
+    case "$_os" in
+        Linux)
+            libo_CHECK_SYSTEM_MODULE([nss],[NSS],[nss >= 3.9.3 nspr >= 4.8],,,TRUE)
+        ;;
+        *)
+            libo_CHECK_SYSTEM_MODULE([nss],[NSS],[nss >= 3.9.3 nspr >= 4.8])
+        ;;
+    esac
     AC_DEFINE(HAVE_FEATURE_NSS)
     ENABLE_NSS=TRUE
 elif test $_os != iOS ; then
@@ -10800,13 +10819,27 @@ AC_SUBST(SYSTEM_LIBORCUS)
 dnl ===================================================================
 dnl HarfBuzz
 dnl ===================================================================
-libo_CHECK_SYSTEM_MODULE([graphite],[GRAPHITE],[graphite2 >= 0.9.3],
+case "$_os" in
+    Linux)
+        libo_CHECK_SYSTEM_MODULE([graphite],[GRAPHITE],[graphite2 >= 0.9.3],
+                         ["-I${WORKDIR}/UnpackedTarball/graphite/include -DGRAPHITE2_STATIC"],
+                         ["-L${WORKDIR}/LinkTarget/StaticLibrary -lgraphite"],
+                         TRUE)
+        libo_CHECK_SYSTEM_MODULE([harfbuzz],[HARFBUZZ],[harfbuzz-icu >= 0.9.42],
+                                 ["-I${WORKDIR}/UnpackedTarball/harfbuzz/src"],
+                                 ["-L${WORKDIR}/UnpackedTarball/harfbuzz/src/.libs -lharfbuzz"],
+                                 TRUE)
+        ;;
+    *)
+        libo_CHECK_SYSTEM_MODULE([graphite],[GRAPHITE],[graphite2 >= 0.9.3],
                          ["-I${WORKDIR}/UnpackedTarball/graphite/include -DGRAPHITE2_STATIC"],
                          ["-L${WORKDIR}/LinkTarget/StaticLibrary -lgraphite"])
+        libo_CHECK_SYSTEM_MODULE([harfbuzz],[HARFBUZZ],[harfbuzz-icu >= 0.9.42],
+                                 ["-I${WORKDIR}/UnpackedTarball/harfbuzz/src"],
+                                 ["-L${WORKDIR}/UnpackedTarball/harfbuzz/src/.libs -lharfbuzz"])
+        ;;
+esac
 
-libo_CHECK_SYSTEM_MODULE([harfbuzz],[HARFBUZZ],[harfbuzz-icu >= 0.9.42],
-                         ["-I${WORKDIR}/UnpackedTarball/harfbuzz/src"],
-                         ["-L${WORKDIR}/UnpackedTarball/harfbuzz/src/.libs -lharfbuzz"])
 
 if test "$COM" = "MSC"; then # override the above
     GRAPHITE_LIBS="${WORKDIR}/LinkTarget/StaticLibrary/graphite.lib"
@@ -11728,6 +11761,7 @@ dnl ===================================================================
 
 GTK3_CFLAGS=""
 GTK3_LIBS=""
+ENABLE_GTKTILEDVIEWER=""
 if test "$test_gtk3" = yes -a "x$enable_gtk3" = "xyes" -o "x$enable_gtk3_kde5" = "xyes"; then
     if test "$with_system_cairo" = no; then
         add_warning 'Non-system cairo combined with gtk3 is assumed to cause trouble; proceed at your own risk.'
@@ -11745,9 +11779,23 @@ if test "$test_gtk3" = yes -a "x$enable_gtk3" = "xyes" -o "x$enable_gtk3_kde5" =
         AC_CHECK_HEADER(EGL/eglplatform.h, [],
                         [AC_MSG_ERROR(EGL headers not found. install mesa-libEGL-devel)], [])
     fi
+elif test -n "$with_gtk3_build" -a "$OS" = "WNT"; then
+    PathFormat "${with_gtk3_build}/lib/pkgconfig"
+    if test "$build_os" = "cygwin"; then
+        dnl cygwin's pkg-config does not recognize "C:/..."-style paths, only "/cygdrive/c/..."
+        formatted_path_unix=`cygpath -au "$formatted_path_unix"`
+    fi
+
+    PKG_CONFIG_PATH="$formatted_path_unix"; export PKG_CONFIG_PATH
+    PKG_CHECK_MODULES(GTK3, cairo gdk-3.0 gio-2.0 glib-2.0 gobject-2.0 gtk+-3.0)
+    GTK3_CFLAGS="$GTK3_CFLAGS -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED"
+    FilterLibs "${GTK3_LIBS}"
+    GTK3_LIBS="${filteredlibs}"
+    ENABLE_GTKTILEDVIEWER="yes"
 fi
 AC_SUBST(GTK3_LIBS)
 AC_SUBST(GTK3_CFLAGS)
+AC_SUBST(ENABLE_GTKTILEDVIEWER)
 
 GTK4_CFLAGS=""
 GTK4_LIBS=""
@@ -13595,6 +13643,12 @@ dnl ===================================================================
 libo_CHECK_SYSTEM_MODULE([libpng],[LIBPNG],[libpng],["-I${WORKDIR}/UnpackedTarball/libpng"],["-L${WORKDIR}/LinkTarget/StaticLibrary -llibpng"])
 
 dnl ===================================================================
+dnl Test whether to build libtiff or rely on the system version
+dnl ===================================================================
+
+libo_CHECK_SYSTEM_MODULE([libtiff],[LIBTIFF],[libtiff-4])
+
+dnl ===================================================================
 dnl Test whether to build libwebp or rely on the system version
 dnl ===================================================================
 
@@ -14733,6 +14787,7 @@ AC_CONFIG_FILES([config_host.mk
                  instsetoo_native/util/openoffice.lst
                  sysui/desktop/macosx/Info.plist
                  vs-code-template.code-workspace:.vscode/vs-code-template.code-workspace.in])
+AC_CONFIG_HEADERS([config_host/config_buildconfig.h])
 AC_CONFIG_HEADERS([config_host/config_buildid.h])
 AC_CONFIG_HEADERS([config_host/config_box2d.h])
 AC_CONFIG_HEADERS([config_host/config_clang.h])

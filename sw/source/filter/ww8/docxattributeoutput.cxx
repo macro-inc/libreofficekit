@@ -137,6 +137,7 @@
 #include <frmatr.hxx>
 #include <txtatr.hxx>
 #include <frameformats.hxx>
+#include <textcontentcontrol.hxx>
 
 #include <o3tl/string_view.hxx>
 #include <o3tl/unit_conversion.hxx>
@@ -361,23 +362,6 @@ void DocxAttributeOutput::WriteFloatingTable(ww8::Frame const* pParentFrame)
     GetExport().WriteText();
 
     m_rExport.SetFloatingTableFrame(nullptr);
-}
-
-void DocxAttributeOutput::StartContentControl(const SwFormatContentControl& rFormatContentControl)
-{
-    m_pContentControl = rFormatContentControl.GetContentControl();
-}
-
-void DocxAttributeOutput::EndContentControl(const SwTextNode& rNode, sal_Int32 nPos)
-{
-    if (rNode.GetTextAttrForCharAt(nPos, RES_TXTATR_FLYCNT) || rNode.GetTextAttrForCharAt(nPos, RES_TXTATR_CONTENTCONTROL))
-    {
-        ++m_nCloseContentControlInPreviousRun;
-    }
-    else
-    {
-        ++m_nCloseContentControlInThisRun;
-    }
 }
 
 static void checkAndWriteFloatingTables(DocxAttributeOutput& rDocxAttributeOutput)
@@ -1582,7 +1566,7 @@ void DocxAttributeOutput::StartRun( const SwRedlineData* pRedlineData, sal_Int32
     m_pSerializer->mark(Tag_StartRun_3); // let's call it "postponed text"
 }
 
-void DocxAttributeOutput::EndRun(const SwTextNode* pNode, sal_Int32 nPos, bool /*bLastRun*/)
+void DocxAttributeOutput::EndRun(const SwTextNode* pNode, sal_Int32 nPos, sal_Int32 nLen, bool /*bLastRun*/)
 {
     int nFieldsInPrevHyperlink = m_nFieldsInHyperlink;
     // Reset m_nFieldsInHyperlink if a new hyperlink is about to start
@@ -1637,12 +1621,6 @@ void DocxAttributeOutput::EndRun(const SwTextNode* pNode, sal_Int32 nPos, bool /
         else
             m_aRunSdt.EndSdtBlock(m_pSerializer);
         m_bEndCharSdt = false;
-    }
-
-    for (; m_nCloseContentControlInPreviousRun > 0; --m_nCloseContentControlInPreviousRun)
-    {
-        // Not the last run of this paragraph.
-        WriteContentControlEnd();
     }
 
     if ( m_closeHyperlinkInPreviousRun )
@@ -1742,8 +1720,6 @@ void DocxAttributeOutput::EndRun(const SwTextNode* pNode, sal_Int32 nPos, bool /
         m_nHyperLinkCount++;
     }
 
-    WriteContentControlStart();
-
     // if there is some redlining in the document, output it
     StartRedline( m_pRedlineData );
 
@@ -1789,6 +1765,17 @@ void DocxAttributeOutput::EndRun(const SwTextNode* pNode, sal_Int32 nPos, bool /
 
     DoWriteBookmarkStartIfExist(nPos);
 
+    if (nLen != -1)
+    {
+        SwTextAttr* pAttr = pNode->GetTextAttrAt(nPos, RES_TXTATR_CONTENTCONTROL, SwTextNode::DEFAULT);
+        if (pAttr && pAttr->GetStart() == nPos)
+        {
+            auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
+            m_pContentControl = pTextContentControl->GetContentControl().GetContentControl();
+            WriteContentControlStart();
+        }
+    }
+
     m_pSerializer->startElementNS(XML_w, XML_r);
     if(GetExport().m_bTabInTOC && m_pHyperlinkAttrList.is())
     {
@@ -1806,6 +1793,16 @@ void DocxAttributeOutput::EndRun(const SwTextNode* pNode, sal_Int32 nPos, bool /
     m_pSerializer->mergeTopMarks(Tag_StartRun_2); // merges the "actual run start"
     // append the actual run end
     m_pSerializer->endElementNS( XML_w, XML_r );
+
+    if (nLen != -1)
+    {
+        sal_Int32 nEnd = nPos + nLen;
+        SwTextAttr* pAttr = pNode->GetTextAttrAt(nPos, RES_TXTATR_CONTENTCONTROL, SwTextNode::DEFAULT);
+        if (pAttr && *pAttr->GetEnd() == nEnd)
+        {
+            WriteContentControlEnd();
+        }
+    }
 
     // if there is some redlining in the document, output it
     // (except in the case of fields with multiple runs)
@@ -1852,12 +1849,6 @@ void DocxAttributeOutput::EndRun(const SwTextNode* pNode, sal_Int32 nPos, bool /
     if ( !m_bWritingField )
     {
         m_pRedlineData = nullptr;
-    }
-
-    for (; m_nCloseContentControlInThisRun > 0; --m_nCloseContentControlInThisRun)
-    {
-        // Last run of this paragraph.
-        WriteContentControlEnd();
     }
 
     if ( m_closeHyperlinkInThisRun )
@@ -2372,6 +2363,24 @@ void DocxAttributeOutput::WriteContentControlStart()
                                        m_pContentControl->GetColor());
     }
 
+    if (!m_pContentControl->GetAlias().isEmpty())
+    {
+        m_pSerializer->singleElementNS(XML_w, XML_alias, FSNS(XML_w, XML_val),
+                                       m_pContentControl->GetAlias());
+    }
+
+    if (!m_pContentControl->GetTag().isEmpty())
+    {
+        m_pSerializer->singleElementNS(XML_w, XML_tag, FSNS(XML_w, XML_val),
+                                       m_pContentControl->GetTag());
+    }
+
+    if (m_pContentControl->GetId())
+    {
+        m_pSerializer->singleElementNS(XML_w, XML_id, FSNS(XML_w, XML_val),
+                                       OString::number(m_pContentControl->GetId()));
+    }
+
     if (m_pContentControl->GetShowingPlaceHolder())
     {
         m_pSerializer->singleElementNS(XML_w, XML_showingPlcHdr);
@@ -2402,16 +2411,30 @@ void DocxAttributeOutput::WriteContentControlStart()
         m_pSerializer->endElementNS(XML_w14, XML_checkbox);
     }
 
-    if (m_pContentControl->HasListItems())
+    if (m_pContentControl->GetComboBox() || m_pContentControl->GetDropDown())
     {
-        m_pSerializer->startElementNS(XML_w, XML_dropDownList);
+        if (m_pContentControl->GetComboBox())
+        {
+            m_pSerializer->startElementNS(XML_w, XML_comboBox);
+        }
+        else
+        {
+            m_pSerializer->startElementNS(XML_w, XML_dropDownList);
+        }
         for (const auto& rItem : m_pContentControl->GetListItems())
         {
             m_pSerializer->singleElementNS(XML_w, XML_listItem,
                     FSNS(XML_w, XML_displayText), rItem.m_aDisplayText,
                     FSNS(XML_w, XML_value), rItem.m_aValue);
         }
-        m_pSerializer->endElementNS(XML_w, XML_dropDownList);
+        if (m_pContentControl->GetComboBox())
+        {
+            m_pSerializer->endElementNS(XML_w, XML_comboBox);
+        }
+        else
+        {
+            m_pSerializer->endElementNS(XML_w, XML_dropDownList);
+        }
     }
 
     if (m_pContentControl->GetDate())
@@ -2447,6 +2470,26 @@ void DocxAttributeOutput::WriteContentControlStart()
 
     m_pSerializer->endElementNS(XML_w, XML_sdtPr);
     m_pSerializer->startElementNS(XML_w, XML_sdtContent);
+
+    const OUString& rPrefixMapping = m_pContentControl->GetDataBindingPrefixMappings();
+    const OUString& rXpath = m_pContentControl->GetDataBindingXpath();
+    if (!rXpath.isEmpty())
+    {
+        // This content control has a data binding, update the data source.
+        SwTextContentControl* pTextAttr = m_pContentControl->GetTextAttr();
+        SwTextNode* pTextNode = m_pContentControl->GetTextNode();
+        SwPosition aPoint(*pTextNode, pTextAttr->GetStart());
+        SwPosition aMark(*pTextNode, *pTextAttr->GetEnd());
+        SwPaM aPam(aMark, aPoint);
+        OUString aSnippet = aPam.GetText();
+        static sal_Unicode const aForbidden[] = {
+            CH_TXTATR_BREAKWORD,
+            0
+        };
+        aSnippet = comphelper::string::removeAny(aSnippet, aForbidden);
+        m_rExport.AddSdtData(rPrefixMapping, rXpath, aSnippet);
+    }
+
     m_pContentControl = nullptr;
 }
 
@@ -3354,7 +3397,8 @@ bool DocxAttributeOutput::FootnoteEndnoteRefTag()
     the switch in DocxAttributeOutput::RunText() nicer ;-)
  */
 static bool impl_WriteRunText( FSHelperPtr const & pSerializer, sal_Int32 nTextToken,
-        const sal_Unicode* &rBegin, const sal_Unicode* pEnd, bool bMove = true )
+        const sal_Unicode* &rBegin, const sal_Unicode* pEnd, bool bMove = true,
+        const OUString& rSymbolFont = OUString() )
 {
     const sal_Unicode *pBegin = rBegin;
 
@@ -3365,31 +3409,38 @@ static bool impl_WriteRunText( FSHelperPtr const & pSerializer, sal_Int32 nTextT
     if ( pBegin >= pEnd )
         return false; // we want to write at least one character
 
-    // we have to add 'preserve' when starting/ending with space
-    if ( *pBegin == ' ' || *( pEnd - 1 ) == ' ' )
+    bool bIsSymbol = !rSymbolFont.isEmpty();
+
+    std::u16string_view aView( pBegin, pEnd - pBegin );
+    if (bIsSymbol)
     {
-        pSerializer->startElementNS(XML_w, nTextToken, FSNS(XML_xml, XML_space), "preserve");
+        for (char16_t aChar : aView)
+        {
+            pSerializer->singleElementNS(XML_w, XML_sym,
+                FSNS(XML_w, XML_font), rSymbolFont,
+                FSNS(XML_w, XML_char), OString::number(aChar, 16));
+        }
     }
     else
-        pSerializer->startElementNS(XML_w, nTextToken);
+    {
+        // we have to add 'preserve' when starting/ending with space
+        if ( *pBegin == ' ' || *( pEnd - 1 ) == ' ' )
+            pSerializer->startElementNS(XML_w, nTextToken, FSNS(XML_xml, XML_space), "preserve");
+        else
+            pSerializer->startElementNS(XML_w, nTextToken);
 
-    pSerializer->writeEscaped( std::u16string_view( pBegin, pEnd - pBegin ) );
-
-    pSerializer->endElementNS( XML_w, nTextToken );
+        pSerializer->writeEscaped( aView );
+        pSerializer->endElementNS( XML_w, nTextToken );
+    }
 
     return true;
 }
 
-void DocxAttributeOutput::RunText( const OUString& rText, rtl_TextEncoding /*eCharSet*/ )
+void DocxAttributeOutput::RunText( const OUString& rText, rtl_TextEncoding /*eCharSet*/, const OUString& rSymbolFont )
 {
     if( m_closeHyperlinkInThisRun )
     {
         m_closeHyperlinkInPreviousRun = true;
-    }
-    if (m_nCloseContentControlInThisRun > 0)
-    {
-        ++m_nCloseContentControlInPreviousRun;
-        --m_nCloseContentControlInThisRun;
     }
     m_bRunTextIsOn = true;
     // one text can be split into more <w:t>blah</w:t>'s by line breaks etc.
@@ -3445,7 +3496,7 @@ void DocxAttributeOutput::RunText( const OUString& rText, rtl_TextEncoding /*eCh
         }
     }
 
-    impl_WriteRunText( m_pSerializer, nTextToken, pBegin, pEnd, false );
+    impl_WriteRunText( m_pSerializer, nTextToken, pBegin, pEnd, false, rSymbolFont );
 }
 
 void DocxAttributeOutput::RawText(const OUString& rText, rtl_TextEncoding /*eCharSet*/)
@@ -3457,7 +3508,7 @@ void DocxAttributeOutput::StartRuby( const SwTextNode& rNode, sal_Int32 nPos, co
 {
     WW8Ruby aWW8Ruby( rNode, rRuby, GetExport() );
     SAL_INFO("sw.ww8", "TODO DocxAttributeOutput::StartRuby( const SwTextNode& rNode, const SwFormatRuby& rRuby )" );
-    EndRun( &rNode, nPos ); // end run before starting ruby to avoid nested runs, and overlap
+    EndRun( &rNode, nPos, -1 ); // end run before starting ruby to avoid nested runs, and overlap
     assert(!m_closeHyperlinkInThisRun); // check that no hyperlink overlaps ruby
     assert(!m_closeHyperlinkInPreviousRun);
     m_pSerializer->startElementNS(XML_w, XML_r);
@@ -3501,7 +3552,7 @@ void DocxAttributeOutput::StartRuby( const SwTextNode& rNode, sal_Int32 nPos, co
 
     EndRunProperties( nullptr );
     RunText( rRuby.GetText( ) );
-    EndRun( &rNode, nPos );
+    EndRun( &rNode, nPos, -1 );
     m_pSerializer->endElementNS( XML_w, XML_rt );
 
     m_pSerializer->startElementNS(XML_w, XML_rubyBase);
@@ -3511,7 +3562,7 @@ void DocxAttributeOutput::StartRuby( const SwTextNode& rNode, sal_Int32 nPos, co
 void DocxAttributeOutput::EndRuby(const SwTextNode& rNode, sal_Int32 nPos)
 {
     SAL_INFO("sw.ww8", "TODO DocxAttributeOutput::EndRuby()" );
-    EndRun( &rNode, nPos );
+    EndRun( &rNode, nPos, -1 );
     m_pSerializer->endElementNS( XML_w, XML_rubyBase );
     m_pSerializer->endElementNS( XML_w, XML_ruby );
     m_pSerializer->endElementNS( XML_w, XML_r );
@@ -6896,6 +6947,11 @@ void DocxAttributeOutput::pushToTableExportContext(DocxTableExportContext& rCont
 
     rContext.m_bStartedParaSdt = m_aParagraphSdt.m_bStartedSdt;
     m_aParagraphSdt.m_bStartedSdt = false;
+    rContext.m_bStartedRunSdt = m_aRunSdt.m_bStartedSdt;
+    m_aRunSdt.m_bStartedSdt = false;
+
+    rContext.m_nHyperLinkCount = m_nHyperLinkCount;
+    m_nHyperLinkCount = 0;
 }
 
 void DocxAttributeOutput::popFromTableExportContext(DocxTableExportContext const & rContext)
@@ -6904,6 +6960,8 @@ void DocxAttributeOutput::popFromTableExportContext(DocxTableExportContext const
     m_tableReference->m_bTableCellOpen = rContext.m_bTableCellOpen;
     m_tableReference->m_nTableDepth = rContext.m_nTableDepth;
     m_aParagraphSdt.m_bStartedSdt = rContext.m_bStartedParaSdt;
+    m_aRunSdt.m_bStartedSdt = rContext.m_bStartedRunSdt;
+    m_nHyperLinkCount = rContext.m_nHyperLinkCount;
 }
 
 void DocxAttributeOutput::WriteTextBox(uno::Reference<drawing::XShape> xShape)

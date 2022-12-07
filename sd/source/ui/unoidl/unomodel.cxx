@@ -2283,6 +2283,8 @@ void SdXImpressDocument::paintTile( VirtualDevice& rDevice,
 
     LokChartHelper::PaintAllChartsOnTile(rDevice, nOutputWidth, nOutputHeight,
                                          nTilePosX, nTilePosY, nTileWidth, nTileHeight);
+    LokStarMathHelper::PaintAllInPlaceOnTile(rDevice, nOutputWidth, nOutputHeight, nTilePosX,
+                                             nTilePosY, nTileWidth, nTileHeight);
 
     if(patchedPageWindow != nullptr)
         patchedPageWindow->unpatchPaintWindow(previousPaintWindow);
@@ -2320,7 +2322,10 @@ OUString SdXImpressDocument::getPartInfo(int nPart)
         OUString::number(static_cast<unsigned int>(bIsSelected)) +
         "\", \"masterPageCount\": \"" +
         OUString::number(nMasterPageCount) +
+        "\", \"mode\": \"" +
+        OUString::number(getEditMode()) +
         "\" }";
+
     return aPartInfo;
 }
 
@@ -2408,16 +2413,13 @@ VclPtr<vcl::Window> SdXImpressDocument::getDocWindow()
 {
     SolarMutexGuard aGuard;
     DrawViewShell* pViewShell = GetViewShell();
-    VclPtr<vcl::Window> pWindow;
-    if (pViewShell)
-        pWindow = pViewShell->GetActiveWindow();
+    if (!pViewShell)
+        return {};
 
-    LokChartHelper aChartHelper(pViewShell->GetViewShell());
-    VclPtr<vcl::Window> pChartWindow = aChartHelper.GetWindow();
-    if (pChartWindow)
-        pWindow = pChartWindow;
+    if (VclPtr<vcl::Window> pWindow = SfxLokHelper::getInPlaceDocWindow(pViewShell->GetViewShell()))
+        return pWindow;
 
-    return pWindow;
+    return pViewShell->GetActiveWindow();
 }
 
 void SdXImpressDocument::setPartMode( int nPartMode )
@@ -2436,6 +2438,26 @@ void SdXImpressDocument::setPartMode( int nPartMode )
         break;
     }
     pViewSh->SetPageKind( aPageKind );
+}
+
+int SdXImpressDocument::getEditMode()
+{
+    DrawViewShell* pViewSh = GetViewShell();
+    if (!pViewSh)
+        return 0;
+
+    return pViewSh->GetViewShellBase().getEditMode();
+}
+
+void SdXImpressDocument::setEditMode(int nMode)
+{
+    SolarMutexGuard aGuard;
+
+    DrawViewShell* pViewSh = GetViewShell();
+    if (!pViewSh)
+        return;
+
+    pViewSh->GetViewShellBase().setEditMode(nMode);
 }
 
 Size SdXImpressDocument::getDocumentSize()
@@ -2564,20 +2586,9 @@ void SdXImpressDocument::postMouseEvent(int nType, int nX, int nY, int nCount, i
 
     constexpr double fScale = o3tl::convert(1.0, o3tl::Length::twip, o3tl::Length::px);
 
-    // check if user hit a chart which is being edited by him
-    LokChartHelper aChartHelper(pViewShell->GetViewShell());
-    if (aChartHelper.postMouseEvent(nType, nX, nY,
-                                    nCount, nButtons, nModifier,
-                                    fScale, fScale))
+    if (SfxLokHelper::testInPlaceComponentMouseEventHit(
+            pViewShell->GetViewShell(), nType, nX, nY, nCount, nButtons, nModifier, fScale, fScale))
         return;
-
-    // check if the user hit a chart which is being edited by someone else
-    // and, if so, skip current mouse event
-    if (nType != LOK_MOUSEEVENT_MOUSEMOVE)
-    {
-        if (LokChartHelper::HitAny(Point(nX, nY)))
-            return;
-    }
 
     const Point aPos(Point(convertTwipToMm100(nX), convertTwipToMm100(nY)));
     LokMouseEventData aMouseEventData(nType, aPos, nCount, MouseEventModifiers::SIMPLECLICK,

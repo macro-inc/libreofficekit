@@ -11,6 +11,7 @@
 
 #include <string_view>
 
+#include <sfx2/lokcomponenthelpers.hxx>
 #include <sfx2/lokhelper.hxx>
 
 #include <com/sun/star/frame/Desktop.hpp>
@@ -123,6 +124,12 @@ int SfxLokHelper::createView(int nDocId)
 
     // No frame with nDocId found.
     return -1;
+}
+
+void SfxLokHelper::setEditMode(int nMode, vcl::ITiledRenderable* pDoc)
+{
+    DisableCallbacks dc;
+    pDoc->setEditMode(nMode);
 }
 
 void SfxLokHelper::destroyView(int nId)
@@ -359,6 +366,7 @@ static OString lcl_generateJSON(const SfxViewShell* pView, const boost::property
     boost::property_tree::ptree aMessageProps = rTree;
     aMessageProps.put("viewId", SfxLokHelper::getView(pView));
     aMessageProps.put("part", pView->getPart());
+    aMessageProps.put("mode", pView->getEditMode());
     std::stringstream aStream;
     boost::property_tree::write_json(aStream, aMessageProps, false /* pretty */);
     const std::string aString = aStream.str();
@@ -370,7 +378,8 @@ static inline OString lcl_generateJSON(const SfxViewShell* pView, int nViewId, s
 {
     assert(pView != nullptr && "pView must be valid");
     return OString::Concat("{ \"viewId\": \"") + OString::number(nViewId)
-           + "\", \"part\": \"" + OString::number(pView->getPart()) + "\", \"" + rKey + "\": \""
+           + "\", \"part\": \"" + OString::number(pView->getPart()) + "\", \"mode\": \""
+           + OString::number(pView->getEditMode()) + "\", \"" + rKey + "\": \""
            + lcl_sanitizeJSONAsValue(rPayload) + "\" }";
 }
 
@@ -542,8 +551,10 @@ void SfxLokHelper::notifyInvalidation(SfxViewShell const* pThisView, tools::Rect
     if (DisableCallbacks::disabled())
         return;
 
+    // -1 means all parts
     const int nPart = comphelper::LibreOfficeKit::isPartInInvalidation() ? pThisView->getPart() : INT_MIN;
-    pThisView->libreOfficeKitViewInvalidateTilesCallback(pRect, nPart);
+    const int nMode = pThisView->getEditMode();
+    pThisView->libreOfficeKitViewInvalidateTilesCallback(pRect, nPart, nMode);
 }
 
 void SfxLokHelper::notifyDocumentSizeChanged(SfxViewShell const* pThisView, const OString& rPayload, vcl::ITiledRenderable* pDoc, bool bInvalidateAll)
@@ -556,7 +567,8 @@ void SfxLokHelper::notifyDocumentSizeChanged(SfxViewShell const* pThisView, cons
         for (int i = 0; i < pDoc->getParts(); ++i)
         {
             tools::Rectangle aRectangle(0, 0, 1000000000, 1000000000);
-            pThisView->libreOfficeKitViewInvalidateTilesCallback(&aRectangle, i);
+            const int nMode = pThisView->getEditMode();
+            pThisView->libreOfficeKitViewInvalidateTilesCallback(&aRectangle, i, nMode);
         }
     }
     pThisView->libreOfficeKitViewCallback(LOK_CALLBACK_DOCUMENT_SIZE_CHANGED, rPayload.getStr());
@@ -580,6 +592,20 @@ void SfxLokHelper::notifyDocumentSizeChangedAllViews(vcl::ITiledRenderable* pDoc
             SfxLokHelper::notifyDocumentSizeChanged(pViewShell, "", pDoc, bInvalidateAll);
             bInvalidateAll = false; // we direct invalidations to all views anyway.
         }
+        pViewShell = SfxViewShell::GetNext(*pViewShell);
+    }
+}
+
+void SfxLokHelper::notifyPartSizeChangedAllViews(vcl::ITiledRenderable* pDoc, int nPart)
+{
+    if (DisableCallbacks::disabled())
+        return;
+
+    SfxViewShell* pViewShell = SfxViewShell::GetFirst();
+    while (pViewShell)
+    {
+        if (pViewShell->getPart() == nPart)
+            SfxLokHelper::notifyDocumentSizeChanged(pViewShell, "", pDoc, false);
         pViewShell = SfxViewShell::GetNext(*pViewShell);
     }
 }
@@ -726,7 +752,8 @@ namespace
                 pFocusWindow->KeyUp(pLOKEv->maKeyEvent);
             break;
         case VclEventId::WindowMouseButtonDown:
-            pLOKEv->mpWindow->LogicMouseButtonDown(pLOKEv->maMouseEvent);
+            pLOKEv->mpWindow->SetLastMousePos(pLOKEv->maMouseEvent.GetPosPixel());
+            pLOKEv->mpWindow->MouseButtonDown(pLOKEv->maMouseEvent);
             // Invoke the context menu
             if (pLOKEv->maMouseEvent.GetButtons() & MOUSE_RIGHT)
             {
@@ -735,7 +762,8 @@ namespace
             }
             break;
         case VclEventId::WindowMouseButtonUp:
-            pLOKEv->mpWindow->LogicMouseButtonUp(pLOKEv->maMouseEvent);
+            pLOKEv->mpWindow->SetLastMousePos(pLOKEv->maMouseEvent.GetPosPixel());
+            pLOKEv->mpWindow->MouseButtonUp(pLOKEv->maMouseEvent);
 
             // sometimes MouseButtonDown captures mouse and starts tracking, and VCL
             // will not take care of releasing that with tiled rendering
@@ -744,7 +772,8 @@ namespace
 
             break;
         case VclEventId::WindowMouseMove:
-            pLOKEv->mpWindow->LogicMouseMove(pLOKEv->maMouseEvent);
+            pLOKEv->mpWindow->SetLastMousePos(pLOKEv->maMouseEvent.GetPosPixel());
+            pLOKEv->mpWindow->MouseMove(pLOKEv->maMouseEvent);
             break;
         case VclEventId::ExtTextInput:
         case VclEventId::EndExtTextInput:
@@ -883,6 +912,54 @@ void SfxLokHelper::dumpState(rtl::OStringBuffer &rState)
 
         pViewShell = SfxViewShell::GetNext(*pViewShell);
     }
+}
+
+void SfxLokHelper::notifyMediaUpdate(boost::property_tree::ptree& json)
+{
+    std::stringstream aStream;
+    boost::property_tree::write_json(aStream, json, /*pretty=*/ false);
+    const std::string str = aStream.str();
+
+    SfxLokHelper::notifyAllViews(LOK_CALLBACK_MEDIA_SHAPE, str.c_str());
+}
+
+bool SfxLokHelper::testInPlaceComponentMouseEventHit(SfxViewShell* pViewShell, int nType, int nX,
+                                                     int nY, int nCount, int nButtons,
+                                                     int nModifier, double fScaleX, double fScaleY,
+                                                     bool bNegativeX)
+{
+    // In LOK RTL mode draw/svx operates in negative X coordinates
+    // But the coordinates from client is always positive, so negate nX.
+    if (bNegativeX)
+        nX = -nX;
+
+    // check if the user hit a chart/math object which is being edited by this view
+    if (LokChartHelper aChartHelper(pViewShell, bNegativeX);
+        aChartHelper.postMouseEvent(nType, nX, nY, nCount, nButtons, nModifier, fScaleX, fScaleY))
+        return true;
+
+    if (LokStarMathHelper aMathHelper(pViewShell);
+        aMathHelper.postMouseEvent(nType, nX, nY, nCount, nButtons, nModifier, fScaleX, fScaleY))
+        return true;
+
+    // check if the user hit a chart which is being edited by someone else
+    // and, if so, skip current mouse event
+    if (nType != LOK_MOUSEEVENT_MOUSEMOVE)
+    {
+        if (LokChartHelper::HitAny({nX, nY}, bNegativeX))
+            return true;
+    }
+
+    return false;
+}
+
+VclPtr<vcl::Window> SfxLokHelper::getInPlaceDocWindow(SfxViewShell* pViewShell)
+{
+    if (VclPtr<vcl::Window> pWindow = LokChartHelper(pViewShell).GetWindow())
+        return pWindow;
+    if (VclPtr<vcl::Window> pWindow = LokStarMathHelper(pViewShell).GetWidgetWindow())
+        return pWindow;
+    return {};
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

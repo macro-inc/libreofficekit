@@ -803,6 +803,7 @@ typedef enum
      * Entered a rich text content control:
      * {
      *     "action": "show",
+     *     "alias": "my alias", // omitted if empty
      *     "rectangles": "1418, 1694, 720, 551; 10291, 1418, 1099, 275"
      * }
      *
@@ -881,6 +882,23 @@ typedef enum
      *
      */
     LOK_CALLBACK_FONTS_MISSING = 57,
+
+    /**
+     * Insertion, removal, movement, and selection of a media shape.
+     * The payload is a json with the relevant details.
+     *
+     *      {
+     *          "action": "insert",
+     *          "id": 123456,
+     *          "url": "file:// ..."
+     *          "x": ...,
+     *          "y": ...,
+     *      }
+     *
+     *      where the "svg" property is a string containing an svg document
+     *      which is a representation of the pie segment.
+     */
+    LOK_CALLBACK_MEDIA_SHAPE = 58,
 }
 LibreOfficeKitCallbackType;
 
@@ -1025,6 +1043,8 @@ static inline const char* lokCallbackTypeToString(int nType)
         return "LOK_CALLBACK_PRINT_RANGES";
     case LOK_CALLBACK_FONTS_MISSING:
         return "LOK_CALLBACK_FONTS_MISSING";
+    case LOK_CALLBACK_MEDIA_SHAPE:
+        return "LOK_CALLBACK_MEDIA_SHAPE";
     }
 
     assert(!"Unknown LibreOfficeKitCallbackType type.");

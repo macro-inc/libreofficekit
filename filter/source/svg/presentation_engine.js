@@ -4464,13 +4464,13 @@ var aOOOAttrTextAdjust = 'text-adjust';
 // element class names
 var aClipPathGroupClassName = 'ClipPathGroup';
 var aPageClassName = 'Page';
-var aSlideNumberClassName = 'Slide_Number';
-var aDateTimeClassName = 'Date/Time';
+var aSlideNumberClassName = 'PageNumber';
+var aDateTimeClassName = 'DateTime';
 var aFooterClassName = 'Footer';
 var aHeaderClassName = 'Header';
 var aDateClassName = 'Date';
 var aTimeClassName = 'Time';
-var aSlideNameClassName='SlideName';
+var aSlideNameClassName='PageName';
 
 // Creating a namespace dictionary.
 var NSS = {};
@@ -4783,15 +4783,6 @@ function getUrlParameter(name)
 function getRandomInt( nMax )
 {
     return Math.floor( Math.random() * nMax );
-}
-
-function isTextFieldElement( aElement ) // eslint-disable-line no-unused-vars
-{
-    var sClassName = aElement.getAttribute( 'class' );
-    return ( sClassName === aSlideNumberClassName ) ||
-           ( sClassName === aFooterClassName ) ||
-           ( sClassName === aHeaderClassName ) ||
-           ( sClassName === aDateTimeClassName );
 }
 
 
@@ -5192,10 +5183,11 @@ initPlaceholderElements : function()
     for( ; i < aPlaceholderList.length; ++i )
     {
         var aPlaceholderElem = aPlaceholderList[i];
-        var sContent = aPlaceholderElem.textContent;
-        if( sContent === '<date>' )
+        var sClass = aPlaceholderElem.getAttribute('class');
+        var sFieldType = sClass.split(' ')[1];
+        if( sFieldType ===  aDateClassName)
             aPlaceholderElem.textContent = new Date().toLocaleDateString();
-        else if( sContent === '<time>' )
+        else if( sFieldType === aTimeClassName )
             aPlaceholderElem.textContent = new Date().toLocaleTimeString();
     }
 },
@@ -5376,24 +5368,43 @@ getSlideAnimationsRoot : function()
 
 }; // end MetaSlide prototype
 
-function getTextFieldType ( elem )
+function removeRedundantParagraphFromTextFieldShape( aObject )
 {
+    var aTextElem = getElementByClassName( aObject, 'SVGTextShape' );
+    if( aTextElem )
+    {
+        var aPlaceholderElement = getElementsByClassName(aTextElem, 'PlaceholderText');
+        if( aPlaceholderElement )
+        {
+            var aTextParagraphSet = getElementsByClassName(aTextElem, 'TextParagraph');
+            // When the text field width is too small, the placeholder text spans several lines.
+            // We remove all text lines but the first one which is used as a placeholder.
+            // This is a workaround but it should work in the majority of cases.
+            // A complete solution needs to support svg text wrapping.
+            if( aTextParagraphSet.length > 1 )
+            {
+                var i = aTextParagraphSet.length;
+                while( i > 1 )
+                {
+                    aTextElem.removeChild(aTextParagraphSet[i - 1]);
+                    --i;
+                }
+            }
+        }
+    }
+}
+
+function getTextFieldType ( elem ) {
     var sFieldType = null;
     var sClass = elem.getAttribute('class');
-    if( sClass == 'TextShape' )
+    if( sClass === 'TextShape' )
     {
-        var aPlaceholderElement = getElementByClassName( elem, 'PlaceholderText' );
-        if (aPlaceholderElement)
+        var aPlaceholderElement = getElementByClassName(elem, 'PlaceholderText');
+        if( aPlaceholderElement )
         {
-            var sContent = aPlaceholderElement.textContent
-            if (sContent === '<number>')
-                sFieldType = aSlideNumberClassName;
-            else if (sContent === '<date>')
-                sFieldType = aDateClassName;
-            else if (sContent === '<time>')
-                sFieldType = aTimeClassName;
-            else if (sContent === '<slide-name>')
-                sFieldType = aSlideNameClassName;
+            var sClassAttr = aPlaceholderElement.getAttribute('class');
+            var classes = sClassAttr.split(' ');
+            sFieldType = classes[1];
         }
     }
     return sFieldType;
@@ -5401,8 +5412,8 @@ function getTextFieldType ( elem )
 
 function isTextFieldByClassName ( sClassName )
 {
-    return sClassName === aDateTimeClassName || sClassName === aFooterClassName
-        || sClassName === aHeaderClassName || sClassName.indexOf( aSlideNumberClassName ) == 0
+    return sClassName.indexOf( aDateTimeClassName ) == 0 || sClassName.indexOf( aFooterClassName ) == 0
+        || sClassName.indexOf( aHeaderClassName ) == 0 || sClassName.indexOf( aSlideNumberClassName ) == 0
         || sClassName.indexOf( aDateClassName ) == 0 || sClassName.indexOf( aTimeClassName ) == 0
         || sClassName.indexOf( aSlideNameClassName ) == 0;
 }
@@ -5421,7 +5432,7 @@ function isTextFieldByClassName ( sClassName )
  *          background image
  *      </g>
  *      <g class='BackgroundObjects'>
- *          <g class='Date/Time'>
+ *          <g class='DateTime'>
  *              date/time placeholder
  *          </g>
  *          <g class='Header'>
@@ -5430,7 +5441,7 @@ function isTextFieldByClassName ( sClassName )
  *          <g class='Footer'>
  *              footer placeholder
  *          </g>
- *          <g class='Slide_Number'>
+ *          <g class='PageNumber'>
  *              slide number placeholder
  *          </g>
  *          shapes
@@ -5487,6 +5498,7 @@ function MasterPage( sMasterPageId, aMetaSlide )
             for( ; i < aBackgroundObjectList.length; ++i )
             {
                 var aObject = aBackgroundObjectList[i];
+                removeRedundantParagraphFromTextFieldShape( aObject );
                 sClass = null;
                 var sFieldType = getTextFieldType( aObject );
                 if( sFieldType && aObject.firstElementChild )
@@ -5501,6 +5513,12 @@ function MasterPage( sMasterPageId, aMetaSlide )
                 if( !sClass )
                 {
                     sClass = aBackgroundObjectList[i].getAttribute('class');
+                    if( sClass === aDateTimeClassName || sClass === aFooterClassName
+                        || sClass === aHeaderClassName || sClass === aSlideNumberClassName)
+                    {
+                        sClass += '.Default';
+                        aObject.setAttribute('class', sClass);
+                    }
                 }
                 if( !sClass || !isTextFieldByClassName( sClass ) )
                 {
@@ -5707,10 +5725,10 @@ PlaceholderShape.prototype.init = function()
  *      <use class='Background'>               // reference to master page background element
  *      <g class='BackgroundObjects'>
  *          <use class='BackgroundObjectSubGroup'>     // reference to the group of shapes on the master page that are below text fields
- *          <g class='Slide_Number'>                   // a cloned element
+ *          <g class='PageNumber'>                   // a cloned element
  *                  ...
  *          </g>
- *          <use class='Date/Time'>                    // reference to a clone
+ *          <use class='DateTime'>                    // reference to a clone
  *          <use class='Footer'>
  *          <use class='Header'>
  *          <use class='BackgroundObjectSubGroup'>     // reference to the group of shapes on the master page that are above text fields
@@ -5834,7 +5852,7 @@ MasterPageView.prototype.createElement = function()
                 // The cloned element is appended directly to the field group element
                 // since there is no slide number field content shared between two slide
                 // (because the slide number of two slide is always different).
-                var nIsPageNumberVisible = sId === aSlideNumberClassName ? this.aMetaSlide.nIsPageNumberVisible : true;
+                var nIsPageNumberVisible = sId === (aSlideNumberClassName + '.Default') ? this.aMetaSlide.nIsPageNumberVisible : true;
                 if( aPlaceholderShapeSet[sId] &&
                     aPlaceholderShapeSet[sId].isValid() &&
                     nIsPageNumberVisible &&
@@ -5845,44 +5863,47 @@ MasterPageView.prototype.createElement = function()
                             aTextFieldContentProviderSet[aSlideNumberClassName] );
                     aSlideNumberFieldHandler.update( this.aMetaSlide.nSlideNumber );
                     aSlideNumberFieldHandler.appendTo( this.aBackgroundObjectsElement );
-                    if ( sId === aSlideNumberClassName )
+                    if ( sId === aSlideNumberClassName + '.Default' )
                         this.aSlideNumberFieldHandler = aSlideNumberFieldHandler;
                 }
             }
-            else if( sId === aDateTimeClassName )
+            else if( sId === aDateTimeClassName + '.Default' )
             {
-                // Date/Time field
+                // DateTime field
                 if( this.aMetaSlide.nIsDateTimeVisible )
                 {
                     this.aDateTimeFieldHandler =
-                        this.initTextFieldHandler( aDateTimeClassName, aPlaceholderShapeSet,
+                        this.initTextFieldHandler( sId, aPlaceholderShapeSet,
                                                    aTextFieldContentProviderSet, aDefsElement,
                                                    aTextFieldHandlerSet, sMasterSlideId );
                 }
             }
-            else if( sId === aFooterClassName )
+            else if( sId === aFooterClassName + '.Default' )
             {
                 // Footer Field
                 if( this.aMetaSlide.nIsFooterVisible )
                 {
                     this.aFooterFieldHandler =
-                        this.initTextFieldHandler( aFooterClassName, aPlaceholderShapeSet,
+                        this.initTextFieldHandler( sId, aPlaceholderShapeSet,
                                                    aTextFieldContentProviderSet, aDefsElement,
                                                    aTextFieldHandlerSet, sMasterSlideId );
                 }
             }
-            else if( sId === aHeaderClassName )
+            else if( sId === aHeaderClassName + '.Default' )
             {
                 // Header Field
                 if( this.aMetaSlide.nIsHeaderVisible )
                 {
                     this.aHeaderFieldHandler =
-                        this.initTextFieldHandler( aHeaderClassName, aPlaceholderShapeSet,
+                        this.initTextFieldHandler( sId, aPlaceholderShapeSet,
                                                    aTextFieldContentProviderSet, aDefsElement,
                                                    aTextFieldHandlerSet, sMasterSlideId );
                 }
             }
-            else if( sId.indexOf( aDateClassName ) == 0
+            else if( sId.indexOf( aDateTimeClassName ) == 0
+                || sId.indexOf( aFooterClassName ) == 0
+                || sId.indexOf( aHeaderClassName ) == 0
+                || sId.indexOf( aDateClassName ) == 0
                 || sId.indexOf( aTimeClassName ) == 0
                 || sId.indexOf( aSlideNameClassName ) == 0 )
             {
@@ -5922,21 +5943,21 @@ MasterPageView.prototype.initTextFieldHandler =
     if( aPlaceholderShape  && aPlaceholderShape.isValid()
         && aTextFieldContentProvider )
     {
-        var sTextFieldContentProviderId = aTextFieldContentProvider.sId;
+        var sTextFiedHandlerKey = aTextFieldContentProvider.sId + '.' + sId;
         // We create only one single TextFieldHandler object (and so one only
         // text field clone) per master slide and text content.
-        if ( !aTextFieldHandlerSet[ sMasterSlideId ][ sTextFieldContentProviderId ] )
+        if ( !aTextFieldHandlerSet[ sMasterSlideId ][ sTextFiedHandlerKey ] )
         {
-            aTextFieldHandlerSet[ sMasterSlideId ][ sTextFieldContentProviderId ] =
+            aTextFieldHandlerSet[ sMasterSlideId ][ sTextFiedHandlerKey ] =
                 new TextFieldHandler( aPlaceholderShape,
                                       aTextFieldContentProvider );
-            aTextFieldHandler = aTextFieldHandlerSet[ sMasterSlideId ][ sTextFieldContentProviderId ];
+            aTextFieldHandler = aTextFieldHandlerSet[ sMasterSlideId ][ sTextFiedHandlerKey ];
             aTextFieldHandler.update();
             aTextFieldHandler.appendTo( aDefsElement );
         }
         else
         {
-            aTextFieldHandler = aTextFieldHandlerSet[ sMasterSlideId ][ sTextFieldContentProviderId ];
+            aTextFieldHandler = aTextFieldHandlerSet[ sMasterSlideId ][ sTextFiedHandlerKey ];
         }
         sRefId = aTextFieldHandler.sId;
     }
@@ -18895,6 +18916,11 @@ SlideShow.prototype.rewindAllEffects = function()
 
 SlideShow.prototype.exitSlideShowInApp = function()
 {
+    if (window.webkit !== undefined &&
+        window.webkit.messageHandlers !== undefined &&
+        window.webkit.messageHandlers.lok !== undefined)
+        window.webkit.messageHandlers.lok.postMessage('EXITSLIDESHOW', '*');
+    // FIXME remove this in a follow-up commit
     if (window.webkit !== undefined &&
         window.webkit.messageHandlers !== undefined &&
         window.webkit.messageHandlers.cool !== undefined)

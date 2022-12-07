@@ -45,6 +45,7 @@ enum class SdtControlType
     richText,
     checkBox,
     picture,
+    comboBox,
     unsupported, // Sdt block is defined, but we still do not support such type of field
     unknown
 };
@@ -116,8 +117,6 @@ class SdtHelper final : public virtual SvRefBase
                             css::uno::Reference<css::awt::XControlModel> const& xControlModel,
                             const css::uno::Sequence<css::beans::PropertyValue>& rGrabBag);
 
-    std::optional<OUString> getValueFromDataBinding();
-
     void loadPropertiesXMLs();
 
     /// <w:placeholder>'s <w:docPart w:val="...">.
@@ -125,6 +124,15 @@ class SdtHelper final : public virtual SvRefBase
 
     /// <w:sdtPr>'s <w15:color w:val="...">.
     OUString m_aColor;
+
+    /// <w:sdtPr>'s <w:alias w:val="...">.
+    OUString m_aAlias;
+
+    /// <w:sdtPr>'s <w:tag w:val="...">.
+    OUString m_aTag;
+
+    /// <w:sdtPr>'s <w:id w:val="...">.
+    sal_Int32 m_nId = 0;
 
 public:
     explicit SdtHelper(DomainMapper_Impl& rDM_Impl,
@@ -204,6 +212,17 @@ public:
 
     void SetColor(const OUString& rColor);
     OUString GetColor() const;
+
+    void SetAlias(const OUString& rAlias);
+    const OUString& GetAlias() const;
+
+    void SetTag(const OUString& rTag);
+    const OUString& GetTag() const;
+
+    void SetId(sal_Int32 nId);
+    sal_Int32 GetId() const;
+
+    std::optional<OUString> getValueFromDataBinding();
 };
 
 } // namespace writerfilter::dmapper

@@ -1104,6 +1104,7 @@ void DomainMapper::lcl_attribute(Id nName, Value & val)
                     case SdtControlType::richText:
                     case SdtControlType::checkBox:
                     case SdtControlType::dropDown:
+                    case SdtControlType::comboBox:
                     case SdtControlType::picture:
                     case SdtControlType::datePicker:
                         m_pImpl->PopSdt();
@@ -1114,11 +1115,7 @@ void DomainMapper::lcl_attribute(Id nName, Value & val)
 
                 if (m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::plainText)
                 {
-                    // The plain text && data binding case needs more work before it can be enabled.
-                    if (m_pImpl->m_pSdtHelper->GetDataBindingPrefixMapping().isEmpty())
-                    {
-                        m_pImpl->PopSdt();
-                    }
+                    m_pImpl->PopSdt();
                 }
             }
 
@@ -1134,6 +1131,7 @@ void DomainMapper::lcl_attribute(Id nName, Value & val)
             switch (m_pImpl->m_pSdtHelper->getControlType())
             {
                 case SdtControlType::dropDown:
+                case SdtControlType::comboBox:
                     m_pImpl->m_pSdtHelper->createDropDownControl();
                     break;
                 case SdtControlType::plainText:
@@ -2709,8 +2707,15 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
         }
     }
     break;
-    case NS_ooxml::LN_CT_SdtPr_dropDownList:
     case NS_ooxml::LN_CT_SdtPr_comboBox:
+    {
+        m_pImpl->m_pSdtHelper->setControlType(SdtControlType::comboBox);
+        writerfilter::Reference<Properties>::Pointer_t pProperties = rSprm.getProps();
+        if (pProperties)
+            pProperties->resolve(*this);
+    }
+    break;
+    case NS_ooxml::LN_CT_SdtPr_dropDownList:
     {
         m_pImpl->m_pSdtHelper->setControlType(SdtControlType::dropDown);
         writerfilter::Reference<Properties>::Pointer_t pProperties = rSprm.getProps();
@@ -2721,8 +2726,23 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
     case NS_ooxml::LN_CT_SdtDropDownList_listItem:
     {
         writerfilter::Reference<Properties>::Pointer_t pProperties = rSprm.getProps();
+
+        size_t nDropDownDisplayTexts = m_pImpl->m_pSdtHelper->getDropDownDisplayTexts().size();
+        size_t nDropDownItems = m_pImpl->m_pSdtHelper->getDropDownItems().size();
+
         if (pProperties)
             pProperties->resolve(*this);
+
+        if (m_pImpl->m_pSdtHelper->getDropDownDisplayTexts().size() != nDropDownDisplayTexts + 1)
+        {
+            // w:displayText="..." is optional, add empty value if it was not provided.
+            m_pImpl->m_pSdtHelper->getDropDownDisplayTexts().push_back(OUString());
+        }
+        if (m_pImpl->m_pSdtHelper->getDropDownItems().size() != nDropDownItems + 1)
+        {
+            // w:value="..." is optional, add empty value if it was not provided.
+            m_pImpl->m_pSdtHelper->getDropDownItems().push_back(OUString());
+        }
     }
     break;
     case NS_ooxml::LN_CT_SdtPr_placeholder:
@@ -2763,11 +2783,8 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
         m_pImpl->m_pSdtHelper->setControlType(SdtControlType::plainText);
         if (m_pImpl->m_pSdtHelper->GetSdtType() == NS_ooxml::LN_CT_SdtRun_sdtContent)
         {
-            if (m_pImpl->m_pSdtHelper->GetDataBindingPrefixMapping().isEmpty())
-            {
-                m_pImpl->m_pSdtHelper->getInteropGrabBagAndClear();
-                break;
-            }
+            m_pImpl->m_pSdtHelper->getInteropGrabBagAndClear();
+            break;
         }
         enableInteropGrabBag("ooxml:CT_SdtPr_text");
         writerfilter::Reference<Properties>::Pointer_t pProperties = rSprm.getProps();
@@ -2794,6 +2811,7 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
     case NS_ooxml::LN_CT_SdtPr_alias:
     case NS_ooxml::LN_CT_SdtPlaceholder_docPart:
     case NS_ooxml::LN_CT_SdtPr_color:
+    case NS_ooxml::LN_CT_SdtPr_tag:
     {
         if (!m_pImpl->GetSdtStarts().empty())
         {
@@ -2804,6 +2822,24 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
                 {
                     pProperties->resolve(*this);
                 }
+                break;
+            }
+
+            if (nSprmId == NS_ooxml::LN_CT_SdtPr_alias)
+            {
+                m_pImpl->m_pSdtHelper->SetAlias(sStringValue);
+                break;
+            }
+
+            if (nSprmId == NS_ooxml::LN_CT_SdtPr_tag)
+            {
+                m_pImpl->m_pSdtHelper->SetTag(sStringValue);
+                break;
+            }
+
+            if (nSprmId == NS_ooxml::LN_CT_SdtPr_id)
+            {
+                m_pImpl->m_pSdtHelper->SetId(nIntValue);
                 break;
             }
 
@@ -2835,6 +2871,14 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
                 {
                     pProperties->resolve(*this);
                 }
+                break;
+            }
+        }
+        else
+        {
+            if (nSprmId == NS_ooxml::LN_CT_SdtPr_tag)
+            {
+                // Tag is only handled here in case of inline SDT.
                 break;
             }
         }
@@ -3736,7 +3780,9 @@ void DomainMapper::lcl_utext(const sal_uInt8 * data_, size_t len)
     }
 
     bool bNewLine = len == 1 && (sText[0] == 0x0d || sText[0] == 0x07);
-    if (m_pImpl->GetSdtStarts().empty() && m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::dropDown)
+    if (m_pImpl->GetSdtStarts().empty()
+        && (m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::dropDown
+            || m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::comboBox))
     {
         // Block, cell or row SDT.
         if (bNewLine)
@@ -3757,7 +3803,7 @@ void DomainMapper::lcl_utext(const sal_uInt8 * data_, size_t len)
             return;
         }
     }
-    else if ((m_pImpl->m_pSdtHelper->GetSdtType() != NS_ooxml::LN_CT_SdtRun_sdtContent || !m_pImpl->m_pSdtHelper->GetDataBindingPrefixMapping().isEmpty()) && m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::plainText)
+    else if (m_pImpl->m_pSdtHelper->GetSdtType() != NS_ooxml::LN_CT_SdtRun_sdtContent && m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::plainText)
     {
         m_pImpl->m_pSdtHelper->getSdtTexts().append(sText);
         if (bNewLine)
@@ -3791,7 +3837,9 @@ void DomainMapper::lcl_utext(const sal_uInt8 * data_, size_t len)
                 pContext = m_pImpl->GetTopFieldContext()->getProperties();
 
             uno::Sequence<beans::PropertyValue> aGrabBag = m_pImpl->m_pSdtHelper->getInteropGrabBagAndClear();
-            if (m_pImpl->GetSdtStarts().empty() || m_pImpl->m_pSdtHelper->getControlType() != SdtControlType::dropDown)
+            if (m_pImpl->GetSdtStarts().empty()
+                || (m_pImpl->m_pSdtHelper->getControlType() != SdtControlType::dropDown
+                    && m_pImpl->m_pSdtHelper->getControlType() != SdtControlType::comboBox))
             {
                 pContext->Insert(PROP_SDTPR, uno::makeAny(aGrabBag), true, CHAR_GRAB_BAG);
             }
@@ -3799,7 +3847,10 @@ void DomainMapper::lcl_utext(const sal_uInt8 * data_, size_t len)
         else
         {
             uno::Sequence<beans::PropertyValue> aGrabBag = m_pImpl->m_pSdtHelper->getInteropGrabBagAndClear();
-            if (m_pImpl->GetSdtStarts().empty() || m_pImpl->m_pSdtHelper->getControlType() != SdtControlType::dropDown)
+            if (m_pImpl->GetSdtStarts().empty()
+                || (m_pImpl->m_pSdtHelper->getControlType() != SdtControlType::dropDown
+                    && m_pImpl->m_pSdtHelper->getControlType() != SdtControlType::comboBox
+                    && m_pImpl->m_pSdtHelper->getControlType() != SdtControlType::richText))
             {
                 m_pImpl->GetTopContextOfType(CONTEXT_PARAGRAPH)->Insert(PROP_SDTPR,
                         uno::makeAny(aGrabBag), true, PARA_GRAB_BAG);

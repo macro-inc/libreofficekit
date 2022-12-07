@@ -58,7 +58,7 @@ public:
     /// End of the text run.
     ///
     /// No-op for binary filters.
-    virtual void EndRun(const SwTextNode* pNode, sal_Int32 nPos, bool bLastRun = false) override;
+    virtual void EndRun(const SwTextNode* pNode, sal_Int32 nPos, sal_Int32 nLen, bool bLastRun = false) override;
 
     /// Before we start outputting the attributes.
     virtual void StartRunProperties() override;
@@ -67,7 +67,7 @@ public:
     virtual void EndRunProperties( const SwRedlineData* pRedlineData ) override;
 
     /// Output text.
-    virtual void RunText( const OUString& rText, rtl_TextEncoding eCharSet = RTL_TEXTENCODING_UTF8 ) override;
+    virtual void RunText( const OUString& rText, rtl_TextEncoding eCharSet = RTL_TEXTENCODING_UTF8, const OUString& rSymbolFont = OUString() ) override;
 
     /// Output text (without markup).
     virtual void RawText(const OUString& rText, rtl_TextEncoding eCharSet) override;

@@ -12,6 +12,7 @@
 
 #include <cassert>
 
+#include <sal/log.hxx>
 #include <fpdf_doc.h>
 #include <fpdf_annot.h>
 #include <fpdf_edit.h>
@@ -136,6 +137,24 @@ static_assert(static_cast<int>(vcl::pdf::PDFErrorType::Security) == FPDF_ERR_SEC
 static_assert(static_cast<int>(vcl::pdf::PDFErrorType::Page) == FPDF_ERR_PAGE,
               "PDFErrorType::Page value mismatch");
 
+static_assert(static_cast<int>(vcl::pdf::PDFFormFieldType::Unknown) == FPDF_FORMFIELD_UNKNOWN,
+              "PDFFormFieldType::Unknown value mismatch");
+static_assert(static_cast<int>(vcl::pdf::PDFFormFieldType::PushButton) == FPDF_FORMFIELD_PUSHBUTTON,
+              "PDFFormFieldType::PushButton value mismatch");
+static_assert(static_cast<int>(vcl::pdf::PDFFormFieldType::CheckBox) == FPDF_FORMFIELD_CHECKBOX,
+              "PDFFormFieldType::CheckBox value mismatch");
+static_assert(static_cast<int>(vcl::pdf::PDFFormFieldType::RadioButton)
+                  == FPDF_FORMFIELD_RADIOBUTTON,
+              "PDFFormFieldType::RadioButton value mismatch");
+static_assert(static_cast<int>(vcl::pdf::PDFFormFieldType::ComboBox) == FPDF_FORMFIELD_COMBOBOX,
+              "PDFFormFieldType::ComboBox value mismatch");
+static_assert(static_cast<int>(vcl::pdf::PDFFormFieldType::ListBox) == FPDF_FORMFIELD_LISTBOX,
+              "PDFFormFieldType::ListBox value mismatch");
+static_assert(static_cast<int>(vcl::pdf::PDFFormFieldType::TextField) == FPDF_FORMFIELD_TEXTFIELD,
+              "PDFFormFieldType::TextField value mismatch");
+static_assert(static_cast<int>(vcl::pdf::PDFFormFieldType::Signature) == FPDF_FORMFIELD_SIGNATURE,
+              "PDFFormFieldType::Signature value mismatch");
+
 namespace
 {
 /// Callback class to be used with FPDF_SaveWithVersion().
@@ -230,6 +249,10 @@ public:
     size_t getAttachmentPointsCount() override;
     std::vector<basegfx::B2DPoint> getAttachmentPoints(size_t nIndex) override;
     std::vector<basegfx::B2DPoint> getLineGeometry() override;
+    PDFFormFieldType getFormFieldType(PDFiumDocument* pDoc) override;
+    float getFormFontSize(PDFiumDocument* pDoc) override;
+    OUString getFormFieldAlternateName(PDFiumDocument* pDoc) override;
+    int getFormFieldFlags(PDFiumDocument* pDoc) override;
 };
 
 class PDFiumPageObjectImpl final : public PDFiumPageObject
@@ -427,7 +450,8 @@ public:
     std::unique_ptr<PDFiumDocument> openDocument(const void* pData, int nSize,
                                                  const OString& rPassword) override;
     PDFErrorType getLastErrorCode() override;
-    std::unique_ptr<PDFiumBitmap> createBitmap(int nWidth, int nHeight, int nAlpha) override;
+    /// @brief creates bitmap, can reduce size if needed, check nWidth and nHeight
+    std::unique_ptr<PDFiumBitmap> createBitmap(int& nWidth, int& nHeight, int nAlpha) override;
 };
 }
 
@@ -498,13 +522,36 @@ PDFErrorType PDFiumImpl::getLastErrorCode()
     return static_cast<PDFErrorType>(FPDF_GetLastError());
 }
 
-std::unique_ptr<PDFiumBitmap> PDFiumImpl::createBitmap(int nWidth, int nHeight, int nAlpha)
+std::unique_ptr<PDFiumBitmap> PDFiumImpl::createBitmap(int& nWidth, int& nHeight, int nAlpha)
 {
     std::unique_ptr<PDFiumBitmap> pPDFiumBitmap;
+
     FPDF_BITMAP pPdfBitmap = FPDFBitmap_Create(nWidth, nHeight, nAlpha);
     if (!pPdfBitmap)
     {
+        int nOriginal = nHeight;
+        // PDFium cannot create big bitmaps, max 2^14 x 2^14 x 4 bytes per pixel
+        if (nHeight > 16384)
+            nHeight = 16384;
+
+        if (nWidth > 16384)
+        {
+            nWidth = 16384.0 / nOriginal * nWidth;
+        }
+
+        if (nWidth * nHeight > 16384 * 16384)
+        {
+            nOriginal = nWidth;
+            nHeight = 16384.0 / nOriginal * nHeight;
+        }
+
+        pPdfBitmap = FPDFBitmap_Create(nWidth, nHeight, nAlpha);
+    }
+
+    if (!pPdfBitmap)
+    {
         maLastError = "Failed to create bitmap";
+        SAL_WARN("vcl.filter", "PDFiumImpl: " << getLastError());
     }
     else
     {
@@ -910,14 +957,14 @@ bool PDFiumPageObjectImpl::getDrawMode(PDFFillMode& rFillMode, bool& rStroke)
 
 BitmapChecksum PDFiumPageImpl::getChecksum(int nMDPPerm)
 {
-    size_t nPageWidth = getWidth();
-    size_t nPageHeight = getHeight();
-    auto pPdfBitmap = std::make_unique<PDFiumBitmapImpl>(
-        FPDFBitmap_Create(nPageWidth, nPageHeight, /*alpha=*/1));
+    int nPageWidth = getWidth();
+    int nPageHeight = getHeight();
+    std::unique_ptr<PDFiumBitmap> pPdfBitmap
+        = PDFiumLibrary::get()->createBitmap(nPageWidth, nPageHeight, /*nAlpha=*/1);
     if (!pPdfBitmap)
-    {
         return 0;
-    }
+
+    PDFiumBitmapImpl* pBitmapImpl = static_cast<PDFiumBitmapImpl*>(pPdfBitmap.get());
 
     int nFlags = 0;
     if (nMDPPerm != 3)
@@ -925,16 +972,16 @@ BitmapChecksum PDFiumPageImpl::getChecksum(int nMDPPerm)
         // Annotations/commenting should affect the checksum, signature verification wants this.
         nFlags = FPDF_ANNOT;
     }
-    FPDF_RenderPageBitmap(pPdfBitmap->getPointer(), mpPage, /*start_x=*/0, /*start_y=*/0,
+    FPDF_RenderPageBitmap(pBitmapImpl->getPointer(), mpPage, /*start_x=*/0, /*start_y=*/0,
                           nPageWidth, nPageHeight,
                           /*rotate=*/0, nFlags);
     Bitmap aBitmap(Size(nPageWidth, nPageHeight), vcl::PixelFormat::N24_BPP);
     {
         BitmapScopedWriteAccess pWriteAccess(aBitmap);
         const auto pPdfBuffer
-            = static_cast<ConstScanline>(FPDFBitmap_GetBuffer(pPdfBitmap->getPointer()));
-        const int nStride = FPDFBitmap_GetStride(pPdfBitmap->getPointer());
-        for (size_t nRow = 0; nRow < nPageHeight; ++nRow)
+            = static_cast<ConstScanline>(FPDFBitmap_GetBuffer(pBitmapImpl->getPointer()));
+        const int nStride = FPDFBitmap_GetStride(pBitmapImpl->getPointer());
+        for (int nRow = 0; nRow < nPageHeight; ++nRow)
         {
             ConstScanline pPdfLine = pPdfBuffer + (nStride * nRow);
             pWriteAccess->CopyScanline(nRow, pPdfLine, ScanlineFormat::N32BitTcBgra, nStride);
@@ -1106,6 +1153,61 @@ std::vector<basegfx::B2DPoint> PDFiumAnnotationImpl::getLineGeometry()
         aLine.emplace_back(aEnd.x, aEnd.y);
     }
     return aLine;
+}
+
+PDFFormFieldType PDFiumAnnotationImpl::getFormFieldType(PDFiumDocument* pDoc)
+{
+    auto pDocImpl = static_cast<PDFiumDocumentImpl*>(pDoc);
+    return PDFFormFieldType(
+        FPDFAnnot_GetFormFieldType(pDocImpl->getFormHandlePointer(), mpAnnotation));
+}
+
+int PDFiumAnnotationImpl::getFormFieldFlags(PDFiumDocument* pDoc)
+{
+    auto pDocImpl = static_cast<PDFiumDocumentImpl*>(pDoc);
+    return FPDFAnnot_GetFormFieldFlags(pDocImpl->getFormHandlePointer(), mpAnnotation);
+}
+
+float PDFiumAnnotationImpl::getFormFontSize(PDFiumDocument* pDoc)
+{
+    auto pDocImpl = static_cast<PDFiumDocumentImpl*>(pDoc);
+    float fRet{};
+    if (!FPDFAnnot_GetFormFontSize(pDocImpl->getFormHandlePointer(), mpAnnotation, &fRet))
+    {
+        return 0.0f;
+    }
+
+    return fRet;
+}
+
+OUString PDFiumAnnotationImpl::getFormFieldAlternateName(PDFiumDocument* pDoc)
+{
+    auto pDocImpl = static_cast<PDFiumDocumentImpl*>(pDoc);
+    OUString aString;
+    unsigned long nSize = FPDFAnnot_GetFormFieldAlternateName(pDocImpl->getFormHandlePointer(),
+                                                              mpAnnotation, nullptr, 0);
+    assert(nSize % 2 == 0);
+    nSize /= 2;
+    if (nSize > 1)
+    {
+        std::unique_ptr<sal_Unicode[]> pText(new sal_Unicode[nSize]);
+        unsigned long nStringSize = FPDFAnnot_GetFormFieldAlternateName(
+            pDocImpl->getFormHandlePointer(), mpAnnotation,
+            reinterpret_cast<FPDF_WCHAR*>(pText.get()), nSize * 2);
+        assert(nStringSize % 2 == 0);
+        nStringSize /= 2;
+        if (nStringSize > 0)
+        {
+#if defined OSL_BIGENDIAN
+            for (unsigned long i = 0; i != nStringSize; ++i)
+            {
+                pText[i] = OSL_SWAPWORD(pText[i]);
+            }
+#endif
+            aString = OUString(pText.get());
+        }
+    }
+    return aString;
 }
 
 namespace
