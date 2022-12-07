@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <com/sun/star/beans/PropertyValues.hpp>
 #include <AnnotationWin.hxx>
 #include <comphelper/lok.hxx>
 #include <hintids.hxx>
@@ -60,9 +61,11 @@
 #include <IDocumentUndoRedo.hxx>
 #include <svl/zforlist.hxx>
 #include <svl/zformat.hxx>
+#include <comphelper/sequenceashashmap.hxx>
 #include <IMark.hxx>
 #include <officecfg/Office/Compatibility.hxx>
 #include <ndtxt.hxx>
+#include <translatehelper.hxx>
 
 
 using namespace nsSwDocInfoSubType;
@@ -686,24 +689,85 @@ FIELD_INSERT:
 
         case FN_INSERT_TEXT_FORMFIELD:
         {
+            OUString aFieldType(ODF_FORMTEXT);
+            const SfxStringItem* pFieldType = rReq.GetArg<SfxStringItem>(FN_PARAM_1);
+            if (pFieldType)
+            {
+                // Allow overwriting the default type.
+                aFieldType = pFieldType->GetValue();
+            }
+
+            OUString aFieldCode;
+            const SfxStringItem* pFieldCode = rReq.GetArg<SfxStringItem>(FN_PARAM_2);
+            if (pFieldCode)
+            {
+                // Allow specifying a field code/command.
+                aFieldCode = pFieldCode->GetValue();
+            }
+
             rSh.GetDoc()->GetIDocumentUndoRedo().StartUndo(SwUndoId::INSERT_FORM_FIELD, nullptr);
+            // Don't update the layout after inserting content and before deleting temporary
+            // text nodes.
+            rSh.StartAction();
 
             SwPaM* pCursorPos = rSh.GetCursor();
             if(pCursorPos)
             {
                 // Insert five En Space into the text field so the field has extent
                 static constexpr OUStringLiteral vEnSpaces = u"\u2002\u2002\u2002\u2002\u2002";
-                bool bSuccess = rSh.GetDoc()->getIDocumentContentOperations().InsertString(*pCursorPos, vEnSpaces);
+                OUString aFieldResult(vEnSpaces);
+                const SfxStringItem* pFieldResult = rReq.GetArg<SfxStringItem>(FN_PARAM_3);
+                if (pFieldResult)
+                {
+                    // Allow specifying a field result / expanded value.
+                    aFieldResult = pFieldResult->GetValue();
+                }
+
+                // Split node to remember where the start position is.
+                bool bSuccess = rSh.GetDoc()->getIDocumentContentOperations().SplitNode(
+                    *pCursorPos->GetPoint(), false);
                 if(bSuccess)
                 {
+                    SwPaM aFieldPam(*pCursorPos->GetPoint());
+                    aFieldPam.Move(fnMoveBackward, GoInContent);
+                    if (pFieldResult)
+                    {
+                        // Paste HTML content.
+                        SwTranslateHelper::PasteHTMLToPaM(rSh, pCursorPos, aFieldResult.toUtf8(),
+                                                          true);
+                        if (pCursorPos->GetPoint()->nContent.GetIndex() == 0)
+                        {
+                            // The paste created a last empty text node, remove it.
+                            SwPaM aPam(*pCursorPos->GetPoint());
+                            aPam.SetMark();
+                            aPam.Move(fnMoveBackward, GoInContent);
+                            rSh.GetDoc()->getIDocumentContentOperations().DeleteAndJoin(aPam);
+                        }
+                    }
+                    else
+                    {
+                        // Insert default placeholder.
+                        rSh.GetDoc()->getIDocumentContentOperations().InsertString(*pCursorPos,
+                                                                                   aFieldResult);
+                    }
+                    // Undo the above SplitNode().
+                    aFieldPam.SetMark();
+                    aFieldPam.Move(fnMoveForward, GoInContent);
+                    rSh.GetDoc()->getIDocumentContentOperations().DeleteAndJoin(aFieldPam);
+                    *aFieldPam.GetMark() = *pCursorPos->GetPoint();
+
                     IDocumentMarkAccess* pMarksAccess = rSh.GetDoc()->getIDocumentMarkAccess();
-                    SwPaM aFieldPam(pCursorPos->GetPoint()->nNode, pCursorPos->GetPoint()->nContent.GetIndex() - vEnSpaces.getLength(),
-                                    pCursorPos->GetPoint()->nNode, pCursorPos->GetPoint()->nContent.GetIndex());
-                    pMarksAccess->makeFieldBookmark(aFieldPam, OUString(), ODF_FORMTEXT,
-                            aFieldPam.Start());
+                    sw::mark::IFieldmark* pFieldmark = pMarksAccess->makeFieldBookmark(
+                        aFieldPam, OUString(), aFieldType, aFieldPam.Start());
+                    if (pFieldmark && !aFieldCode.isEmpty())
+                    {
+                        pFieldmark->GetParameters()->insert(
+                            std::pair<OUString, uno::Any>(ODF_CODE_PARAM, uno::Any(aFieldCode)));
+                    }
                 }
             }
 
+            rSh.EndAction();
             rSh.GetDoc()->GetIDocumentUndoRedo().EndUndo(SwUndoId::INSERT_FORM_FIELD, nullptr);
             rSh.GetView().GetViewFrame()->GetBindings().Invalidate( SID_UNDO );
         }
@@ -769,6 +833,77 @@ FIELD_INSERT:
 
         rSh.GetDoc()->GetIDocumentUndoRedo().EndUndo(SwUndoId::INSERT_FORM_FIELD, nullptr);
         rSh.GetView().GetViewFrame()->GetBindings().Invalidate( SID_UNDO );
+    }
+    break;
+    case FN_UPDATE_TEXT_FORMFIELDS:
+    {
+        OUString aFieldType;
+        const SfxStringItem* pFieldType = rReq.GetArg<SfxStringItem>(FN_PARAM_1);
+        if (pFieldType)
+        {
+            aFieldType = pFieldType->GetValue();
+        }
+        OUString aFieldCommandPrefix;
+        const SfxStringItem* pFieldCommandPrefix = rReq.GetArg<SfxStringItem>(FN_PARAM_2);
+        if (pFieldCommandPrefix)
+        {
+            aFieldCommandPrefix = pFieldCommandPrefix->GetValue();
+        }
+        uno::Sequence<beans::PropertyValues> aFields;
+        const SfxUnoAnyItem* pFields = rReq.GetArg<SfxUnoAnyItem>(FN_PARAM_3);
+        if (pFields)
+        {
+            pFields->GetValue() >>= aFields;
+        }
+
+        rSh.GetDoc()->GetIDocumentUndoRedo().StartUndo(SwUndoId::INSERT_FORM_FIELD, nullptr);
+        rSh.StartAction();
+
+        IDocumentMarkAccess* pMarkAccess = rSh.GetDoc()->getIDocumentMarkAccess();
+        sal_Int32 nFieldIndex = 0;
+        for (auto it = pMarkAccess->getFieldmarksBegin(); it != pMarkAccess->getFieldmarksEnd(); ++it)
+        {
+            auto pFieldmark = dynamic_cast<sw::mark::IFieldmark*>(*it);
+            assert(pFieldmark);
+            if (pFieldmark->GetFieldname() != aFieldType)
+            {
+                continue;
+            }
+
+            auto itParam = pFieldmark->GetParameters()->find(ODF_CODE_PARAM);
+            if (itParam == pFieldmark->GetParameters()->end())
+            {
+                continue;
+            }
+
+            OUString aCommand;
+            itParam->second >>= aCommand;
+            if (!aCommand.startsWith(aFieldCommandPrefix))
+            {
+                continue;
+            }
+
+            if (aFields.getLength() <= nFieldIndex)
+            {
+                continue;
+            }
+
+            comphelper::SequenceAsHashMap aMap(aFields[nFieldIndex++]);
+            itParam->second = aMap["FieldCommand"];
+            SwPaM aPaM(pFieldmark->GetMarkPos(), pFieldmark->GetOtherMarkPos());
+            aPaM.Normalize();
+            // Skip field start & separator.
+            aPaM.GetPoint()->nContent += 2;
+            // Skip field end.
+            aPaM.GetMark()->nContent -= 1;
+            rSh.GetDoc()->getIDocumentContentOperations().DeleteAndJoin(aPaM);
+            OUString aFieldResult;
+            aMap["FieldResult"] >>= aFieldResult;
+            SwTranslateHelper::PasteHTMLToPaM(rSh, &aPaM, aFieldResult.toUtf8(), true);
+        }
+
+        rSh.EndAction();
+        rSh.GetDoc()->GetIDocumentUndoRedo().EndUndo(SwUndoId::INSERT_FORM_FIELD, nullptr);
     }
     break;
         default:
@@ -976,6 +1111,7 @@ void SwTextShell::InsertHyperlink(const SvxHyperlinkItem& rHlnkItem)
     const OUString& rName   = rHlnkItem.GetName();
     const OUString& rURL    = rHlnkItem.GetURL();
     const OUString& rTarget = rHlnkItem.GetTargetFrame();
+    const OUString& rReplacementText = rHlnkItem.GetReplacementText();
     sal_uInt16 nType =  o3tl::narrowing<sal_uInt16>(rHlnkItem.GetInsertMode());
     nType &= ~HLINK_HTMLMODE;
     const SvxMacroTableDtor* pMacroTable = rHlnkItem.GetMacroTable();
@@ -1015,7 +1151,19 @@ void SwTextShell::InsertHyperlink(const SvxHyperlinkItem& rHlnkItem)
                     aINetFormat.SetMacro(SvMacroItemId::OnMouseOut, *pMacro);
             }
             rSh.SttSelect();
-            rSh.InsertURL( aINetFormat, rName, true );
+            // inserting mention
+            if (comphelper::LibreOfficeKit::isActive() && !rReplacementText.isEmpty())
+            {
+                SwPaM* pCursorPos = rSh.GetCursor();
+                // move cursor backwards to select @mention
+                for(int i=0; i < rReplacementText.getLength(); i++)
+                    pCursorPos->Move(fnMoveBackward);
+                rSh.InsertURL( aINetFormat, rName, false );
+            }
+            else
+            {
+                rSh.InsertURL( aINetFormat, rName, true );
+            }
             rSh.EndSelect();
         }
         break;

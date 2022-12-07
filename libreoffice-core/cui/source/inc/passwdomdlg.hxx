@@ -36,6 +36,7 @@ class PasswordToOpenModifyDialog : public SfxDialogController
     std::unique_ptr<weld::Label> m_xReenterPasswdToModifyFT;
     std::unique_ptr<weld::Entry> m_xReenterPasswdToModifyED;
     std::unique_ptr<weld::Label> m_xReenterPasswdToModifyInd;
+    std::shared_ptr<weld::MessageDialog> m_xErrorBox;
 
     OUString                    m_aOneMismatch;
     OUString                    m_aTwoMismatch;
@@ -44,6 +45,7 @@ class PasswordToOpenModifyDialog : public SfxDialogController
 
     int                         m_nMaxPasswdLen;
     bool                        m_bIsPasswordToModify;
+    bool                        m_bAllowEmpty;
 
 
     DECL_LINK(OkBtnClickHdl, weld::Button&, void);
@@ -57,11 +59,13 @@ public:
     PasswordToOpenModifyDialog(weld::Window* pParent,
             sal_uInt16 nMaxPasswdLen /* 0 -> no max len enforced */,
             bool bIsPasswordToModify );
+    ~PasswordToOpenModifyDialog();
 
     // AbstractPasswordToOpenModifyDialog
     OUString  GetPasswordToOpen() const;
     OUString  GetPasswordToModify() const;
     bool    IsRecommendToOpenReadonly() const;
+    void    AllowEmpty();
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

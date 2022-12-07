@@ -34,11 +34,13 @@
 #include <cppuhelper/implbase.hxx>
 
 #include <unobaseclass.hxx>
+#include <unocoll.hxx>
 
 typedef std::deque<css::uno::Reference<css::text::XTextRange>> TextRangeList_t;
 
 class SwPaM;
 class SwTextNode;
+class SwFormatContentControl;
 class SwContentControl;
 
 /**
@@ -153,6 +155,24 @@ public:
     void SAL_CALL removeVetoableChangeListener(
         const OUString& rPropertyName,
         const css::uno::Reference<css::beans::XVetoableChangeListener>& xListener) override;
+};
+
+/// UNO wrapper around SwContentControlManager.
+class SwXContentControls final : public cppu::WeakImplHelper<css::container::XIndexAccess>,
+                                 public SwUnoCollection
+{
+    ~SwXContentControls() override;
+
+public:
+    SwXContentControls(SwDoc* pDoc);
+
+    // XIndexAccess
+    sal_Int32 SAL_CALL getCount() override;
+    css::uno::Any SAL_CALL getByIndex(sal_Int32 nIndex) override;
+
+    // XElementAccess
+    css::uno::Type SAL_CALL getElementType() override;
+    sal_Bool SAL_CALL hasElements() override;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

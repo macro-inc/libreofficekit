@@ -50,6 +50,15 @@ bool isBuilderEnabled(std::u16string_view rUIFile, bool bMobile)
         || rUIFile == u"modules/scalc/ui/datafielddialog.ui"
         || rUIFile == u"modules/scalc/ui/pivotfielddialog.ui"
         || rUIFile == u"modules/scalc/ui/datafieldoptionsdialog.ui"
+        || rUIFile == u"modules/scalc/ui/insertcells.ui"
+        || rUIFile == u"modules/scalc/ui/deletecells.ui"
+        || rUIFile == u"modules/scalc/ui/deletecontents.ui"
+        || rUIFile == u"modules/scalc/ui/ungroupdialog.ui"
+        || rUIFile == u"modules/scalc/ui/groupdialog.ui"
+        || rUIFile == u"modules/scalc/ui/rowheightdialog.ui"
+        || rUIFile == u"modules/scalc/ui/optimalrowheightdialog.ui"
+        || rUIFile == u"modules/scalc/ui/colwidthdialog.ui"
+        || rUIFile == u"modules/scalc/ui/optimalcolwidthdialog.ui"
         || rUIFile == u"svx/ui/fontworkgallerydialog.ui"
         || rUIFile == u"svx/ui/findreplacedialog.ui" || rUIFile == u"cui/ui/macroselectordialog.ui"
         || rUIFile == u"uui/ui/macrowarnmedium.ui"
@@ -58,6 +67,7 @@ bool isBuilderEnabled(std::u16string_view rUIFile, bool bMobile)
         || rUIFile == u"xmlsec/ui/viewcertdialog.ui" || rUIFile == u"xmlsec/ui/certgeneral.ui"
         || rUIFile == u"xmlsec/ui/certpage.ui" || rUIFile == u"svx/ui/accessibilitycheckdialog.ui"
         || rUIFile == u"svx/ui/accessibilitycheckentry.ui"
+        || rUIFile == u"modules/swriter/ui/translationdialog.ui"
         || rUIFile == u"cui/ui/widgettestdialog.ui"
         || rUIFile == u"modules/swriter/ui/contentcontroldlg.ui"
         || rUIFile == u"modules/swriter/ui/contentcontrollistitemdlg.ui"
@@ -69,8 +79,15 @@ bool isBuilderEnabled(std::u16string_view rUIFile, bool bMobile)
         || rUIFile == u"sfx/ui/linefragment.ui" || rUIFile == u"sfx/ui/editdurationdialog.ui"
         || rUIFile == u"modules/swriter/ui/insertcaption.ui"
         || rUIFile == u"modules/swriter/ui/captionoptions.ui"
-        || rUIFile == u"cui/ui/formatnumberdialog.ui"
-        || rUIFile == u"cui/ui/numberingformatpage.ui")
+        || rUIFile == u"cui/ui/formatnumberdialog.ui" || rUIFile == u"cui/ui/password.ui"
+        || rUIFile == u"cui/ui/numberingformatpage.ui"
+        || rUIFile == u"modules/scalc/ui/deletecontents.ui"
+        || rUIFile == u"modules/scalc/ui/groupdialog.ui"
+        || rUIFile == u"modules/scalc/ui/ungroupdialog.ui"
+        || rUIFile == u"modules/scalc/ui/rowheightdialog.ui"
+        || rUIFile == u"modules/scalc/ui/optimalrowheightdialog.ui"
+        || rUIFile == u"modules/scalc/ui/colwidthdialog.ui"
+        || rUIFile == u"modules/scalc/ui/optimalcolwidthdialog.ui")
     {
         return true;
     }

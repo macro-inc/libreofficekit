@@ -33,6 +33,7 @@
 #include <xmloff/odffields.hxx>
 #include <libxml/xmlwriter.h>
 #include <comphelper/random.hxx>
+#include <comphelper/sequence.hxx>
 #include <comphelper/anytostring.hxx>
 #include <sal/log.hxx>
 #include <svl/numformat.hxx>
@@ -558,6 +559,7 @@ namespace sw::mark
 
     TextFieldmark::TextFieldmark(const SwPaM& rPaM, const OUString& rName)
         : Fieldmark(rPaM)
+        , m_pDocumentContentOperationsManager(nullptr)
     {
         if ( !rName.isEmpty() )
             m_aName = rName;
@@ -566,6 +568,7 @@ namespace sw::mark
     void TextFieldmark::InitDoc(SwDoc& io_rDoc,
             sw::mark::InsertMode const eMode, SwPosition const*const pSepPos)
     {
+        m_pDocumentContentOperationsManager = &io_rDoc.GetDocumentContentOperationsManager();
         if (eMode == sw::mark::InsertMode::New)
         {
             lcl_SetFieldMarks(*this, io_rDoc, CH_TXT_ATR_FIELDSTART, CH_TXT_ATR_FIELDEND, pSepPos);
@@ -588,6 +591,45 @@ namespace sw::mark
         // notify layouts to unhide - for the entire fieldmark, as in InitDoc()
         SwPaM const tmp(GetMarkPos(), GetOtherMarkPos());
         sw::UpdateFramesForRemoveDeleteRedline(rDoc, tmp);
+    }
+
+    OUString TextFieldmark::GetContent() const
+    {
+        const SwTextNode& rTextNode = *GetMarkEnd().nNode.GetNode().GetTextNode();
+        SwPosition const sepPos(sw::mark::FindFieldSep(*this));
+        const sal_Int32 nStart(sepPos.nContent.GetIndex());
+        const sal_Int32 nEnd(GetMarkEnd().nContent.GetIndex());
+
+        OUString sContent;
+        const sal_Int32 nLen = rTextNode.GetText().getLength();
+        if (nStart + 1 < nLen && nEnd <= nLen && nEnd > nStart + 2)
+            sContent = rTextNode.GetText().copy(nStart + 1, nEnd - nStart - 2);
+
+        return sContent;
+    }
+
+    void TextFieldmark::ReplaceContent(const OUString& sNewContent)
+    {
+        if (!m_pDocumentContentOperationsManager)
+            return;
+
+        SwPosition const sepPos(sw::mark::FindFieldSep(*this));
+        const sal_Int32 nStart(sepPos.nContent.GetIndex());
+        const sal_Int32 nEnd(GetMarkEnd().nContent.GetIndex());
+
+        const sal_Int32 nLen = GetMarkEnd().nNode.GetNode().GetTextNode()->GetText().getLength();
+        if (nStart + 1 < nLen && nEnd <= nLen && nEnd > nStart + 2)
+        {
+            SwPaM aFieldPam(GetMarkStart().nNode.GetNode(), nStart + 1,
+                            GetMarkStart().nNode.GetNode(), nEnd - 1);
+            m_pDocumentContentOperationsManager->ReplaceRange(aFieldPam, sNewContent, false);
+        }
+        else
+        {
+            SwPaM aFieldStartPam(GetMarkStart().nNode.GetNode(), nStart + 1);
+            m_pDocumentContentOperationsManager->InsertString(aFieldStartPam, sNewContent);
+        }
+        Invalidate();
     }
 
     NonTextFieldmark::NonTextFieldmark(const SwPaM& rPaM)
@@ -621,9 +663,12 @@ namespace sw::mark
     }
 
 
-    CheckboxFieldmark::CheckboxFieldmark(const SwPaM& rPaM)
+    CheckboxFieldmark::CheckboxFieldmark(const SwPaM& rPaM, const OUString& rName)
         : NonTextFieldmark(rPaM)
-    { }
+    {
+        if (!rName.isEmpty())
+            m_aName = rName;
+    }
 
     void CheckboxFieldmark::SetChecked(bool checked)
     {
@@ -645,6 +690,17 @@ namespace sw::mark
         return bResult;
     }
 
+    OUString CheckboxFieldmark::GetContent() const
+    {
+        return IsChecked() ? "1" : "0";
+    }
+
+    void CheckboxFieldmark::ReplaceContent(const OUString& sNewContent)
+    {
+        SetChecked(sNewContent.toBoolean());
+        Invalidate();
+    }
+
     FieldmarkWithDropDownButton::FieldmarkWithDropDownButton(const SwPaM& rPaM)
         : NonTextFieldmark(rPaM)
         , m_pButton(nullptr)
@@ -662,9 +718,11 @@ namespace sw::mark
             m_pButton.disposeAndClear();
     }
 
-    DropDownFieldmark::DropDownFieldmark(const SwPaM& rPaM)
+    DropDownFieldmark::DropDownFieldmark(const SwPaM& rPaM, const OUString& rName)
         : FieldmarkWithDropDownButton(rPaM)
     {
+        if (!rName.isEmpty())
+            m_aName = rName;
     }
 
     DropDownFieldmark::~DropDownFieldmark()
@@ -685,6 +743,182 @@ namespace sw::mark
     void DropDownFieldmark::RemoveButton()
     {
         FieldmarkWithDropDownButton::RemoveButton();
+    }
+
+    /** GetContent
+     *  @param pIndex The zero-based index to retrieve
+     *                [in] if pIndex is null or negative, return the listbox's chosen result,
+     *                     else return the indicated entry (or last entry for invalid choice).
+     *                [out] the index of the returned result or -1 if error
+     */
+    OUString DropDownFieldmark::GetContent(sal_Int32* pIndex) const
+    {
+        sal_Int32 nIndex = pIndex ? *pIndex : -1;
+        auto rParameters = *GetParameters();
+        if (nIndex < 0)
+            rParameters[ODF_FORMDROPDOWN_RESULT] >>= nIndex;
+
+        uno::Sequence<OUString> aSeq;
+        rParameters[ODF_FORMDROPDOWN_LISTENTRY] >>= aSeq;
+        nIndex = std::min(nIndex, aSeq.getLength() - 1);
+
+        if (nIndex < 0)
+        {
+            if (pIndex)
+                *pIndex = -1;
+            return OUString();
+        }
+
+        if (pIndex)
+            *pIndex = nIndex;
+
+        return aSeq[nIndex];
+    }
+
+    OUString DropDownFieldmark::GetContent() const
+    {
+        return GetContent(nullptr);
+    }
+
+    /** AddContent : INSERTS a new choice
+     *  @param rText: The choice to add to the list choices.
+     *
+     *  @param pIndex [optional]
+     *                [in] If pIndex is null or invalid, append to the end of the list.
+     *                [out] Modified to point to the position of the choice if it already exists.
+     */
+    void DropDownFieldmark::AddContent(const OUString& rText, sal_Int32* pIndex)
+    {
+        uno::Sequence<OUString> aSeq;
+        sw::mark::IFieldmark::parameter_map_t* pParameters = GetParameters();
+        (*pParameters)[ODF_FORMDROPDOWN_LISTENTRY] >>= aSeq;
+
+        // no duplicates: if it already exists, modify the given index to point to it
+        const sal_Int32 nCurrentTextPos = comphelper::findValue(aSeq, rText);
+        if (nCurrentTextPos != -1)
+        {
+            if (pIndex)
+                *pIndex = nCurrentTextPos;
+            return;
+        }
+
+        const sal_Int32 nLen = aSeq.getLength();
+        const sal_Int32 nNewPos = pIndex && *pIndex > -1 ? std::min(*pIndex, nLen) : nLen;
+
+        // need to shift list result index up if adding new entry before it
+        sal_Int32 nResultIndex = -1;
+        (*pParameters)[ODF_FORMDROPDOWN_RESULT] >>= nResultIndex;
+        if (nNewPos <= nResultIndex)
+            (*pParameters)[ODF_FORMDROPDOWN_RESULT] <<= nResultIndex + 1;
+
+        auto aList = comphelper::sequenceToContainer<std::vector<OUString>>(aSeq);
+        if (nNewPos < nLen)
+            aList.insert(aList.begin() + nNewPos, rText);
+        else
+        {
+            *pIndex = nLen;
+            aList.push_back(rText);
+        }
+
+        (*pParameters)[ODF_FORMDROPDOWN_LISTENTRY] <<= comphelper::containerToSequence(aList);
+        Invalidate();
+    }
+
+    /**
+     * ReplaceContent : changes the list result index or renames the existing choices
+     * @param pText
+     *               [in] If pIndex is null, change the list result index to this provided choice
+     *                       (but do nothing if pText is an invalid choice)
+     *                    else rename that entry.
+     *
+     * @param pIndex
+     *               [in] If pText is null, change the list result index to this provided Index
+     *                        (or the last position if it is an invalid choice)
+     *                    else rename this entry (doing nothing for invalid indexes).
+     *               [out] If pIndex is invalid, it is modified to use the last position.
+     *
+     * This function allows duplicate entries - which is also allowed in MS Word.
+     */
+    void DropDownFieldmark::ReplaceContent(const OUString* pText, sal_Int32* pIndex)
+    {
+        if (!pIndex && !pText)
+            return;
+
+        uno::Sequence<OUString> aSeq;
+        sw::mark::IFieldmark::parameter_map_t* pParameters = GetParameters();
+        (*pParameters)[ODF_FORMDROPDOWN_LISTENTRY] >>= aSeq;
+        const sal_Int32 nLen = aSeq.getLength();
+
+        if (!pText)
+        {
+            if (*pIndex < 0 || *pIndex >= nLen)
+                *pIndex = nLen - 1;
+
+            // select pIndex as the new value for the list box
+            (*pParameters)[ODF_FORMDROPDOWN_RESULT] <<= *pIndex;
+            Invalidate();
+            return;
+        }
+
+        if (!pIndex)
+        {
+            const sal_Int32 nNewPos = comphelper::findValue(aSeq, *pText);
+            if (nNewPos != -1)
+            {
+                (*pParameters)[ODF_FORMDROPDOWN_RESULT] <<= nNewPos;
+                Invalidate();
+            }
+            return;
+        }
+
+        if (*pIndex > -1 && *pIndex < nLen)
+        {
+            auto aList = comphelper::sequenceToContainer<std::vector<OUString>>(aSeq);
+            aList[*pIndex] = *pText;
+            (*pParameters)[ODF_FORMDROPDOWN_LISTENTRY] <<= comphelper::containerToSequence(aList);
+            Invalidate();
+        }
+    }
+
+    void DropDownFieldmark::ReplaceContent(const OUString& rNewContent)
+    {
+        ReplaceContent(&rNewContent, nullptr);
+    }
+
+    /**
+     * Remove everything if the given index is negative, else remove the given index (if valid).
+     * If deleting the currently selected choice, reset the selection to the first choice.
+     */
+    void DropDownFieldmark::DelContent(sal_Int32 nDelIndex)
+    {
+        sw::mark::IFieldmark::parameter_map_t* pParameters = GetParameters();
+        uno::Sequence<OUString> aSeq;
+        if (nDelIndex < 0)
+        {
+            pParameters->erase(ODF_FORMDROPDOWN_RESULT);
+            (*pParameters)[ODF_FORMDROPDOWN_LISTENTRY] <<= aSeq;
+            Invalidate();
+            return;
+        }
+
+        (*pParameters)[ODF_FORMDROPDOWN_LISTENTRY] >>= aSeq;
+        if (nDelIndex >= aSeq.getLength())
+            return;
+
+        // If deleting the current choice, select the first entry instead
+        // else need to shift list result index down if deleting an entry before it
+        sal_Int32 nResultIndex = -1;
+        (*pParameters)[ODF_FORMDROPDOWN_RESULT] >>= nResultIndex;
+        if (nDelIndex == nResultIndex)
+            nResultIndex = 0;
+        else if (nDelIndex < nResultIndex)
+            --nResultIndex;
+
+        comphelper::removeElementAt(aSeq, nDelIndex);
+        if (nResultIndex != -1)
+            (*pParameters)[ODF_FORMDROPDOWN_RESULT] <<= nResultIndex;
+        (*pParameters)[ODF_FORMDROPDOWN_LISTENTRY] <<= aSeq;
+        Invalidate();
     }
 
     void DropDownFieldmark::SetPortionPaintArea(const SwRect& rPortionPaintArea)

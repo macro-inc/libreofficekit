@@ -125,6 +125,32 @@ void XMLContentControlContext::startFastElement(
                 }
                 break;
             }
+            case XML_ELEMENT(LO_EXT, XML_COMBOBOX):
+            {
+                if (sax::Converter::convertBool(bTmp, rIter.toView()))
+                {
+                    m_bComboBox = bTmp;
+                }
+                break;
+            }
+            case XML_ELEMENT(LO_EXT, XML_DROPDOWN):
+            {
+                if (sax::Converter::convertBool(bTmp, rIter.toView()))
+                {
+                    m_bDropDown = bTmp;
+                }
+                break;
+            }
+            case XML_ELEMENT(LO_EXT, XML_ALIAS):
+            {
+                m_aAlias = rIter.toString();
+                break;
+            }
+            case XML_ELEMENT(LO_EXT, XML_TAG):
+            {
+                m_aTag = rIter.toString();
+                break;
+            }
             default:
                 XMLOFF_WARN_UNKNOWN("xmloff", rIter);
         }
@@ -214,6 +240,26 @@ void XMLContentControlContext::endFastElement(sal_Int32)
     if (m_bPlainText)
     {
         xPropertySet->setPropertyValue("PlainText", uno::Any(m_bPlainText));
+    }
+
+    if (m_bComboBox)
+    {
+        xPropertySet->setPropertyValue("ComboBox", uno::Any(m_bComboBox));
+    }
+
+    if (m_bDropDown)
+    {
+        xPropertySet->setPropertyValue("DropDown", uno::Any(m_bDropDown));
+    }
+
+    if (!m_aAlias.isEmpty())
+    {
+        xPropertySet->setPropertyValue("Alias", uno::Any(m_aAlias));
+    }
+
+    if (!m_aTag.isEmpty())
+    {
+        xPropertySet->setPropertyValue("Tag", uno::Any(m_aTag));
     }
 }
 

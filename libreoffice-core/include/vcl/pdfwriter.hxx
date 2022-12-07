@@ -193,6 +193,11 @@ public:
         Signature
     };
 
+    enum FormatType
+    {
+        Text, Number, Time, Date
+    };
+
     enum ErrorCode
     {
         // transparent object occurred and was draw opaque because
@@ -215,7 +220,7 @@ public:
         Error_Signature_Failed,
     };
 
-    struct UNLESS_MERGELIBS(VCL_DLLPUBLIC) AnyWidget
+    struct VCL_DLLPUBLIC AnyWidget
     {
         WidgetType          Type;       // primitive RTTI
     public:
@@ -286,7 +291,7 @@ public:
             ,TabOrder( rSource.TabOrder )
         {
         }
-        AnyWidget& operator=( const AnyWidget& );  // never implemented
+        AnyWidget& operator=( const AnyWidget& ) = delete;  // never implemented
     };
 
     struct PushButtonWidget final : public AnyWidget
@@ -329,7 +334,7 @@ public:
         }
     };
 
-    struct CheckBoxWidget final : public AnyWidget
+    struct VCL_DLLPUBLIC CheckBoxWidget final : public AnyWidget
     {
         bool                Checked;
         OUString            OnValue; // the value of the checkbox if it is selected
@@ -373,19 +378,26 @@ public:
         // in the group
     };
 
-    struct EditWidget final : public AnyWidget
+    struct VCL_DLLPUBLIC EditWidget final : public AnyWidget
     {
         bool                MultiLine;  // whether multiple lines are allowed
         bool                Password;   // visible echo off
         bool                FileSelect; // field is a file selector
         sal_Int32           MaxLen;     // maximum field length in characters, 0 means unlimited
+        FormatType          Format;
+        OUString            CurrencySymbol;
+        sal_Int32           DecimalAccuracy;
+        bool                PrependCurrencySymbol;
+        OUString            TimeFormat;
+        OUString            DateFormat;
 
         EditWidget()
                 : AnyWidget( vcl::PDFWriter::Edit ),
                   MultiLine( false ),
                   Password( false ),
                   FileSelect( false ),
-                  MaxLen( 0 )
+                  MaxLen( 0 ),
+                  Format( FormatType::Text )
         {}
 
         virtual std::shared_ptr<AnyWidget> Clone() const override
@@ -394,7 +406,7 @@ public:
         }
     };
 
-    struct ListBoxWidget final : public AnyWidget
+    struct VCL_DLLPUBLIC ListBoxWidget final : public AnyWidget
     {
         bool                            DropDown;
         bool                            MultiSelect;

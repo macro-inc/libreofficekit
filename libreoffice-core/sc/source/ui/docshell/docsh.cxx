@@ -44,6 +44,7 @@
 #include <sfx2/docfile.hxx>
 #include <sfx2/event.hxx>
 #include <sfx2/docfilt.hxx>
+#include <sfx2/lokhelper.hxx>
 #include <sfx2/objface.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <svl/documentlockfile.hxx>
@@ -114,6 +115,7 @@
 #include <warnpassword.hxx>
 #include <optsolver.hxx>
 #include <sheetdata.hxx>
+#include <table.hxx>
 #include <tabprotection.hxx>
 #include <docparam.hxx>
 #include "docshimp.hxx"

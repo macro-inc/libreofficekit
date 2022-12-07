@@ -1388,6 +1388,14 @@ gb_ExternalProject__use_fontconfig :=
 
 else
 
+ifneq ($(filter-out MACOSX WNT,$(OS)),)
+
+$(eval $(call gb_Helper_register_packages_for_install,ooo,\
+	fontconfig \
+))
+
+endif
+
 define gb_LinkTarget__use_fontconfig
 $(call gb_LinkTarget_use_external_project,$(1),fontconfig)
 $(call gb_LinkTarget_set_include,$(1),\
@@ -2752,6 +2760,53 @@ endef
 
 endif # !SYSTEM_LIBPNG
 
+ifneq ($(SYSTEM_LIBTIFF),)
+
+define gb_LinkTarget__use_libtiff
+$(call gb_LinkTarget_set_include,$(1),\
+	$$(INCLUDE) \
+	$(LIBTIFF_CFLAGS) \
+)
+
+$(call gb_LinkTarget_add_libs,$(1),\
+	$(LIBTIFF_LIBS) \
+)
+
+endef
+
+gb_ExternalProject__use_libtiff :=
+
+else # !SYSTEM_LIBTIFF
+
+define gb_LinkTarget__use_libtiff
+$(call gb_LinkTarget_set_include,$(1),\
+	$(LIBTIFF_CFLAGS) \
+	$$(INCLUDE) \
+)
+
+$(call gb_LinkTarget_set_include,$(1),\
+	-I$(call gb_UnpackedTarball_get_dir,libtiff)/libtiff \
+	$$(INCLUDE) \
+)
+ifeq ($(OS),WNT)
+$(call gb_LinkTarget_add_libs,$(1),\
+	$(call gb_UnpackedTarball_get_dir,libtiff)/libtiff/.libs/libtiff$(gb_StaticLibrary_PLAINEXT) \
+)
+else
+$(call gb_LinkTarget_add_libs,$(1),\
+	-L$(call gb_UnpackedTarball_get_dir,libtiff)/libtiff/.libs -ltiff \
+)
+endif
+$(call gb_LinkTarget_use_external_project,$(1),libtiff,full)
+
+endef
+
+define gb_ExternalProject__use_libtiff
+$(call gb_ExternalProject_use_external_project,$(1),libtiff)
+
+endef
+
+endif # !SYSTEM_LIBTIFF
 
 ifneq ($(SYSTEM_LIBWEBP),)
 
@@ -2795,9 +2850,7 @@ $(call gb_LinkTarget_use_external_project,$(1),libwebp)
 endef
 
 define gb_ExternalProject__use_libwebp
-$(call gb_ExternalProject_use_external_project,$(1),\
-	libwebp \
-)
+$(call gb_ExternalProject_use_external_project,$(1),libwebp)
 
 endef
 

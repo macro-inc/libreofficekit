@@ -763,6 +763,13 @@ bool SwPaM::HasReadonlySel( bool bFormView ) const
     {
         // Allow editing when the cursor/selection is fully inside of a legacy form field.
         bRet = !( pA != nullptr && !bAtStartA && !bAtStartB && pA == pB );
+
+        if (bRet && rDoc.GetEditShell()->CursorInsideContentControl())
+        {
+            // Also allow editing inside content controls in general, similar to form fields.
+            // Specific types will be disabled below.
+            bRet = false;
+        }
     }
 
     if (!bRet)
@@ -833,7 +840,16 @@ bool SwPaM::HasReadonlySel( bool bFormView ) const
                     = rFormatContentControl.GetContentControl();
                 if (pContentControl && !pContentControl->GetReadWrite())
                 {
-                    bRet = pContentControl->GetCheckbox() || pContentControl->GetPicture();
+                    switch (pContentControl->GetType())
+                    {
+                        case SwContentControlType::CHECKBOX:
+                        case SwContentControlType::PICTURE:
+                        case SwContentControlType::DROP_DOWN_LIST:
+                            bRet = true;
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }

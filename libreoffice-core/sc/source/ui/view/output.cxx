@@ -919,7 +919,17 @@ void drawIconSets(vcl::RenderContext& rRenderContext, const ScIconSetInfo* pOldI
     tools::Long aHeight = o3tl::convert(10, o3tl::Length::pt, o3tl::Length::mm100);
 
     if (pOldIconSetInfo->mnHeight)
-        aHeight = o3tl::convert(pOldIconSetInfo->mnHeight, o3tl::Length::twip, o3tl::Length::mm100);
+    {
+        if (comphelper::LibreOfficeKit::isActive())
+        {
+            aHeight = rRenderContext.LogicToPixel(Size(0, pOldIconSetInfo->mnHeight), MapMode(MapUnit::MapTwip)).Height();
+            aHeight *= comphelper::LibreOfficeKit::getDPIScale();
+        }
+        else
+        {
+            aHeight = o3tl::convert(pOldIconSetInfo->mnHeight, o3tl::Length::twip, o3tl::Length::mm100);
+        }
+    }
 
     Size aSize = rIcon.GetSizePixel();
     double fRatio = aSize.Width() / aSize.Height();

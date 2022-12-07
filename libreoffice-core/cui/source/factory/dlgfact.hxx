@@ -383,10 +383,12 @@ private:
 };
 
 // AbstractPasswordToOpenModifyDialog_Impl
-DECL_ABSTDLG_CLASS(AbstractPasswordToOpenModifyDialog,PasswordToOpenModifyDialog)
+DECL_ABSTDLG_CLASS_SHARED_ASYNC(AbstractPasswordToOpenModifyDialog,AbstractPasswordToOpenModifyDialog, PasswordToOpenModifyDialog)
     virtual OUString  GetPasswordToOpen() const override;
     virtual OUString  GetPasswordToModify() const override;
     virtual bool      IsRecommendToOpenReadonly() const override;
+    virtual void      Response(sal_Int32) override;
+    virtual void      AllowEmpty() override;
 };
 
 // AbstractSvxCharacterMapDialog_Impl

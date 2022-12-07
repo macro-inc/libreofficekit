@@ -72,6 +72,13 @@ $(eval $(call gb_Library_add_exception_objects,vbaswobj,\
     sw/source/ui/vba/vbacells \
     sw/source/ui/vba/vbacolumn \
     sw/source/ui/vba/vbacolumns \
+    sw/source/ui/vba/vbaformfield \
+    sw/source/ui/vba/vbaformfields \
+    sw/source/ui/vba/vbaformfieldcheckbox \
+    sw/source/ui/vba/vbaformfielddropdown \
+    sw/source/ui/vba/vbaformfielddropdownlistentries \
+    sw/source/ui/vba/vbaformfielddropdownlistentry \
+    sw/source/ui/vba/vbaformfieldtextinput \
     sw/source/ui/vba/vbaframe \
     sw/source/ui/vba/vbaframes \
     sw/source/ui/vba/vbalistformat \
@@ -130,6 +137,7 @@ $(eval $(call gb_Library_add_exception_objects,vbaswobj,\
     sw/source/ui/vba/vbatableofcontents \
     sw/source/ui/vba/vbatablesofcontents \
     sw/source/ui/vba/vbavariable \
+    sw/source/ui/vba/vbawordbasic \
     sw/source/ui/vba/vbadocuments \
     sw/source/ui/vba/vbaparagraphformat \
     sw/source/ui/vba/vbaborders \

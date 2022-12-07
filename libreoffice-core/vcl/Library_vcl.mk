@@ -79,6 +79,7 @@ $(eval $(call gb_Library_use_libraries,vcl,\
 
 $(eval $(call gb_Library_use_externals,vcl,\
     boost_headers \
+    expat \
     gio \
     glm_headers \
     graphite \
@@ -89,6 +90,7 @@ $(eval $(call gb_Library_use_externals,vcl,\
     libeot \
     libjpeg \
     libpng \
+    libtiff \
     libwebp \
     mdds_headers \
     $(if $(filter PDFIUM,$(BUILD_TYPE)),pdfium) \
@@ -408,6 +410,7 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/app/svmain \
     vcl/source/app/timer \
     vcl/source/app/unohelp2 \
+    vcl/source/app/htmltransferable \
     vcl/source/app/unohelp \
     vcl/source/app/vclevent \
     vcl/source/app/watchdog \
@@ -447,13 +450,12 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/filter/ipict/ipict \
     vcl/source/filter/ipsd/ipsd \
     vcl/source/filter/ipict/shape \
+    vcl/source/filter/ipdf/pdfcompat \
     vcl/source/filter/ipdf/pdfread \
     vcl/source/filter/ipdf/pdfdocument \
     vcl/source/filter/iras/iras \
     vcl/source/filter/itga/itga \
-    vcl/source/filter/itiff/ccidecom \
     vcl/source/filter/itiff/itiff \
-    vcl/source/filter/itiff/lzwdecom \
     vcl/source/filter/ixbm/xbmread \
     vcl/source/filter/ixpm/xpmread \
     vcl/source/filter/jpeg/Exif \

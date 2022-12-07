@@ -283,6 +283,7 @@ struct _LibreOfficeKitDocumentClass
     void (*paintPartTile) (LibreOfficeKitDocument* pThis,
                            unsigned char* pBuffer,
                            const int nPart,
+                           const int nMode,
                            const int nCanvasWidth,
                            const int nCanvasHeight,
                            const int nTilePosX,
@@ -482,6 +483,15 @@ struct _LibreOfficeKitDocumentClass
                                     const char* pMimeType,
                                     char** pText,
                                     char** pUsedMimeType);
+
+    /// @see lok::Document::getDataArea().
+    void (*getDataArea) (LibreOfficeKitDocument* pThis,
+                         long nPart,
+                         long* pCol,
+                         long* pRow);
+
+    /// @see lok::Document::getEditMode().
+    int (*getEditMode) (LibreOfficeKitDocument* pThis);
 
 #endif // defined LOK_USE_UNSTABLE_API || defined LIBO_INTERNAL_ONLY
 };

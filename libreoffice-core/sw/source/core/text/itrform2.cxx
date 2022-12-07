@@ -55,8 +55,11 @@
 #include <IMark.hxx>
 #include <IDocumentMarkAccess.hxx>
 #include <comphelper/processfactory.hxx>
+#include <vcl/pdfextoutdevdata.hxx>
+#include <comphelper/string.hxx>
 #include <docsh.hxx>
 #include <unocrsrhelper.hxx>
+#include <textcontentcontrol.hxx>
 #include <com/sun/star/rdf/Statement.hpp>
 #include <com/sun/star/rdf/URI.hpp>
 #include <com/sun/star/rdf/URIs.hpp>
@@ -866,9 +869,13 @@ public:
 /// A content control portion is a text portion that is inside RES_TXTATR_CONTENTCONTROL.
 class SwContentControlPortion : public SwTextPortion
 {
+    SwTextContentControl* m_pTextContentControl;
 public:
-    SwContentControlPortion() { SetWhichPor(PortionType::ContentControl); }
+    SwContentControlPortion(SwTextContentControl* pTextContentControl);
     virtual void Paint(const SwTextPaintInfo& rInf) const override;
+
+    /// Emits a PDF form widget for this portion on success, does nothing on failure.
+    bool DescribePDFControl(const SwTextPaintInfo& rInf) const;
 };
 }
 
@@ -886,11 +893,166 @@ void SwMetaPortion::Paint( const SwTextPaintInfo &rInf ) const
     }
 }
 
+SwContentControlPortion::SwContentControlPortion(SwTextContentControl* pTextContentControl)
+    : m_pTextContentControl(pTextContentControl)
+{
+    SetWhichPor(PortionType::ContentControl);
+}
+
+bool SwContentControlPortion::DescribePDFControl(const SwTextPaintInfo& rInf) const
+{
+    auto pPDFExtOutDevData = dynamic_cast<vcl::PDFExtOutDevData*>(rInf.GetOut()->GetExtOutDevData());
+    if (!pPDFExtOutDevData)
+    {
+        return false;
+    }
+
+    if (!pPDFExtOutDevData->GetIsExportFormFields())
+    {
+        return false;
+    }
+
+    if (!m_pTextContentControl)
+    {
+        return false;
+    }
+
+    const SwFormatContentControl& rFormatContentControl = m_pTextContentControl->GetContentControl();
+    const std::shared_ptr<SwContentControl>& pContentControl = rFormatContentControl.GetContentControl();
+    if (!pContentControl)
+    {
+        return false;
+    }
+
+    // Check if this is the first content control portion of this content control.
+    SwTextNode* pTextNode = pContentControl->GetTextNode();
+    sal_Int32 nStart = m_pTextContentControl->GetStart();
+    sal_Int32 nEnd = *m_pTextContentControl->GetEnd();
+    TextFrameIndex nViewStart = rInf.GetTextFrame()->MapModelToView(pTextNode, nStart);
+    TextFrameIndex nViewEnd = rInf.GetTextFrame()->MapModelToView(pTextNode, nEnd);
+    // The content control portion starts 1 char after the starting dummy character.
+    if (rInf.GetIdx() != nViewStart + TextFrameIndex(1))
+    {
+        // Ignore: don't process and also don't emit plain text fallback.
+        return true;
+    }
+
+    std::unique_ptr<vcl::PDFWriter::AnyWidget> pDescriptor;
+    switch (pContentControl->GetType())
+    {
+        case SwContentControlType::RICH_TEXT:
+        case SwContentControlType::PLAIN_TEXT:
+        {
+            pDescriptor = std::make_unique<vcl::PDFWriter::EditWidget>();
+            break;
+        }
+        case SwContentControlType::CHECKBOX:
+        {
+            pDescriptor = std::make_unique<vcl::PDFWriter::CheckBoxWidget>();
+            auto pCheckBoxWidget = static_cast<vcl::PDFWriter::CheckBoxWidget*>(pDescriptor.get());
+            pCheckBoxWidget->Checked = pContentControl->GetChecked();
+            pCheckBoxWidget->OnValue = pContentControl->GetCheckedState();
+            pCheckBoxWidget->OffValue = pContentControl->GetUncheckedState();
+            break;
+        }
+        case SwContentControlType::DROP_DOWN_LIST:
+        {
+            pDescriptor = std::make_unique<vcl::PDFWriter::ListBoxWidget>();
+            auto pListWidget = static_cast<vcl::PDFWriter::ListBoxWidget*>(pDescriptor.get());
+            pListWidget->DropDown = true;
+            for (const auto& rItem : pContentControl->GetListItems())
+            {
+                pListWidget->Entries.push_back(rItem.m_aDisplayText);
+            }
+            break;
+        }
+        case SwContentControlType::COMBO_BOX:
+        {
+            pDescriptor = std::make_unique<vcl::PDFWriter::ComboBoxWidget>();
+            auto pComboWidget = static_cast<vcl::PDFWriter::ComboBoxWidget*>(pDescriptor.get());
+            for (const auto& rItem : pContentControl->GetListItems())
+            {
+                pComboWidget->Entries.push_back(rItem.m_aDisplayText);
+            }
+            break;
+        }
+        case SwContentControlType::DATE:
+        {
+            pDescriptor = std::make_unique<vcl::PDFWriter::EditWidget>();
+            auto pEditWidget = static_cast<vcl::PDFWriter::EditWidget*>(pDescriptor.get());
+            pEditWidget->Format = vcl::PDFWriter::Date;
+            // GetDateFormat() uses a syntax that works with SvNumberFormatter::PutEntry(), PDF's
+            // AFDate_FormatEx() uses a similar syntax, but uses lowercase characters in case of
+            // "Y", "M" and "D" at least.
+            pEditWidget->DateFormat = pContentControl->GetDateFormat().toAsciiLowerCase();
+            break;
+        }
+        default:
+            break;
+    }
+
+    if (!pDescriptor)
+    {
+        return false;
+    }
+
+    const SwFont* pFont = rInf.GetFont();
+    if (pFont)
+    {
+        pDescriptor->TextFont = pFont->GetActualFont();
+    }
+
+    // Description for accessibility purposes.
+    if (!pContentControl->GetAlias().isEmpty())
+    {
+        pDescriptor->Description = pContentControl->GetAlias();
+    }
+
+    if (!pContentControl->GetShowingPlaceHolder())
+    {
+        SwPosition aPoint(*pTextNode, nStart);
+        SwPosition aMark(*pTextNode, nEnd);
+        SwPaM aPam(aMark, aPoint);
+        OUString aText = aPam.GetText();
+        static sal_Unicode const aForbidden[] = {
+            CH_TXTATR_BREAKWORD,
+            0
+        };
+        pDescriptor->Text = comphelper::string::removeAny(aText, aForbidden);
+    }
+
+    // Calculate the bounding rectangle of this content control, which can be one or more layout
+    // portions in one or more lines.
+    SwRect aLocation;
+    auto pTextFrame = const_cast<SwTextFrame*>(rInf.GetTextFrame());
+    SwTextSizeInfo aInf(pTextFrame);
+    SwTextCursor aLine(pTextFrame, &aInf);
+    SwRect aStartRect;
+    aLine.GetCharRect(&aStartRect, nViewStart);
+    aLocation = aStartRect;
+    SwRect aEndRect;
+    aLine.GetCharRect(&aEndRect, nViewEnd);
+    aLocation.Union(aEndRect);
+    pDescriptor->Location = aLocation.SVRect();
+
+    pPDFExtOutDevData->BeginStructureElement(vcl::PDFWriter::Form);
+    pPDFExtOutDevData->CreateControl(*pDescriptor);
+    pPDFExtOutDevData->EndStructureElement();
+
+    return true;
+}
+
 void SwContentControlPortion::Paint(const SwTextPaintInfo& rInf) const
 {
     if (Width())
     {
         rInf.DrawViewOpt(*this, PortionType::ContentControl);
+
+        if (DescribePDFControl(rInf))
+        {
+            return;
+        }
+
         SwTextPortion::Paint(rInf);
     }
 }
@@ -1013,7 +1175,19 @@ SwTextPortion *SwTextFormatter::WhichTextPor( SwTextFormatInfo &rInf ) const
         }
         else if (GetFnt()->IsContentControl())
         {
-            pPor = new SwContentControlPortion;
+            SwTextFrame const*const pFrame(rInf.GetTextFrame());
+            SwPosition aPosition(pFrame->MapViewToModelPos(rInf.GetIdx()));
+            SwTextNode* pTextNode = aPosition.nNode.GetNode().GetTextNode();
+            SwTextContentControl* pTextContentControl = nullptr;
+            if (pTextNode)
+            {
+                sal_Int32 nIndex = aPosition.nContent.GetIndex();
+                if (SwTextAttr* pAttr = pTextNode->GetTextAttrAt(nIndex, RES_TXTATR_CONTENTCONTROL, SwTextNode::PARENT))
+                {
+                    pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
+                }
+            }
+            pPor = new SwContentControlPortion(pTextContentControl);
         }
         else
         {

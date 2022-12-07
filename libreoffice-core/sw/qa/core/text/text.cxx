@@ -18,6 +18,8 @@
 #include <vcl/filter/PDFiumLibrary.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <unotools/mediadescriptor.hxx>
+#include <editeng/fhgtitem.hxx>
+#include <editeng/wghtitem.hxx>
 
 #include <docsh.hxx>
 #include <unotxdoc.hxx>
@@ -33,6 +35,11 @@
 #include <fmtcntnt.hxx>
 #include <fmtfsize.hxx>
 #include <IDocumentRedlineAccess.hxx>
+#include <formatcontentcontrol.hxx>
+#include <strings.hrc>
+#include <ndtxt.hxx>
+#include <txatbase.hxx>
+#include <textcontentcontrol.hxx>
 
 constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/core/text/data/";
 
@@ -115,18 +122,10 @@ CPPUNIT_TEST_FIXTURE(SwCoreTextTest, testBibliographyUrlPdfExport)
     xText->insertTextContent(xCursor, xContent, /*bAbsorb=*/false);
 
     // When exporting to PDF:
-    uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-    utl::MediaDescriptor aMediaDescriptor;
-    aMediaDescriptor["FilterName"] <<= OUString("writer_pdf_Export");
-    xStorable->storeToURL(maTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
+    StoreToTempFile("writer_pdf_Export");
 
     // Then make sure the field links the source.
-    SvFileStream aFile(maTempFile.GetURL(), StreamMode::READ);
-    SvMemoryStream aMemory;
-    aMemory.WriteStream(aFile);
-    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument
-        = pPDFium->openDocument(aMemory.GetData(), aMemory.GetSize(), OString());
-    CPPUNIT_ASSERT(pPdfDocument);
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = LoadPdfFromTempFile();
     std::unique_ptr<vcl::pdf::PDFiumPage> pPdfPage = pPdfDocument->openPage(/*nIndex=*/0);
     // Without the accompanying fix in place, this test would have failed, the field was not
     // clickable (while it was clickable on the UI).
@@ -532,6 +531,206 @@ CPPUNIT_TEST_FIXTURE(SwCoreTextTest, testRedlineDelete)
     // Then make sure that the redline is created:
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1),
                          pDoc->getIDocumentRedlineAccess().GetRedlineTable().size());
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreTextTest, testContentControlPDF)
+{
+    // Given a file with a content control:
+    SwDoc* pDoc = createSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->InsertContentControl(SwContentControlType::RICH_TEXT);
+    pWrtShell->SttEndDoc(/*bStt=*/true);
+    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/false, 1, /*bBasicCall=*/false);
+    sal_Int32 nPlaceHolderLen = SwResId(STR_CONTENT_CONTROL_PLACEHOLDER).getLength();
+    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/true, nPlaceHolderLen,
+                     /*bBasicCall=*/false);
+    pWrtShell->Insert("mycontent");
+    const SwPosition* pStart = pWrtShell->GetCursor()->Start();
+    SwTextNode* pTextNode = pStart->nNode.GetNode().GetTextNode();
+    sal_Int32 nIndex = pStart->nContent.GetIndex();
+    SwTextAttr* pAttr
+        = pTextNode->GetTextAttrAt(nIndex, RES_TXTATR_CONTENTCONTROL, SwTextNode::PARENT);
+    auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
+    const SwFormatContentControl& rFormatContentControl = pTextContentControl->GetContentControl();
+    std::shared_ptr<SwContentControl> pContentControl = rFormatContentControl.GetContentControl();
+    // Alias/title, to be mapped to PDF's description.
+    pContentControl->SetAlias("mydesc");
+
+    // When exporting to PDF:
+    StoreToTempFile("writer_pdf_Export");
+
+    // Then make sure that a fillable form widget is emitted:
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = LoadPdfFromTempFile();
+    std::unique_ptr<vcl::pdf::PDFiumPage> pPage = pPdfDocument->openPage(0);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 0
+    // i.e. the content control was just exported as normal text.
+    CPPUNIT_ASSERT_EQUAL(1, pPage->getAnnotationCount());
+    std::unique_ptr<vcl::pdf::PDFiumAnnotation> pAnnotation = pPage->getAnnotation(0);
+    CPPUNIT_ASSERT_EQUAL(vcl::pdf::PDFAnnotationSubType::Widget, pAnnotation->getSubType());
+
+    // Also verify that the widget description is correct, it was empty:
+    CPPUNIT_ASSERT_EQUAL(OUString("mydesc"),
+                         pAnnotation->getFormFieldAlternateName(pPdfDocument.get()));
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreTextTest, testCheckboxContentControlPDF)
+{
+    // Given a file with a checkbox content control:
+    SwDoc* pDoc = createSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->InsertContentControl(SwContentControlType::CHECKBOX);
+
+    // When exporting to PDF:
+    StoreToTempFile("writer_pdf_Export");
+
+    // Then make sure that a checkbox form widget is emitted:
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = LoadPdfFromTempFile();
+    std::unique_ptr<vcl::pdf::PDFiumPage> pPage = pPdfDocument->openPage(0);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 0
+    // i.e. the checkbox content control was just exported as normal text.
+    CPPUNIT_ASSERT_EQUAL(1, pPage->getAnnotationCount());
+    std::unique_ptr<vcl::pdf::PDFiumAnnotation> pAnnotation = pPage->getAnnotation(0);
+    CPPUNIT_ASSERT_EQUAL(vcl::pdf::PDFAnnotationSubType::Widget, pAnnotation->getSubType());
+    // Also check the form widget type:
+    CPPUNIT_ASSERT_EQUAL(vcl::pdf::PDFFormFieldType::CheckBox,
+                         pAnnotation->getFormFieldType(pPdfDocument.get()));
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreTextTest, testDropdownContentControlPDF)
+{
+    // Given a file with a dropdown content control:
+    SwDoc* pDoc = createSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->InsertContentControl(SwContentControlType::DROP_DOWN_LIST);
+
+    // When exporting to PDF:
+    StoreToTempFile("writer_pdf_Export");
+
+    // Then make sure that a dropdown form widget is emitted:
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = LoadPdfFromTempFile();
+    std::unique_ptr<vcl::pdf::PDFiumPage> pPage = pPdfDocument->openPage(0);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 0
+    // i.e. the dropdown content control was just exported as normal text.
+    CPPUNIT_ASSERT_EQUAL(1, pPage->getAnnotationCount());
+    std::unique_ptr<vcl::pdf::PDFiumAnnotation> pAnnotation = pPage->getAnnotation(0);
+    CPPUNIT_ASSERT_EQUAL(vcl::pdf::PDFAnnotationSubType::Widget, pAnnotation->getSubType());
+    // Also check the form widget type (our dropdown is called combo in PDF terms):
+    CPPUNIT_ASSERT_EQUAL(vcl::pdf::PDFFormFieldType::ComboBox,
+                         pAnnotation->getFormFieldType(pPdfDocument.get()));
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreTextTest, testDateContentControlPDF)
+{
+    // Given a file with a date content control:
+    SwDoc* pDoc = createSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->InsertContentControl(SwContentControlType::DATE);
+
+    // When exporting to PDF:
+    StoreToTempFile("writer_pdf_Export");
+
+    // Then make sure that a date form widget is emitted:
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = LoadPdfFromTempFile();
+    std::unique_ptr<vcl::pdf::PDFiumPage> pPage = pPdfDocument->openPage(0);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 0
+    // i.e. the date content control was just exported as normal text.
+    CPPUNIT_ASSERT_EQUAL(1, pPage->getAnnotationCount());
+    std::unique_ptr<vcl::pdf::PDFiumAnnotation> pAnnotation = pPage->getAnnotation(0);
+    CPPUNIT_ASSERT_EQUAL(vcl::pdf::PDFAnnotationSubType::Widget, pAnnotation->getSubType());
+    // Also check the form widget type (our date is a mode of text in PDF terms):
+    CPPUNIT_ASSERT_EQUAL(vcl::pdf::PDFFormFieldType::TextField,
+                         pAnnotation->getFormFieldType(pPdfDocument.get()));
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreTextTest, testContentControlPDFFont)
+{
+    // Given a document with a custom 24pt font size and a content control:
+    SwDoc* pDoc = createSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    SfxItemSetFixed<RES_CHRATR_FONTSIZE, RES_CHRATR_FONTSIZE> aSet(pWrtShell->GetAttrPool());
+    SvxFontHeightItem aItem(480, 100, RES_CHRATR_FONTSIZE);
+    aSet.Put(aItem);
+    pWrtShell->SetAttrSet(aSet);
+    pWrtShell->InsertContentControl(SwContentControlType::RICH_TEXT);
+
+    // When exporting that document to PDF:
+    StoreToTempFile("writer_pdf_Export");
+
+    // Then make sure that the widget in the PDF result has that custom font size:
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = LoadPdfFromTempFile();
+    std::unique_ptr<vcl::pdf::PDFiumPage> pPage = pPdfDocument->openPage(0);
+    CPPUNIT_ASSERT_EQUAL(1, pPage->getAnnotationCount());
+    std::unique_ptr<vcl::pdf::PDFiumAnnotation> pAnnotation = pPage->getAnnotation(0);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 24
+    // - Actual  : 8
+    // i.e. i.e. the font size was some default, not the 24pt specified in the model.
+    CPPUNIT_ASSERT_EQUAL(24.0f, pAnnotation->getFormFontSize(pPdfDocument.get()));
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreTextTest, testComboContentControlPDF)
+{
+    // Given a file with a combo box content control:
+    SwDoc* pDoc = createSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->InsertContentControl(SwContentControlType::COMBO_BOX);
+
+    // When exporting to PDF:
+    StoreToTempFile("writer_pdf_Export");
+
+    // Then make sure that a combo box form widget is emitted:
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = LoadPdfFromTempFile();
+    std::unique_ptr<vcl::pdf::PDFiumPage> pPage = pPdfDocument->openPage(0);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 0
+    // i.e. the combo box content control was exported as plain text.
+    CPPUNIT_ASSERT_EQUAL(1, pPage->getAnnotationCount());
+    std::unique_ptr<vcl::pdf::PDFiumAnnotation> pAnnotation = pPage->getAnnotation(0);
+    CPPUNIT_ASSERT_EQUAL(vcl::pdf::PDFAnnotationSubType::Widget, pAnnotation->getSubType());
+    CPPUNIT_ASSERT_EQUAL(vcl::pdf::PDFFormFieldType::ComboBox,
+                         pAnnotation->getFormFieldType(pPdfDocument.get()));
+    // 19th bit: combo box, not dropdown.
+    CPPUNIT_ASSERT(pAnnotation->getFormFieldFlags(pPdfDocument.get()) & 0x00040000);
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreTextTest, testRichContentControlPDF)
+{
+    // Given a file with a rich content control, its value set to "xxx<b>yyy</b>":
+    SwDoc* pDoc = createSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->InsertContentControl(SwContentControlType::RICH_TEXT);
+    pWrtShell->SttEndDoc(/*bStt=*/true);
+    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/false, 1, /*bBasicCall=*/false);
+    sal_Int32 nPlaceHolderLen = SwResId(STR_CONTENT_CONTROL_PLACEHOLDER).getLength();
+    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/true, nPlaceHolderLen,
+                     /*bBasicCall=*/false);
+    pWrtShell->Insert("xxxyyy");
+    pWrtShell->Left(CRSR_SKIP_CHARS, /*bSelect=*/true, 3, /*bBasicCall=*/false);
+    SfxItemSetFixed<RES_CHRATR_WEIGHT, RES_CHRATR_WEIGHT> aSet(pWrtShell->GetAttrPool());
+    SvxWeightItem aItem(WEIGHT_BOLD, RES_CHRATR_WEIGHT);
+    aSet.Put(aItem);
+    pWrtShell->SetAttrSet(aSet);
+
+    // When exporting to PDF:
+    StoreToTempFile("writer_pdf_Export");
+
+    // Then make sure that a single fillable form widget is emitted:
+    std::unique_ptr<vcl::pdf::PDFiumDocument> pPdfDocument = LoadPdfFromTempFile();
+    std::unique_ptr<vcl::pdf::PDFiumPage> pPage = pPdfDocument->openPage(0);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 2
+    // i.e. "xxx<b>yyy</b>" was exported as 2 widgets, not 1.
+    CPPUNIT_ASSERT_EQUAL(1, pPage->getAnnotationCount());
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

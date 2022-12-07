@@ -22,6 +22,7 @@
 #include <mutex>
 
 #include <com/sun/star/text/XWordCursor.hpp>
+#include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 
 #include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/servicehelper.hxx>
@@ -167,11 +168,16 @@ public:
     OUString m_aDateLanguage;
     OUString m_aCurrentDate;
     bool m_bPlainText;
+    bool m_bComboBox;
+    bool m_bDropDown;
     OUString m_aPlaceholderDocPart;
     OUString m_aDataBindingPrefixMappings;
     OUString m_aDataBindingXpath;
     OUString m_aDataBindingStoreItemID;
     OUString m_aColor;
+    OUString m_aAlias;
+    OUString m_aTag;
+    sal_Int32 m_nId;
 
     Impl(SwXContentControl& rThis, SwDoc& rDoc, SwContentControl* pContentControl,
          const uno::Reference<text::XText>& xParentText,
@@ -188,6 +194,9 @@ public:
         , m_bPicture(false)
         , m_bDate(false)
         , m_bPlainText(false)
+        , m_bComboBox(false)
+        , m_bDropDown(false)
+        , m_nId(0)
     {
         if (m_pContentControl)
         {
@@ -537,11 +546,16 @@ void SwXContentControl::AttachImpl(const uno::Reference<text::XTextRange>& xText
     pContentControl->SetDateLanguage(m_pImpl->m_aDateLanguage);
     pContentControl->SetCurrentDate(m_pImpl->m_aCurrentDate);
     pContentControl->SetPlainText(m_pImpl->m_bPlainText);
+    pContentControl->SetComboBox(m_pImpl->m_bComboBox);
+    pContentControl->SetDropDown(m_pImpl->m_bDropDown);
     pContentControl->SetPlaceholderDocPart(m_pImpl->m_aPlaceholderDocPart);
     pContentControl->SetDataBindingPrefixMappings(m_pImpl->m_aDataBindingPrefixMappings);
     pContentControl->SetDataBindingXpath(m_pImpl->m_aDataBindingXpath);
     pContentControl->SetDataBindingStoreItemID(m_pImpl->m_aDataBindingStoreItemID);
     pContentControl->SetColor(m_pImpl->m_aColor);
+    pContentControl->SetAlias(m_pImpl->m_aAlias);
+    pContentControl->SetTag(m_pImpl->m_aTag);
+    pContentControl->SetId(m_pImpl->m_nId);
 
     SwFormatContentControl aContentControl(pContentControl, nWhich);
     bool bSuccess
@@ -775,10 +789,21 @@ void SAL_CALL SwXContentControl::setPropertyValue(const OUString& rPropertyName,
         if (m_pImpl->m_bIsDescriptor)
         {
             m_pImpl->m_aListItems = aItems;
+
+            if (!m_pImpl->m_bComboBox && !m_pImpl->m_bDropDown)
+            {
+                m_pImpl->m_bDropDown = true;
+            }
         }
         else
         {
             m_pImpl->m_pContentControl->SetListItems(aItems);
+
+            if (!m_pImpl->m_pContentControl->GetComboBox()
+                && !m_pImpl->m_pContentControl->GetDropDown())
+            {
+                m_pImpl->m_pContentControl->SetDropDown(true);
+            }
         }
     }
     else if (rPropertyName == UNO_NAME_PICTURE)
@@ -871,6 +896,36 @@ void SAL_CALL SwXContentControl::setPropertyValue(const OUString& rPropertyName,
             }
         }
     }
+    else if (rPropertyName == UNO_NAME_COMBO_BOX)
+    {
+        bool bValue;
+        if (rValue >>= bValue)
+        {
+            if (m_pImpl->m_bIsDescriptor)
+            {
+                m_pImpl->m_bComboBox = bValue;
+            }
+            else
+            {
+                m_pImpl->m_pContentControl->SetComboBox(bValue);
+            }
+        }
+    }
+    else if (rPropertyName == UNO_NAME_DROP_DOWN)
+    {
+        bool bValue;
+        if (rValue >>= bValue)
+        {
+            if (m_pImpl->m_bIsDescriptor)
+            {
+                m_pImpl->m_bDropDown = bValue;
+            }
+            else
+            {
+                m_pImpl->m_pContentControl->SetDropDown(bValue);
+            }
+        }
+    }
     else if (rPropertyName == UNO_NAME_PLACEHOLDER_DOC_PART)
     {
         OUString aValue;
@@ -943,6 +998,51 @@ void SAL_CALL SwXContentControl::setPropertyValue(const OUString& rPropertyName,
             else
             {
                 m_pImpl->m_pContentControl->SetColor(aValue);
+            }
+        }
+    }
+    else if (rPropertyName == UNO_NAME_ALIAS)
+    {
+        OUString aValue;
+        if (rValue >>= aValue)
+        {
+            if (m_pImpl->m_bIsDescriptor)
+            {
+                m_pImpl->m_aAlias = aValue;
+            }
+            else
+            {
+                m_pImpl->m_pContentControl->SetAlias(aValue);
+            }
+        }
+    }
+    else if (rPropertyName == UNO_NAME_TAG)
+    {
+        OUString aValue;
+        if (rValue >>= aValue)
+        {
+            if (m_pImpl->m_bIsDescriptor)
+            {
+                m_pImpl->m_aTag = aValue;
+            }
+            else
+            {
+                m_pImpl->m_pContentControl->SetTag(aValue);
+            }
+        }
+    }
+    else if (rPropertyName == UNO_NAME_ID)
+    {
+        sal_Int32 nValue = 0;
+        if (rValue >>= nValue)
+        {
+            if (m_pImpl->m_bIsDescriptor)
+            {
+                m_pImpl->m_nId = nValue;
+            }
+            else
+            {
+                m_pImpl->m_pContentControl->SetId(nValue);
             }
         }
     }
@@ -1091,6 +1191,28 @@ uno::Any SAL_CALL SwXContentControl::getPropertyValue(const OUString& rPropertyN
             aRet <<= m_pImpl->m_pContentControl->GetPlainText();
         }
     }
+    else if (rPropertyName == UNO_NAME_COMBO_BOX)
+    {
+        if (m_pImpl->m_bIsDescriptor)
+        {
+            aRet <<= m_pImpl->m_bComboBox;
+        }
+        else
+        {
+            aRet <<= m_pImpl->m_pContentControl->GetComboBox();
+        }
+    }
+    else if (rPropertyName == UNO_NAME_DROP_DOWN)
+    {
+        if (m_pImpl->m_bIsDescriptor)
+        {
+            aRet <<= m_pImpl->m_bDropDown;
+        }
+        else
+        {
+            aRet <<= m_pImpl->m_pContentControl->GetDropDown();
+        }
+    }
     else if (rPropertyName == UNO_NAME_PLACEHOLDER_DOC_PART)
     {
         if (m_pImpl->m_bIsDescriptor)
@@ -1144,6 +1266,46 @@ uno::Any SAL_CALL SwXContentControl::getPropertyValue(const OUString& rPropertyN
         else
         {
             aRet <<= m_pImpl->m_pContentControl->GetColor();
+        }
+    }
+    else if (rPropertyName == UNO_NAME_ALIAS)
+    {
+        if (m_pImpl->m_bIsDescriptor)
+        {
+            aRet <<= m_pImpl->m_aAlias;
+        }
+        else
+        {
+            aRet <<= m_pImpl->m_pContentControl->GetAlias();
+        }
+    }
+    else if (rPropertyName == UNO_NAME_TAG)
+    {
+        if (m_pImpl->m_bIsDescriptor)
+        {
+            aRet <<= m_pImpl->m_aTag;
+        }
+        else
+        {
+            aRet <<= m_pImpl->m_pContentControl->GetTag();
+        }
+    }
+    else if (rPropertyName == UNO_NAME_DATE_STRING)
+    {
+        if (!m_pImpl->m_bIsDescriptor)
+        {
+            aRet <<= m_pImpl->m_pContentControl->GetDateString();
+        }
+    }
+    else if (rPropertyName == UNO_NAME_ID)
+    {
+        if (m_pImpl->m_bIsDescriptor)
+        {
+            aRet <<= m_pImpl->m_nId;
+        }
+        else
+        {
+            aRet <<= m_pImpl->m_pContentControl->GetId();
         }
     }
     else
@@ -1230,6 +1392,63 @@ uno::Reference<container::XEnumeration> SAL_CALL SwXContentControl::createEnumer
     {
         return new SwXTextPortionEnumeration(aPam, std::deque(*m_pImpl->m_pTextPortions));
     }
+}
+
+SwXContentControls::SwXContentControls(SwDoc* pDoc)
+    : SwUnoCollection(pDoc)
+{
+}
+
+SwXContentControls::~SwXContentControls() {}
+
+sal_Int32 SwXContentControls::getCount()
+{
+    SolarMutexGuard aGuard;
+
+    if (!IsValid())
+    {
+        throw uno::RuntimeException();
+    }
+
+    return GetDoc()->GetContentControlManager().GetCount();
+}
+
+uno::Any SwXContentControls::getByIndex(sal_Int32 nIndex)
+{
+    SolarMutexGuard aGuard;
+
+    if (!IsValid())
+    {
+        throw uno::RuntimeException();
+    }
+
+    SwContentControlManager& rManager = GetDoc()->GetContentControlManager();
+    if (nIndex < 0 || o3tl::make_unsigned(nIndex) >= rManager.GetCount())
+    {
+        throw lang::IndexOutOfBoundsException();
+    }
+
+    SwTextContentControl* pTextContentControl = rManager.Get(nIndex);
+    const SwFormatContentControl& rFormatContentControl = pTextContentControl->GetContentControl();
+    uno::Reference<css::text::XTextContent> xContentControl
+        = SwXContentControl::CreateXContentControl(*rFormatContentControl.GetContentControl());
+    uno::Any aRet;
+    aRet <<= xContentControl;
+    return aRet;
+}
+
+uno::Type SwXContentControls::getElementType() { return cppu::UnoType<text::XTextContent>::get(); }
+
+sal_Bool SwXContentControls::hasElements()
+{
+    SolarMutexGuard aGuard;
+
+    if (!IsValid())
+    {
+        throw uno::RuntimeException();
+    }
+
+    return !GetDoc()->GetContentControlManager().IsEmpty();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

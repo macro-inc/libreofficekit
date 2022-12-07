@@ -881,11 +881,17 @@
 #define UNO_NAME_DATE_LANGUAGE "DateLanguage"
 #define UNO_NAME_CURRENT_DATE "CurrentDate"
 #define UNO_NAME_PLAIN_TEXT "PlainText"
+#define UNO_NAME_COMBO_BOX "ComboBox"
+#define UNO_NAME_DROP_DOWN "DropDown"
 #define UNO_NAME_PLACEHOLDER_DOC_PART "PlaceholderDocPart"
 #define UNO_NAME_DATA_BINDING_PREFIX_MAPPINGS "DataBindingPrefixMappings"
 #define UNO_NAME_DATA_BINDING_XPATH "DataBindingXpath"
 #define UNO_NAME_DATA_BINDING_STORE_ITEM_ID "DataBindingStoreItemID"
 #define UNO_NAME_COLOR "Color"
+#define UNO_NAME_ALIAS "Alias"
+#define UNO_NAME_TAG "Tag"
+#define UNO_NAME_ID "Id"
+#define UNO_NAME_DATE_STRING "DateString"
 #endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

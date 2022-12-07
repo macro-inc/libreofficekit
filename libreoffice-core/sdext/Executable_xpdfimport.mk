@@ -11,6 +11,8 @@ $(eval $(call gb_Executable_Executable,xpdfimport))
 
 $(eval $(call gb_Executable_use_externals,xpdfimport,\
     boost_headers \
+    expat \
+    freetype \
     poppler \
     $(if $(filter-out WNT MACOSX,$(OS)),fontconfig) \
     zlib \
@@ -20,6 +22,10 @@ $(eval $(call gb_Executable_add_exception_objects,xpdfimport,\
     sdext/source/pdfimport/xpdfwrapper/pdfioutdev_gpl \
     sdext/source/pdfimport/xpdfwrapper/pnghelper \
     sdext/source/pdfimport/xpdfwrapper/wrapper_gpl \
+))
+
+$(eval $(call gb_Executable_use_system_win32_libs,xpdfimport,\
+	shell32 \
 ))
 
 $(eval $(call gb_Executable_add_default_nativeres,xpdfimport))

@@ -45,6 +45,7 @@ enum class SwContentControlType
     PICTURE,
     DATE,
     PLAIN_TEXT,
+    COMBO_BOX,
 };
 
 /// SfxPoolItem subclass that wraps an SwContentControl.
@@ -75,6 +76,7 @@ public:
      * (re-)moved.
      */
     void NotifyChangeTextNode(SwTextNode* pTextNode);
+    SwTextNode* GetTextNode() const;
     static SwFormatContentControl* CreatePoolDefault(sal_uInt16 nWhich);
     std::shared_ptr<SwContentControl> GetContentControl() { return m_pContentControl; }
     const std::shared_ptr<SwContentControl>& GetContentControl() const { return m_pContentControl; }
@@ -146,6 +148,12 @@ class SW_DLLPUBLIC SwContentControl : public sw::BroadcastingModify
     /// Plain text, i.e. not rich text.
     bool m_bPlainText = false;
 
+    /// Same as drop-down, but free-form input is also accepted.
+    bool m_bComboBox = false;
+
+    /// Same as combo box, but free-form input is not accepted.
+    bool m_bDropDown = false;
+
     /// The placeholder's doc part: just remembered.
     OUString m_aPlaceholderDocPart;
 
@@ -160,6 +168,15 @@ class SW_DLLPUBLIC SwContentControl : public sw::BroadcastingModify
 
     /// The color: just remembered.
     OUString m_aColor;
+
+    /// The alias: just remembered.
+    OUString m_aAlias;
+
+    /// The tag: just remembered.
+    OUString m_aTag;
+
+    /// The id: just remembered.
+    sal_Int32 m_nId = 0;
 
     /// Stores a list item index, in case the doc model is not yet updated.
     std::optional<size_t> m_oSelectedListItem;
@@ -225,8 +242,6 @@ public:
 
     std::vector<SwContentControlListItem> GetListItems() const { return m_aListItems; }
 
-    bool HasListItems() const { return !m_aListItems.empty(); }
-
     void SetListItems(const std::vector<SwContentControlListItem>& rListItems)
     {
         m_aListItems = rListItems;
@@ -264,6 +279,14 @@ public:
     void SetPlainText(bool bPlainText) { m_bPlainText = bPlainText; }
 
     bool GetPlainText() const { return m_bPlainText; }
+
+    void SetComboBox(bool bComboBox) { m_bComboBox = bComboBox; }
+
+    bool GetComboBox() const { return m_bComboBox; }
+
+    void SetDropDown(bool bDropDown) { m_bDropDown = bDropDown; }
+
+    bool GetDropDown() const { return m_bDropDown; }
 
     void SetPlaceholderDocPart(const OUString& rPlaceholderDocPart)
     {
@@ -316,9 +339,23 @@ public:
 
     OUString GetColor() const { return m_aColor; }
 
+    void SetAlias(const OUString& rAlias) { m_aAlias = rAlias; }
+
+    const OUString& GetAlias() const { return m_aAlias; }
+
+    void SetTag(const OUString& rTag) { m_aTag = rTag; }
+
+    const OUString& GetTag() const { return m_aTag; }
+
+    void SetId(sal_Int32 nId) { m_nId = nId; }
+
+    sal_Int32 GetId() const { return m_nId; }
+
     void SetReadWrite(bool bReadWrite) { m_bReadWrite = bReadWrite; }
 
     bool GetReadWrite() const { return m_bReadWrite; }
+
+    SwContentControlType GetType() const;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

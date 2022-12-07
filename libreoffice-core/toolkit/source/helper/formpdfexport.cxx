@@ -492,8 +492,120 @@ namespace toolkitform
                         nMaxTextLength = 0;
                     pEditWidget->MaxLen = nMaxTextLength;
                 }
-            }
 
+                switch ( nControlType )
+                {
+                    case FormComponentType::CURRENCYFIELD:
+                    case FormComponentType::NUMERICFIELD:
+                    {
+
+                        pEditWidget->Format = vcl::PDFWriter::Number;
+
+                        static constexpr OUStringLiteral FM_PROP_CURRENCYSYMBOL = u"CurrencySymbol";
+                        if ( xPSI->hasPropertyByName( FM_PROP_CURRENCYSYMBOL ) )
+                        {
+                            OUString sCurrencySymbol;
+                            if( ! (xModelProps->getPropertyValue( FM_PROP_CURRENCYSYMBOL ) >>= sCurrencySymbol) )
+                                SAL_WARN("toolkit.helper", "describePDFControl: unable to get property " << FM_PROP_CURRENCYSYMBOL);
+                            pEditWidget->CurrencySymbol = sCurrencySymbol;
+                        }
+
+                        static constexpr OUStringLiteral FM_PROP_DECIMALACCURACY = u"DecimalAccuracy";
+                        if ( xPSI->hasPropertyByName( FM_PROP_DECIMALACCURACY ) )
+                        {
+                            sal_Int32 nDecimalAccuracy = 0;
+                            if( ! (xModelProps->getPropertyValue( FM_PROP_DECIMALACCURACY ) >>= nDecimalAccuracy) )
+                                SAL_WARN("toolkit.helper", "describePDFControl: unable to get property " << FM_PROP_DECIMALACCURACY);
+                            pEditWidget->DecimalAccuracy = nDecimalAccuracy;
+                        }
+
+                        static constexpr OUStringLiteral FM_PROP_PREPENDCURRENCYSYMBOL = u"PrependCurrencySymbol";
+                        if ( xPSI->hasPropertyByName( FM_PROP_PREPENDCURRENCYSYMBOL ) )
+                        {
+                            bool bPrependCurrencySymbol = true;
+                            if( ! (xModelProps->getPropertyValue( FM_PROP_PREPENDCURRENCYSYMBOL ) >>= bPrependCurrencySymbol) )
+                                SAL_WARN("toolkit.helper", "describePDFControl: unable to get property " << FM_PROP_PREPENDCURRENCYSYMBOL);
+                            pEditWidget->PrependCurrencySymbol = bPrependCurrencySymbol;
+                        }
+                    } break;
+                    case FormComponentType::TIMEFIELD:
+                    {
+                        pEditWidget->Format = vcl::PDFWriter::Time;
+
+                        static constexpr OUStringLiteral FM_PROP_TIMEFORMAT = u"TimeFormat";
+                        if ( xPSI->hasPropertyByName( FM_PROP_TIMEFORMAT ) )
+                        {
+                            sal_Int32 nTimeFormat = 0;
+                            if( ! (xModelProps->getPropertyValue( FM_PROP_TIMEFORMAT ) >>= nTimeFormat) )
+                                SAL_WARN("toolkit.helper", "describePDFControl: unable to get property " << FM_PROP_TIMEFORMAT);
+
+                            switch ( nTimeFormat )
+                            {
+                                case 0:
+                                    pEditWidget->TimeFormat = "HH:MM"; //13:45
+                                    break;
+                                case 1:
+                                    pEditWidget->TimeFormat = "HH:MM:ss"; //13:45:00
+                                    break;
+                                case 2:
+                                    pEditWidget->TimeFormat = "h:MMtt"; //01:45 PM
+                                    break;
+                                case 3:
+                                    pEditWidget->TimeFormat = "h:MM:sstt"; //01:45:00 PM
+                                    break;
+                            }
+                        }
+                    } break;
+                    case FormComponentType::DATEFIELD:
+                    {
+                        pEditWidget->Format = vcl::PDFWriter::Date;
+
+                        static constexpr OUStringLiteral FM_PROP_DATEFORMAT = u"DateFormat";
+                        if ( xPSI->hasPropertyByName( FM_PROP_DATEFORMAT ) )
+                        {
+                            sal_Int32 nDateFormat = 0;
+                            if( ! (xModelProps->getPropertyValue( FM_PROP_DATEFORMAT ) >>= nDateFormat) )
+                                SAL_WARN("toolkit.helper", "describePDFControl: unable to get property " << FM_PROP_DATEFORMAT);
+
+                            switch ( nDateFormat )
+                            {
+                                case 0:
+                                case 1:
+                                    pEditWidget->DateFormat = "mm/dd/yy"; // Standard (short)
+                                    break;
+                                case 2:
+                                case 3:
+                                    pEditWidget->DateFormat = "mm/dd/yyyy"; // Standard (long)
+                                    break;
+                                case 4:
+                                    pEditWidget->DateFormat = "dd/mm/yy"; // DD/MM/YY
+                                    break;
+                                case 5:
+                                    pEditWidget->DateFormat = "mm/dd/yy"; // MM/DD/YY
+                                    break;
+                                case 6:
+                                    pEditWidget->DateFormat = "yy/mm/dd"; // YY/MM/DD
+                                    break;
+                                case 7:
+                                    pEditWidget->DateFormat = "dd/mm/yyyy"; // DD/MM/YYYY
+                                    break;
+                                case 8:
+                                    pEditWidget->DateFormat = "mm/dd/yyyy"; // MM/DD/YYYY
+                                    break;
+                                case 9:
+                                    pEditWidget->DateFormat = "yyyy/mm/dd"; // YYYY/MM/DD
+                                    break;
+                                case 10:
+                                    pEditWidget->DateFormat = "yy-mm-dd"; // YY-MM-DD
+                                    break;
+                                case 11:
+                                    pEditWidget->DateFormat = "yyyy-mm-dd"; // YYYY-MM-DD
+                                    break;
+                            }
+                        }
+                    } break;
+                }
+            }
 
             // buttons
             if ( Descriptor->getType() == vcl::PDFWriter::PushButton )

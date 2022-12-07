@@ -14,6 +14,7 @@
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/drawing/XShapes.hpp>
 #include <com/sun/star/frame/XStorable.hpp>
+#include <com/sun/star/text/GraphicCrop.hpp>
 #include <com/sun/star/text/XFootnotesSupplier.hpp>
 #include <com/sun/star/text/XTextDocument.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
@@ -55,6 +56,64 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf150197_predefinedNumbering)
     CPPUNIT_ASSERT_EQUAL(OUString("1."), getProperty<OUString>(getParagraph(1), "ListLabelString"));
 }
 
+CPPUNIT_TEST_FIXTURE(Test, testInlineSdtHeader)
+{
+    // Without the accompanying fix in place, this test would have failed with an assertion failure,
+    // we produced not-well-formed XML on save.
+    loadAndSave("inline-sdt-header.docx");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testSdtDuplicatedId)
+{
+    // Given a document with 2 inline <w:sdt>, with each a <w:id>:
+    // When exporting that back to DOCX:
+    loadAndSave("sdt-duplicated-id.docx");
+
+    // Then make sure we write 2 <w:sdt> and no duplicates:
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 2
+    // - Actual  : 4
+    // i.e. grab-bags introduced 2 unwanted duplicates.
+    assertXPath(pXmlDoc, "//w:sdt", 2);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testImageCropping)
+{
+    loadAndReload("crop-roundtrip.docx");
+
+    // the image has no cropping after roundtrip, because it has been physically cropped
+    // NB: this test should be fixed when the core feature to show image cropped when it
+    // has the "GraphicCrop" is set is implemented
+    auto aGraphicCropStruct = getProperty<text::GraphicCrop>(getShape(1), "GraphicCrop");
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), aGraphicCropStruct.Left);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), aGraphicCropStruct.Right);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), aGraphicCropStruct.Top);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), aGraphicCropStruct.Bottom);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf152200)
+{
+    // Given a document with a fly anchored after a FORMTEXT in the end of the paragraph:
+    // When exporting that back to DOCX:
+    loadAndSave("tdf152200-field+textbox.docx");
+
+    // Then make sure that fldChar with type 'end' goes prior to the at-char anchored fly.
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    const int nRunsBeforeFldCharEnd = countXPathNodes(pXmlDoc, "//w:fldChar[@w:fldCharType='end']/preceding::w:r");
+    CPPUNIT_ASSERT(nRunsBeforeFldCharEnd);
+    const int nRunsBeforeAlternateContent = countXPathNodes(pXmlDoc, "//mc:AlternateContent/preceding::w:r");
+    CPPUNIT_ASSERT(nRunsBeforeAlternateContent);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected greater than: 6
+    // - Actual  : 5
+    CPPUNIT_ASSERT_GREATER(nRunsBeforeFldCharEnd, nRunsBeforeAlternateContent);
+    // Make sure we only have one paragraph in body, and only three field characters overal,
+    // located directly in runs of this paragraph
+    assertXPath(pXmlDoc, "/w:document/w:body/w:p");
+    assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:r/w:fldChar", 3);
+    assertXPath(pXmlDoc, "//w:fldChar", 3); // no field characters elsewhere
+}
 
 CPPUNIT_PLUGIN_IMPLEMENT();
 

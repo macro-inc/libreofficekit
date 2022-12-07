@@ -1286,7 +1286,7 @@ void SVGFilter::implGenerateMetaData()
                     if( !bBackgroundVisibility ) // visibility default value: 'visible'
                         mpSVGExport->AddAttribute( XML_NAMESPACE_NONE, aOOOAttrBackgroundVisibility, "hidden" );
 
-                    // Page Number, Date/Time, Footer and Header Fields are regarded as background objects.
+                    // Page Number, DateTime, Footer and Header Fields are regarded as background objects.
                     // So bBackgroundObjectsVisibility overrides visibility of master page text fields.
                     xPropSet->getPropertyValue( "IsBackgroundObjectsVisible" )  >>= bBackgroundObjectsVisibility;
                     if( bBackgroundObjectsVisibility ) // visibility default value: 'visible'
@@ -1303,45 +1303,39 @@ void SVGFilter::implGenerateMetaData()
                             mpSVGExport->AddAttribute( XML_NAMESPACE_NONE, NSPREFIX "page-number-visibility", "visible" );
                         }
 
-                        // Date/Time Field
-                        xPropSet->getPropertyValue( "IsDateTimeVisible" ) >>= bDateTimeVisibility;
-                        if( bDateTimeVisibility ) // visibility default value: 'visible'
+                        // DateTime Field
+                        bool bDateTimeFixed           = true;     // default: fixed
+                        xPropSet->getPropertyValue( "IsDateTimeFixed" ) >>= bDateTimeFixed;
+                        if( bDateTimeFixed ) // we are interested only in the field text not in the date/time format
                         {
-                            bool bDateTimeFixed           = true;     // default: fixed
-                            xPropSet->getPropertyValue( "IsDateTimeFixed" ) >>= bDateTimeFixed;
-                            if( bDateTimeFixed ) // we are interested only in the field text not in the date/time format
+                            xPropSet->getPropertyValue( "DateTimeText" ) >>= aFixedDateTimeField.text;
+                            if( !aFixedDateTimeField.text.isEmpty() )
                             {
-                                xPropSet->getPropertyValue( "DateTimeText" ) >>= aFixedDateTimeField.text;
-                                if( !aFixedDateTimeField.text.isEmpty() )
-                                {
-                                    OUString sFieldId = implGenerateFieldId( aFieldSet, aFixedDateTimeField, aElemTextFieldId, xMasterPage );
-                                    mpSVGExport->AddAttribute( XML_NAMESPACE_NONE, aOOOAttrDateTimeField, sFieldId );
-                                }
-                            }
-                            else // the inverse applies: we are interested only in the date/time format not in the field text
-                            {
-                                xPropSet->getPropertyValue( "DateTimeFormat" ) >>= aVariableDateTimeField.format;
-                                OUString sFieldId = implGenerateFieldId( aFieldSet, aVariableDateTimeField, aElemTextFieldId, xMasterPage );
+                                OUString sFieldId = implGenerateFieldId( aFieldSet, aFixedDateTimeField, aElemTextFieldId, xMasterPage );
                                 mpSVGExport->AddAttribute( XML_NAMESPACE_NONE, aOOOAttrDateTimeField, sFieldId );
                             }
                         }
-                        else
+                        else // the inverse applies: we are interested only in the date/time format not in the field text
+                        {
+                            xPropSet->getPropertyValue( "DateTimeFormat" ) >>= aVariableDateTimeField.format;
+                            OUString sFieldId = implGenerateFieldId( aFieldSet, aVariableDateTimeField, aElemTextFieldId, xMasterPage );
+                            mpSVGExport->AddAttribute( XML_NAMESPACE_NONE, aOOOAttrDateTimeField, sFieldId );
+                        }
+                        xPropSet->getPropertyValue( "IsDateTimeVisible" ) >>= bDateTimeVisibility;
+                        if( !bDateTimeVisibility ) // visibility default value: 'visible'
                         {
                             mpSVGExport->AddAttribute( XML_NAMESPACE_NONE, NSPREFIX "date-time-visibility", "hidden" );
                         }
 
                         // Footer Field
-                        xPropSet->getPropertyValue( "IsFooterVisible" )  >>= bFooterVisibility;
-                        if( bFooterVisibility ) // visibility default value: 'visible'
+                        xPropSet->getPropertyValue( "FooterText" ) >>= aFooterField.text;
+                        if( !aFooterField.text.isEmpty() )
                         {
-                            xPropSet->getPropertyValue( "FooterText" ) >>= aFooterField.text;
-                            if( !aFooterField.text.isEmpty() )
-                            {
-                                OUString sFieldId = implGenerateFieldId( aFieldSet, aFooterField, aElemTextFieldId, xMasterPage );
-                                mpSVGExport->AddAttribute( XML_NAMESPACE_NONE, aOOOAttrFooterField, sFieldId );
-                            }
+                            OUString sFieldId = implGenerateFieldId( aFieldSet, aFooterField, aElemTextFieldId, xMasterPage );
+                            mpSVGExport->AddAttribute( XML_NAMESPACE_NONE, aOOOAttrFooterField, sFieldId );
                         }
-                        else
+                        xPropSet->getPropertyValue( "IsFooterVisible" )  >>= bFooterVisibility;
+                        if( !bFooterVisibility ) // visibility default value: 'visible'
                         {
                             mpSVGExport->AddAttribute( XML_NAMESPACE_NONE, NSPREFIX "footer-visibility", "hidden" );
                         }
@@ -2124,9 +2118,9 @@ bool SVGFilter::implExportShape( const Reference< css::drawing::XShape >& rxShap
 
                     if( mbPresentation )
                     {
-                        bool bIsPageNumber  = ( aShapeClass == "Slide_Number" );
+                        bool bIsPageNumber  = ( aShapeClass == "PageNumber" );
                         bool bIsFooter      = ( aShapeClass == "Footer" );
-                        bool bIsDateTime    = ( aShapeClass == "Date/Time" );
+                        bool bIsDateTime    = ( aShapeClass == "DateTime" );
                         bool bTextField = bIsPageNumber || bIsFooter || bIsDateTime;
                         if( bTextField )
                         {
@@ -2602,9 +2596,9 @@ OUString SVGFilter::implGetClassFromShape( const Reference< css::drawing::XShape
     else if( aShapeType.lastIndexOf( "presentation.FooterShape" ) != -1 )
         aRet = "Footer";
     else if( aShapeType.lastIndexOf( "presentation.DateTimeShape" ) != -1 )
-        aRet = "Date/Time";
+        aRet = "DateTime";
     else if( aShapeType.lastIndexOf( "presentation.SlideNumberShape" ) != -1 )
-        aRet = "Slide_Number";
+        aRet = "PageNumber";
     else if( aShapeType.lastIndexOf( "presentation.TitleTextShape" ) != -1 )
         aRet = "TitleText";
     else if( aShapeType.lastIndexOf( "presentation.OutlinerShape" ) != -1 )

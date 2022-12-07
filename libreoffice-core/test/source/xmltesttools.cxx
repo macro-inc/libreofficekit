@@ -148,9 +148,11 @@ OUString XmlTestTools::getXPathContent(const xmlDocUniquePtr& pXmlDoc, const OSt
                 xmlXPathFreeObject(pXmlObj);
                 return convertedVal;
             }
+#if LIBXML_VERSION < 21000 || defined(LIBXML_XPTR_LOCS_ENABLED)
         case XPATH_POINT:
         case XPATH_RANGE:
         case XPATH_LOCATIONSET:
+#endif
         case XPATH_USERS:
         case XPATH_XSLT_TREE:
             xmlXPathFreeObject(pXmlObj);
@@ -181,13 +183,19 @@ void XmlTestTools::assertXPathAttrs(const xmlDocUniquePtr& pXmlDoc, const OStrin
     }
 }
 
-void XmlTestTools::assertXPath(const xmlDocUniquePtr& pXmlDoc, const OString& rXPath, int nNumberOfNodes)
+int XmlTestTools::countXPathNodes(const xmlDocUniquePtr& pXmlDoc, const OString& rXPath)
 {
     xmlXPathObjectPtr pXmlObj = getXPathNode(pXmlDoc, rXPath);
     xmlNodeSetPtr pXmlNodes = pXmlObj->nodesetval;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(OString(OString::Concat("In <") + pXmlDoc->name + ">, XPath '" + rXPath + "' number of nodes is incorrect").getStr(),
-                                 nNumberOfNodes, xmlXPathNodeSetGetLength(pXmlNodes));
+    const int n = xmlXPathNodeSetGetLength(pXmlNodes);
     xmlXPathFreeObject(pXmlObj);
+    return n;
+}
+
+void XmlTestTools::assertXPath(const xmlDocUniquePtr& pXmlDoc, const OString& rXPath, int nNumberOfNodes)
+{
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(OString(OString::Concat("In <") + pXmlDoc->name + ">, XPath '" + rXPath + "' number of nodes is incorrect").getStr(),
+                                 nNumberOfNodes, countXPathNodes(pXmlDoc, rXPath));
 }
 
 void XmlTestTools::assertXPathContent(const xmlDocUniquePtr& pXmlDoc, const OString& rXPath, const OUString& rContent)

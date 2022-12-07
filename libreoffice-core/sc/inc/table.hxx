@@ -178,6 +178,12 @@ private:
     SCROW           nRepeatStartY;
     SCROW           nRepeatEndY;
 
+    // last used col and row
+    bool            mbCellAreaDirty;
+    bool            mbCellAreaEmpty;
+    SCCOL           mnEndCol;
+    SCROW           mnEndRow;
+
     std::unique_ptr<ScTableProtection> pTabProtection;
 
     std::unique_ptr<ScCompressedArray<SCCOL, sal_uInt16>> mpColWidth;
@@ -593,7 +599,8 @@ public:
     void        InvalidateTableArea();
     void        InvalidatePageBreaks();
 
-    bool        GetCellArea( SCCOL& rEndCol, SCROW& rEndRow ) const;            // FALSE = empty
+    void        InvalidateCellArea() { mbCellAreaDirty = true; }
+    bool        GetCellArea( SCCOL& rEndCol, SCROW& rEndRow );            // FALSE = empty
     bool        GetTableArea( SCCOL& rEndCol, SCROW& rEndRow, bool bCalcHiddens = false) const;
     bool        GetPrintArea( SCCOL& rEndCol, SCROW& rEndRow, bool bNotes, bool bCalcHiddens = false) const;
     bool        GetPrintAreaHor( SCROW nStartRow, SCROW nEndRow,
@@ -700,7 +707,7 @@ public:
     void        GetAutoFormatData(SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCROW nEndRow, ScAutoFormatData& rData);
     bool        SearchAndReplace(
         const SvxSearchItem& rSearchItem, SCCOL& rCol, SCROW& rRow, const ScMarkData& rMark,
-        ScRangeList& rMatchedRanges, OUString& rUndoStr, ScDocument* pUndoDoc);
+        ScRangeList& rMatchedRanges, OUString& rUndoStr, ScDocument* pUndoDoc, bool& bMatchedRangesWereClamped);
 
     void        FindMaxRotCol( RowInfo* pRowInfo, SCSIZE nArrCount, SCCOL nX1, SCCOL nX2 );
 
@@ -1189,7 +1196,7 @@ private:
                         const ScMarkData& rMark, OUString& rUndoStr, ScDocument* pUndoDoc);
     bool        ReplaceAll(
         const SvxSearchItem& rSearchItem, const ScMarkData& rMark, ScRangeList& rMatchedRanges,
-        OUString& rUndoStr, ScDocument* pUndoDoc);
+        OUString& rUndoStr, ScDocument* pUndoDoc, bool& bMatchedRangesWereClamped);
 
     bool        SearchStyle(const SvxSearchItem& rSearchItem, SCCOL& rCol, SCROW& rRow,
                             const ScMarkData& rMark);

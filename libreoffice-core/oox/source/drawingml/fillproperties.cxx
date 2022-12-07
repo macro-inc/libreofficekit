@@ -197,9 +197,31 @@ Reference< XGraphic > lclCheckAndApplyChangeColorTransform(const BlipFillPropert
             sal_Int16 nToTransparence = aBlipProps.maColorChangeTo.getTransparency();
             sal_Int8 nToAlpha = static_cast< sal_Int8 >( (100 - nToTransparence) * 2.55 );
 
+            sal_uInt8 nTolerance = 9;
+            Graphic aGraphic{ xGraphic };
+            if( aGraphic.IsGfxLink() )
+            {
+                // tdf#149670: Try to guess tolerance depending on image format
+                switch (aGraphic.GetGfxLink().GetType())
+                {
+                    case GfxLinkType::NativeJpg:
+                        nTolerance = 15;
+                        break;
+                    case GfxLinkType::NativePng:
+                    case GfxLinkType::NativeTif:
+                        nTolerance = 1;
+                        break;
+                    case GfxLinkType::NativeBmp:
+                        nTolerance = 0;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             uno::Reference<graphic::XGraphicTransformer> xTransformer(aBlipProps.mxFillGraphic, uno::UNO_QUERY);
             if (xTransformer.is())
-                return xTransformer->colorChange(xGraphic, sal_Int32(nFromColor), 9, sal_Int32(nToColor), nToAlpha);
+                return xTransformer->colorChange(xGraphic, sal_Int32(nFromColor), nTolerance, sal_Int32(nToColor), nToAlpha);
         }
     }
     return xGraphic;
@@ -796,7 +818,6 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
                                 aGraphCrop.Right = static_cast< sal_Int32 >( ( static_cast< double >( aOriginalSize.Width ) * aFillRect.X2 ) / 100000 );
                             if ( aFillRect.Y2 )
                                 aGraphCrop.Bottom = static_cast< sal_Int32 >( ( static_cast< double >( aOriginalSize.Height ) * aFillRect.Y2 ) / 100000 );
-                            rPropMap.setProperty(PROP_GraphicCrop, aGraphCrop);
 
                             bool bHasCropValues = aGraphCrop.Left != 0 || aGraphCrop.Right !=0 || aGraphCrop.Top != 0 || aGraphCrop.Bottom != 0;
                             // Negative GraphicCrop values means "crop" here.
@@ -804,12 +825,17 @@ void FillProperties::pushToPropMap( ShapePropertyMap& rPropMap,
 
                             if(bIsCustomShape && bHasCropValues && bNeedCrop)
                             {
+                                // Physically crop the image
+                                // In this case, don't set the PROP_GraphicCrop because that
+                                // would lead to applying the crop twice after roundtrip
                                 xGraphic = lclCropGraphic(xGraphic, CropQuotientsFromFillRect(aFillRect));
                                 if (rPropMap.supportsProperty(ShapeProperty::FillBitmapName))
                                     rPropMap.setProperty(ShapeProperty::FillBitmapName, xGraphic);
                                 else
                                     rPropMap.setProperty(ShapeProperty::FillBitmap, xGraphic);
                             }
+                            else
+                                rPropMap.setProperty(PROP_GraphicCrop, aGraphCrop);
                         }
                     }
                 }
