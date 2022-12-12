@@ -100,13 +100,13 @@ $(eval $(call gb_Module_add_targets,extensions,\
 
 endif # WNT
 
-ifeq ($(OS),MACOSX)
-$(eval $(call gb_Module_add_targets,extensions,\
-	Library_OOoSpotlightImporter \
-	Package_mdibundle \
-	Package_OOoSpotlightImporter \
-))
-endif # OS=MACOSX
+# ifeq ($(OS),MACOSX)
+# $(eval $(call gb_Module_add_targets,extensions,\
+# 	Library_OOoSpotlightImporter \
+# 	Package_mdibundle \
+# 	Package_OOoSpotlightImporter \
+# ))
+# endif # OS=MACOSX
 
 $(eval $(call gb_Module_add_subsequentcheck_targets,extensions,\
     JunitTest_extensions_unoapi \

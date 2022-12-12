@@ -62,6 +62,8 @@ SvpSalFrame::SvpSalFrame( SvpSalInstance* pInstance,
     // Nothing
 #elif defined( _WIN32 )
     // NOTHING
+#elif defined( MACOSX )
+    // NOTHING
 #elif defined( UNX )
     m_aSystemChildData.pSalFrame    = this;
 #endif

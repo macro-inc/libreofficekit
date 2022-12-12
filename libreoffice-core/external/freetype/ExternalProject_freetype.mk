@@ -31,7 +31,6 @@ $(call gb_ExternalProject_get_state_target,freetype,build) :
 	$(call gb_ExternalProject_run,build,\
 		$(gb_RUN_CONFIGURE) ./configure \
 			--disable-shared \
-			--with-pic \
 			--without-zlib \
 			--without-brotli \
 			--without-bzip2 \
@@ -41,6 +40,10 @@ $(call gb_ExternalProject_get_state_target,freetype,build) :
 			--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
 			CFLAGS="$(CFLAGS) $(if $(debug),-g) $(gb_VISIBILITY_FLAGS)" \
 		&& $(MAKE) install \
+		$(if $(filter MACOSX,$(OS)), \
+			&& cp $(call gb_UnpackedTarball_get_dir,freetype/instdir/lib)/libfreetype.a $(call gb_UnpackedTarball_get_dir,freetype/instdir/lib)/freetype.a \
+			&& cp $(call gb_UnpackedTarball_get_dir,freetype/instdir/lib)/libfreetype.la $(call gb_UnpackedTarball_get_dir,freetype/instdir/lib)/freetype.la \
+			) \
 		&& touch $@	)
 	$(call gb_Trace_EndRange,freetype,EXTERNAL)
 endif

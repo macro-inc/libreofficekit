@@ -1295,8 +1295,6 @@ endef
 
 else # !SYSTEM_CAIRO
 
-ifneq ($(filter-out MACOSX,$(OS)),)
-
 $(eval $(call gb_Helper_register_packages_for_install,ooo,\
 	cairo \
     pixman \
@@ -1326,8 +1324,6 @@ $(call gb_LinkTarget_add_libs,$(1),\
 endif
 
 endef
-
-endif # !MACOSX, !WNT
 
 endif # !SYSTEM_CAIRO
 

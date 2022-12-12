@@ -576,7 +576,9 @@ vcl_headless_freetype_libs = \
 
 ifeq ($(USING_X11),TRUE)
 $(eval $(call gb_Library_add_exception_objects,vcl,\
+    $(if $(filter-out TRUE,$(DISABLE_GUI)), \
     vcl/source/app/salplug \
+	) \
     vcl/unx/generic/printer/jobdata \
     vcl/unx/generic/printer/ppdparser \
     vcl/unx/generic/window/screensaverinhibitor \
@@ -744,7 +746,9 @@ $(eval $(call gb_Library_use_system_darwin_frameworks,vcl,\
 ))
 
 $(eval $(call gb_Library_add_exception_objects,vcl,\
-    vcl/source/app/salplug \
+    $(if $(filter-out TRUE,$(DISABLE_GUI)), \
+      vcl/source/app/salplug \
+    ) \
 ))
 endif
 

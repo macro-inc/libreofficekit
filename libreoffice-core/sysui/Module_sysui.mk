@@ -19,11 +19,11 @@ $(eval $(call gb_Module_add_targets,sysui,\
 	$(if $(filter SOLARIS,$(OS)),CustomTarget_solaris) \
 ))
 else # OS=MACOSX
-$(eval $(call gb_Module_add_targets,sysui,\
-	Package_osxicons \
-	CustomTarget_infoplist \
-	Package_infoplist \
-))
+# $(eval $(call gb_Module_add_targets,sysui,\
+# 	Package_osxicons \
+# 	CustomTarget_infoplist \
+# 	Package_infoplist \
+# ))
 endif
 endif
 

@@ -1,0 +1,147 @@
+name: Build and release for macOS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check_version:
+    uses: ./.github/workflows/check-version-tag.yml
+  fetch:
+    needs: [check_version]
+    if: ${{ needs.check_version.outputs.should_run != 'false' }}
+    runs-on: macos-latest
+    name: Fetch external projects
+    steps:
+      - name: Turn off line ending conversion in git
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Sparse Checkout
+        run: |
+          git clone --no-checkout --depth=1 --filter=blob:none --sparse https://github.com/${{ github.repository }} lok
+          cd lok
+          git config --local gc.auto 0
+          tee .git/info/sparse-checkout <<EOF
+          /*
+          !/*/
+          /libreoffice-core/
+          !/libreoffice-core/translations
+          !/libreoffice-core/helpcontent2
+          /libreoffice-core/dictionaries
+          !/libreoffice-core/dictionaries/*/
+          /libreoffice-core/dictionaries/en
+          /libreoffice-core/translations/source
+          !/libreoffice-core/translations/source/*/
+          /libreoffice-core/translations/source/en-GB/
+          /libreoffice-core/translations/source/en-ZA/
+          EOF
+          git -c protocol.version=2 checkout
+      - name: Setup /external-tar
+        run: |
+          UID_GID="$(id -u):$(id -g)"
+          sudo mkdir /external-tar
+          sudo chown $UID_GID /external-tar
+      - name: Cache external tarballs
+        id: cache-external-tar
+        uses: actions/cache@v3
+        with:
+          path: /external-tar
+          key: external-tar-linux-${{ hashFiles('lok/libreoffice-core/download.lst') }}-${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+          restore-keys: |
+            external-tar-linux--${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+            external-tar-${{ hashFiles('lok/libreoffice-core/download.lst') }}-${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+            external-tar-${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+            external-tar--
+            external-tar-
+      - name: Install build dependencies
+        if: steps.cache-external-tar.outputs.cache-hit != 'true'
+        run: brew install nasm autoconf automake gperf
+      - name: Configure LOKit and Fetch Tarballs
+        if: steps.cache-external-tar.outputs.cache-hit != 'true'
+        env:
+          PARALLELISM: 4
+        run: |
+          cd lok/libreoffice-core
+          ./autogen.sh --with-distro=LOKit-Linux --with-external-tar="/external-tar"
+          make fetch
+  build:
+    needs: [check_version, fetch]
+    if: ${{ needs.check_version.outputs.should_run != 'false' }}
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - name: Remove .NET/Haskell/Android to free up space (~30 GiB)
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android
+      - name: Turn off line ending conversion in git
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Checkout
+        run: |
+          UID_GID="$(id -u):$(id -g)"
+          sudo mkdir /lok
+          sudo chown $UID_GID /lok
+          git -c protocol.version=2 clone --depth=1 https://github.com/${{ github.repository }} /lok
+          cd /lok
+          git config --local gc.auto 0
+      - name: Install build dependencies
+        run: brew install nasm autoconf automake gperf
+      - name: Setup /external-tar
+        run: |
+          UID_GID="$(id -u):$(id -g)"
+          sudo mkdir /external-tar
+          sudo chown $UID_GID /external-tar
+      - name: Cache external tarballs
+        id: cache-external-tar
+        uses: actions/cache@v3
+        with:
+          path: /external-tar
+          key: external-tar-linux-${{ hashFiles('/lok/libreoffice-core/download.lst') }}-${{ hashFiles('/lok/libreoffice-core/external/**/*') }}
+          restore-keys: |
+            external-tar-linux--${{ hashFiles('lok/libreoffice-core/external/**/*') }}
+            external-tar-${{ hashFiles('/lok/libreoffice-core/download.lst') }}-${{ hashFiles('/lok/libreoffice-core/external/**/*') }}
+            external-tar-${{ hashFiles('/lok/libreoffice-core/external/**/*') }}
+            external-tar--
+            external-tar-
+      - name: Build (x64)
+        env:
+          PARALLELISM: 4
+        run: |
+          cd /lok/libreoffice-core
+          ./autogen.sh --with-distro=LOKit-Mac --with-external-tar="/external-tar"
+          make build-nocheck
+      - name: Make artifact (x64)
+        run: |
+          cd /lok/libreoffice-core
+          /usr/bin/tar -cJf libreofficekit.tar.xz instdir
+          cp libreofficekit.tar.xz $GITHUB_WORKSPACE/libreofficekit-mac-x64.tar.xz
+          cd $GITHUB_WORKSPACE
+          sha256sum libreofficekit-mac-x64.tar.xz > libreofficekit-mac-x64.tar.xz.sha256sum
+      - name: Build (aarch64)
+        env:
+          PARALLELISM: 4
+        run: |
+          cd /lok/libreoffice-core
+          ./autogen.sh --with-distro=LOKit-Mac --with-external-tar="/external-tar" --host=aarch64-apple-darwin
+          make build-nocheck
+      - name: Make artifact (aarch64)
+        run: |
+          cd /lok/libreoffice-core
+          /usr/bin/tar -cJf libreofficekit.tar.xz instdir
+          cp libreofficekit.tar.xz $GITHUB_WORKSPACE/libreofficekit-mac-aarch64.tar.xz
+          cd $GITHUB_WORKSPACE
+          sha256sum libreofficekit-mac-aarch64.tar.xz > libreofficekit-mac-aarch64.tar.xz.sha256sum
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "libreofficekit-mac-x64.tar.xz,libreofficekit-mac-x64.tar.xz.sha256sum,libreofficekit-mac-aarch64.tar.xz,libreofficekit-mac-aarch64.tar.xz.sha256sum"
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          name: ${{ needs.check_version.outputs.version }}
+          tag: ${{ needs.check_version.outputs.version }}
+          body: |
+            This is an automated release built from the `main` branch.
+            For changes, please review the commit log.

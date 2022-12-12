@@ -1,7 +1,8 @@
-# -*- Mode: Diff -*-
---- src/Makefile.in
-+++ src/Makefile.in
-@@ -525,6 +525,6 @@
+diff -ur fontconfig.org/src/Makefile.in fontconfig/src/Makefile.in
+--- fontconfig.org/src/Makefile.in	2022-12-08 20:11:05.000000000 +0900
++++ fontconfig/src/Makefile.in	2022-12-08 20:14:01.000000000 +0900
+@@ -525,7 +525,7 @@
+ 
  lib_LTLIBRARIES = libfontconfig.la
  libfontconfig_la_LDFLAGS = \
 -	-version-info @LIBT_VERSION_INFO@ -no-undefined $(export_symbols)

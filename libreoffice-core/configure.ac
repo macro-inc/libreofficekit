@@ -9,7 +9,7 @@ dnl in order to create a configure script.
 # several non-alphanumeric characters, those are split off and used only for the
 # ABOUTBOXPRODUCTVERSIONSUFFIX in openoffice.lst. Why that is necessary, no idea.
 
-AC_INIT([Collabora Office],[22.05.8.4],[],[],[https://collaboraoffice.com/])
+AC_INIT([LibreOfficeKit],[22.05.8.4],[],[],[https://github.com/coparse-inc/libreofficekit])
 
 dnl libnumbertext needs autoconf 2.68, but that can pick up autoconf268 just fine if it is installed
 dnl whereas aclocal (as run by autogen.sh) insists on using autoconf and fails hard
@@ -944,16 +944,32 @@ cygwin*|wsl*)
     ;;
 
 darwin*|macos*) # macOS
-    using_freetype_fontconfig=no
+    using_freetype_fontconfig=yes
+    test_system_freetype=no
+    test_system_fontconfig=no
+    test_cairo=yes
+    with_system_cairo=no
+    enable_cairo_canvas=yes
     using_x11=no
-    build_skia=yes
+    build_skia=no
+    using_vclplug=no
+    test_openldap=no
+    using_headless_plugin=yes
+    test_cmis=no
+    test_openldap=no
+    test_webdav=no
+    enable_lotuswordpro=no
+    disable_database_connectivity_dependencies
+    with_ppds=no
+    enable_firebird_sdbc=no
+    DISABLE_GUI=TRUE
+    DISABLE_PYTHON=TRUE
     if test -n "$LODE_HOME" ; then
         mac_sanitize_path
         AC_MSG_NOTICE([sanitized the PATH to $PATH])
     fi
     _os=Darwin
-    INSTROOTBASESUFFIX=/$PRODUCTNAME_WITHOUT_SPACES.app
-    INSTROOTCONTENTSUFFIX=/Contents
+    INSTROOTBASESUFFIX=/x64
     SDKDIRNAME=${PRODUCTNAME_WITHOUT_SPACES}${PRODUCTVERSION}_SDK
     # See comment above the case "$host_os"
     LINKFLAGSSHL="-dynamiclib -single_module"
@@ -977,6 +993,7 @@ darwin*|macos*) # macOS
 
         # Apple's Clang uses "arm64"
         host_cpu_for_clang=arm64
+        INSTROOTBASESUFFIX=/aarch64
     esac
 ;;
 
@@ -3701,25 +3718,25 @@ dnl ===================================================================
 dnl Structure of install set
 dnl ===================================================================
 
-if test $_os = Darwin; then
-    LIBO_BIN_FOLDER=MacOS
-    LIBO_ETC_FOLDER=Resources
-    LIBO_LIBEXEC_FOLDER=MacOS
-    LIBO_LIB_FOLDER=Frameworks
-    LIBO_LIB_PYUNO_FOLDER=Resources
-    LIBO_SHARE_FOLDER=Resources
-    LIBO_SHARE_HELP_FOLDER=Resources/help
-    LIBO_SHARE_JAVA_FOLDER=Resources/java
-    LIBO_SHARE_PRESETS_FOLDER=Resources/presets
-    LIBO_SHARE_READMES_FOLDER=Resources/readmes
-    LIBO_SHARE_RESOURCE_FOLDER=Resources/resource
-    LIBO_SHARE_SHELL_FOLDER=Resources/shell
-    LIBO_URE_BIN_FOLDER=MacOS
-    LIBO_URE_ETC_FOLDER=Resources/ure/etc
-    LIBO_URE_LIB_FOLDER=Frameworks
-    LIBO_URE_MISC_FOLDER=Resources/ure/share/misc
-    LIBO_URE_SHARE_JAVA_FOLDER=Resources/java
-elif test $_os = WINNT; then
+# if test $_os = Darwin; then
+#     LIBO_BIN_FOLDER=MacOS
+#     LIBO_ETC_FOLDER=Resources
+#     LIBO_LIBEXEC_FOLDER=MacOS
+#     LIBO_LIB_FOLDER=Frameworks
+#     LIBO_LIB_PYUNO_FOLDER=Resources
+#     LIBO_SHARE_FOLDER=Resources
+#     LIBO_SHARE_HELP_FOLDER=Resources/help
+#     LIBO_SHARE_JAVA_FOLDER=Resources/java
+#     LIBO_SHARE_PRESETS_FOLDER=Resources/presets
+#     LIBO_SHARE_READMES_FOLDER=Resources/readmes
+#     LIBO_SHARE_RESOURCE_FOLDER=Resources/resource
+#     LIBO_SHARE_SHELL_FOLDER=Resources/shell
+#     LIBO_URE_BIN_FOLDER=MacOS
+#     LIBO_URE_ETC_FOLDER=Resources/ure/etc
+#     LIBO_URE_LIB_FOLDER=Frameworks
+#     LIBO_URE_MISC_FOLDER=Resources/ure/share/misc
+#     LIBO_URE_SHARE_JAVA_FOLDER=Resources/java
+if test $_os = WINNT; then
     LIBO_BIN_FOLDER=program
     LIBO_ETC_FOLDER=program
     LIBO_LIBEXEC_FOLDER=program
@@ -13557,10 +13574,12 @@ dnl ===================================================================
 dnl Test whether to build cairo or rely on the system version
 dnl ===================================================================
 
-if test "$_os" = "WINNT"; then
+if test "$_os" = "WINNT" -o "$_os" = "Darwin"; then
+    AC_MSG_CHECKING([whether to use the system cairo])
     BUILD_TYPE="$BUILD_TYPE CAIRO"
     AC_DEFINE(ENABLE_CAIRO_CANVAS)
     ENABLE_CAIRO_CANVAS=TRUE
+    AC_MSG_RESULT([yes])
 elif test "$test_cairo" = "yes"; then
     AC_MSG_CHECKING([whether to use the system cairo])
 
