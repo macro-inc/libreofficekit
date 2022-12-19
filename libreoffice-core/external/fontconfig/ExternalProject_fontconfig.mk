@@ -31,12 +31,12 @@ $(call gb_ExternalProject_get_state_target,fontconfig,build) :
 			FREETYPE_LIBS="-L$(call gb_UnpackedTarball_get_dir,freetype)/instdir/lib -lfreetype" \
 		) \
 		$(gb_RUN_CONFIGURE) ./configure \
+			--disable-shared \
 			--disable-silent-rules \
 			$(if $(filter ANDROID,$(OS)),--with-arch=arm) \
 			--with-expat-includes=$(call gb_UnpackedTarball_get_dir,expat)/lib \
 			--with-expat-lib=$(gb_StaticLibrary_WORKDIR) \
 			--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
-			--disable-shared \
 			$(if $(filter ANDROID EMSCRIPTEN,$(OS)), \
 				ac_cv_func_fstatfs=no ac_cv_func_fstatvfs=no \
 			) \
