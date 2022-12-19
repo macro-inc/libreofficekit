@@ -140,9 +140,6 @@
 #include <vcl/ImageTree.hxx>
 #include <vcl/ITiledRenderable.hxx>
 #include <vcl/dialoghelper.hxx>
-#ifdef _WIN32
-#include <vcl/BitmapReadAccess.hxx>
-#endif
 #include <unicode/uchar.h>
 #include <unotools/securityoptions.hxx>
 #include <unotools/configmgr.hxx>
@@ -3725,36 +3722,6 @@ static void doc_paintTile(LibreOfficeKitDocument* pThis,
         pDevice->DrawRect(aRect);
         pDevice->Pop();
     }
-
-#ifdef _WIN32
-    // pBuffer was not used there
-    pDevice->EnableMapMode(false);
-    BitmapEx aBmpEx = pDevice->GetBitmapEx({ 0, 0 }, { nCanvasWidth, nCanvasHeight });
-    Bitmap aBmp = aBmpEx.GetBitmap();
-    Bitmap aAlpha = aBmpEx.GetAlpha();
-    Bitmap::ScopedReadAccess sraBmp(aBmp);
-    Bitmap::ScopedReadAccess sraAlpha(aAlpha);
-
-    assert(sraBmp->Height() == nCanvasHeight);
-    assert(sraBmp->Width() == nCanvasWidth);
-    assert(!sraAlpha || sraBmp->Height() == sraAlpha->Height());
-    assert(!sraAlpha || sraBmp->Width() == sraAlpha->Width());
-    auto p = pBuffer;
-    for (tools::Long y = 0; y < sraBmp->Height(); ++y)
-    {
-        Scanline dataBmp = sraBmp->GetScanline(y);
-        Scanline dataAlpha = sraAlpha ? sraAlpha->GetScanline(y) : nullptr;
-        for (tools::Long x = 0; x < sraBmp->Width(); ++x)
-        {
-            BitmapColor color = sraBmp->GetPixelFromData(dataBmp, x);
-            sal_uInt8 alpha = dataAlpha ? sraAlpha->GetPixelFromData(dataAlpha, x).GetBlue() : 255;
-            *p++ = color.GetBlue();
-            *p++ = color.GetGreen();
-            *p++ = color.GetRed();
-            *p++ = alpha;
-        }
-    }
-#endif
 #endif
 
 #else
