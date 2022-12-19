@@ -155,7 +155,7 @@ $(eval $(call gb_Rdb_add_components,services,\
 		$(call gb_Helper_optional,AVMEDIA,avmedia/source/macavf/avmediaMacAVF) \
 		shell/source/backends/macbe/macbe1 \
 	) \
-	$(if $(filter iOS MACOSX,$(OS)), \
+	$(if $(filter iOS,$(OS)), \
 		lingucomponent/source/spellcheck/macosxspell/MacOSXSpell \
 	) \
 	$(if $(filter WNT,$(OS)), \
