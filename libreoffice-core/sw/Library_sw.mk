@@ -423,6 +423,7 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/core/tox/ToxTextGenerator \
     sw/source/core/tox/ToxWhitespaceStripper \
     sw/source/core/txtnode/GrammarContact \
+    sw/source/core/txtnode/OnlineAccessibilityCheck \
     sw/source/core/txtnode/attrcontentcontrol \
     sw/source/core/txtnode/atrfld \
     sw/source/core/txtnode/atrflyin \
@@ -759,7 +760,9 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/uibase/uno/unomod \
     sw/source/uibase/uno/unomodule \
     sw/source/uibase/uno/unotxdoc \
+    sw/source/uibase/uno/loktxdoc \
     sw/source/uibase/uno/unotxvw \
+    sw/source/uibase/utlui/AccessibilityStatusBarControl \
     sw/source/uibase/utlui/attrdesc \
     sw/source/uibase/utlui/bookctrl \
     sw/source/uibase/utlui/condedit \

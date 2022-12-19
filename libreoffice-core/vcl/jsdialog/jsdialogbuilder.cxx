@@ -1177,11 +1177,15 @@ weld::MessageDialog* JSInstanceBuilder::CreateMessageDialog(weld::Widget* pParen
 
         std::string sWindowId = std::to_string(xMessageDialog->GetLOKWindowId());
         InsertWindowToMap(sWindowId);
+        xMessageDialog->SetLOKTunnelingState(false);
+
+        return new JSMessageDialog(xMessageDialog, nullptr, true);
     }
+    else
+        SAL_WARN("vcl", "No notifier in JSInstanceBuilder::CreateMessageDialog");
 
-    xMessageDialog->SetLOKTunnelingState(false);
-
-    return new JSMessageDialog(xMessageDialog, nullptr, true);
+    // fallback
+    return new SalInstanceMessageDialog(xMessageDialog, nullptr, true);
 }
 
 JSDialog::JSDialog(JSDialogSender* pSender, ::Dialog* pDialog, SalInstanceBuilder* pBuilder,
@@ -1316,6 +1320,20 @@ void JSComboBox::set_active(int pos)
 }
 
 bool JSComboBox::changed_by_direct_pick() const { return true; }
+
+IMPL_LINK(JSNotebook, LeaveHdl, const OString&, rPage, bool)
+{
+    m_aLeavePageOverridenHdl.Call(rPage);
+    sendFullUpdate();
+    return true;
+}
+
+IMPL_LINK(JSNotebook, EnterHdl, const OString&, rPage, bool)
+{
+    m_aEnterPageOverridenHdl.Call(rPage);
+    sendFullUpdate();
+    return true;
+}
 
 JSNotebook::JSNotebook(JSDialogSender* pSender, ::TabControl* pControl,
                        SalInstanceBuilder* pBuilder, bool bTakeOwnership)

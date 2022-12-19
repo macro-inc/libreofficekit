@@ -26,6 +26,8 @@
 #include <comphelper/propertyvalue.hxx>
 #include <xmloff/odffields.hxx>
 #include <comphelper/string.hxx>
+#include <comphelper/propertysequence.hxx>
+#include <comphelper/sequence.hxx>
 
 #include <IDocumentContentOperations.hxx>
 #include <cmdid.h>
@@ -343,6 +345,98 @@ CPPUNIT_TEST_FIXTURE(SwUibaseShellsTest, testUpdateFieldmarks)
     // - Actual  : old result 1old result 2
     // i.e. the fieldmarks were not updated.
     CPPUNIT_ASSERT_EQUAL(OUString("new result 1new result 2"), aActual);
+}
+
+CPPUNIT_TEST_FIXTURE(SwUibaseShellsTest, testInsertBookmark)
+{
+    // Given an empty document:
+    SwDoc* pDoc = createSwDoc();
+
+    // When inserting a bookmark with text:
+    OUString aExpectedBookmarkName("ZOTERO_BREF_GiQ7DAWQYWLy");
+    uno::Sequence<css::beans::PropertyValue> aArgs = {
+        comphelper::makePropertyValue("Bookmark", uno::Any(aExpectedBookmarkName)),
+        comphelper::makePropertyValue("BookmarkText", uno::Any(OUString("<p>aaa</p><p>bbb</p>"))),
+    };
+    dispatchCommand(mxComponent, ".uno:InsertBookmark", aArgs);
+
+    // Then make sure that we create a bookmark that covers that text:
+    IDocumentMarkAccess& rIDMA = *pDoc->getIDocumentMarkAccess();
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), rIDMA.getBookmarksCount());
+    for (auto it = rIDMA.getBookmarksBegin(); it != rIDMA.getBookmarksEnd(); ++it)
+    {
+        sw::mark::IMark* pMark = *it;
+        CPPUNIT_ASSERT_EQUAL(aExpectedBookmarkName, pMark->GetName());
+        SwPaM aPam(pMark->GetMarkStart(), pMark->GetMarkEnd());
+        OUString aActualResult = aPam.GetText();
+        // Without the accompanying fix in place, this test would have failed with:
+        // - Expected: aaa\nbbb
+        // - Actual  :
+        // i.e. no text was inserted, the bookmark was collapsed.
+        CPPUNIT_ASSERT_EQUAL(OUString("aaa\nbbb"), aActualResult);
+    }
+}
+
+CPPUNIT_TEST_FIXTURE(SwUibaseShellsTest, testUpdateBookmarks)
+{
+    // Given a document with 2 bookmarks, first covering "B" and second covering "D":
+    SwDoc* pDoc = createSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->Insert("ABCDE");
+    pWrtShell->SttEndDoc(/*bStt=*/true);
+    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/false, 1, /*bBasicCall=*/false);
+    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/true, 1, /*bBasicCall=*/false);
+    pWrtShell->SetBookmark(vcl::KeyCode(), "ZOTERO_BREF_GiQ7DAWQYWLy");
+    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/false, 1, /*bBasicCall=*/false);
+    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/true, 1, /*bBasicCall=*/false);
+    pWrtShell->SetBookmark(vcl::KeyCode(), "ZOTERO_BREF_PRxDGUb4SWXF");
+
+    // When updating the content of bookmarks:
+    pWrtShell->SttEndDoc(/*bStt=*/true);
+    std::vector<beans::PropertyValue> aArgsVec = comphelper::JsonToPropertyValues(R"json(
+{
+    "BookmarkNamePrefix": {
+        "type": "string",
+        "value": "ZOTERO_BREF_"
+    },
+    "Bookmarks": {
+        "type": "[][]com.sun.star.beans.PropertyValue",
+        "value": [
+            {
+                "Bookmark": {
+                    "type": "string",
+                    "value": "ZOTERO_BREF_GiQ7DAWQYWLy"
+                },
+                "BookmarkText": {
+                    "type": "string",
+                    "value": "new result 1"
+                }
+            },
+            {
+                "Bookmark": {
+                    "type": "string",
+                    "value": "ZOTERO_BREF_PRxDGUb4SWXF"
+                },
+                "BookmarkText": {
+                    "type": "string",
+                    "value": "new result 2"
+                }
+            }
+        ]
+    }
+}
+)json");
+    uno::Sequence<beans::PropertyValue> aArgs = comphelper::containerToSequence(aArgsVec);
+    dispatchCommand(mxComponent, ".uno:UpdateBookmarks", aArgs);
+
+    // Then make sure that the only paragraph is updated correctly:
+    SwCursor* pCursor = pWrtShell->GetCursor();
+    OUString aActual = pCursor->GetPoint()->nNode.GetNode().GetTextNode()->GetText();
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: Anew result 1Cnew result 2E
+    // - Actual  : ABCDE
+    // i.e. the content was not updated.
+    CPPUNIT_ASSERT_EQUAL(OUString("Anew result 1Cnew result 2E"), aActual);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

@@ -30,6 +30,7 @@
 #include <ndtxt.hxx>
 #include <textcontentcontrol.hxx>
 #include <doc.hxx>
+#include <wrtsh.hxx>
 
 using namespace com::sun::star;
 
@@ -223,6 +224,94 @@ void SwContentControl::SwClientNotify(const SwModify&, const SfxHint& rHint)
         SetXContentControl(uno::Reference<text::XTextContent>());
         GetNotifier().Broadcast(SfxHint(SfxHintId::Deinitializing));
     }
+}
+
+std::optional<size_t> SwContentControl::GetSelectedListItem(bool bCheckDocModel) const
+{
+    if (!bCheckDocModel || m_oSelectedListItem)
+        return m_oSelectedListItem;
+
+    const size_t nLen = GetListItems().size();
+    if (GetShowingPlaceHolder() || !nLen || !GetTextAttr())
+        return std::nullopt;
+
+    const OUString& rText = GetTextAttr()->ToString();
+    for (size_t i = 0; i < nLen; ++i)
+    {
+        if (GetTextAttr()[i].ToString() == rText)
+            return i;
+    }
+    assert(!GetDropDown() && "DropDowns must always have an associated list item");
+    return std::nullopt;
+}
+
+bool SwContentControl::AddListItem(size_t nZIndex, const OUString& rDisplayText,
+                                   const OUString& rValue)
+{
+    SwContentControlListItem aListItem;
+    if (rValue.isEmpty())
+    {
+        if (rDisplayText.isEmpty())
+            return false;
+        aListItem.m_aValue = rDisplayText;
+    }
+    else
+    {
+        aListItem.m_aValue = rValue;
+        aListItem.m_aDisplayText = rDisplayText;
+    }
+
+    // Avoid adding duplicates
+    for (auto& rListItem : GetListItems())
+    {
+        if (rListItem == aListItem)
+            return false;
+    }
+
+    const size_t nLen = GetListItems().size();
+    nZIndex = std::min(nZIndex, nLen);
+    const std::optional<size_t> oSelected = GetSelectedListItem();
+    if (oSelected && *oSelected >= nZIndex)
+    {
+        if (*oSelected < nLen)
+            SetSelectedListItem(*oSelected + 1);
+    }
+    std::vector<SwContentControlListItem> vListItems = GetListItems();
+    vListItems.insert(vListItems.begin() + nZIndex, aListItem);
+    SetListItems(vListItems);
+    return true;
+}
+
+void SwContentControl::DeleteListItem(size_t nZIndex)
+{
+    if (nZIndex >= GetListItems().size())
+        return;
+
+    const std::optional<size_t> oSelected = GetSelectedListItem();
+    if (oSelected)
+    {
+        if (*oSelected == nZIndex)
+        {
+            SetSelectedListItem(std::nullopt);
+            if (m_bDropDown && GetTextAttr())
+                GetTextAttr()->Invalidate();
+        }
+        else if (*oSelected < nZIndex)
+            SetSelectedListItem(*oSelected - 1);
+    }
+
+    std::vector<SwContentControlListItem> vListItems = GetListItems();
+    vListItems.erase(vListItems.begin() + nZIndex);
+    SetListItems(vListItems);
+    return;
+}
+
+void SwContentControl::ClearListItems()
+{
+    SetSelectedListItem(std::nullopt);
+    SetListItems(std::vector<SwContentControlListItem>());
+    if (m_bDropDown && GetTextAttr())
+        GetTextAttr()->Invalidate();
 }
 
 OUString SwContentControl::GetDateString() const
@@ -580,10 +669,60 @@ void SwTextContentControl::ChgTextNode(SwTextNode* pNode)
     }
 }
 
+void SwTextContentControl::Delete(bool bSaveContents)
+{
+    if (!GetTextNode())
+        return;
+
+    if (bSaveContents)
+    {
+        SwIndex aStart(GetTextNode(), GetStart());
+        GetTextNode()->RstTextAttr(aStart, *End() - GetStart(), RES_TXTATR_CONTENTCONTROL);
+    }
+    else
+    {
+        SwPaM aPaM(*GetTextNode(), GetStart(), *GetTextNode(), *End());
+        GetTextNode()->GetDoc().getIDocumentContentOperations().DeleteAndJoin(aPaM);
+    }
+}
+
 SwTextNode* SwTextContentControl::GetTextNode() const
 {
     auto& rFormatContentControl = static_cast<const SwFormatContentControl&>(GetAttr());
     return rFormatContentControl.GetTextNode();
+}
+
+OUString SwTextContentControl::ToString() const
+{
+    if (!GetTextNode())
+        return OUString();
+
+    // Don't select the text attribute itself at the start.
+    sal_Int32 nStart = GetStart() + 1;
+    // Don't select the CH_TXTATR_BREAKWORD itself at the end.
+    sal_Int32 nEnd = *End() - 1;
+
+    SwPaM aPaM(*GetTextNode(), nStart, *GetTextNode(), nEnd);
+    return aPaM.GetText();
+}
+
+void SwTextContentControl::Invalidate()
+{
+    SwDocShell* pDocShell = GetTextNode() ? GetTextNode()->GetDoc().GetDocShell() : nullptr;
+    if (!pDocShell || !pDocShell->GetWrtShell())
+        return;
+
+    // save the cursor
+    // NOTE: needs further testing to see if this is adequate (i.e. in auto-run macros...)
+    pDocShell->GetWrtShell()->Push();
+
+    // visit the control in the text (which makes any necessary visual changes)
+    // NOTE: simply going to a control indicates cancelling ShowingPlaceHolder, unless bOnlyRefresh
+    // NOTE: simply going to a checkbox causes a toggle, unless bOnlyRefresh
+    auto& rFormatContentControl = static_cast<SwFormatContentControl&>(GetAttr());
+    pDocShell->GetWrtShell()->GotoContentControl(rFormatContentControl, /*bOnlyRefresh=*/true);
+
+    pDocShell->GetWrtShell()->Pop(SwCursorShell::PopMode::DeleteCurrent);
 }
 
 void SwTextContentControl::dumpAsXml(xmlTextWriterPtr pWriter) const
