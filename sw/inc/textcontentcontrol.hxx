@@ -41,7 +41,12 @@ public:
 
     void ChgTextNode(SwTextNode* pNode);
 
+    void Delete(bool bSaveContents);
+
     SwTextNode* GetTextNode() const;
+    /// Get the current (potentially invalid) string from the doc
+    OUString ToString() const;
+    void Invalidate();
 
     void dumpAsXml(xmlTextWriterPtr pWriter) const override;
 };

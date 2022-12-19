@@ -833,6 +833,7 @@ $(eval $(call gb_UnoApi_add_idlfiles,oovbaapi,ooo/vba/word,\
     WdFarEastLineBreakLevel \
     WdFieldKind \
     WdFieldShading \
+    WdContentControlType \
     WdFieldType \
     WdFindMatch \
     WdFindWrap \
@@ -1057,6 +1058,10 @@ $(eval $(call gb_UnoApi_add_idlfiles,oovbaapi,ooo/vba/word,\
 	XFields \
 	XFind \
 	XFont \
+	XContentControl \
+	XContentControls \
+	XContentControlListEntry \
+	XContentControlListEntries \
 	XFormField \
 	XFormFields \
 	XFrame \

@@ -225,7 +225,6 @@ public:
 
     /// End: Data collected during idle time
 
-
 public:
     using SwContentNode::GetAttr;
     /// for hanging TextFormatCollections somewhere else (Outline-Numbering!)

@@ -179,9 +179,11 @@ class SW_DLLPUBLIC SwContentControl : public sw::BroadcastingModify
     sal_Int32 m_nId = 0;
 
     /// Stores a list item index, in case the doc model is not yet updated.
+    // i.e. temporarily store the selected item until the text is inserted by GotoContentControl.
     std::optional<size_t> m_oSelectedListItem;
 
     /// Stores a date timestamp, in case the doc model is not yet updated.
+    // i.e. temporarily store the date until the text is inserted by GotoContentControl.
     std::optional<double> m_oSelectedDate;
 
     /**
@@ -247,6 +249,10 @@ public:
         m_aListItems = rListItems;
     }
 
+    bool AddListItem(size_t nZIndex, const OUString& rDisplayText, const OUString& rValue);
+    void DeleteListItem(size_t nZIndex);
+    void ClearListItems();
+
     void SetPicture(bool bPicture) { m_bPicture = bPicture; }
 
     bool GetPicture() const { return m_bPicture; }
@@ -301,6 +307,10 @@ public:
     }
 
     std::optional<size_t> GetSelectedListItem() const { return m_oSelectedListItem; }
+
+    /// Get a copy of selected list item's index,
+    /// potentially even if the selection is already written out to text (i.e. validated).
+    std::optional<size_t> GetSelectedListItem(bool bCheckDocModel) const;
 
     void SetSelectedDate(std::optional<double> oSelectedDate) { m_oSelectedDate = oSelectedDate; }
 
