@@ -3692,7 +3692,7 @@ static void doc_paintTile(LibreOfficeKitDocument* pThis,
         return;
     }
 
-#if defined(UNX) && !defined(MACOSX) || defined(_WIN32)
+#if defined(UNX) || defined(_WIN32)
 
     // Painting of zoomed or HiDPI spreadsheets is special, we actually draw everything at 100%,
     // and only set cairo's (or CoreGraphic's, in the iOS case) scale factor accordingly, so that
@@ -6734,9 +6734,6 @@ static bool initialize_uno(const OUString& aAppProgramURL)
     // For iOS we already hardcode the inifile as "rc" in the .app directory.
     rtl::Bootstrap::setIniFilename(aAppProgramURL + "/" SAL_CONFIGFILE("fundamental"));
     xContext = cppu::defaultBootstrap_InitialComponentContext(aAppProgramURL + "/rc");
-#elif defined MACOSX
-    rtl::Bootstrap::setIniFilename(aAppProgramURL + "/../Resources/" SAL_CONFIGFILE("soffice"));
-    xContext = cppu::defaultBootstrap_InitialComponentContext();
 #else
     rtl::Bootstrap::setIniFilename(aAppProgramURL + "/" SAL_CONFIGFILE("soffice"));
     xContext = cppu::defaultBootstrap_InitialComponentContext();

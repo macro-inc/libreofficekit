@@ -478,8 +478,6 @@ EXE_LINK_FLAGS=$(GCC_ARCH_OPTION) -Wl,-multiply_defined,suppress
 LINK_LIBS=-L$(OUT)/lib -L$(OO_SDK_OUT)/$(PLATFORM)/lib -L"$(OO_SDK_URE_LIB_DIR)"
 LINK_JAVA_LIBS=-framework JavaVM
 
-URE_MISC=$(OFFICE_HOME)/Contents/Resources/ure/share/misc
-
 endif
 
 ###########################################################################

@@ -1384,13 +1384,9 @@ gb_ExternalProject__use_fontconfig :=
 
 else
 
-ifneq ($(filter-out MACOSX WNT,$(OS)),)
-
 $(eval $(call gb_Helper_register_packages_for_install,ooo,\
 	fontconfig \
 ))
-
-endif
 
 define gb_LinkTarget__use_fontconfig
 $(call gb_LinkTarget_use_external_project,$(1),fontconfig)

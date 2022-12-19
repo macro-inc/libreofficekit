@@ -182,6 +182,10 @@ OUString const & psp::getFontPath()
     if (aPath.isEmpty())
     {
         OUStringBuffer aPathBuffer( 512 );
+// hack to get fonts working properly on macOS
+#ifdef MACOSX
+    aPathBuffer.append("/System/Library/Fonts;/Library/Fonts;~/Library/Fonts;/System/Library/AssetsV2/com_apple_MobileAsset_Font7;");
+#endif
 
         OUString aConfigPath( getOfficePath( whichOfficePath::ConfigPath ) );
         OUString aInstallationRootPath( getOfficePath( whichOfficePath::InstallationRootPath ) );

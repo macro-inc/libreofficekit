@@ -165,11 +165,11 @@ $(call gb_CustomTarget_get_workdir,instsetoo_native/setup)/$(call gb_Helper_get_
 	$(call gb_Trace_StartRange,$(subst $(WORKDIR)/,,$@),ECH)
 	( \
 		echo '[Bootstrap]' \
-		&& echo 'URE_INTERNAL_LIB_DIR=$${ORIGIN}$(if $(filter MACOSX,$(OS)),/../../../Frameworks)' \
-		&& echo 'URE_INTERNAL_JAVA_DIR=$(if $(filter MACOSX,$(OS)),$${ORIGIN}/../../java,$${ORIGIN}/classes)' \
+		&& echo 'URE_INTERNAL_LIB_DIR=$${ORIGIN}' \
+		&& echo 'URE_INTERNAL_JAVA_DIR=$${ORIGIN}/classes' \
 		&& echo 'URE_INTERNAL_JAVA_CLASSPATH=$${URE_MORE_JAVA_TYPES}' \
-		&& echo 'UNO_TYPES=$(if $(filter MACOSX,$(OS)),$${ORIGIN}/../share/misc/,$${ORIGIN}/)types.rdb $${URE_MORE_TYPES}' \
-		&& echo 'UNO_SERVICES=$(if $(filter MACOSX,$(OS)),$${ORIGIN}/../share/misc/,$${ORIGIN}/)services.rdb $${URE_MORE_SERVICES}' \
+		&& echo 'UNO_TYPES=$${ORIGIN}/types.rdb $${URE_MORE_TYPES}' \
+		&& echo 'UNO_SERVICES=$${ORIGIN}/services.rdb $${URE_MORE_SERVICES}' \
 	) > $@
 	$(call gb_Trace_EndRange,$(subst $(WORKDIR)/,,$@),ECH)
 

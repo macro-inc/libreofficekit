@@ -19,7 +19,8 @@ $(eval $(call gb_ExternalProject_register_targets,fontconfig,\
 ))
 
 # Can't have this inside the $(call gb_ExternalProject_run as it contains commas
-fontconfig_add_fonts=/usr/share/X11/fonts/Type1,/usr/share/X11/fonts/TTF,/usr/local/share/fonts
+fontconfig_add_fonts_linux=/usr/share/X11/fonts/Type1,/usr/share/X11/fonts/TTF,/usr/local/share/fonts
+fontconfig_add_fonts_mac=/System/Library/Fonts,/Library/Fonts,~/Library/Fonts,/System/Library/AssetsV2/com_apple_MobileAsset_Font7
 
 $(call gb_ExternalProject_get_state_target,fontconfig,build) :
 	$(call gb_Trace_StartRange,fontconfig,EXTERNAL)
@@ -37,15 +38,15 @@ $(call gb_ExternalProject_get_state_target,fontconfig,build) :
 			--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
 			--disable-shared \
 			$(if $(filter ANDROID EMSCRIPTEN,$(OS)), \
-				--disable-shared \
 				ac_cv_func_fstatfs=no ac_cv_func_fstatvfs=no \
 			) \
 			$(if $(filter LINUX,$(OS)), \
-				--disable-static \
+				--with-add-fonts=$(fontconfig_add_fonts_linux) \
+				--with-cache-dir=/usr/lib/fontconfig/cache \
 			) \
-			--prefix=/ \
-			--with-add-fonts=$(fontconfig_add_fonts) \
-			--with-cache-dir=/usr/lib/fontconfig/cache \
+			$(if $(filter MACOSX,$(OS)), \
+				--with-add-fonts=$(fontconfig_add_fonts_mac) \
+			) \
 		&& $(MAKE) -C src \
 	)
 	$(call gb_Trace_EndRange,fontconfig,EXTERNAL)

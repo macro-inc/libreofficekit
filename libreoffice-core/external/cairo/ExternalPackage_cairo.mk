@@ -15,7 +15,7 @@ ifneq ($(DISABLE_DYNLOADING),TRUE)
 ifeq ($(COM),MSC)
 $(eval $(call gb_ExternalPackage_add_file,cairo,$(LIBO_LIB_FOLDER)/cairo.dll,src/release/cairo$(if $(MSVC_USE_DEBUG_RUNTIME),_debug).dll))
 else ifeq ($(OS),MACOSX)
-$(eval $(call gb_ExternalPackage_add_file,cairo,$(LIBO_LIB_FOLDER)/libcairo.dylib,src/.libs/libcairo.2.dylib))
+$(eval $(call gb_ExternalPackage_add_file,cairo,$(LIBO_LIB_FOLDER)/libcairo.2.dylib,src/.libs/libcairo.2.dylib))
 else
 $(eval $(call gb_ExternalPackage_add_file,cairo,$(LIBO_LIB_FOLDER)/libcairo.so.2,src/.libs/libcairo.so.2.1170$(CAIRO_VERSION_MICRO).0))
 endif
