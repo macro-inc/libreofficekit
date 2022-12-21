@@ -31,6 +31,7 @@ $(call gb_ExternalProject_get_state_target,fontconfig,build) :
 			FREETYPE_LIBS="-L$(call gb_UnpackedTarball_get_dir,freetype)/instdir/lib -lfreetype" \
 		) \
 		$(gb_RUN_CONFIGURE) ./configure \
+			--with-pic \
 			--disable-shared \
 			--disable-silent-rules \
 			$(if $(filter ANDROID,$(OS)),--with-arch=arm) \

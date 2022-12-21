@@ -31,6 +31,7 @@ $(call gb_ExternalProject_get_state_target,freetype,build) :
 	$(call gb_ExternalProject_run,build,\
 		$(gb_RUN_CONFIGURE) ./configure \
 			--disable-shared \
+			--with-pic \
 			--without-zlib \
 			--without-brotli \
 			--without-bzip2 \
