@@ -961,6 +961,7 @@ darwin*|macos*) # macOS
     enable_lotuswordpro=no
     disable_database_connectivity_dependencies
     with_ppds=no
+    enable_odk=no
     enable_firebird_sdbc=no
     DISABLE_GUI=TRUE
     DISABLE_PYTHON=TRUE
@@ -970,7 +971,6 @@ darwin*|macos*) # macOS
     fi
     _os=Darwin
     INSTROOTBASESUFFIX=/x64
-    SDKDIRNAME=${PRODUCTNAME_WITHOUT_SPACES}${PRODUCTVERSION}_SDK
     # See comment above the case "$host_os"
     LINKFLAGSSHL="-dynamiclib -single_module"
 
@@ -995,6 +995,7 @@ darwin*|macos*) # macOS
         host_cpu_for_clang=arm64
         INSTROOTBASESUFFIX=/aarch64
     esac
+    SDKDIRNAME=${INSTROOTBASESUFFIX}/sdk
 ;;
 
 ios*) # iOS
