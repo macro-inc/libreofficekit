@@ -12,7 +12,7 @@ sudo apt-get install git build-essential zip libkrb5-dev nasm graphviz python3 p
 ```
 
 ## macOS
-- [Download and install Xcode 14.0.1](https://developer.apple.com/services-account/download?path=/Developer_Tools/Xcode_14.0.1/Xcode_14.0.1.xip)
+- [Download and install Xcode 13.4.1](https://developer.apple.com/services-account/download?path=/Developer_Tools/Xcode_13.4.1/Xcode_13.4.1.xip)
   - Open Xcode after installing and agree to the EULA
 - [Install brew](https://brew.sh)
 - Install dependencies using brew:
