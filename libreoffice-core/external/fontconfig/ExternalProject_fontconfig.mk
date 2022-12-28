@@ -47,6 +47,7 @@ $(call gb_ExternalProject_get_state_target,fontconfig,build) :
 			) \
 			$(if $(filter MACOSX,$(OS)), \
 				--with-add-fonts=$(fontconfig_add_fonts_mac) \
+				--without-libintl-prefix \
 			) \
 		&& $(MAKE) -C src \
 	)
