@@ -5655,6 +5655,10 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
     {
         return getPostIts(pThis);
     }
+    else if (aCommand == ".uno:ViewTrackChangesInformation")
+    {
+        return getTrackedChanges(pThis);
+    }
     else if (aCommand == ".uno:ViewAnnotationsPosition")
     {
         return getPostItsPos(pThis);

@@ -11,7 +11,7 @@ jobs:
   fetch:
     needs: [check_version]
     if: ${{ needs.check_version.outputs.should_run != 'false' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Fetch external projects
     steps:
       - name: Turn off line ending conversion in git
@@ -57,7 +57,10 @@ jobs:
             external-tar-
       - name: Install build dependencies
         if: steps.cache-external-tar.outputs.cache-hit != 'true'
-        run: sudo apt-get install git build-essential zip libkrb5-dev nasm graphviz python3 python3-dev autoconf libfontconfig1-dev gperf libxslt1-dev xsltproc libxml2-utils libxrandr-dev libx11-dev bison flex libgtk-3-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libnss3-dev libavahi-client-dev libxt-dev
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libunwind-dev
+          sudo apt-get install -y git build-essential zip libkrb5-dev nasm graphviz python3 python3-dev autoconf libfontconfig1-dev gperf libxslt1-dev xsltproc libxml2-utils libxrandr-dev libx11-dev bison flex libgtk-3-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libnss3-dev libavahi-client-dev libxt-dev gettext
       - name: Configure LOKit and Fetch Tarballs
         if: steps.cache-external-tar.outputs.cache-hit != 'true'
         env:
@@ -69,7 +72,7 @@ jobs:
   build:
     needs: [check_version, fetch]
     if: ${{ needs.check_version.outputs.should_run != 'false' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Build
     steps:
       - name: Remove .NET/Haskell/Android to free up space (~30 GiB)
@@ -88,7 +91,10 @@ jobs:
           cd /lok
           git config --local gc.auto 0
       - name: Install build dependencies
-        run: sudo apt-get install git build-essential zip libkrb5-dev nasm graphviz python3 python3-dev autoconf libfontconfig1-dev gperf libxslt1-dev xsltproc libxml2-utils libxrandr-dev libx11-dev bison flex libgtk-3-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libnss3-dev libavahi-client-dev libxt-dev
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libunwind-dev
+          sudo apt-get install -y git build-essential zip libkrb5-dev nasm graphviz python3 python3-dev autoconf libfontconfig1-dev gperf libxslt1-dev xsltproc libxml2-utils libxrandr-dev libx11-dev bison flex libgtk-3-dev libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev libnss3-dev libavahi-client-dev libxt-dev gettext
       - name: Setup /external-tar
         run: |
           UID_GID="$(id -u):$(id -g)"
