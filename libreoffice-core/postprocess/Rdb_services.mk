@@ -60,8 +60,8 @@ $(eval $(call gb_Rdb_add_components,services,\
 	$(if $(filter ANDROID,$(OS)),vcl/vcl.android) \
 	$(if $(DISABLE_GUI),vcl/vcl.headless) \
 	$(if $(filter iOS,$(OS)),vcl/vcl.ios) \
-	$(if $(filter MACOSX,$(OS)),vcl/vcl.macosx) \
-	$(if $(DISABLE_GUI),,$(if $(filter WNT,$(OS)),\
+	$(if $(DISABLE_GUI),,$(if $(filter MACOSX,$(OS)),vcl/vcl.macosx) \
+	$(if $(filter WNT,$(OS)),\
 		vcl/vcl.windows \
 		vcl/vclplug_win \
 	)) \
@@ -155,7 +155,7 @@ $(eval $(call gb_Rdb_add_components,services,\
 		$(call gb_Helper_optional,AVMEDIA,avmedia/source/macavf/avmediaMacAVF) \
 		shell/source/backends/macbe/macbe1 \
 	) \
-	$(if $(filter iOS MACOSX,$(OS)), \
+	$(if $(filter iOS,$(OS)), \
 		lingucomponent/source/spellcheck/macosxspell/MacOSXSpell \
 	) \
 	$(if $(filter WNT,$(OS)), \

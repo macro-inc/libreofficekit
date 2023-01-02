@@ -63,7 +63,7 @@
 # include <process.h>
 # include <string.h>
 
-// This are aliases from windows.h that conflict with FreetypeManager::
+// These are aliases from windows.h that conflict with FreetypeManager::
 # undef CreateFont
 # undef GetGlyphOutline
 #else
@@ -121,7 +121,6 @@ bool FreetypeFontFile::Map()
     if (mnRefCount++ == 0)
     {
         const char* pFileName = maNativeFileName.getStr();
-
 #if !defined( _WIN32 )
         int nFile = open( pFileName, O_RDONLY );
         if( nFile < 0 )

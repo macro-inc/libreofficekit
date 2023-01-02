@@ -2537,7 +2537,7 @@ SfxVoidItem InsertAuthoritiesEntry FN_INSERT_AUTH_ENTRY_DLG
 ]
 
 SfxVoidItem InsertBookmark FN_INSERT_BOOKMARK
-(SfxStringItem Bookmark FN_INSERT_BOOKMARK)
+(SfxStringItem Bookmark FN_INSERT_BOOKMARK, SfxStringItem BookmarkText FN_PARAM_1)
 [
     AutoUpdate = FALSE,
     FastCall = FALSE,
@@ -2551,6 +2551,20 @@ SfxVoidItem InsertBookmark FN_INSERT_BOOKMARK
     AccelConfig = TRUE,
     MenuConfig = TRUE,
     ToolBoxConfig = TRUE,
+    GroupId = SfxGroupId::Insert;
+]
+
+SfxVoidItem UpdateBookmarks FN_UPDATE_BOOKMARKS
+(SfxStringItem BookmarkNamePrefix FN_PARAM_1, SfxUnoAnyItem Bookmarks FN_PARAM_2)
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = FALSE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
     GroupId = SfxGroupId::Insert;
 ]
 
@@ -3118,6 +3132,23 @@ SfxVoidItem InsertDateContentControl FN_INSERT_DATE_CONTENT_CONTROL
 ]
 
 SfxVoidItem InsertPlainTextContentControl FN_INSERT_PLAIN_TEXT_CONTENT_CONTROL
+()
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = FALSE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
+    AccelConfig = TRUE,
+    MenuConfig = TRUE,
+    ToolBoxConfig = TRUE,
+    GroupId = SfxGroupId::Insert;
+]
+
+SfxVoidItem InsertComboBoxContentControl FN_INSERT_COMBO_BOX_CONTENT_CONTROL
 ()
 [
     AutoUpdate = FALSE,
@@ -5939,6 +5970,23 @@ SfxStringItem StateWordCount FN_STAT_WORDCOUNT
     GroupId = SfxGroupId::View;
 ]
 
+SfxStringItem StateAccessibilityCheck FN_STAT_ACCESSIBILITY_CHECK
+
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = TRUE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
+    AccelConfig = FALSE,
+    MenuConfig = FALSE,
+    ToolBoxConfig = FALSE,
+    GroupId = SfxGroupId::View;
+]
+
 SfxBoolItem SubScript FN_SET_SUB_SCRIPT
 
 [
@@ -8186,7 +8234,25 @@ SfxBoolItem ShowInlineTooltips FN_SHOW_INLINETOOLTIPS
 ]
 
 SfxVoidItem TextFormField FN_INSERT_TEXT_FORMFIELD
+(SfxStringItem FieldType FN_PARAM_1, SfxStringItem FieldCommand FN_PARAM_2, SfxStringItem FieldResult FN_PARAM_3)
+[
+    AutoUpdate = TRUE,
+    FastCall = FALSE,
+    ReadOnlyDoc = FALSE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
 
+
+    AccelConfig = TRUE,
+    MenuConfig = TRUE,
+    ToolBoxConfig = TRUE,
+    GroupId = SfxGroupId::Controls;
+]
+
+SfxVoidItem TextFormFields FN_UPDATE_TEXT_FORMFIELDS
+(SfxStringItem FieldType FN_PARAM_1, SfxStringItem FieldCommandPrefix FN_PARAM_2, SfxUnoAnyItem Fields FN_PARAM_3)
 [
     AutoUpdate = TRUE,
     FastCall = FALSE,

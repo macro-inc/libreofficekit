@@ -67,6 +67,7 @@ class SdrAngleItem;
 #define MID_HLINK_TARGET        0x71
 #define MID_HLINK_TYPE          0x72
 #define MID_HLINK_TEXT          0x73
+#define MID_HLINK_REPLACEMENTTEXT 0x74
 
 #define MID_VIEWLAYOUT_COLUMNS  0x77
 #define MID_VIEWLAYOUT_BOOKMODE 0x78
@@ -570,7 +571,7 @@ class SdrAngleItem;
 #define SID_FM_FILECONTROL                              ( SID_SVX_START + 605 )
 //( SID_SVX_START + 606 ) is used by SID_DRAWTBX_REDACTED_EXPORT
 #define SID_FM_NAVIGATIONBAR                            ( SID_SVX_START + 607 )
-//FREE
+#define SID_FM_TRANSLATE                                ( SID_SVX_START + 608 )
 //FREE
 #define SID_FM_DELETEROWS                               ( SID_SVX_START + 610 )
 //FREE

@@ -193,13 +193,11 @@ std::vector<PrintFontManager::PrintFont> PrintFontManager::analyzeFontFile( int 
     OString aFullPath = aDir + "/" + rFontFile;
 #endif
 
-    // #i1872# reject unreadable files
 #ifdef _WIN32
     if (_open(aFullPath.getStr(), _O_RDONLY) == -1)
-    {
         return aNewFonts;
-    }
 #else
+    // #i1872# reject unreadable files
     if( access( aFullPath.getStr(), R_OK ) )
         return aNewFonts;
 #endif

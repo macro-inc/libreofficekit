@@ -102,7 +102,13 @@
 #include <xmloff/odffields.hxx>
 #include <bookmark.hxx>
 #include <linguistic/misc.hxx>
+#include <comphelper/sequenceashashmap.hxx>
 #include <authfld.hxx>
+#include <translatelangselect.hxx>
+#include <svtools/deeplcfg.hxx>
+#include <translatehelper.hxx>
+#include <IDocumentContentOperations.hxx>
+#include <IDocumentUndoRedo.hxx>
 
 using namespace ::com::sun::star;
 using namespace com::sun::star::beans;
@@ -375,6 +381,92 @@ OUString GetLocalURL(const SwWrtShell& rSh)
     return rLocalURL;
 }
 
+void UpdateBookmarks(SfxRequest& rReq, SwWrtShell& rWrtSh)
+{
+    if (rWrtSh.getIDocumentSettingAccess().get(DocumentSettingId::PROTECT_BOOKMARKS))
+    {
+        return;
+    }
+
+    OUString aBookmarkNamePrefix;
+    const SfxStringItem* pBookmarkNamePrefix = rReq.GetArg<SfxStringItem>(FN_PARAM_1);
+    if (pBookmarkNamePrefix)
+    {
+        aBookmarkNamePrefix = pBookmarkNamePrefix->GetValue();
+    }
+
+    uno::Sequence<beans::PropertyValues> aBookmarks;
+    const SfxUnoAnyItem* pBookmarks = rReq.GetArg<SfxUnoAnyItem>(FN_PARAM_2);
+    if (pBookmarks)
+    {
+        pBookmarks->GetValue() >>= aBookmarks;
+    }
+
+    rWrtSh.GetDoc()->GetIDocumentUndoRedo().StartUndo(SwUndoId::INSBOOKMARK, nullptr);
+    rWrtSh.StartAction();
+
+    IDocumentMarkAccess& rIDMA = *rWrtSh.GetDoc()->getIDocumentMarkAccess();
+    sal_Int32 nBookmarkIndex = 0;
+    bool bSortMarks = false;
+    for (auto it = rIDMA.getBookmarksBegin(); it != rIDMA.getBookmarksEnd(); ++it)
+    {
+        auto pMark = dynamic_cast<sw::mark::Bookmark*>(*it);
+        assert(pMark);
+        if (!pMark->GetName().startsWith(aBookmarkNamePrefix))
+        {
+            continue;
+        }
+
+        if (aBookmarks.getLength() <= nBookmarkIndex)
+        {
+            continue;
+        }
+
+        comphelper::SequenceAsHashMap aMap(aBookmarks[nBookmarkIndex++]);
+        if (aMap["Bookmark"].get<OUString>() != pMark->GetName())
+        {
+            continue;
+        }
+
+        OUString aBookmarkText = aMap["BookmarkText"].get<OUString>();
+
+        // Insert markers to remember where the paste positions are.
+        SwPaM aMarkers(pMark->GetMarkEnd());
+        IDocumentContentOperations& rIDCO = rWrtSh.GetDoc()->getIDocumentContentOperations();
+        bool bSuccess = rIDCO.InsertString(aMarkers, "XY");
+        if (bSuccess)
+        {
+            SwPaM aPasteEnd(pMark->GetMarkEnd());
+            aPasteEnd.Move(fnMoveForward, GoInContent);
+
+            // Paste HTML content.
+            SwPaM* pCursorPos = rWrtSh.GetCursor();
+            *pCursorPos = aPasteEnd;
+            SwTranslateHelper::PasteHTMLToPaM(rWrtSh, pCursorPos, aBookmarkText.toUtf8(), true);
+
+            // Update the bookmark to point to the new content.
+            SwPaM aPasteStart(pMark->GetMarkEnd());
+            aPasteStart.Move(fnMoveForward, GoInContent);
+            SwPaM aStartMarker(pMark->GetMarkStart(), *aPasteStart.GetPoint());
+            SwPaM aEndMarker(*aPasteEnd.GetPoint(), *aPasteEnd.GetPoint());
+            aEndMarker.GetMark()->nContent += 1;
+            pMark->SetMarkPos(*aPasteStart.GetPoint());
+            pMark->SetOtherMarkPos(*aPasteEnd.GetPoint());
+            bSortMarks = true;
+
+            // Remove markers. the start marker includes the old content as well.
+            rIDCO.DeleteAndJoin(aStartMarker);
+            rIDCO.DeleteAndJoin(aEndMarker);
+        }
+    }
+    if (bSortMarks)
+    {
+        rIDMA.assureSortedMarkContainers();
+    }
+
+    rWrtSh.EndAction();
+    rWrtSh.GetDoc()->GetIDocumentUndoRedo().EndUndo(SwUndoId::INSBOOKMARK, nullptr);
+}
 }
 
 void SwTextShell::Execute(SfxRequest &rReq)
@@ -690,10 +782,52 @@ void SwTextShell::Execute(SfxRequest &rReq)
         }
         case FN_INSERT_BOOKMARK:
         {
+            const SfxStringItem* pBookmarkText = rReq.GetArg<SfxStringItem>(FN_PARAM_1);
+            SwPaM* pCursorPos = rWrtSh.GetCursor();
             if ( pItem )
             {
+                rWrtSh.StartAction();
                 OUString sName = static_cast<const SfxStringItem*>(pItem)->GetValue();
+
+                if (pBookmarkText)
+                {
+                    OUString aBookmarkText = pBookmarkText->GetValue();
+                    // Split node to remember where the start position is.
+                    bool bSuccess = rWrtSh.GetDoc()->getIDocumentContentOperations().SplitNode(
+                        *pCursorPos->GetPoint(), /*bChkTableStart=*/false);
+                    if (bSuccess)
+                    {
+                        SwPaM aBookmarkPam(*pCursorPos->GetPoint());
+                        aBookmarkPam.Move(fnMoveBackward, GoInContent);
+
+                        // Paste HTML content.
+                        SwTranslateHelper::PasteHTMLToPaM(
+                            rWrtSh, pCursorPos, aBookmarkText.toUtf8(), /*bSetSelection=*/true);
+                        if (pCursorPos->GetPoint()->nContent == 0)
+                        {
+                            // The paste created a last empty text node, remove it.
+                            SwPaM aPam(*pCursorPos->GetPoint());
+                            aPam.SetMark();
+                            aPam.Move(fnMoveBackward, GoInContent);
+                            rWrtSh.GetDoc()->getIDocumentContentOperations().DeleteAndJoin(aPam);
+                        }
+
+                        // Undo the above SplitNode().
+                        aBookmarkPam.SetMark();
+                        aBookmarkPam.Move(fnMoveForward, GoInContent);
+                        rWrtSh.GetDoc()->getIDocumentContentOperations().DeleteAndJoin(
+                            aBookmarkPam);
+                        *aBookmarkPam.GetMark() = *pCursorPos->GetPoint();
+                        *pCursorPos = aBookmarkPam;
+                    }
+                }
+
                 rWrtSh.SetBookmark( vcl::KeyCode(), sName );
+                if (pBookmarkText)
+                {
+                    pCursorPos->DeleteMark();
+                }
+                rWrtSh.EndAction();
             }
             else
             {
@@ -704,6 +838,11 @@ void SwTextShell::Execute(SfxRequest &rReq)
                 pDlg->StartExecuteAsync(aContext);
             }
 
+            break;
+        }
+        case FN_UPDATE_BOOKMARKS:
+        {
+            UpdateBookmarks(rReq, rWrtSh);
             break;
         }
         case FN_DELETE_BOOKMARK:
@@ -1503,6 +1642,32 @@ void SwTextShell::Execute(SfxRequest &rReq)
         }
     }
     break;
+    case SID_FM_TRANSLATE:
+    {
+        const SfxPoolItem* pTargetLangStringItem = nullptr;
+        if (pArgs && SfxItemState::SET == pArgs->GetItemState(SID_ATTR_TARGETLANG_STR, false, &pTargetLangStringItem))
+        {
+            SvxDeeplOptions& rDeeplOptions = SvxDeeplOptions::Get();
+            if (rDeeplOptions.getAPIUrl().isEmpty() || rDeeplOptions.getAuthKey().isEmpty())
+            {
+                SAL_WARN("translate", "API options are not set");
+                break;
+            }
+            const OString aAPIUrl = OUStringToOString(OUString(rDeeplOptions.getAPIUrl() + "?tag_handling=html"), RTL_TEXTENCODING_UTF8).trim();
+            const OString aAuthKey = OUStringToOString(rDeeplOptions.getAuthKey(), RTL_TEXTENCODING_UTF8).trim();
+            OString aTargetLang = OUStringToOString(static_cast<const SfxStringItem*>(pTargetLangStringItem)->GetValue(), RTL_TEXTENCODING_UTF8);
+            SwTranslateHelper::TranslateAPIConfig aConfig({aAPIUrl, aAuthKey, aTargetLang});
+            SwTranslateHelper::TranslateDocument(rWrtSh, aConfig);
+        }
+        else
+        {
+            SwAbstractDialogFactory* pFact = SwAbstractDialogFactory::Create();
+            std::shared_ptr<AbstractSwTranslateLangSelectDlg> pAbstractDialog(pFact->CreateSwTranslateLangSelectDlg(GetView().GetFrameWeld(), rWrtSh));
+            std::shared_ptr<weld::DialogController> pDialogController(pAbstractDialog->getDialogController());
+            weld::DialogController::runAsync(pDialogController, [] (sal_Int32 /*nResult*/) { });
+        }
+    }
+    break;
     case SID_SPELLCHECK_IGNORE:
     {
         SwPaM *pPaM = rWrtSh.GetCursor();
@@ -1973,6 +2138,16 @@ void SwTextShell::GetState( SfxItemSet &rSet )
                     }
                     else
                         GetView().GetViewFrame()->GetBindings().SetVisibleState( nWhich, true );
+                }
+                break;
+
+            case SID_FM_TRANSLATE:
+                {
+                    const SvxDeeplOptions& rDeeplOptions = SvxDeeplOptions::Get();
+                    if (rDeeplOptions.getAPIUrl().isEmpty() || rDeeplOptions.getAuthKey().isEmpty())
+                    {
+                        rSet.DisableItem(nWhich);
+                    }
                 }
                 break;
 

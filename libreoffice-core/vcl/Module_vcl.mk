@@ -106,9 +106,10 @@ endif
 
 ifeq ($(OS),MACOSX)
 $(eval $(call gb_Module_add_targets,vcl,\
+$(if $(DISABLE_GUI),, \
     Package_osxres \
     Library_vclplug_osx \
-))
+)))
 endif
 
 ifeq ($(OS),WNT)
@@ -235,31 +236,6 @@ $(eval $(call gb_Module_add_check_targets,vcl,\
         CppunitTest_vcl_skia) \
     CppunitTest_vcl_filter_igif \
 ))
-
-ifeq ($(USING_X11),TRUE)
-$(eval $(call gb_Module_add_check_targets,vcl,\
-    CppunitTest_vcl_timer \
-))
-endif
-
-ifeq ($(DISABLE_GUI),TRUE)
-$(eval $(call gb_Module_add_check_targets,vcl,\
-    CppunitTest_vcl_timer \
-))
-endif
-
-# Is any configuration missing?
-ifeq ($(OS),WNT)
-$(eval $(call gb_Module_add_check_targets,vcl,\
-    CppunitTest_vcl_timer \
-))
-endif
-
-ifeq ($(OS),MACOSX)
-$(eval $(call gb_Module_add_check_targets,vcl,\
-    CppunitTest_vcl_timer \
-))
-endif
 
 # screenshots
 $(eval $(call gb_Module_add_screenshot_targets,vcl,\

@@ -990,24 +990,32 @@ bool OutputDevice::ImplNewFont() const
     bool bRet = true;
 
     // #95414# fix for OLE objects which use scale factors very creatively
-    if( mbMap && !aSize.Width() )
-    {
-        int nOrigWidth = pFontInstance->mxFontMetric->GetWidth();
-        float fStretch = static_cast<float>(maMapRes.mnMapScNumX) * maMapRes.mnMapScDenomY;
-        fStretch /= static_cast<float>(maMapRes.mnMapScNumY) * maMapRes.mnMapScDenomX;
-        int nNewWidth = static_cast<int>(nOrigWidth * fStretch + 0.5);
-        if( (nNewWidth != nOrigWidth) && (nNewWidth != 0) )
-        {
-            Size aOrigSize = maFont.GetFontSize();
-            const_cast<vcl::Font&>(maFont).SetFontSize( Size( nNewWidth, aSize.Height() ) );
-            mbMap = false;
-            mbNewFont = true;
-            bRet = ImplNewFont();  // recurse once using stretched width
-            mbMap = true;
-            const_cast<vcl::Font&>(maFont).SetFontSize( aOrigSize );
-        }
-    }
+    if (mbMap && !aSize.Width())
+        bRet = AttemptOLEFontScaleFix(const_cast<vcl::Font&>(maFont), aSize.Height());
 
+    return bRet;
+}
+
+bool OutputDevice::AttemptOLEFontScaleFix(vcl::Font& rFont, tools::Long nHeight) const
+{
+    const float fDenominator = static_cast<float>(maMapRes.mnMapScNumY) * maMapRes.mnMapScDenomX;
+    if (fDenominator == 0.0)
+        return false;
+    const float fNumerator = static_cast<float>(maMapRes.mnMapScNumX) * maMapRes.mnMapScDenomY;
+    float fStretch = fNumerator / fDenominator;
+    int nOrigWidth = mpFontInstance->mxFontMetric->GetWidth();
+    int nNewWidth = static_cast<int>(nOrigWidth * fStretch + 0.5);
+    bool bRet = true;
+    if (nNewWidth != nOrigWidth && nNewWidth != 0)
+    {
+        Size aOrigSize = rFont.GetFontSize();
+        rFont.SetFontSize(Size(nNewWidth, nHeight));
+        mbMap = false;
+        mbNewFont = true;
+        bRet = ImplNewFont();  // recurse once using stretched width
+        mbMap = true;
+        rFont.SetFontSize(aOrigSize);
+    }
     return bRet;
 }
 
@@ -1216,6 +1224,7 @@ std::unique_ptr<SalLayout> OutputDevice::ImplGlyphFallbackLayout( std::unique_pt
         // find a font family suited for glyph fallback
         // GetGlyphFallbackFont() needs a valid FontInstance
         // if the system-specific glyph fallback is active
+        OUString oldMissingCodes = aMissingCodes;
         if( !pFallbackFont )
             pFallbackFont = mxFontCache->GetGlyphFallbackFont( mxFontCollection.get(),
                 aFontSelData, mpFontInstance.get(), nFallbackLevel, aMissingCodes );
@@ -1225,11 +1234,20 @@ std::unique_ptr<SalLayout> OutputDevice::ImplGlyphFallbackLayout( std::unique_pt
         if( nFallbackLevel < MAX_FALLBACK-1)
         {
             // ignore fallback font if it is the same as the original font
-            // unless we are looking for a substitution for 0x202F, in which
-            // case we'll just use a normal space
-            if( mpFontInstance->GetFontFace() == pFallbackFont->GetFontFace() &&
-                aMissingCodes.indexOf(0x202F) == -1 )
+            // TODO: This seems broken. Either the font does not provide any of the missing
+            // codes, in which case the fallback should not select it. Or it does provide
+            // some of the missing codes, and then why weren't they used the first time?
+            // This will just loop repeatedly finding the same font (it used to remove
+            // the found font from mxFontCache, but doesn't do that anymore and I don't
+            // see how doing that would remove the font from consideration for fallback).
+            if( mpFontInstance->GetFontFace() == pFallbackFont->GetFontFace())
             {
+                if(aMissingCodes != oldMissingCodes)
+                {
+                    SAL_WARN("vcl.gdi", "Font fallback to the same font, but has missing codes");
+                    // Restore the missing codes if we're not going to use this font.
+                    aMissingCodes = oldMissingCodes;
+                }
                 continue;
             }
         }

@@ -43,6 +43,7 @@
 #include <cppuhelper/implbase.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <o3tl/numeric.hxx>
+#include <o3tl/temporary.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <osl/file.hxx>
 #include <osl/thread.h>
@@ -4382,11 +4383,71 @@ bool PDFWriterImpl::emitWidgetAnnotations()
                 }
             }
         }
-        if( rWidget.m_eType == PDFWriter::Edit && rWidget.m_nMaxLen > 0 )
+        if( rWidget.m_eType == PDFWriter::Edit )
         {
-            aLine.append( "/MaxLen " );
-            aLine.append( rWidget.m_nMaxLen );
-            aLine.append( "\n" );
+            if ( rWidget.m_nMaxLen > 0 )
+            {
+                aLine.append( "/MaxLen " );
+                aLine.append( rWidget.m_nMaxLen );
+                aLine.append( "\n" );
+            }
+
+            if ( rWidget.m_nFormat == PDFWriter::Number )
+            {
+                OString aHexText;
+
+                if ( !rWidget.m_aCurrencySymbol.isEmpty() )
+                {
+                    // Get the hexadecimal code
+                    sal_UCS4 cChar = rWidget.m_aCurrencySymbol.iterateCodePoints(&o3tl::temporary(sal_Int32(1)), -1);
+                    aHexText = "\\\\u" + OString::number(cChar, 16);
+                }
+
+                aLine.append("/AA<<\n");
+                aLine.append("/F<</JS(AFNumber_Format\\(");
+                aLine.append(OString::number(rWidget.m_nDecimalAccuracy));
+                aLine.append(", 0, 0, 0, \"");
+                aLine.append( aHexText );
+                aLine.append("\",");
+                aLine.append(OString::boolean(rWidget.m_bPrependCurrencySymbol));
+                aLine.append("\\);)");
+                aLine.append("/S/JavaScript>>\n");
+                aLine.append("/K<</JS(AFNumber_Keystroke\\(");
+                aLine.append(OString::number(rWidget.m_nDecimalAccuracy));
+                aLine.append(", 0, 0, 0, \"");
+                aLine.append( aHexText );
+                aLine.append("\",");
+                aLine.append(OString::boolean(rWidget.m_bPrependCurrencySymbol));
+                aLine.append("\\);)");
+                aLine.append("/S/JavaScript>>\n");
+                aLine.append(">>\n");
+            }
+            else if ( rWidget.m_nFormat == PDFWriter::Time )
+            {
+                aLine.append("/AA<<\n");
+                aLine.append("/F<</JS(AFTime_FormatEx\\(\"");
+                aLine.append(OUStringToOString(rWidget.m_aTimeFormat, RTL_TEXTENCODING_ASCII_US));
+                aLine.append("\"\\);)");
+                aLine.append("/S/JavaScript>>\n");
+                aLine.append("/K<</JS(AFTime_KeystrokeEx\\(\"");
+                aLine.append(OUStringToOString(rWidget.m_aTimeFormat, RTL_TEXTENCODING_ASCII_US));
+                aLine.append("\"\\);)");
+                aLine.append("/S/JavaScript>>\n");
+                aLine.append(">>\n");
+            }
+            else if ( rWidget.m_nFormat == PDFWriter::Date )
+            {
+                aLine.append("/AA<<\n");
+                aLine.append("/F<</JS(AFDate_FormatEx\\(\"");
+                aLine.append(OUStringToOString(rWidget.m_aDateFormat, RTL_TEXTENCODING_ASCII_US));
+                aLine.append("\"\\);)");
+                aLine.append("/S/JavaScript>>\n");
+                aLine.append("/K<</JS(AFDate_KeystrokeEx\\(\"");
+                aLine.append(OUStringToOString(rWidget.m_aDateFormat, RTL_TEXTENCODING_ASCII_US));
+                aLine.append("\"\\);)");
+                aLine.append("/S/JavaScript>>\n");
+                aLine.append(">>\n");
+            }
         }
         if( rWidget.m_eType == PDFWriter::PushButton )
         {
@@ -8456,6 +8517,21 @@ void PDFWriterImpl::writeReferenceXObject(const ReferenceXObjectEmit& rEmit)
             return;
         }
 
+        double aOrigin[2] = { 0.0, 0.0 };
+        if (auto* pArray = dynamic_cast<filter::PDFArrayElement*>(pPage->Lookup("MediaBox")))
+        {
+            const auto& rElements = pArray->GetElements();
+            if (rElements.size() >= 4)
+            {
+                // get x1, y1 of the rectangle.
+                for (sal_Int32 nIdx = 0; nIdx < 2; ++nIdx)
+                {
+                    if (const auto* pNumElement = dynamic_cast<filter::PDFNumberElement*>(rElements[nIdx]))
+                        aOrigin[nIdx] = pNumElement->GetValue();
+                }
+            }
+        }
+
         std::vector<filter::PDFObjectElement*> aContentStreams;
         if (filter::PDFObjectElement* pContentStream = pPage->LookupObject("Contents"))
             aContentStreams.push_back(pContentStream);
@@ -8557,7 +8633,7 @@ void PDFWriterImpl::writeReferenceXObject(const ReferenceXObjectEmit& rEmit)
             // Now transform the object: rotate around the center and make sure that the rotation
             // doesn't affect the aspect ratio.
             basegfx::B2DHomMatrix aMat;
-            aMat.translate(-0.5 * aBBox.getWidth(), -0.5 * aBBox.getHeight());
+            aMat.translate(-0.5 * aBBox.getWidth() - aOrigin[0], -0.5 * aBBox.getHeight() - aOrigin[1]);
             aMat.rotate(basegfx::deg2rad(nAngle));
             aMat.translate(0.5 * nWidth, 0.5 * nHeight);
 
@@ -8580,10 +8656,14 @@ void PDFWriterImpl::writeReferenceXObject(const ReferenceXObjectEmit& rEmit)
         auto & rResources = rExternalPDFStream.getCopiedResources();
         aCopier.copyPageResources(pPage, aLine, rResources);
 
-        aLine.append(" /BBox [ 0 0 ");
-        aLine.append(aBBox.getWidth());
-        aLine.append(" ");
-        aLine.append(aBBox.getHeight());
+        aLine.append(" /BBox [ ");
+        aLine.append(aOrigin[0]);
+        aLine.append(' ');
+        aLine.append(aOrigin[1]);
+        aLine.append(' ');
+        aLine.append(aBBox.getWidth() + aOrigin[0]);
+        aLine.append(' ');
+        aLine.append(aBBox.getHeight() + aOrigin[1]);
         aLine.append(" ]");
 
         if (!g_bDebugDisableCompression)
@@ -11014,6 +11094,12 @@ sal_Int32 PDFWriterImpl::createControl( const PDFWriter::AnyWidget& rControl, sa
         if( rEdit.FileSelect && m_aContext.Version > PDFWriter::PDFVersion::PDF_1_3 )
             rNewWidget.m_nFlags |= 0x00100000;
         rNewWidget.m_nMaxLen = rEdit.MaxLen;
+        rNewWidget.m_nFormat = rEdit.Format;
+        rNewWidget.m_aCurrencySymbol = rEdit.CurrencySymbol;
+        rNewWidget.m_nDecimalAccuracy = rEdit.DecimalAccuracy;
+        rNewWidget.m_bPrependCurrencySymbol = rEdit.PrependCurrencySymbol;
+        rNewWidget.m_aTimeFormat = rEdit.TimeFormat;
+        rNewWidget.m_aDateFormat = rEdit.DateFormat;
         rNewWidget.m_aValue = rEdit.Text;
 
         createDefaultEditAppearance( rNewWidget, rEdit );

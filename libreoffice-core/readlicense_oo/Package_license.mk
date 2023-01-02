@@ -12,17 +12,9 @@ $(eval $(call gb_Package_Package,readlicense_oo_license,$(call gb_CustomTarget_g
 ifeq ($(OS),WNT)
 $(eval $(call gb_Package_add_file,readlicense_oo_license,license.txt,license.txt))
 else
-ifneq ($(OS),MACOSX)
 $(eval $(call gb_Package_add_file,readlicense_oo_license,LICENSE,LICENSE))
-else
-$(eval $(call gb_Package_add_file,readlicense_oo_license,Resources/LICENSE,LICENSE))
-endif
 endif
 
-ifneq ($(OS),MACOSX)
 $(eval $(call gb_Package_add_file,readlicense_oo_license,LICENSE.html,LICENSE.html))
-else
-$(eval $(call gb_Package_add_file,readlicense_oo_license,Resources/LICENSE.html,LICENSE.html))
-endif
 
 # vim: set noet sw=4 ts=4:

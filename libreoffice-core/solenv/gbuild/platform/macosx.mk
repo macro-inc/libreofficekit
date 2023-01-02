@@ -32,7 +32,7 @@ gb_OSDEFS := \
 	-D_REENTRANT \
 	-DNO_PTHREAD_PRIORITY \
 	-DMAC_OS_X_VERSION_MIN_REQUIRED=$(MAC_OS_X_VERSION_MIN_REQUIRED) \
-	-DMAC_OS_X_VERSION_MAX_ALLOWED=$(MAC_OS_X_VERSION_MAX_ALLOWED) \
+	-DMAC_OS_X_VERSION_MAX_ALLOWED=$(MAC_OS_X_VERSION_MIN_REQUIRED) \
 	$(LFS_CFLAGS) \
 
 
@@ -373,7 +373,7 @@ endef
 
 # Python
 gb_Python_PRECOMMAND := PYTHONPATH="$$PYPATH"
-gb_Python_INSTALLED_EXECUTABLE := $(INSTROOT)/$(LIBO_LIB_FOLDER)/LibreOfficePython.framework/Versions/$(PYTHON_VERSION_MAJOR).$(PYTHON_VERSION_MINOR)/Resources/Python.app/Contents/MacOS/LibreOfficePython
+gb_Python_INSTALLED_EXECUTABLE := /bin/sh $(INSTROOT)/program/Python
 # this is passed to gdb as executable when running tests
 gb_Python_INSTALLED_EXECUTABLE_GDB := $(gb_Python_INSTALLED_EXECUTABLE)
 

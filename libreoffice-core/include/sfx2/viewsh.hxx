@@ -58,6 +58,7 @@ class Menu;
 class NotifyEvent;
 class SfxInPlaceClient;
 class SfxLokCallbackInterface;
+class SfxStoringHelper;
 namespace rtl { class OStringBuffer; }
 namespace vcl { class PrinterController; }
 
@@ -173,6 +174,9 @@ friend class SfxPrinterController;
 
     /// Used to set the DocId at construction time. See SetCurrentDocId.
     static ViewShellDocId       mnCurrentDocId;
+
+    /// Used for async export
+    std::shared_ptr<SfxStoringHelper> m_xHelper;
 
 protected:
     virtual void                Activate(bool IsMDIActivate) override;
@@ -345,7 +349,7 @@ public:
     /// Invokes the registered callback, if there are any.
     virtual void libreOfficeKitViewCallback(int nType, const char* pPayload) const override;
     virtual void libreOfficeKitViewCallbackWithViewId(int nType, const char* pPayload, int nViewId) const override;
-    virtual void libreOfficeKitViewInvalidateTilesCallback(const tools::Rectangle* pRect, int nPart) const override;
+    virtual void libreOfficeKitViewInvalidateTilesCallback(const tools::Rectangle* pRect, int nPart, int nMode) const override;
     virtual void libreOfficeKitViewUpdatedCallback(int nType) const override;
     virtual void libreOfficeKitViewUpdatedCallbackPerViewId(int nType, int nViewId, int nSourceViewId) const override;
     // Performs any pending calls to libreOfficeKitViewInvalidateTilesCallback() as necessary.
@@ -360,6 +364,8 @@ public:
     void setTiledSearching(bool bTiledSearching);
     /// See lok::Document::getPart().
     virtual int getPart() const;
+    /// See lok::Document::getMode().
+    virtual int getEditMode() const;
     virtual void dumpAsXml(xmlTextWriterPtr pWriter) const;
     /// See OutlinerViewShell::GetViewShellId().
     ViewShellId GetViewShellId() const override;
@@ -409,6 +415,8 @@ public:
     // Blocked Command view settings
     void setBlockedCommandList(const char* blockedCommandList);
     bool isBlockedCommand(OUString command);
+
+    void SetStoringHelper(std::shared_ptr<SfxStoringHelper> xHelper) { m_xHelper = xHelper; }
 };
 
 

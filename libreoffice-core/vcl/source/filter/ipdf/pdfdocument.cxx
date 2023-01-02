@@ -8,6 +8,8 @@
  */
 
 #include <vcl/filter/pdfdocument.hxx>
+#include <pdf/pdfcompat.hxx>
+#include <config_features.h>
 
 #include <map>
 #include <memory>
@@ -1348,6 +1350,18 @@ void PDFDocument::SetIDObject(size_t nID, PDFObjectElement* pObject)
     m_aIDObjects[nID] = pObject;
 }
 
+bool PDFDocument::ReadWithPossibleFixup(SvStream& rStream)
+{
+    if (Read(rStream))
+        return true;
+
+    // Read failed, try a roundtrip through pdfium and then retry.
+    rStream.Seek(0);
+    SvMemoryStream aStandardizedStream;
+    vcl::pdf::convertToHighestSupported(rStream, aStandardizedStream);
+    return Read(aStandardizedStream);
+}
+
 bool PDFDocument::Read(SvStream& rStream)
 {
     // Check file magic.
@@ -1904,7 +1918,26 @@ const std::vector<std::unique_ptr<PDFElement>>& PDFDocument::GetElements() const
 /// Visits the page tree recursively, looking for page objects.
 static void visitPages(PDFObjectElement* pPages, std::vector<PDFObjectElement*>& rRet)
 {
-    auto pKids = dynamic_cast<PDFArrayElement*>(pPages->Lookup("Kids"));
+    auto pKidsRef = pPages->Lookup("Kids");
+    auto pKids = dynamic_cast<PDFArrayElement*>(pKidsRef);
+    if (!pKids)
+    {
+        auto pRefKids = dynamic_cast<PDFReferenceElement*>(pKidsRef);
+        if (!pRefKids)
+        {
+            SAL_WARN("vcl.filter", "visitPages: pages has no kids");
+            return;
+        }
+        auto pObjWithKids = pRefKids->LookupObject();
+        if (!pObjWithKids)
+        {
+            SAL_WARN("vcl.filter", "visitPages: pages has no kids");
+            return;
+        }
+
+        pKids = pObjWithKids->GetArray();
+    }
+
     if (!pKids)
     {
         SAL_WARN("vcl.filter", "visitPages: pages has no kids");

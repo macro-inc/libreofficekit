@@ -3407,6 +3407,7 @@ bool ScDocFunc::DeleteTable( SCTAB nTab, bool bRecord )
 
         SfxApplication* pSfxApp = SfxGetpApp();                                // Navigator
         pSfxApp->Broadcast( SfxHint( SfxHintId::ScTablesChanged ) );
+        pSfxApp->Broadcast( SfxHint( SfxHintId::ScAreasChanged ) );
         pSfxApp->Broadcast( SfxHint( SfxHintId::ScDbAreasChanged ) );
         pSfxApp->Broadcast( SfxHint( SfxHintId::ScAreaLinksChanged ) );
 
@@ -3523,7 +3524,7 @@ bool ScDocFunc::RenameTable( SCTAB nTab, const OUString& rName, bool bRecord, bo
         rDocShell.PostPaintExtras();
         aModificator.SetDocumentModified();
         SfxGetpApp()->Broadcast( SfxHint( SfxHintId::ScTablesChanged ) );
-        SfxGetpApp()->Broadcast( SfxHint( SfxHintId::ScTablesRenamed ) );
+        SfxGetpApp()->Broadcast( SfxHint( SfxHintId::ScAreasChanged ) );
 
         bSuccess = true;
     }

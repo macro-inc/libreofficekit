@@ -18,6 +18,10 @@ $(eval $(call gb_ExternalProject_register_targets,fontconfig,\
 	build \
 ))
 
+# Can't have this inside the $(call gb_ExternalProject_run as it contains commas
+fontconfig_add_fonts_linux=/usr/share/X11/fonts/Type1,/usr/share/X11/fonts/TTF,/usr/local/share/fonts
+fontconfig_add_fonts_mac=/System/Library/Fonts,/Library/Fonts,~/Library/Fonts,/System/Library/AssetsV2/com_apple_MobileAsset_Font7
+
 $(call gb_ExternalProject_get_state_target,fontconfig,build) :
 	$(call gb_Trace_StartRange,fontconfig,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
@@ -27,13 +31,24 @@ $(call gb_ExternalProject_get_state_target,fontconfig,build) :
 			FREETYPE_LIBS="-L$(call gb_UnpackedTarball_get_dir,freetype)/instdir/lib -lfreetype" \
 		) \
 		$(gb_RUN_CONFIGURE) ./configure \
+			--with-pic \
 			--disable-shared \
 			--disable-silent-rules \
 			$(if $(filter ANDROID,$(OS)),--with-arch=arm) \
 			--with-expat-includes=$(call gb_UnpackedTarball_get_dir,expat)/lib \
 			--with-expat-lib=$(gb_StaticLibrary_WORKDIR) \
 			--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
-			$(if $(filter EMSCRIPTEN,$(OS)),ac_cv_func_fstatfs=no ac_cv_func_fstatvfs=no) \
+			$(if $(filter ANDROID EMSCRIPTEN,$(OS)), \
+				ac_cv_func_fstatfs=no ac_cv_func_fstatvfs=no \
+			) \
+			$(if $(filter LINUX,$(OS)), \
+				--with-add-fonts=$(fontconfig_add_fonts_linux) \
+				--with-cache-dir=/usr/lib/fontconfig/cache \
+			) \
+			$(if $(filter MACOSX,$(OS)), \
+				--with-add-fonts=$(fontconfig_add_fonts_mac) \
+				--without-libintl-prefix \
+			) \
 		&& $(MAKE) -C src \
 	)
 	$(call gb_Trace_EndRange,fontconfig,EXTERNAL)

@@ -58,7 +58,8 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
 
     if (sControlType == "responsebutton")
     {
-        if (pWidget == nullptr)
+        auto pButton = dynamic_cast<weld::Button*>(pWidget);
+        if (pWidget == nullptr || (pButton && !pButton->is_custom_handler_set()))
         {
             // welded wrapper not found - use response code instead
             pWidget = JSInstanceBuilder::FindWeldWidgetsMap(nWindowId, "__DIALOG__");
@@ -90,7 +91,10 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                     OString pageId = OUStringToOString(rData["data"], RTL_TEXTENCODING_ASCII_US);
                     int page = std::atoi(pageId.getStr());
 
+                    OString aCurrentPage = pNotebook->get_current_page_ident();
+                    LOKTrigger::leave_page(*pNotebook, aCurrentPage);
                     pNotebook->set_current_page(page);
+                    LOKTrigger::enter_page(*pNotebook, pNotebook->get_page_ident(page));
 
                     return true;
                 }

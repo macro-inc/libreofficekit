@@ -54,7 +54,8 @@
 #include <unotextrange.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
-#include <IGrammarContact.hxx>
+#include <GrammarContact.hxx>
+#include <OnlineAccessibilityCheck.hxx>
 #include <comphelper/flagguard.hxx>
 #include <strings.hrc>
 #include <IDocumentLayoutAccess.hxx>
@@ -1502,9 +1503,13 @@ void SwCursorShell::UpdateCursorPos()
                                      &aTmpState );
         pShellCursor->DeleteMark();
     }
-    IGrammarContact *pGrammarContact = GetDoc() ? GetDoc()->getGrammarContact() : nullptr;
-    if( pGrammarContact )
-        pGrammarContact->updateCursorPosition( *m_pCurrentCursor->GetPoint() );
+    auto* pDoc = GetDoc();
+    if (pDoc)
+    {
+        pDoc->getGrammarContact()->updateCursorPosition(*m_pCurrentCursor->GetPoint());
+        pDoc->getOnlineAccessibilityCheck()->update(*m_pCurrentCursor->GetPoint());
+    }
+
     --mnStartAction;
     if( aOldSz != GetDocSize() )
         SizeChgNotify();

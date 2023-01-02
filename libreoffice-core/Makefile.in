@@ -9,7 +9,7 @@
 
 gb_Top_MODULE_CHECK_TARGETS := slowcheck unitcheck subsequentcheck perfcheck uicheck screenshot
 
-.PHONY : check-if-root bootstrap gbuild build build-non-l10n-only build-l10n-only check clean clean-build clean-host test-install distclean distro-pack-install docs download etags fetch get-submodules id install install-gdb-printers install-strip tags debugrun help showmodules translations packageinfo internal.clean $(gb_Top_MODULE_CHECK_TARGETS)
+.PHONY : check-if-root bootstrap gbuild build build-non-l10n-only build-l10n-only check clean clean-build clean-host distclean distro-pack-install docs download etags fetch get-submodules id install install-gdb-printers install-strip tags debugrun help showmodules translations packageinfo internal.clean $(gb_Top_MODULE_CHECK_TARGETS)
 
 MAKECMDGOALS?=build
 build_goal:=$(if $(filter build build-nocheck uicheck,$(MAKECMDGOALS)),build)\
@@ -201,7 +201,7 @@ include $(SRCDIR)/compilerplugins/Makefile.mk
 #
 # Distclean
 #
-distclean : clean compilerplugins-clean
+distclean : clean compilerplugins-clean mac-app-store-package.clean
 	rm -fr \
         $(BUILDDIR)/Makefile \
         $(BUILDDIR)/aclocal.m4 \
@@ -328,61 +328,55 @@ install-strip:
 	@$(call gb_Top_InstallFinished,Installation,$(INSTALLDIR))
 endif # !MACOSX
 
-test-install: build
-	@rm -rf $(TESTINSTALLDIR)
-	@mkdir -p $(TESTINSTALLDIR)
-ifeq ($(OS_FOR_BUILD),WNT)
-	cd $(SRCDIR)/instsetoo_native && $(MAKE) LIBO_TEST_INSTALL=TRUE $(GMAKE_OPTIONS)
-else
-	@$(SRCDIR)/solenv/bin/ooinstall $(TESTINSTALLDIR)
-ifeq ($(OS),MACOSX)
-#
-# Create Resources/*.lproj directories for languages supported by macOS
-	set -x; for lang in ca cs da de el en es fi fr hr hu id it ja ko ms nl no pl pt pt_PT ro ru sk sv th tr uk vi zh_CN zh_TW; do \
-		lproj=$(TESTINSTALLDIR)/$(PRODUCTNAME_WITHOUT_SPACES).app/Contents/Resources/$$lang.lproj; \
-		mkdir "$$lproj"; \
-	done
-#
-# Remove unnecessary executables in the LibreOfficePython framework
-	rm -rf $(TESTINSTALLDIR)/$(PRODUCTNAME_WITHOUT_SPACES).app/Contents/Frameworks/LibreOfficePython.framework/Versions/[1-9]*/bin
-#
-# Remove the python.o object file which is weird and interferes with app store uploading
-# And with it removed, presumably the other stuff in the Python lib/python3.3/config-3.3m probably does not make sense either.
-	rm -rf $(TESTINSTALLDIR)/$(PRODUCTNAME_WITHOUT_SPACES).app/Contents/Frameworks/LibreOfficePython.framework/Versions/[1-9]*/lib/python[1-9]*/config-[1-9]*
-#
-ifneq ($(ENABLE_MACOSX_SANDBOX),)
+# target to bypass the packaging steps/to only assemble the package
+mac-app-store-package.prepare: $(BUILDDIR)/$(PLATFORMID)/done
 
-# Remove the gengal binary that we hardly need and the shell scripts
-# for which code signatures (stored as extended attributes) won't
-# survive upload to the App Store anyway. See
-# https://developer.apple.com/library/content/documentation/Security/Conceptual/CodeSigningGuide/Procedures/Procedures.html#//apple_ref/doc/uid/TP40005929-CH4-TNTAG201
-# We could put the shell scripts somewhere in Resources instead, but
-# no 3rd-party code that would be interested in them would look there
-# anyway.
-	rm $(TESTINSTALLDIR)/$(PRODUCTNAME_WITHOUT_SPACES).app/Contents/MacOS/gengal
-	rm $(TESTINSTALLDIR)/$(PRODUCTNAME_WITHOUT_SPACES).app/Contents/MacOS/unopkg
-	rm $(TESTINSTALLDIR)/$(PRODUCTNAME_WITHOUT_SPACES).app/Contents/MacOS/unoinfo
-endif
-ifneq ($(MACOSX_PROVISIONING_PROFILE),)
-	cp "$(MACOSX_PROVISIONING_PROFILE)" $(TESTINSTALLDIR)/$(PRODUCTNAME_WITHOUT_SPACES).app/Contents/embedded.provisionprofile
-endif
-ifneq ($(MACOSX_CODESIGNING_IDENTITY),)
-# Then use the macosx-codesign-app-bundle script
-	@$(SRCDIR)/solenv/bin/macosx-codesign-app-bundle $(TESTINSTALLDIR)/$(PRODUCTNAME_WITHOUT_SPACES).app
-endif
-endif
-endif
-	@$(call gb_Top_InstallFinished,Test Installation,$(TESTINSTALLDIR))
+# shorthand target to build a complete package for the currently building architecture
+mac-app-store-package: mac-app-store-package.$(PLATFORMID)
 
-mac-app-store-package: test-install
+# recipe/targets to do the actual packaging
+# the symbolication switch to productbuild unfortunately is undocumented, but that is what XCode
+# uses when it creates a package with symbols for uploading to the appstore
+mac-app-store-package.$(PLATFORMID) mac-app-store-package.universal: mac-app-store-package.%: $(BUILDDIR)/%/done
 ifneq ($(MACOSX_PACKAGE_SIGNING_IDENTITY),)
-	rm -rf "$(PRODUCTNAME).app"
-	mv "$(TESTINSTALLDIR)/$(PRODUCTNAME_WITHOUT_SPACES).app" "$(PRODUCTNAME).app"
-	productbuild --component "$(PRODUCTNAME).app" /Applications --sign $(MACOSX_PACKAGE_SIGNING_IDENTITY) $(PRODUCTNAME_WITHOUT_SPACES).pkg
+	$(SRCDIR)/solenv/bin/macosx-codesign-app-bundle $*/"$(PRODUCTNAME)".app
+	productbuild $(if $(ENABLE_SYMBOLS_FOR),--symbolication $*/Symbols) --component $*/"$(PRODUCTNAME)".app /Applications --sign $(MACOSX_PACKAGE_SIGNING_IDENTITY) $(PRODUCTNAME_WITHOUT_SPACES).pkg
 else
 	@echo You did not provide an installer signing identity with --enable-macosx-package-signing
 	@exit 1
 endif
+
+# the builds need to persist a standard "make clean" to be able to combine them into an universal
+# binary, so provide an additional target that can be used standalone or via make distclean
+mac-app-store-package.clean:
+	rm -rf \
+	    $(BUILDDIR)/macosx_x86_64 \
+	    $(BUILDDIR)/macosx_aarch64 \
+	    $(BUILDDIR)/universal \
+	    $(BUILDDIR)/$(PRODUCTNAME_WITHOUT_SPACES).pkg
+
+# used by the mac-app-store targets
+$(BUILDDIR)/$(PLATFORMID)/done:
+	rm -rf   $(PLATFORMID)
+	mkdir -p $(PLATFORMID)/Symbols
+	mv $(TESTINSTALLDIR)/$(PRODUCTNAME_WITHOUT_SPACES).app $(PLATFORMID)/"$(PRODUCTNAME)".app
+ifneq ($(ENABLE_SYMBOLS_FOR),)
+	symbols -arch all -symbolsPackageDir $(PLATFORMID)/Symbols $(PLATFORMID)/"$(PRODUCTNAME)".app/Contents/Frameworks/[^L]* $(PLATFORMID)/"$(PRODUCTNAME)".app/Contents/MacOS/*
+	strip -S                                                   $(PLATFORMID)/"$(PRODUCTNAME)".app/Contents/Frameworks/[^L]* $(PLATFORMID)/"$(PRODUCTNAME)".app/Contents/MacOS/*
+endif
+	touch $@
+
+# build one arch using the mac-app-store-package.prepare target, make clean and change the autogen.input
+# to build for the other target, then use mac-app-store-package.universal to build for the other arch and
+# combine the two into a universal binary
+$(BUILDDIR)/universal/done: $(BUILDDIR)/macosx_x86_64/done $(BUILDDIR)/macosx_aarch64/done
+	rm -rf universal
+	mkdir -p universal/Symbols
+ifneq ($(ENABLE_SYMBOLS_FOR),)
+	cp -a macosx_x86_64/Symbols/* macosx_aarch64/Symbols/* universal/Symbols/
+endif
+	$(SRCDIR)/bin/merge-app-bundles macosx_x86_64/"$(PRODUCTNAME)".app macosx_aarch64/"$(PRODUCTNAME)".app universal/"$(PRODUCTNAME)".app
+	touch $@
 
 distro-pack-install: install
 	$(SRCDIR)/bin/distro-install-clean-up

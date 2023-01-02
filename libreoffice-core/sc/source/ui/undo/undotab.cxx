@@ -366,6 +366,7 @@ void ScUndoDeleteTab::Undo()
     }
     SfxApplication* pSfxApp = SfxGetpApp();                                // Navigator
     pSfxApp->Broadcast( SfxHint( SfxHintId::ScTablesChanged ) );
+    pSfxApp->Broadcast( SfxHint( SfxHintId::ScAreasChanged ) );
     pSfxApp->Broadcast( SfxHint( SfxHintId::ScDbAreasChanged ) );
     pSfxApp->Broadcast( SfxHint( SfxHintId::ScAreaLinksChanged ) );
 
@@ -436,7 +437,7 @@ void ScUndoRenameTab::DoChange( SCTAB nTabP, const OUString& rName ) const
     rDoc.RenameTab( nTabP, rName );
 
     SfxGetpApp()->Broadcast( SfxHint( SfxHintId::ScTablesChanged ) );    // Navigator
-    SfxGetpApp()->Broadcast( SfxHint( SfxHintId::ScTablesRenamed ) );    // Name Box
+    SfxGetpApp()->Broadcast( SfxHint( SfxHintId::ScAreasChanged ) );     // Also Name Box
 
     pDocShell->PostPaintGridAll();
     pDocShell->PostPaintExtras();
@@ -600,7 +601,9 @@ void ScUndoCopyTab::DoChange() const
     if (pViewShell)
         pViewShell->SetTabNo((*mpOldTabs)[0],true);
 
-    SfxGetpApp()->Broadcast( SfxHint( SfxHintId::ScTablesChanged ) );    // Navigator
+    SfxApplication* pSfxApp = SfxGetpApp();                         // Navigator
+    pSfxApp->Broadcast( SfxHint( SfxHintId::ScTablesChanged ) );
+    pSfxApp->Broadcast( SfxHint( SfxHintId::ScAreasChanged ) );
 
     pDocShell->PostPaintGridAll();
     pDocShell->PostPaintExtras();

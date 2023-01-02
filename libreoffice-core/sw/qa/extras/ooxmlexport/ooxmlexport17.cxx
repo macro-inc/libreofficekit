@@ -202,6 +202,7 @@ CPPUNIT_TEST_FIXTURE(Test, testDropdownContentControlExport)
         xMSF->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
     {
+        xContentControlProps->setPropertyValue("DropDown", uno::Any(true));
         uno::Sequence<beans::PropertyValues> aListItems = {
             {
                 comphelper::makePropertyValue("DisplayText", uno::Any(OUString("red"))),
@@ -297,6 +298,8 @@ CPPUNIT_TEST_FIXTURE(Test, testDateContentControlExport)
     xContentControlProps->setPropertyValue("DataBindingXpath", uno::Any(OUString("/ns0:employees[1]/ns0:employee[1]/ns0:hireDate[1]")));
     xContentControlProps->setPropertyValue("DataBindingStoreItemID", uno::Any(OUString("{241A8A02-7FFD-488D-8827-63FBE74E8BC9}")));
     xContentControlProps->setPropertyValue("Color", uno::Any(OUString("008000")));
+    xContentControlProps->setPropertyValue("Alias", uno::Any(OUString("myalias")));
+    xContentControlProps->setPropertyValue("Tag", uno::Any(OUString("mytag")));
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to DOCX:
@@ -318,6 +321,8 @@ CPPUNIT_TEST_FIXTURE(Test, testDateContentControlExport)
     assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:dataBinding", "xpath", "/ns0:employees[1]/ns0:employee[1]/ns0:hireDate[1]");
     assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:dataBinding", "storeItemID", "{241A8A02-7FFD-488D-8827-63FBE74E8BC9}");
     assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w15:color", "val", "008000");
+    assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:alias", "val", "myalias");
+    assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:tag", "val", "mytag");
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf137466, "tdf137466.docx")

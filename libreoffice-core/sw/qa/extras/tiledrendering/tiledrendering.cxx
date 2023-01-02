@@ -19,6 +19,8 @@
 #include <com/sun/star/frame/XStorable.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/text/XTextViewCursorSupplier.hpp>
+#include <com/sun/star/text/XTextField.hpp>
+#include <com/sun/star/text/AuthorDisplayFormat.hpp>
 #include <com/sun/star/datatransfer/XTransferable2.hpp>
 
 #include <test/helper/transferable.hxx>
@@ -3506,7 +3508,17 @@ CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testRedlinePortions)
 CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testContentControl)
 {
     // Given a document with a content control:
-    SwXTextDocument* pXTextDocument = createDoc("content-control.odt");
+    SwXTextDocument* pXTextDocument = createDoc();
+    uno::Reference<text::XText> xText = pXTextDocument->getText();
+    uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
+    xText->insertString(xCursor, "test", /*bAbsorb=*/false);
+    xCursor->gotoStart(/*bExpand=*/false);
+    xCursor->gotoEnd(/*bExpand=*/true);
+    uno::Reference<text::XTextContent> xContentControl(
+        pXTextDocument->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
+    xContentControlProps->setPropertyValue("Alias", uno::Any(OUString("my alias")));
+    xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
     SwWrtShell* pWrtShell = pXTextDocument->GetDocShell()->GetWrtShell();
     setupLibreOfficeKitViewCallback(pWrtShell->GetSfxViewShell());
     pWrtShell->SttEndDoc(/*bStt=*/true);
@@ -3526,6 +3538,11 @@ CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testContentControl)
         CPPUNIT_ASSERT_EQUAL(OString("show"), sAction);
         OString sRectangles = aTree.get_child("rectangles").get_value<std::string>().c_str();
         CPPUNIT_ASSERT(!sRectangles.isEmpty());
+        // Without the accompanying fix in place, this test would have failed width:
+        // uncaught exception of type std::exception (or derived).
+        // - No such node (alias)
+        OString sAlias = aTree.get_child("alias").get_value<std::string>().c_str();
+        CPPUNIT_ASSERT_EQUAL(OString("my alias"), sAlias);
     }
 
     // And when leaving that content control:
@@ -3733,6 +3750,45 @@ CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testDateContentControl)
     // - Actual  : choose a date
     // i.e. the document text was not updated.
     CPPUNIT_ASSERT_EQUAL(OUString("2022-05-30"), pTextNode->GetExpandText(pWrtShell->GetLayout()));
+}
+
+CPPUNIT_TEST_FIXTURE(SwTiledRenderingTest, testAuthorField)
+{
+    SwXTextDocument* pXTextDocument = createDoc();
+    const OUString sAuthor("Abcd Xyz");
+
+    uno::Sequence<beans::PropertyValue> aPropertyValues1(comphelper::InitPropertySequence(
+    {
+        {".uno:Author", uno::makeAny(sAuthor)},
+    }));
+    pXTextDocument->initializeForTiledRendering(aPropertyValues1);
+
+    auto insertAuthorField = [this]()
+    {
+        uno::Reference<lang::XMultiServiceFactory> const xMSF(mxComponent, uno::UNO_QUERY_THROW);
+        uno::Reference<text::XTextDocument> const xTD(mxComponent, uno::UNO_QUERY_THROW);
+
+        auto const xText = xTD->getText();
+        auto const xTextCursor = xText->createTextCursor();
+        CPPUNIT_ASSERT(xTextCursor.is());
+
+        xTextCursor->gotoEnd(false);
+
+        uno::Reference<text::XTextField> const xTextField(
+            xMSF->createInstance("com.sun.star.text.textfield.Author"), uno::UNO_QUERY_THROW);
+
+        uno::Reference<beans::XPropertySet> xTextFieldProps(xTextField, uno::UNO_QUERY_THROW);
+        xTextFieldProps->setPropertyValue("FullName", uno::Any(true));
+
+        xText->insertTextContent(xTextCursor, xTextField, false);
+    };
+
+    insertAuthorField();
+    Scheduler::ProcessEventsToIdle();
+
+    xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+
+    assertXPath(pXmlDoc, "/root/page[1]/body/txt[1]/Special[1]", "rText", sAuthor);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

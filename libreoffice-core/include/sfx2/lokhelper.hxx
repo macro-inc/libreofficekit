@@ -13,6 +13,8 @@
 #include <vcl/IDialogRenderable.hxx>
 #include <vcl/ITiledRenderable.hxx>
 #include <vcl/event.hxx>
+#include <vcl/vclptr.hxx>
+#include <vcl/window.hxx>
 #include <sfx2/dllapi.h>
 #include <sfx2/viewsh.hxx>
 #include <tools/gen.hxx>
@@ -56,6 +58,8 @@ public:
     static void destroyView(int nId);
     /// Set a view shell as current one.
     static void setView(int nId);
+    /// Set the edit mode for a document with callbacks disabled.
+    static void setEditMode(int nMode, vcl::ITiledRenderable* pDoc);
     /// Get view shell with id
     static SfxViewShell* getViewOfId(int nId);
     /// Get the currently active view.
@@ -113,6 +117,8 @@ public:
     static void notifyDocumentSizeChanged(SfxViewShell const* pThisView, const OString& rPayload, vcl::ITiledRenderable* pDoc, bool bInvalidateAll = true);
     /// Emits a LOK_CALLBACK_DOCUMENT_SIZE_CHANGED for all views of the same document - if @bInvalidateAll - first invalidates all parts
     static void notifyDocumentSizeChangedAllViews(vcl::ITiledRenderable* pDoc, bool bInvalidateAll = true);
+    /// Emits a LOK_CALLBACK_DOCUMENT_SIZE_CHANGED for all views of the same document with the same part
+    static void notifyPartSizeChangedAllViews(vcl::ITiledRenderable* pDoc, int nPart);
     /// Emits a LOK_CALLBACK_INVALIDATE_TILES, but tweaks it according to setOptionalFeatures() if needed.
     static void notifyInvalidation(SfxViewShell const* pThisView, tools::Rectangle const *);
     /// Notifies all views with the given type and payload.
@@ -154,6 +160,19 @@ public:
 
     /// Helper for diagnosing run-time problems
     static void dumpState(rtl::OStringBuffer &rState);
+
+    /// Notify all views of a media update.
+    /// This could be a new insertion or property modifications to an existing one.
+    static void notifyMediaUpdate(boost::property_tree::ptree& json);
+
+    /// Process the mouse event in the currently active in-place component (if any).
+    /// Returns true if the event has been processed, and no further processing is necessary.
+    static bool testInPlaceComponentMouseEventHit(SfxViewShell* pViewShell, int nType, int nX,
+                                                  int nY, int nCount, int nButtons, int nModifier,
+                                                  double fScaleX, double fScaleY,
+                                                  bool bNegativeX = false);
+
+    static VclPtr<vcl::Window> getInPlaceDocWindow(SfxViewShell* pViewShell);
 
 private:
     static int createView(SfxViewFrame* pViewFrame, ViewShellDocId docId);

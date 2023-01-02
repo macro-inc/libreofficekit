@@ -45,6 +45,7 @@
 #include <map>
 #include <math.h>
 #include <memory>
+#include <new>
 #include <numeric>
 #include <ostream>
 #include <set>
@@ -53,6 +54,7 @@
 #include <stack>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <string>
@@ -66,13 +68,13 @@
 #if PCH_LEVEL >= 2
 #endif // PCH_LEVEL >= 2
 #if PCH_LEVEL >= 3
-#include <absl/types/bad_optional_access.h>
 #include <build/build_config.h>
 #include <constants/access_permissions.h>
 #include <constants/annotation_common.h>
 #include <constants/annotation_flags.h>
 #include <constants/appearance.h>
 #include <constants/ascii.h>
+#include <constants/font_encodings.h>
 #include <constants/form_fields.h>
 #include <constants/form_flags.h>
 #include <constants/page_object.h>
@@ -94,7 +96,6 @@
 #include <core/fpdfapi/font/cpdf_cid2unicodemap.h>
 #include <core/fpdfapi/font/cpdf_cidfont.h>
 #include <core/fpdfapi/font/cpdf_cmap.h>
-#include <core/fpdfapi/font/cpdf_cmapmanager.h>
 #include <core/fpdfapi/font/cpdf_cmapparser.h>
 #include <core/fpdfapi/font/cpdf_font.h>
 #include <core/fpdfapi/font/cpdf_fontencoding.h>
@@ -127,6 +128,7 @@
 #include <core/fpdfapi/page/cpdf_iccprofile.h>
 #include <core/fpdfapi/page/cpdf_image.h>
 #include <core/fpdfapi/page/cpdf_imageobject.h>
+#include <core/fpdfapi/page/cpdf_indexedcs.h>
 #include <core/fpdfapi/page/cpdf_meshstream.h>
 #include <core/fpdfapi/page/cpdf_occontext.h>
 #include <core/fpdfapi/page/cpdf_page.h>
@@ -187,7 +189,6 @@
 #include <core/fpdfapi/render/charposlist.h>
 #include <core/fpdfapi/render/cpdf_devicebuffer.h>
 #include <core/fpdfapi/render/cpdf_docrenderdata.h>
-#include <core/fpdfapi/render/cpdf_imagecacheentry.h>
 #include <core/fpdfapi/render/cpdf_imageloader.h>
 #include <core/fpdfapi/render/cpdf_imagerenderer.h>
 #include <core/fpdfapi/render/cpdf_pagerendercache.h>
@@ -273,18 +274,18 @@
 #include <core/fxcodec/scanlinedecoder.h>
 #include <core/fxcrt/autonuller.h>
 #include <core/fxcrt/autorestorer.h>
+#include <core/fxcrt/binary_buffer.h>
 #include <core/fxcrt/bytestring.h>
-#include <core/fxcrt/cfx_binarybuf.h>
 #include <core/fxcrt/cfx_bitstream.h>
 #include <core/fxcrt/cfx_datetime.h>
-#include <core/fxcrt/cfx_fixedbufgrow.h>
 #include <core/fxcrt/cfx_memorystream.h>
-#include <core/fxcrt/cfx_readonlymemorystream.h>
+#include <core/fxcrt/cfx_read_only_span_stream.h>
+#include <core/fxcrt/cfx_read_only_string_stream.h>
+#include <core/fxcrt/cfx_read_only_vector_stream.h>
 #include <core/fxcrt/cfx_seekablestreamproxy.h>
 #include <core/fxcrt/cfx_timer.h>
 #include <core/fxcrt/cfx_utf8decoder.h>
 #include <core/fxcrt/cfx_utf8encoder.h>
-#include <core/fxcrt/cfx_widetextbuf.h>
 #include <core/fxcrt/css/cfx_css.h>
 #include <core/fxcrt/css/cfx_csscolorvalue.h>
 #include <core/fxcrt/css/cfx_csscomputedstyle.h>
@@ -306,6 +307,7 @@
 #include <core/fxcrt/css/cfx_cssvalue.h>
 #include <core/fxcrt/css/cfx_cssvaluelist.h>
 #include <core/fxcrt/css/cfx_cssvaluelistparser.h>
+#include <core/fxcrt/data_vector.h>
 #include <core/fxcrt/fileaccess_iface.h>
 #include <core/fxcrt/fx_bidi.h>
 #include <core/fxcrt/fx_codepage.h>
@@ -319,6 +321,7 @@
 #include <core/fxcrt/fx_safe_types.h>
 #include <core/fxcrt/fx_stream.h>
 #include <core/fxcrt/fx_string.h>
+#include <core/fxcrt/fx_string_wrappers.h>
 #include <core/fxcrt/fx_system.h>
 #include <core/fxcrt/fx_unicode.h>
 #include <core/fxcrt/maybe_owned.h>
@@ -326,12 +329,14 @@
 #include <core/fxcrt/pauseindicator_iface.h>
 #include <core/fxcrt/retain_ptr.h>
 #include <core/fxcrt/scoped_set_insertion.h>
+#include <core/fxcrt/small_buffer.h>
 #include <core/fxcrt/span_util.h>
 #include <core/fxcrt/stl_util.h>
 #include <core/fxcrt/string_data_template.h>
 #include <core/fxcrt/string_pool_template.h>
 #include <core/fxcrt/unowned_ptr.h>
 #include <core/fxcrt/widestring.h>
+#include <core/fxcrt/widetext_buffer.h>
 #include <core/fxcrt/xml/cfx_xmlchardata.h>
 #include <core/fxcrt/xml/cfx_xmldocument.h>
 #include <core/fxcrt/xml/cfx_xmlelement.h>
@@ -340,6 +345,7 @@
 #include <core/fxcrt/xml/cfx_xmlparser.h>
 #include <core/fxcrt/xml/cfx_xmltext.h>
 #include <core/fxge/agg/fx_agg_driver.h>
+#include <core/fxge/calculate_pitch.h>
 #include <core/fxge/cfx_cliprgn.h>
 #include <core/fxge/cfx_color.h>
 #include <core/fxge/cfx_defaultrenderdevice.h>
@@ -375,21 +381,18 @@
 #include <core/fxge/dib/fx_dib.h>
 #include <core/fxge/dib/scanlinecomposer_iface.h>
 #include <core/fxge/fontdata/chromefontdata/chromefontdata.h>
+#include <core/fxge/freetype/fx_freetype.h>
 #include <core/fxge/fx_font.h>
-#include <core/fxge/fx_freetype.h>
 #include <core/fxge/renderdevicedriver_iface.h>
 #include <core/fxge/scoped_font_transform.h>
 #include <core/fxge/systemfontinfo_iface.h>
 #include <core/fxge/text_char_pos.h>
 #include <core/fxge/text_glyph_pos.h>
-#include <fpdfsdk/cpdfsdk_actionhandler.h>
 #include <fpdfsdk/cpdfsdk_annot.h>
-#include <fpdfsdk/cpdfsdk_annothandlermgr.h>
 #include <fpdfsdk/cpdfsdk_annotiteration.h>
 #include <fpdfsdk/cpdfsdk_annotiterator.h>
 #include <fpdfsdk/cpdfsdk_appstream.h>
 #include <fpdfsdk/cpdfsdk_baannot.h>
-#include <fpdfsdk/cpdfsdk_baannothandler.h>
 #include <fpdfsdk/cpdfsdk_customaccess.h>
 #include <fpdfsdk/cpdfsdk_filewriteadapter.h>
 #include <fpdfsdk/cpdfsdk_formfillenvironment.h>
@@ -399,7 +402,6 @@
 #include <fpdfsdk/cpdfsdk_pauseadapter.h>
 #include <fpdfsdk/cpdfsdk_renderpage.h>
 #include <fpdfsdk/cpdfsdk_widget.h>
-#include <fpdfsdk/cpdfsdk_widgethandler.h>
 #include <fpdfsdk/formfiller/cffl_button.h>
 #include <fpdfsdk/formfiller/cffl_checkbox.h>
 #include <fpdfsdk/formfiller/cffl_combobox.h>
@@ -412,7 +414,6 @@
 #include <fpdfsdk/formfiller/cffl_radiobutton.h>
 #include <fpdfsdk/formfiller/cffl_textfield.h>
 #include <fpdfsdk/formfiller/cffl_textobject.h>
-#include <fpdfsdk/ipdfsdk_annothandler.h>
 #include <fpdfsdk/pwl/cpwl_button.h>
 #include <fpdfsdk/pwl/cpwl_caret.h>
 #include <fpdfsdk/pwl/cpwl_cbbutton.h>
@@ -427,7 +428,6 @@
 #include <fpdfsdk/pwl/cpwl_special_button.h>
 #include <fpdfsdk/pwl/cpwl_wnd.h>
 #include <fpdfsdk/pwl/ipwl_fillernotify.h>
-#include <fpdfsdk/pwl/ipwl_systemhandler.h>
 #include <fxjs/cjs_event_context_stub.h>
 #include <fxjs/cjs_runtimestub.h>
 #include <fxjs/ijs_event_context.h>

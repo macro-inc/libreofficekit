@@ -160,6 +160,7 @@ $(WORKDIR)/download: $(BUILDDIR)/config_$(gb_Side).mk $(SRCDIR)/download.lst $(S
 		$(call fetch_Optional,LIBLANGTAG,LIBLANGTAG_TARBALL) \
 		$(call fetch_Optional,LIBNUMBERTEXT,LIBNUMBERTEXT_TARBALL) \
 		$(call fetch_Optional,LIBPNG,LIBPNG_TARBALL) \
+		$(call fetch_Optional,LIBTIFF,LIBTIFF_TARBALL) \
 		$(call fetch_Optional,LIBTOMMATH,LIBTOMMATH_TARBALL) \
 		$(call fetch_Optional,LIBWEBP,LIBWEBP_TARBALL) \
 		$(call fetch_Optional,LIBXML2,LIBXML_TARBALL) \
@@ -248,7 +249,7 @@ $(WORKDIR)/download: $(BUILDDIR)/config_$(gb_Side).mk $(SRCDIR)/download.lst $(S
 	,$(call fetch_Download_item,https://github.com/antijingoist/opendyslexic/releases/download/v0.91.12,$(item)))
 	$(foreach item, \
 		$(call fetch_Optional,EXPAT,EXPAT_TARBALL) \
-	,$(call fetch_Download_item,https://github.com/libexpat/libexpat/releases/download/R_2_4_8,$(item)))
+	,$(call fetch_Download_item,https://github.com/libexpat/libexpat/releases/download/R_2_4_9,$(item)))
 	@mkdir -p $(dir $@) && touch $@
 	@mkdir -p $(dir $@)/Executable
 

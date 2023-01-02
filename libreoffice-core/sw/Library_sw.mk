@@ -422,7 +422,8 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/core/tox/ToxTabStopTokenHandler \
     sw/source/core/tox/ToxTextGenerator \
     sw/source/core/tox/ToxWhitespaceStripper \
-    sw/source/core/txtnode/SwGrammarContact \
+    sw/source/core/txtnode/GrammarContact \
+    sw/source/core/txtnode/OnlineAccessibilityCheck \
     sw/source/core/txtnode/attrcontentcontrol \
     sw/source/core/txtnode/atrfld \
     sw/source/core/txtnode/atrflyin \
@@ -635,6 +636,7 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/uibase/docvw/SidebarWinAcc \
     sw/source/uibase/docvw/HeaderFooterWin \
     sw/source/uibase/docvw/OutlineContentVisibilityWin \
+    sw/source/uibase/docvw/contentcontrolaliasbutton \
     sw/source/uibase/docvw/edtdd \
     sw/source/uibase/docvw/edtwin \
     sw/source/uibase/docvw/edtwin2 \
@@ -687,6 +689,7 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/uibase/shells/grfsh \
     sw/source/uibase/shells/grfshex \
     sw/source/uibase/shells/langhelper \
+    sw/source/uibase/shells/translatehelper \
     sw/source/uibase/shells/listsh \
     sw/source/uibase/shells/mediash \
     sw/source/uibase/shells/navsh \
@@ -757,7 +760,9 @@ $(eval $(call gb_Library_add_exception_objects,sw,\
     sw/source/uibase/uno/unomod \
     sw/source/uibase/uno/unomodule \
     sw/source/uibase/uno/unotxdoc \
+    sw/source/uibase/uno/loktxdoc \
     sw/source/uibase/uno/unotxvw \
+    sw/source/uibase/utlui/AccessibilityStatusBarControl \
     sw/source/uibase/utlui/attrdesc \
     sw/source/uibase/utlui/bookctrl \
     sw/source/uibase/utlui/condedit \

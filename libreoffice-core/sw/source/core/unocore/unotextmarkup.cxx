@@ -32,8 +32,7 @@
 #include <ndtxt.hxx>
 #include <SwGrammarMarkUp.hxx>
 #include <TextCursorHelper.hxx>
-
-#include <IGrammarContact.hxx>
+#include <GrammarContact.hxx>
 
 #include <com/sun/star/lang/XUnoTunnel.hpp>
 #include <com/sun/star/text/XTextRange.hpp>
@@ -160,7 +159,7 @@ void SAL_CALL SwXTextMarkup::commitStringMarkup(
     }
     else if ( nType == text::TextMarkupType::PROOFREADING || nType == text::TextMarkupType::SENTENCE )
     {
-        IGrammarContact *pGrammarContact = getGrammarContact(*m_pImpl->m_pTextNode);
+        sw::GrammarContact* pGrammarContact = sw::getGrammarContactFor(*m_pImpl->m_pTextNode);
         if( pGrammarContact )
         {
             pWList = pGrammarContact->getGrammarCheck(*m_pImpl->m_pTextNode, true);
@@ -284,7 +283,7 @@ void SAL_CALL SwXTextMarkup::commitStringMarkup(
     }
 
     if( bRepaint )
-        finishGrammarCheck(*m_pImpl->m_pTextNode);
+        sw::finishGrammarCheckFor(*m_pImpl->m_pTextNode);
 }
 
 static void lcl_commitGrammarMarkUp(
@@ -414,7 +413,7 @@ void SAL_CALL SwXTextMarkup::commitMultiTextMarkup(
     // get appropriate list to use...
     SwGrammarMarkUp* pWList = nullptr;
     bool bRepaint = false;
-    IGrammarContact *pGrammarContact = getGrammarContact(*m_pImpl->m_pTextNode);
+    sw::GrammarContact* pGrammarContact = sw::getGrammarContactFor(*m_pImpl->m_pTextNode);
     if( pGrammarContact )
     {
         pWList = pGrammarContact->getGrammarCheck(*m_pImpl->m_pTextNode, true);
@@ -459,7 +458,7 @@ void SAL_CALL SwXTextMarkup::commitMultiTextMarkup(
     }
 
     if( bRepaint )
-        finishGrammarCheck(*m_pImpl->m_pTextNode);
+        sw::finishGrammarCheckFor(*m_pImpl->m_pTextNode);
 }
 
 void SwXTextMarkup::Impl::Notify(const SfxHint& rHint)

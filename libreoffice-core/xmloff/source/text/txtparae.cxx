@@ -2360,7 +2360,8 @@ void XMLTextParagraphExport::exportTextRangeEnumeration(
             }
             else if (sType == gsSoftPageBreak)
             {
-                exportSoftPageBreak();
+                if (!bAutoStyles)
+                    exportSoftPageBreak();
             }
             else if (sType == "LineBreak")
             {
@@ -3954,6 +3955,38 @@ void XMLTextParagraphExport::ExportContentControl(
             OUStringBuffer aBuffer;
             sax::Converter::convertBool(aBuffer, bPlainText);
             GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_PLAIN_TEXT, aBuffer.makeStringAndClear());
+        }
+
+        bool bComboBox = false;
+        xPropertySet->getPropertyValue("ComboBox") >>= bComboBox;
+        if (bComboBox)
+        {
+            OUStringBuffer aBuffer;
+            sax::Converter::convertBool(aBuffer, bComboBox);
+            GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_COMBOBOX, aBuffer.makeStringAndClear());
+        }
+
+        bool bDropDown = false;
+        xPropertySet->getPropertyValue("DropDown") >>= bDropDown;
+        if (bDropDown)
+        {
+            OUStringBuffer aBuffer;
+            sax::Converter::convertBool(aBuffer, bDropDown);
+            GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_DROPDOWN, aBuffer.makeStringAndClear());
+        }
+
+        OUString aAlias;
+        xPropertySet->getPropertyValue("Alias") >>= aAlias;
+        if (!aAlias.isEmpty())
+        {
+            GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_ALIAS, aAlias);
+        }
+
+        OUString aTag;
+        xPropertySet->getPropertyValue("Tag") >>= aTag;
+        if (!aTag.isEmpty())
+        {
+            GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_TAG, aTag);
         }
     }
 

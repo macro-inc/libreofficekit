@@ -77,11 +77,12 @@ $(call gb_ExternalProject_get_state_target,cairo,build) :
 		$(if $(filter EMSCRIPTEN ANDROID iOS,$(OS)),--disable-xlib --disable-xcb,$(if $(filter TRUE,$(DISABLE_GUI)),--disable-xlib --disable-xcb,--enable-xlib --enable-xcb)) \
 		$(if $(filter iOS,$(OS)),--enable-quartz --enable-quartz-font) \
 		--disable-valgrind \
-		$(if $(filter iOS,$(OS)),--disable-ft,--enable-ft --enable-fc) \
+		--enable-ft --enable-fc \
 		--disable-svg --enable-gtk-doc=no --enable-test-surfaces=no \
 		$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
 		$(if $(filter INTEL ARM X86_64,$(CPUNAME)),ac_cv_c_bigendian=no ax_cv_c_float_words_bigendian=no) \
 		$(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________OOO) \
+		$(if $(filter MACOSX,$(OS)),FONTCONFIG_LIBS="-L$(call gb_UnpackedTarball_get_dir,fontconfig)/src/.libs -lfontconfig -L$(gb_StaticLibrary_WORKDIR) -lexpat") \
 	&& cd src && $(MAKE) \
 	)
 	$(call gb_Trace_EndRange,cairo,EXTERNAL)

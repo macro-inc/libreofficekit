@@ -71,8 +71,12 @@ $(if $(GNUPARALLEL), \
 , \
     $(call gb_Helper_print_on_error, \
     cd $(dir $@) \
+    $(if $(filter WNT,$(OS)), \
+       && PATH="$(shell cygpath -u $(SRCDIR)/solenv/bin):$$PATH" \
+    , \
+       && PATH="$(SRCDIR)/solenv/bin:$$PATH") \
     $(foreach curpkg,$(1),\
-    && $(SRCDIR)/solenv/bin/call_installer.sh $(if $(verbose),-verbose,-quiet) $(curpkg) \
+    && call_installer.sh $(if $(verbose),-verbose,-quiet) $(curpkg) \
     ),$@.log))
 endef
 
@@ -105,7 +109,9 @@ else # LIBO_TEST_INSTALL
 					$(foreach lang,$(gb_HELP_LANGS), \
 						"ooohelppack:$(lang)::-helppack:$(pkgformat):nostrip" )) \
 			, \
-				":en-US:::$(pkgformat):$(if $(filter-out archive,$(pkgformat)),strip,nostrip)" \
+				$(if $(filter MACOSX,$(OS)), \
+					":$(subst $(WHITESPACE),$(COMMA),$(strip $(instsetoo_native_WITH_LANG))):::$(pkgformat):$(if $(filter-out archive,$(pkgformat)),strip,nostrip)", \
+					":en-US:::$(pkgformat):$(if $(filter-out archive,$(pkgformat)),strip,nostrip)") \
 				$(if $(filter ODK,$(BUILD_TYPE)), \
 					":en-US:_SDK::$(pkgformat):nostrip") \
 				$(if $(and $(filter HELP,$(BUILD_TYPE)), $(filter-out MACOSX,$(OS))), \

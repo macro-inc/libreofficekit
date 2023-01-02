@@ -2922,6 +2922,28 @@ xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.
           <rng:ref name="boolean"/>
         </rng:attribute>
       </rng:optional>
+      <rng:optional>
+        <!-- default value: false -->
+        <rng:attribute name="loext:combobox">
+          <rng:ref name="boolean"/>
+        </rng:attribute>
+      </rng:optional>
+      <rng:optional>
+        <!-- default value: false -->
+        <rng:attribute name="loext:dropdown">
+          <rng:ref name="boolean"/>
+        </rng:attribute>
+      </rng:optional>
+      <rng:optional>
+        <rng:attribute name="loext:alias">
+          <rng:ref name="string"/>
+        </rng:attribute>
+      </rng:optional>
+      <rng:optional>
+        <rng:attribute name="loext:tag">
+          <rng:ref name="string"/>
+        </rng:attribute>
+      </rng:optional>
       <rng:zeroOrMore>
         <rng:element name="loext:list-item">
           <rng:attribute name="loext:display-text">

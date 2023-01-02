@@ -11,24 +11,30 @@
 #include <AccessibilityCheck.hxx>
 #include <AccessibilityIssue.hxx>
 #include <AccessibilityCheckStrings.hrc>
+#include <strings.hrc>
 #include <ndnotxt.hxx>
 #include <ndtxt.hxx>
 #include <docsh.hxx>
 #include <IDocumentDrawModelAccess.hxx>
 #include <drawdoc.hxx>
 #include <svx/svdpage.hxx>
+#include <sortedobjs.hxx>
 #include <swtable.hxx>
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/text/XTextContent.hpp>
 #include <com/sun/star/document/XDocumentPropertiesSupplier.hpp>
+#include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
 #include <unoparagraph.hxx>
+#include <unotools/intlwrapper.hxx>
 #include <tools/urlobj.hxx>
 #include <editeng/langitem.hxx>
+#include <calbck.hxx>
 #include <charatr.hxx>
 #include <svx/xfillit0.hxx>
 #include <svx/xflclit.hxx>
 #include <ftnidx.hxx>
 #include <txtftn.hxx>
+#include <txtfrm.hxx>
 #include <svl/itemiter.hxx>
 #include <o3tl/vector_utils.hxx>
 #include <svx/swframetypes.hxx>
@@ -41,6 +47,26 @@ namespace sw
 {
 namespace
 {
+SwTextNode* lclSearchNextTextNode(SwNode* pCurrent)
+{
+    SwTextNode* pTextNode = nullptr;
+
+    auto nIndex = pCurrent->GetIndex();
+    auto nCount = pCurrent->GetNodes().Count();
+
+    nIndex++; // go to next node
+
+    while (pTextNode == nullptr && nIndex < nCount)
+    {
+        auto pNode = pCurrent->GetNodes()[nIndex];
+        if (pNode->IsTextNode())
+            pTextNode = pNode->GetTextNode();
+        nIndex++;
+    }
+
+    return pTextNode;
+}
+
 std::shared_ptr<sw::AccessibilityIssue>
 lclAddIssue(sfx::AccessibilityIssueCollection& rIssueCollection, OUString const& rText,
             sfx::AccessibilityIssueID eIssue = sfx::AccessibilityIssueID::UNSPECIFIED)
@@ -50,19 +76,6 @@ lclAddIssue(sfx::AccessibilityIssueCollection& rIssueCollection, OUString const&
     rIssueCollection.getIssues().push_back(pIssue);
     return pIssue;
 }
-
-class BaseCheck
-{
-protected:
-    sfx::AccessibilityIssueCollection& m_rIssueCollection;
-
-public:
-    BaseCheck(sfx::AccessibilityIssueCollection& rIssueCollection)
-        : m_rIssueCollection(rIssueCollection)
-    {
-    }
-    virtual ~BaseCheck() {}
-};
 
 class NodeCheck : public BaseCheck
 {
@@ -210,11 +223,53 @@ public:
     }
 };
 
+class TableFormattingCheck : public NodeCheck
+{
+private:
+    void checkTableNode(SwTableNode* pTableNode)
+    {
+        if (!pTableNode)
+            return;
+
+        const SwTable& rTable = pTableNode->GetTable();
+        if (!rTable.IsTableComplex())
+        {
+            size_t nEmptyBoxes = 0;
+            size_t nBoxCount = 0;
+            for (const SwTableLine* pTableLine : rTable.GetTabLines())
+            {
+                nBoxCount += pTableLine->GetTabBoxes().size();
+                for (const SwTableBox* pBox : pTableLine->GetTabBoxes())
+                    if (pBox->IsEmpty())
+                        ++nEmptyBoxes;
+            }
+            // If more than half of the boxes are empty we can assume that it is used for formatting
+            if (nEmptyBoxes > nBoxCount / 2)
+                lclAddIssue(m_rIssueCollection, SwResId(STR_TABLE_FORMATTING),
+                            sfx::AccessibilityIssueID::TABLE_FORMATTING);
+        }
+    }
+
+public:
+    TableFormattingCheck(sfx::AccessibilityIssueCollection& rIssueCollection)
+        : NodeCheck(rIssueCollection)
+    {
+    }
+
+    void check(SwNode* pCurrent) override
+    {
+        if (pCurrent->GetNodeType() & SwNodeType::Table)
+        {
+            SwTableNode* pTableNode = pCurrent->GetTableNode();
+            if (pTableNode)
+                checkTableNode(pTableNode);
+        }
+    }
+};
+
 class NumberingCheck : public NodeCheck
 {
 private:
-    SwTextNode* m_pPreviousTextNode;
-
     const std::vector<std::pair<OUString, OUString>> m_aNumberingCombinations{
         { "1.", "2." }, { "(1)", "(2)" }, { "1)", "2)" },   { "a.", "b." }, { "(a)", "(b)" },
         { "a)", "b)" }, { "A.", "B." },   { "(A)", "(B)" }, { "A)", "B)" }
@@ -223,7 +278,6 @@ private:
 public:
     NumberingCheck(sfx::AccessibilityIssueCollection& rIssueCollection)
         : NodeCheck(rIssueCollection)
-        , m_pPreviousTextNode(nullptr)
     {
     }
 
@@ -232,28 +286,32 @@ public:
         if (!pCurrent->IsTextNode())
             return;
 
-        if (m_pPreviousTextNode)
+        SwTextNode* pCurrentTextNode = pCurrent->GetTextNode();
+        SwTextNode* pNextTextNode = lclSearchNextTextNode(pCurrent);
+
+        if (!pNextTextNode)
+            return;
+
+        for (auto& rPair : m_aNumberingCombinations)
         {
-            for (auto& rPair : m_aNumberingCombinations)
+            if (pCurrentTextNode->GetText().startsWith(rPair.first)
+                && pNextTextNode->GetText().startsWith(rPair.second))
             {
-                if (pCurrent->GetTextNode()->GetText().startsWith(rPair.second)
-                    && m_pPreviousTextNode->GetText().startsWith(rPair.first))
-                {
-                    OUString sNumbering = rPair.first + " " + rPair.second + "...";
-                    OUString sIssueText
-                        = SwResId(STR_FAKE_NUMBERING).replaceAll("%NUMBERING%", sNumbering);
-                    lclAddIssue(m_rIssueCollection, sIssueText);
-                }
+                OUString sNumbering = rPair.first + " " + rPair.second + "...";
+                OUString sIssueText
+                    = SwResId(STR_FAKE_NUMBERING).replaceAll("%NUMBERING%", sNumbering);
+                lclAddIssue(m_rIssueCollection, sIssueText,
+                            sfx::AccessibilityIssueID::MANUAL_NUMBERING);
             }
         }
-        m_pPreviousTextNode = pCurrent->GetTextNode();
     }
 };
 
 class HyperlinkCheck : public NodeCheck
 {
 private:
-    void checkTextRange(uno::Reference<text::XTextRange> const& xTextRange)
+    void checkTextRange(uno::Reference<text::XTextRange> const& xTextRange, SwTextNode* pTextNode,
+                        sal_Int32 nStart)
     {
         uno::Reference<beans::XPropertySet> xProperties(xTextRange, uno::UNO_QUERY);
         if (!xProperties->getPropertySetInfo()->hasPropertyByName("HyperLinkURL"))
@@ -268,7 +326,19 @@ private:
             {
                 OUString sIssueText
                     = SwResId(STR_HYPERLINK_TEXT_IS_LINK).replaceFirst("%LINK%", sHyperlink);
-                lclAddIssue(m_rIssueCollection, sIssueText);
+                lclAddIssue(m_rIssueCollection, sIssueText,
+                            sfx::AccessibilityIssueID::HYPERLINK_IS_TEXT);
+            }
+            else if (sText.getLength() <= 5)
+            {
+                auto pIssue = lclAddIssue(m_rIssueCollection, SwResId(STR_HYPERLINK_TEXT_IS_SHORT),
+                                          sfx::AccessibilityIssueID::HYPERLINK_SHORT);
+                pIssue->setIssueObject(IssueObject::TEXT);
+                pIssue->setNode(pTextNode);
+                SwDoc& rDocument = pTextNode->GetDoc();
+                pIssue->setDoc(rDocument);
+                pIssue->setStart(nStart);
+                pIssue->setEnd(nStart + sText.getLength());
             }
         }
     }
@@ -292,12 +362,14 @@ public:
 
         uno::Reference<container::XEnumerationAccess> xRunEnumAccess(xParagraph, uno::UNO_QUERY);
         uno::Reference<container::XEnumeration> xRunEnum = xRunEnumAccess->createEnumeration();
+        sal_Int32 nStart = 0;
         while (xRunEnum->hasMoreElements())
         {
             uno::Reference<text::XTextRange> xRun(xRunEnum->nextElement(), uno::UNO_QUERY);
             if (xRun.is())
             {
-                checkTextRange(xRun);
+                checkTextRange(xRun, pTextNode, nStart);
+                nStart += xRun->getString().getLength();
             }
         }
     }
@@ -340,8 +412,8 @@ class TextContrastCheck : public NodeCheck
 {
 private:
     void checkTextRange(uno::Reference<text::XTextRange> const& xTextRange,
-                        uno::Reference<text::XTextContent> const& xParagraph,
-                        const SwTextNode* pTextNode)
+                        uno::Reference<text::XTextContent> const& xParagraph, SwTextNode* pTextNode,
+                        sal_Int32 nTextStart)
     {
         Color nParaBackColor(COL_AUTO);
         uno::Reference<beans::XPropertySet> xParagraphProperties(xParagraph, uno::UNO_QUERY);
@@ -362,9 +434,6 @@ private:
             SAL_WARN("sw.a11y", "CharColor void");
             return;
         }
-        Color aForegroundColor(ColorTransparency, nCharColor);
-        if (aForegroundColor == COL_AUTO)
-            return;
 
         const SwPageDesc* pPageDescription = pTextNode->FindPageDesc();
         const SwFrameFormat& rPageFormat = pPageDescription->GetMaster();
@@ -395,6 +464,22 @@ private:
         // If not character background color, try paragraph background color
         if (aBackgroundColor == COL_AUTO)
             aBackgroundColor = nParaBackColor;
+        else
+        {
+            auto pIssue
+                = lclAddIssue(m_rIssueCollection, SwResId(STR_TEXT_FORMATTING_CONVEYS_MEANING),
+                              sfx::AccessibilityIssueID::TEXT_FORMATTING);
+            pIssue->setIssueObject(IssueObject::TEXT);
+            pIssue->setNode(pTextNode);
+            SwDoc& rDocument = pTextNode->GetDoc();
+            pIssue->setDoc(rDocument);
+            pIssue->setStart(nTextStart);
+            pIssue->setEnd(nTextStart + xTextRange->getString().getLength());
+        }
+
+        Color aForegroundColor(ColorTransparency, nCharColor);
+        if (aForegroundColor == COL_AUTO)
+            return;
 
         // If not paragraph background color, try page color
         if (aBackgroundColor == COL_AUTO)
@@ -430,18 +515,21 @@ public:
 
         uno::Reference<container::XEnumerationAccess> xRunEnumAccess(xParagraph, uno::UNO_QUERY);
         uno::Reference<container::XEnumeration> xRunEnum = xRunEnumAccess->createEnumeration();
+        sal_Int32 nStart = 0;
         while (xRunEnum->hasMoreElements())
         {
             uno::Reference<text::XTextRange> xRun(xRunEnum->nextElement(), uno::UNO_QUERY);
             if (xRun.is())
-                checkTextRange(xRun, xParagraph, pTextNode);
+            {
+                checkTextRange(xRun, xParagraph, pTextNode, nStart);
+                nStart += xRun->getString().getLength();
+            }
         }
     }
 };
 
 class TextFormattingCheck : public NodeCheck
 {
-private:
 public:
     TextFormattingCheck(sfx::AccessibilityIssueCollection& rIssueCollection)
         : NodeCheck(rIssueCollection)
@@ -533,6 +621,7 @@ public:
         pIssue->setStart(pTextAttr->GetStart());
         pIssue->setEnd(pTextAttr->GetAnyEnd());
     }
+
     void check(SwNode* pCurrent) override
     {
         if (!pCurrent->IsTextNode())
@@ -549,6 +638,334 @@ public:
                 {
                     checkAutoFormat(pTextNode, pTextAttr);
                 }
+            }
+        }
+        else if (pTextNode->HasSwAttrSet())
+        {
+            // Paragraph doesn't have hints but the entire paragraph might have char attributes
+            auto& aSwAttrSet = pTextNode->GetSwAttrSet();
+            auto nParagraphLength = pTextNode->GetText().getLength();
+            if (nParagraphLength == 0)
+                return;
+            if (aSwAttrSet.HasItem(RES_CHRATR_WEIGHT) || aSwAttrSet.HasItem(RES_CHRATR_CJK_WEIGHT)
+                || aSwAttrSet.HasItem(RES_CHRATR_CTL_WEIGHT)
+                || aSwAttrSet.HasItem(RES_CHRATR_POSTURE)
+                || aSwAttrSet.HasItem(RES_CHRATR_CJK_POSTURE)
+                || aSwAttrSet.HasItem(RES_CHRATR_CTL_POSTURE)
+                || aSwAttrSet.HasItem(RES_CHRATR_SHADOWED) || aSwAttrSet.HasItem(RES_CHRATR_COLOR)
+                || aSwAttrSet.HasItem(RES_CHRATR_EMPHASIS_MARK)
+                || aSwAttrSet.HasItem(RES_CHRATR_UNDERLINE)
+                || aSwAttrSet.HasItem(RES_CHRATR_OVERLINE)
+                || aSwAttrSet.HasItem(RES_CHRATR_CROSSEDOUT)
+                || aSwAttrSet.HasItem(RES_CHRATR_RELIEF) || aSwAttrSet.HasItem(RES_CHRATR_CONTOUR))
+            {
+                auto pIssue
+                    = lclAddIssue(m_rIssueCollection, SwResId(STR_TEXT_FORMATTING_CONVEYS_MEANING),
+                                  sfx::AccessibilityIssueID::TEXT_FORMATTING);
+                pIssue->setIssueObject(IssueObject::TEXT);
+                pIssue->setNode(pTextNode);
+                SwDoc& rDocument = pTextNode->GetDoc();
+                pIssue->setDoc(rDocument);
+                pIssue->setEnd(nParagraphLength);
+            }
+        }
+    }
+};
+
+class NewlineSpacingCheck : public NodeCheck
+{
+private:
+    static SwTextNode* getNextTextNode(SwNode* pCurrent)
+    {
+        SwTextNode* pTextNode = nullptr;
+
+        auto nIndex = pCurrent->GetIndex();
+        auto nCount = pCurrent->GetNodes().Count();
+
+        nIndex++; // go to next node
+
+        while (pTextNode == nullptr && nIndex < nCount)
+        {
+            auto pNode = pCurrent->GetNodes()[nIndex];
+            if (pNode->IsTextNode())
+                pTextNode = pNode->GetTextNode();
+            nIndex++;
+        }
+
+        return pTextNode;
+    }
+
+public:
+    NewlineSpacingCheck(sfx::AccessibilityIssueCollection& rIssueCollection)
+        : NodeCheck(rIssueCollection)
+    {
+    }
+    void check(SwNode* pCurrent) override
+    {
+        if (!pCurrent->IsTextNode())
+            return;
+
+        // Don't count empty table box text nodes
+        if (pCurrent->GetTableBox())
+            return;
+
+        SwTextNode* pTextNode = pCurrent->GetTextNode();
+        auto nParagraphLength = pTextNode->GetText().getLength();
+        if (nParagraphLength == 0)
+        {
+            SwTextNode* pNextTextNode = getNextTextNode(pCurrent);
+            if (!pNextTextNode)
+                return;
+            if (pNextTextNode->GetText().getLength() == 0)
+            {
+                auto pIssue = lclAddIssue(m_rIssueCollection, SwResId(STR_AVOID_NEWLINES_SPACE),
+                                          sfx::AccessibilityIssueID::TEXT_FORMATTING);
+                pIssue->setIssueObject(IssueObject::TEXT);
+                pIssue->setNode(pNextTextNode);
+                SwDoc& rDocument = pNextTextNode->GetDoc();
+                pIssue->setDoc(rDocument);
+            }
+        }
+        else
+        {
+            // Check for excess lines inside this paragraph
+            const OUString& sParagraphText = pTextNode->GetText();
+            int nLineCount = 0;
+            for (sal_Int32 i = 0; i < nParagraphLength; i++)
+            {
+                auto aChar = sParagraphText[i];
+                if (aChar == '\n')
+                {
+                    nLineCount++;
+                    // Looking for 2 newline characters and above as one can be part of the line
+                    // break after a sentence
+                    if (nLineCount > 2)
+                    {
+                        auto pIssue
+                            = lclAddIssue(m_rIssueCollection, SwResId(STR_AVOID_NEWLINES_SPACE),
+                                          sfx::AccessibilityIssueID::TEXT_FORMATTING);
+                        pIssue->setIssueObject(IssueObject::TEXT);
+                        pIssue->setNode(pTextNode);
+                        SwDoc& rDocument = pTextNode->GetDoc();
+                        pIssue->setDoc(rDocument);
+                        pIssue->setStart(i);
+                        pIssue->setEnd(i);
+                    }
+                }
+                // Don't count carriage return as normal character
+                else if (aChar != '\r')
+                {
+                    nLineCount = 0;
+                }
+            }
+        }
+    }
+};
+
+class SpaceSpacingCheck : public NodeCheck
+{
+public:
+    SpaceSpacingCheck(sfx::AccessibilityIssueCollection& rIssueCollection)
+        : NodeCheck(rIssueCollection)
+    {
+    }
+    void check(SwNode* pCurrent) override
+    {
+        if (!pCurrent->IsTextNode())
+            return;
+        SwTextNode* pTextNode = pCurrent->GetTextNode();
+        auto nParagraphLength = pTextNode->GetText().getLength();
+        const OUString& sParagraphText = pTextNode->GetText();
+        sal_Int32 nSpaceCount = 0;
+        sal_Int32 nSpaceStart = 0;
+        sal_Int32 nTabCount = 0;
+        bool bNonSpaceFound = false;
+        bool bPreviousWasChar = false;
+        for (sal_Int32 i = 0; i < nParagraphLength; i++)
+        {
+            switch (sParagraphText[i])
+            {
+                case ' ':
+                {
+                    if (bNonSpaceFound)
+                    {
+                        nSpaceCount++;
+                        if (nSpaceCount == 2)
+                            nSpaceStart = i;
+                    }
+                    break;
+                }
+                case '\t':
+                {
+                    if (bPreviousWasChar)
+                    {
+                        ++nTabCount;
+                        bPreviousWasChar = false;
+                        if (nTabCount == 2)
+                        {
+                            auto pIssue = lclAddIssue(m_rIssueCollection,
+                                                      SwResId(STR_AVOID_TABS_FORMATTING),
+                                                      sfx::AccessibilityIssueID::TEXT_FORMATTING);
+                            pIssue->setIssueObject(IssueObject::TEXT);
+                            pIssue->setNode(pTextNode);
+                            SwDoc& rDocument = pTextNode->GetDoc();
+                            pIssue->setDoc(rDocument);
+                            pIssue->setStart(0);
+                            pIssue->setEnd(nParagraphLength);
+                        }
+                    }
+                    break;
+                }
+                default:
+                {
+                    if (nSpaceCount >= 2)
+                    {
+                        auto pIssue
+                            = lclAddIssue(m_rIssueCollection, SwResId(STR_AVOID_SPACES_SPACE),
+                                          sfx::AccessibilityIssueID::TEXT_FORMATTING);
+                        pIssue->setIssueObject(IssueObject::TEXT);
+                        pIssue->setNode(pTextNode);
+                        SwDoc& rDocument = pTextNode->GetDoc();
+                        pIssue->setDoc(rDocument);
+                        pIssue->setStart(nSpaceStart);
+                        pIssue->setEnd(nSpaceStart + nSpaceCount - 1);
+                    }
+                    bNonSpaceFound = true;
+                    bPreviousWasChar = true;
+                    nSpaceCount = 0;
+                    break;
+                }
+            }
+        }
+    }
+};
+
+class FakeFootnoteCheck : public NodeCheck
+{
+private:
+    void checkAutoFormat(SwTextNode* pTextNode, const SwTextAttr* pTextAttr)
+    {
+        const SwFormatAutoFormat& rAutoFormat = pTextAttr->GetAutoFormat();
+        SfxItemIter aItemIter(*rAutoFormat.GetStyleHandle());
+        const SfxPoolItem* pItem = aItemIter.GetCurItem();
+        while (pItem)
+        {
+            if (pItem->Which() == RES_CHRATR_ESCAPEMENT)
+            {
+                auto pEscapementItem = static_cast<const SvxEscapementItem*>(pItem);
+                if (pEscapementItem->GetEscapement() == SvxEscapement::Superscript
+                    && pTextAttr->GetStart() == 0 && pTextAttr->GetAnyEnd() == 1)
+                {
+                    auto pIssue = lclAddIssue(m_rIssueCollection, SwResId(STR_AVOID_FAKE_FOOTNOTES),
+                                              sfx::AccessibilityIssueID::FAKE_FOOTNOTE);
+                    pIssue->setIssueObject(IssueObject::TEXT);
+                    pIssue->setNode(pTextNode);
+                    SwDoc& rDocument = pTextNode->GetDoc();
+                    pIssue->setDoc(rDocument);
+                    pIssue->setStart(0);
+                    pIssue->setEnd(pTextNode->GetText().getLength());
+                    break;
+                }
+            }
+            pItem = aItemIter.NextItem();
+        }
+    }
+
+public:
+    FakeFootnoteCheck(sfx::AccessibilityIssueCollection& rIssueCollection)
+        : NodeCheck(rIssueCollection)
+    {
+    }
+    void check(SwNode* pCurrent) override
+    {
+        if (!pCurrent->IsTextNode())
+            return;
+        SwTextNode* pTextNode = pCurrent->GetTextNode();
+        if (pTextNode->GetText().getLength() == 0)
+            return;
+
+        if (pTextNode->GetText()[0] == '*')
+        {
+            auto pIssue = lclAddIssue(m_rIssueCollection, SwResId(STR_AVOID_FAKE_FOOTNOTES),
+                                      sfx::AccessibilityIssueID::FAKE_FOOTNOTE);
+            pIssue->setIssueObject(IssueObject::TEXT);
+            pIssue->setNode(pTextNode);
+            SwDoc& rDocument = pTextNode->GetDoc();
+            pIssue->setDoc(rDocument);
+            pIssue->setStart(0);
+            pIssue->setEnd(pTextNode->GetText().getLength());
+        }
+        else if (pTextNode->HasHints())
+        {
+            SwpHints& rHints = pTextNode->GetSwpHints();
+            for (size_t i = 0; i < rHints.Count(); ++i)
+            {
+                const SwTextAttr* pTextAttr = rHints.Get(i);
+                if (pTextAttr->Which() == RES_TXTATR_AUTOFMT)
+                {
+                    checkAutoFormat(pTextNode, pTextAttr);
+                }
+            }
+        }
+    }
+};
+
+class FakeCaptionCheck : public NodeCheck
+{
+public:
+    FakeCaptionCheck(sfx::AccessibilityIssueCollection& rIssueCollection)
+        : NodeCheck(rIssueCollection)
+    {
+    }
+    void check(SwNode* pCurrent) override
+    {
+        if (!pCurrent->IsTextNode())
+            return;
+
+        SwTextNode* pTextNode = pCurrent->GetTextNode();
+        const OUString& sText = pTextNode->GetText();
+
+        if (sText.getLength() == 0)
+            return;
+
+        // Check if it's a real caption
+        const SwNode* aStartFly = pCurrent->FindFlyStartNode();
+        if (aStartFly
+            && aStartFly->GetFlyFormat()->GetAnchor().GetAnchorId() != RndStdIds::FLY_AS_CHAR)
+            return;
+
+        auto aIter = SwIterator<SwTextFrame, SwTextNode, sw::IteratorMode::UnwrapMulti>(*pTextNode);
+        auto nCount = 0;
+        for (auto aTextFrame = aIter.First(); aTextFrame; aTextFrame = aIter.Next())
+        {
+            auto aObjects = aTextFrame->GetDrawObjs();
+            if (aObjects)
+                nCount += aObjects->size();
+
+            if (nCount > 1)
+                return;
+        }
+
+        // Check that there's exactly 1 image anchored in this node
+        if (nCount == 1)
+        {
+            OString sTemp;
+            sText.convertToString(&sTemp, RTL_TEXTENCODING_ASCII_US, 0);
+            if (sText.startsWith(SwResId(STR_POOLCOLL_LABEL))
+                || sText.startsWith(SwResId(STR_POOLCOLL_LABEL_ABB))
+                || sText.startsWith(SwResId(STR_POOLCOLL_LABEL_TABLE))
+                || sText.startsWith(SwResId(STR_POOLCOLL_LABEL_FRAME))
+                || sText.startsWith(SwResId(STR_POOLCOLL_LABEL_DRAWING))
+                || sText.startsWith(SwResId(STR_POOLCOLL_LABEL_FIGURE)))
+            {
+                auto pIssue = lclAddIssue(m_rIssueCollection, SwResId(STR_AVOID_FAKE_CAPTIONS),
+                                          sfx::AccessibilityIssueID::FAKE_CAPTION);
+                pIssue->setIssueObject(IssueObject::TEXT);
+                pIssue->setNode(pTextNode);
+                SwDoc& rDocument = pTextNode->GetDoc();
+                pIssue->setDoc(rDocument);
+                pIssue->setStart(0);
+                pIssue->setEnd(sText.getLength());
             }
         }
     }
@@ -869,6 +1286,46 @@ public:
     }
 };
 
+class BackgroundImageCheck : public DocumentCheck
+{
+public:
+    BackgroundImageCheck(sfx::AccessibilityIssueCollection& rIssueCollection)
+        : DocumentCheck(rIssueCollection)
+    {
+    }
+    void check(SwDoc* pDoc) override
+    {
+        uno::Reference<lang::XComponent> xDoc = pDoc->GetDocShell()->GetBaseModel();
+        uno::Reference<style::XStyleFamiliesSupplier> xStyleFamiliesSupplier(xDoc, uno::UNO_QUERY);
+        if (!xStyleFamiliesSupplier.is())
+            return;
+        uno::Reference<container::XNameAccess> xStyleFamilies
+            = xStyleFamiliesSupplier->getStyleFamilies();
+        uno::Reference<container::XNameAccess> xStyleFamily(xStyleFamilies->getByName("PageStyles"),
+                                                            uno::UNO_QUERY);
+        if (!xStyleFamily.is())
+            return;
+        const uno::Sequence<OUString>& xStyleFamilyNames = xStyleFamily->getElementNames();
+        for (const OUString& rStyleFamilyName : xStyleFamilyNames)
+        {
+            uno::Reference<beans::XPropertySet> xPropertySet(
+                xStyleFamily->getByName(rStyleFamilyName), uno::UNO_QUERY);
+            if (!xPropertySet.is())
+                continue;
+            auto aFillStyleContainer = xPropertySet->getPropertyValue("FillStyle");
+            if (aFillStyleContainer.has<drawing::FillStyle>())
+            {
+                drawing::FillStyle aFillStyle = aFillStyleContainer.get<drawing::FillStyle>();
+                if (aFillStyle == drawing::FillStyle_BITMAP)
+                {
+                    lclAddIssue(m_rIssueCollection, SwResId(STR_AVOID_BACKGROUND_IMAGES),
+                                sfx::AccessibilityIssueID::DOCUMENT_BACKGROUND);
+                }
+            }
+        }
+    }
+};
+
 } // end anonymous namespace
 
 // Check Shapes, TextBox
@@ -906,34 +1363,66 @@ void AccessibilityCheck::checkObject(SdrObject* pObject)
     }
 }
 
+void AccessibilityCheck::init()
+{
+    if (m_aDocumentChecks.empty())
+    {
+        m_aDocumentChecks.emplace_back(new DocumentDefaultLanguageCheck(m_aIssueCollection));
+        m_aDocumentChecks.emplace_back(new DocumentTitleCheck(m_aIssueCollection));
+        m_aDocumentChecks.emplace_back(new FootnoteEndnoteCheck(m_aIssueCollection));
+        m_aDocumentChecks.emplace_back(new BackgroundImageCheck(m_aIssueCollection));
+    }
+
+    if (m_aNodeChecks.empty())
+    {
+        m_aNodeChecks.emplace_back(new NoTextNodeAltTextCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new TableNodeMergeSplitCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new TableFormattingCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new NumberingCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new HyperlinkCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new TextContrastCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new BlinkingTextCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new HeaderCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new TextFormattingCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new NonInteractiveFormCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new FloatingTextCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new TableHeadingCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new HeadingOrderCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new NewlineSpacingCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new SpaceSpacingCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new FakeFootnoteCheck(m_aIssueCollection));
+        m_aNodeChecks.emplace_back(new FakeCaptionCheck(m_aIssueCollection));
+    }
+}
+
+void AccessibilityCheck::checkNode(SwNode* pNode)
+{
+    if (m_pDoc == nullptr || pNode == nullptr)
+        return;
+
+    init();
+
+    for (std::shared_ptr<BaseCheck>& rpNodeCheck : m_aNodeChecks)
+    {
+        auto pNodeCheck = dynamic_cast<NodeCheck*>(rpNodeCheck.get());
+        if (pNodeCheck)
+            pNodeCheck->check(pNode);
+    }
+}
+
 void AccessibilityCheck::check()
 {
     if (m_pDoc == nullptr)
         return;
 
-    std::vector<std::unique_ptr<DocumentCheck>> aDocumentChecks;
-    aDocumentChecks.push_back(std::make_unique<DocumentDefaultLanguageCheck>(m_aIssueCollection));
-    aDocumentChecks.push_back(std::make_unique<DocumentTitleCheck>(m_aIssueCollection));
-    aDocumentChecks.push_back(std::make_unique<FootnoteEndnoteCheck>(m_aIssueCollection));
+    init();
 
-    for (std::unique_ptr<DocumentCheck>& rpDocumentCheck : aDocumentChecks)
+    for (std::shared_ptr<BaseCheck>& rpDocumentCheck : m_aDocumentChecks)
     {
-        rpDocumentCheck->check(m_pDoc);
+        auto pDocumentCheck = dynamic_cast<DocumentCheck*>(rpDocumentCheck.get());
+        if (pDocumentCheck)
+            pDocumentCheck->check(m_pDoc);
     }
-
-    std::vector<std::unique_ptr<NodeCheck>> aNodeChecks;
-    aNodeChecks.push_back(std::make_unique<NoTextNodeAltTextCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<TableNodeMergeSplitCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<NumberingCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<HyperlinkCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<TextContrastCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<BlinkingTextCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<HeaderCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<TextFormattingCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<NonInteractiveFormCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<FloatingTextCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<TableHeadingCheck>(m_aIssueCollection));
-    aNodeChecks.push_back(std::make_unique<HeadingOrderCheck>(m_aIssueCollection));
 
     auto const& pNodes = m_pDoc->GetNodes();
     SwNode* pNode = nullptr;
@@ -942,9 +1431,11 @@ void AccessibilityCheck::check()
         pNode = pNodes[n];
         if (pNode)
         {
-            for (std::unique_ptr<NodeCheck>& rpNodeCheck : aNodeChecks)
+            for (std::shared_ptr<BaseCheck>& rpNodeCheck : m_aNodeChecks)
             {
-                rpNodeCheck->check(pNode);
+                auto pNodeCheck = dynamic_cast<NodeCheck*>(rpNodeCheck.get());
+                if (pNodeCheck)
+                    pNodeCheck->check(pNode);
             }
         }
     }

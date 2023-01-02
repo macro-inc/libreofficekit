@@ -54,8 +54,13 @@ class LanguageToolGrammarChecker
     o3tl::lru_map<OUString, Sequence<SingleProofreadingError>> mCachedResults;
     LanguageToolGrammarChecker(const LanguageToolGrammarChecker&) = delete;
     LanguageToolGrammarChecker& operator=(const LanguageToolGrammarChecker&) = delete;
+    static void parseDudenResponse(ProofreadingResult& rResult,
+                                   std::string_view aJSONBody);
     static void parseProofreadingJSONResponse(ProofreadingResult& rResult,
                                               std::string_view aJSONBody);
+    static std::string makeDudenHttpRequest(std::string_view aURL, HTTP_METHOD method,
+                                            const OString& aPostData,
+                                            tools::Long& nStatusCode);
     static std::string makeHttpRequest(std::string_view aURL, HTTP_METHOD method,
                                        const OString& aPostData, tools::Long& nStatusCode);
 

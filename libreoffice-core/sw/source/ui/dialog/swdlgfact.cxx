@@ -90,6 +90,7 @@
 #include <uiborder.hxx>
 #include <mmresultdialogs.hxx>
 #include <formatlinebreak.hxx>
+#include <translatelangselect.hxx>
 
 using namespace ::com::sun::star;
 using namespace css::frame;
@@ -223,6 +224,11 @@ short AbstractSwFieldDlg_Impl::Execute()
 short AbstractSwRenameXNamedDlg_Impl::Execute()
 {
     return m_xDlg->run();
+}
+
+bool AbstractSwContentControlListItemDlg_Impl::StartExecuteAsync(VclAbstractDialog::AsyncContext& rCtx)
+{
+    return weld::DialogController::runAsync(m_xDlg, rCtx.maEndDialogFn);
 }
 
 short AbstractSwContentControlListItemDlg_Impl::Execute()
@@ -827,6 +833,12 @@ sal_uInt16 AbstractMailMergeWizard_Impl::GetRestartPage() const
     return m_xDlg->GetRestartPage();
 }
 
+std::optional<SwLanguageListItem> AbstractSwTranslateLangSelectDlg_Impl::GetSelectedLanguage()
+{
+    SwTranslateLangSelectDlg* pDlg = dynamic_cast<SwTranslateLangSelectDlg*>(m_xDlg.get());
+    return pDlg->GetSelectedLanguage();
+}
+
 VclPtr<AbstractSwInsertAbstractDlg> SwAbstractDialogFactory_Impl::CreateSwInsertAbstractDlg(weld::Window* pParent)
 {
     return VclPtr<AbstractSwInsertAbstractDlg_Impl>::Create(std::make_unique<SwInsertAbstractDlg>(pParent));
@@ -878,12 +890,17 @@ SwAbstractDialogFactory_Impl::CreateSwContentControlListItemDlg(weld::Window* pP
                                                                 SwContentControlListItem& rItem)
 {
     return VclPtr<AbstractSwContentControlListItemDlg_Impl>::Create(
-        std::make_unique<SwContentControlListItemDlg>(pParent, rItem));
+        std::make_shared<SwContentControlListItemDlg>(pParent, rItem));
 }
 
 std::shared_ptr<AbstractSwBreakDlg> SwAbstractDialogFactory_Impl::CreateSwBreakDlg(weld::Window* pParent, SwWrtShell &rSh)
 {
     return std::make_shared<AbstractSwBreakDlg_Impl>(std::make_unique<SwBreakDlg>(pParent, rSh));
+}
+
+std::shared_ptr<AbstractSwTranslateLangSelectDlg> SwAbstractDialogFactory_Impl::CreateSwTranslateLangSelectDlg(weld::Window* pParent, SwWrtShell &rSh)
+{
+    return std::make_shared<AbstractSwTranslateLangSelectDlg_Impl>(std::make_unique<SwTranslateLangSelectDlg>(pParent, rSh));
 }
 
 VclPtr<VclAbstractDialog> SwAbstractDialogFactory_Impl::CreateSwChangeDBDlg(SwView& rVw)

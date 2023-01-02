@@ -1,0 +1,31 @@
+name: Build and release for macOS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check_version:
+    uses: ./.github/workflows/check-version-tag.yml
+  build:
+    needs: [check_version]
+    if: ${{ needs.check_version.outputs.should_run != 'false' }}
+    runs-on: ubuntu-latest
+    name: Queue macOS Build Buddy
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: x86_64
+            userhost: MACOS_BUILD_BUDDY_USERHOST_INTEL
+            key: MACOS_BUILD_BUDDY_KEY_INTEL
+          - name: arm64
+            userhost: MACOS_BUILD_BUDDY_USERHOST_M1
+            key: MACOS_BUILD_BUDDY_KEY_M1
+    steps:
+      - name: Queue macOS Build Buddy
+        run: |
+          echo '${{ secrets[matrix.key] }}' > buddykey
+          chmod 500 buddykey
+          ssh -o LogLevel=ERROR -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i buddykey ${{ secrets[matrix.userhost] }} ${{ needs.check_version.outputs.version }} libreofficekit $GITHUB_SHA

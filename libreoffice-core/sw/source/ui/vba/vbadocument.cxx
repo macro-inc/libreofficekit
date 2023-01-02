@@ -21,7 +21,9 @@
 #include <sal/log.hxx>
 
 #include "vbafilterpropsfromformat.hxx"
+#include "vbacontentcontrols.hxx"
 #include "vbadocument.hxx"
+#include "vbaformfields.hxx"
 #include "vbarange.hxx"
 #include "vbarangehelper.hxx"
 #include "vbadocumentproperties.hxx"
@@ -201,6 +203,32 @@ SwVbaDocument::Bookmarks( const uno::Any& rIndex )
     return xBookmarksVba->Item( rIndex, uno::Any() );
 }
 
+uno::Any SAL_CALL SwVbaDocument::ContentControls(const uno::Any& index)
+{
+    uno::Reference<XCollection> xContentControls(
+        new SwVbaContentControls(this, mxContext, mxTextDocument, "", ""));
+    if (index.hasValue())
+        return xContentControls->Item(index, uno::Any());
+
+    return uno::Any(xContentControls);
+}
+
+uno::Any SAL_CALL SwVbaDocument::SelectContentControlsByTag(const uno::Any& index)
+{
+    OUString sTag;
+    index >>= sTag;
+    return uno::Any(uno::Reference<XCollection>(
+                        new SwVbaContentControls(this, mxContext, mxTextDocument, sTag, "")));
+}
+
+uno::Any SAL_CALL SwVbaDocument::SelectContentControlsByTitle(const uno::Any& index)
+{
+    OUString sTitle;
+    index >>= sTitle;
+    return uno::Any(uno::Reference<XCollection>(
+                        new SwVbaContentControls(this, mxContext, mxTextDocument, "", sTitle)));
+}
+
 uno::Any SAL_CALL
 SwVbaDocument::Variables( const uno::Any& rIndex )
 {
@@ -273,11 +301,12 @@ SwVbaDocument::TablesOfContents( const uno::Any& index )
     return uno::makeAny( xCol );
 }
 
-uno::Any SAL_CALL
-SwVbaDocument::FormFields( const uno::Any& /*index*/ )
+uno::Any SAL_CALL SwVbaDocument::FormFields(const uno::Any& index)
 {
-    uno::Reference< XCollection > xCol;
-    return uno::makeAny( xCol );
+    uno::Reference<XCollection> xCol(new SwVbaFormFields(this, mxContext, mxModel));
+    if (index.hasValue())
+        return xCol->Item(index, uno::Any());
+    return uno::Any(xCol);
 }
 
 uno::Any SAL_CALL

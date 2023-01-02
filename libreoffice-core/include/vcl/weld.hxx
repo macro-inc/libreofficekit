@@ -220,6 +220,8 @@ public:
     virtual void set_tooltip_text(const OUString& rTip) = 0;
     virtual OUString get_tooltip_text() const = 0;
 
+    virtual void set_cursor_data(void* pData) = 0;
+
     virtual void connect_focus_in(const Link<Widget&, void>& rLink)
     {
         assert(!m_aFocusInHdl.IsSet() || !rLink.IsSet());
@@ -459,6 +461,8 @@ public:
 
 class VCL_DLLPUBLIC Notebook : virtual public Widget
 {
+    friend class ::LOKTrigger;
+
 protected:
     Link<const OString&, bool> m_aLeavePageHdl;
     Link<const OString&, void> m_aEnterPageHdl;
@@ -1432,6 +1436,7 @@ public:
     virtual void set_from_icon_name(const OUString& rIconName) = 0;
     virtual OUString get_label() const = 0;
     void clicked() { signal_clicked(); }
+    bool is_custom_handler_set() { return m_aClickHdl.IsSet(); }
 
     // font size is in points, not pixels, e.g. see Window::[G]etPointFont
     virtual void set_font(const vcl::Font& rFont) = 0;

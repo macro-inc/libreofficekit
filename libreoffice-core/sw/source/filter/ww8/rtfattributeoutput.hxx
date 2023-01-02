@@ -74,7 +74,8 @@ public:
                   bool bSingleEmptyRun = false) override;
 
     /// End of the text run.
-    void EndRun(const SwTextNode* pNode, sal_Int32 nPos, bool bLastRun = false) override;
+    void EndRun(const SwTextNode* pNode, sal_Int32 nPos, sal_Int32 nLen,
+                bool bLastRun = false) override;
 
     /// Called before we start outputting the attributes.
     void StartRunProperties() override;
@@ -83,7 +84,8 @@ public:
     void EndRunProperties(const SwRedlineData* pRedlineData) override;
 
     /// Output text (inside a run).
-    void RunText(const OUString& rText, rtl_TextEncoding eCharSet = RTL_TEXTENCODING_UTF8) override;
+    void RunText(const OUString& rText, rtl_TextEncoding eCharSet = RTL_TEXTENCODING_UTF8,
+                 const OUString& rSymbolFont = OUString()) override;
 
     // Access to (anyway) private buffers, used by the sdr exporter
     OStringBuffer& RunText();

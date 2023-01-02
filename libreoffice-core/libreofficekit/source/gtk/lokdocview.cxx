@@ -126,6 +126,8 @@ struct LOKDocViewPrivateImpl
     std::vector<GdkRectangle> m_aTextSelectionRectangles;
     /// Rectangles of the current content control.
     std::vector<GdkRectangle> m_aContentControlRectangles;
+    /// Alias/title of the current content control.
+    std::string m_aContentControlAlias;
     /// Rectangles of view selections. The current view can only see
     /// them, can't modify them. Key is the view id.
     std::map<int, ViewRectangles> m_aTextViewSelectionRectangles;
@@ -255,6 +257,15 @@ struct LOKDocViewPrivateImpl
     }
 };
 
+// Must be run with g_aLOKMutex locked
+void setDocumentView(LibreOfficeKitDocument* pDoc, int viewId)
+{
+    assert(pDoc);
+    std::stringstream ss;
+    ss << "lok::Document::setView(" << viewId << ")";
+    g_info("%s", ss.str().c_str());
+    pDoc->pClass->setView(pDoc, viewId);
+}
 }
 
 /// Wrapper around LOKDocViewPrivateImpl, managed by malloc/memset/free.
@@ -326,7 +337,6 @@ static void lok_doc_view_initable_iface_init (GInitableIface *iface);
 static void callbackWorker (int nType, const char* pPayload, void* pData);
 static void updateClientZoom (LOKDocView *pDocView);
 
-SAL_DLLPUBLIC_EXPORT GType lok_doc_view_get_type();
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
@@ -595,10 +605,8 @@ postKeyEventInThread(gpointer data)
     gint nTileSizePixelsScaled = nTileSizePixels * nScaleFactor;
 
     std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
 
     if (priv->m_nTileSizeTwips)
     {
@@ -1407,10 +1415,21 @@ callback (gpointer pData)
         {
             auto aRectangles = aTree.get<std::string>("rectangles");
             priv->m_aContentControlRectangles = payloadToRectangles(pDocView, aRectangles.c_str());
+
+            auto it = aTree.find("alias");
+            if (it == aTree.not_found())
+            {
+                priv->m_aContentControlAlias.clear();
+            }
+            else
+            {
+                priv->m_aContentControlAlias = it->second.get_value<std::string>();
+            }
         }
         else if (aAction == "hide")
         {
             priv->m_aContentControlRectangles.clear();
+            priv->m_aContentControlAlias.clear();
         }
         else if (aAction == "change-picture")
         {
@@ -1466,6 +1485,8 @@ callback (gpointer pData)
     case LOK_CALLBACK_SC_FOLLOW_JUMP:
     case LOK_CALLBACK_PRINT_RANGES:
     case LOK_CALLBACK_FONTS_MISSING:
+    case LOK_CALLBACK_MEDIA_SHAPE:
+    case LOK_CALLBACK_EXPORT_FILE:
     {
         // TODO: Implement me
         break;
@@ -1873,6 +1894,27 @@ renderOverlay(LOKDocView* pDocView, cairo_t* pCairo)
                             twipToPixel(rRectangle.height, priv->m_fZoom));
             cairo_fill(pCairo);
         }
+
+        if (!priv->m_aContentControlAlias.empty())
+        {
+            cairo_text_extents_t aExtents;
+            cairo_text_extents(pCairo, priv->m_aContentControlAlias.c_str(), &aExtents);
+            // Blue with 75% transparency.
+            cairo_set_source_rgba(pCairo, 0, 0, 1, 0.25);
+            cairo_rectangle(pCairo,
+                            twipToPixel(priv->m_aContentControlRectangles[0].x, priv->m_fZoom) + aExtents.x_bearing,
+                            twipToPixel(priv->m_aContentControlRectangles[0].y, priv->m_fZoom) + aExtents.y_bearing,
+                            aExtents.width,
+                            aExtents.height);
+            cairo_fill(pCairo);
+
+            cairo_move_to(pCairo,
+                    twipToPixel(priv->m_aContentControlRectangles[0].x, priv->m_fZoom),
+                    twipToPixel(priv->m_aContentControlRectangles[0].y, priv->m_fZoom));
+            cairo_set_source_rgb(pCairo, 0, 0, 0);
+            cairo_show_text(pCairo, priv->m_aContentControlAlias.c_str());
+            cairo_fill(pCairo);
+        }
     }
 
     // Selections of other views.
@@ -2139,10 +2181,7 @@ lok_doc_view_signal_motion (GtkWidget* pWidget, GdkEventMotion* pEvent)
     GError* error = nullptr;
 
     std::unique_lock<std::mutex> aGuard(g_aLOKMutex);
-    std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     if (priv->m_bInDragMiddleHandle)
     {
         g_info("lcl_signalMotion: dragging the middle handle");
@@ -2240,11 +2279,8 @@ setGraphicSelectionInThread(gpointer data)
     LOEvent* pLOEvent = static_cast<LOEvent*>(g_task_get_task_data(task));
 
     std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
-    ss.str(std::string());
     ss << "lok::Document::setGraphicSelection(" << pLOEvent->m_nSetGraphicSelectionType;
     ss << ", " << pLOEvent->m_nSetGraphicSelectionX;
     ss << ", " << pLOEvent->m_nSetGraphicSelectionY << ")";
@@ -2264,6 +2300,7 @@ setClientZoomInThread(gpointer data)
     LOEvent* pLOEvent = static_cast<LOEvent*>(g_task_get_task_data(task));
 
     std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     priv->m_pDocument->pClass->setClientZoom(priv->m_pDocument,
                                              pLOEvent->m_nTilePixelWidth,
                                              pLOEvent->m_nTilePixelHeight,
@@ -2280,11 +2317,8 @@ postMouseEventInThread(gpointer data)
     LOEvent* pLOEvent = static_cast<LOEvent*>(g_task_get_task_data(task));
 
     std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
-    ss.str(std::string());
     ss << "lok::Document::postMouseEvent(" << pLOEvent->m_nPostMouseEventType;
     ss << ", " << pLOEvent->m_nPostMouseEventX;
     ss << ", " << pLOEvent->m_nPostMouseEventY;
@@ -2316,7 +2350,13 @@ openDocumentInThread (gpointer data)
     }
 
     priv->m_pOffice->pClass->registerCallback(priv->m_pOffice, globalCallbackWorker, pDocView);
-    priv->m_pDocument = priv->m_pOffice->pClass->documentLoadWithOptions( priv->m_pOffice, priv->m_aDocPath.c_str(), "en-US" );
+    std::string url = priv->m_aDocPath;
+    if (gchar* pURL = g_filename_to_uri(url.c_str(), nullptr, nullptr))
+    {
+        url = pURL;
+        g_free(pURL);
+    }
+    priv->m_pDocument = priv->m_pOffice->pClass->documentLoadWithOptions( priv->m_pOffice, url.c_str(), "en-US" );
     if ( !priv->m_pDocument )
     {
         char *pError = priv->m_pOffice->pClass->getError( priv->m_pOffice );
@@ -2340,10 +2380,7 @@ setPartInThread(gpointer data)
     int nPart = pLOEvent->m_nPart;
 
     std::unique_lock<std::mutex> aGuard(g_aLOKMutex);
-    std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     priv->m_pDocument->pClass->setPart( priv->m_pDocument, nPart );
     aGuard.unlock();
 
@@ -2360,10 +2397,7 @@ setPartmodeInThread(gpointer data)
     int nPartMode = pLOEvent->m_nPartMode;
 
     std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
-    std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     priv->m_pDocument->pClass->setPartMode( priv->m_pDocument, nPartMode );
 }
 
@@ -2383,10 +2417,7 @@ setEditInThread(gpointer data)
     {
         g_info("lok_doc_view_set_edit: leaving edit mode");
         std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
-        std::stringstream ss;
-        ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-        g_info("%s", ss.str().c_str());
-        priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
+        setDocumentView(priv->m_pDocument, priv->m_nViewId);
         priv->m_pDocument->pClass->resetSelection(priv->m_pDocument);
     }
     priv->m_bEdit = bEdit;
@@ -2403,11 +2434,8 @@ postCommandInThread (gpointer data)
     LOKDocViewPrivate& priv = getPrivate(pDocView);
 
     std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
-    ss.str(std::string());
     ss << "lok::Document::postUnoCommand(" << pLOEvent->m_pCommand << ", " << pLOEvent->m_pArguments << ")";
     g_info("%s", ss.str().c_str());
     priv->m_pDocument->pClass->postUnoCommand(priv->m_pDocument, pLOEvent->m_pCommand, pLOEvent->m_pArguments, pLOEvent->m_bNotifyWhenFinished);
@@ -2454,11 +2482,8 @@ paintTileInThread (gpointer data)
     aTileRectangle.y = pixelToTwip(nTileSizePixelsScaled, pLOEvent->m_fPaintTileZoom * nScaleFactor) * pLOEvent->m_nPaintTileX;
 
     std::unique_lock<std::mutex> aGuard(g_aLOKMutex);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
-    ss.str(std::string());
     GTimer* aTimer = g_timer_new();
     gulong nElapsedMs;
     ss << "lok::Document::paintTile(" << static_cast<void*>(pBuffer) << ", "
@@ -2732,12 +2757,9 @@ static void lok_doc_view_destroy (GtkWidget* widget)
 
     // Ignore notifications sent to this view on shutdown.
     std::unique_lock<std::mutex> aGuard(g_aLOKMutex);
-    std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
     if (priv->m_pDocument)
     {
-        priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
+        setDocumentView(priv->m_pDocument, priv->m_nViewId);
         priv->m_pDocument->pClass->registerCallback(priv->m_pDocument, nullptr, nullptr);
     }
 
@@ -2751,17 +2773,13 @@ static void lok_doc_view_destroy (GtkWidget* widget)
 
     if (priv->m_pDocument)
     {
-        if (priv->m_pDocument->pClass->getViewsCount(priv->m_pDocument) > 1)
+        // This call may drop several views - e.g., embedded OLE in-place clients
+        priv->m_pDocument->pClass->destroyView(priv->m_pDocument, priv->m_nViewId);
+        if (priv->m_pDocument->pClass->getViewsCount(priv->m_pDocument) == 0)
         {
-            priv->m_pDocument->pClass->destroyView(priv->m_pDocument, priv->m_nViewId);
-        }
-        else
-        {
-            if (priv->m_pDocument)
-            {
-                priv->m_pDocument->pClass->destroy (priv->m_pDocument);
-                priv->m_pDocument = nullptr;
-            }
+            // Last view(s) gone
+            priv->m_pDocument->pClass->destroy (priv->m_pDocument);
+            priv->m_pDocument = nullptr;
             if (priv->m_pOffice)
             {
                 priv->m_pOffice->pClass->destroy (priv->m_pOffice);
@@ -2823,6 +2841,8 @@ static gboolean spin_lok_loop(void *pData)
 static void updateClientZoom(LOKDocView *pDocView)
 {
     LOKDocViewPrivate& priv = getPrivate(pDocView);
+    if (!priv->m_fZoom)
+        return; // Not initialized yet?
     gint nScaleFactor = gtk_widget_get_scale_factor(GTK_WIDGET(pDocView));
     gint nTileSizePixelsScaled = nTileSizePixels * nScaleFactor;
     GError* error = nullptr;
@@ -3700,10 +3720,7 @@ lok_doc_view_get_parts (LOKDocView* pDocView)
         return -1;
 
     std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
-    std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     return priv->m_pDocument->pClass->getParts( priv->m_pDocument );
 }
 
@@ -3715,10 +3732,7 @@ lok_doc_view_get_part (LOKDocView* pDocView)
         return -1;
 
     std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
-    std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     return priv->m_pDocument->pClass->getPart( priv->m_pDocument );
 }
 
@@ -3762,10 +3776,7 @@ SAL_DLLPUBLIC_EXPORT void lok_doc_view_send_content_control_event(LOKDocView* pD
     }
 
     std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
-    std::stringstream ss;
-    ss << "lok::Document::sendContentControlEvent('" << pArguments << "')";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     return priv->m_pDocument->pClass->sendContentControlEvent(priv->m_pDocument, pArguments);
 }
 
@@ -3777,10 +3788,7 @@ lok_doc_view_get_part_name (LOKDocView* pDocView, int nPart)
         return nullptr;
 
     std::scoped_lock<std::mutex> aGuard(g_aLOKMutex);
-    std::stringstream ss;
-    ss << "lok::Document::setView(" << priv->m_nViewId << ")";
-    g_info("%s", ss.str().c_str());
-    priv->m_pDocument->pClass->setView(priv->m_pDocument, priv->m_nViewId);
+    setDocumentView(priv->m_pDocument, priv->m_nViewId);
     return priv->m_pDocument->pClass->getPartName( priv->m_pDocument, nPart );
 }
 

@@ -194,6 +194,7 @@
 
 // Region: Insert
 #define FN_INSERT_BOOKMARK      (FN_INSERT + 2 )  /* Bookmark */
+// FN_INSERT + 3 is FN_INSERT_BREAK
 
 #define FN_INSERT_BREAK_DLG     (FN_INSERT + 4 )  /* Break */
 #define FN_INSERT_COLUMN_BREAK  (FN_INSERT + 5 )  /* Column break */
@@ -222,6 +223,7 @@
 #define FN_POSTIT               (FN_INSERT + 29)    /* Insert/edit PostIt */
 #define FN_INSERT_TABLE         (FN_INSERT + 30)    /* Insert Table */
 #define FN_INSERT_STRING        (FN_INSERT+31)
+#define FN_INSERT_COMBO_BOX_CONTENT_CONTROL (FN_INSERT + 32) /* Combo box content control */
 #define FN_INSERT_FRAME_INTERACT (FN_INSERT + 33)   /* Insert interactive frame */
 #define FN_INSERT_FRAME         (FN_INSERT + 34)    /* Insert Frame */
 
@@ -301,10 +303,13 @@
 #define FN_PROTECT_FIELDS               (FN_INSERT2 + 26)
 #define FN_PROTECT_BOOKMARKS            (FN_INSERT2 + 27)
 
+#define FN_UPDATE_TEXT_FORMFIELDS       (FN_INSERT2 + 28)
+
 // clipboard table content
 #define FN_PASTE_NESTED_TABLE       (FN_INSERT2 + 30)  /* instead of the cell-by-cell copy between source and target tables */
 #define FN_TABLE_PASTE_ROW_BEFORE   (FN_INSERT2 + 31)  /* paste table as new table rows */
 #define FN_TABLE_PASTE_COL_BEFORE   (FN_INSERT2 + 32)  /* paste table as new table columns */
+#define FN_UPDATE_BOOKMARKS (FN_INSERT2 + 34)
 
 // Region: Format
 #define FN_AUTOFORMAT_APPLY     (FN_FORMAT + 1 ) /* apply autoformat options */
@@ -845,6 +850,7 @@
 #define FN_STAT_SELMODE             (FN_STAT + 5)
 #define FN_STAT_BOOKMARK            (FN_STAT + 8)  /* For Popup Bookmarks*/
 #define FN_STAT_WORDCOUNT           (FN_STAT + 9)
+#define FN_STAT_ACCESSIBILITY_CHECK (FN_STAT + 10)
 
 // Region: Page preview
 #define FN_SHOW_TWO_PAGES           (FN_PGPREVIEW + 1)

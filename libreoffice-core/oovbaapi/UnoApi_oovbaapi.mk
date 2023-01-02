@@ -833,6 +833,7 @@ $(eval $(call gb_UnoApi_add_idlfiles,oovbaapi,ooo/vba/word,\
     WdFarEastLineBreakLevel \
     WdFieldKind \
     WdFieldShading \
+    WdContentControlType \
     WdFieldType \
     WdFindMatch \
     WdFindWrap \
@@ -1052,10 +1053,15 @@ $(eval $(call gb_UnoApi_add_idlfiles,oovbaapi,ooo/vba/word,\
 	XDocument \
 	XDocumentOutgoing \
 	XDocuments \
+	XDropDown \
 	XField \
 	XFields \
 	XFind \
 	XFont \
+	XContentControl \
+	XContentControls \
+	XContentControlListEntry \
+	XContentControlListEntries \
 	XFormField \
 	XFormFields \
 	XFrame \
@@ -1063,6 +1069,8 @@ $(eval $(call gb_UnoApi_add_idlfiles,oovbaapi,ooo/vba/word,\
 	XGlobals \
 	XHeaderFooter \
 	XHeadersFooters \
+	XListEntries \
+	XListEntry \
 	XListFormat \
 	XListGalleries \
 	XListGallery \
@@ -1097,6 +1105,7 @@ $(eval $(call gb_UnoApi_add_idlfiles,oovbaapi,ooo/vba/word,\
 	XTabStop \
 	XTabStops \
 	XTemplate \
+	XTextInput \
 	XVariable \
 	XVariables \
 	XView \

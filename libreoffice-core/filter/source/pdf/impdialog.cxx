@@ -29,6 +29,7 @@
 #include <sfx2/objsh.hxx>
 #include <svx/AccessibilityCheckDialog.hxx>
 
+#include <comphelper/lok.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/storagehelper.hxx>
@@ -254,7 +255,10 @@ ImpPDFTabDialog::ImpPDFTabDialog(weld::Window* pParent, const Sequence< Property
 
     // queue the tab pages for later creation (created when first shown)
     AddTabPage("general", ImpPDFTabGeneralPage::Create, nullptr );
-    AddTabPage("digitalsignatures", ImpPDFTabSigningPage::Create, nullptr);
+    if (comphelper::LibreOfficeKit::isActive())
+        m_xTabCtrl->remove_page("digitalsignatures");
+    else
+        AddTabPage("digitalsignatures", ImpPDFTabSigningPage::Create, nullptr);
     AddTabPage("security", ImpPDFTabSecurityPage::Create, nullptr);
     AddTabPage("links", ImpPDFTabLinksPage::Create, nullptr);
     AddTabPage("userinterface", ImpPDFTabViewerPage::Create, nullptr);
@@ -537,6 +541,8 @@ ImpPDFTabGeneralPage::ImpPDFTabGeneralPage(weld::Container* pPage, weld::DialogC
 
 ImpPDFTabGeneralPage::~ImpPDFTabGeneralPage()
 {
+    if (mxPasswordUnusedWarnDialog)
+        mxPasswordUnusedWarnDialog->response(RET_CANCEL);
 }
 
 void ImpPDFTabGeneralPage::SetFilterConfigItem(ImpPDFTabDialog* pParent)
@@ -620,7 +626,15 @@ void ImpPDFTabGeneralPage::SetFilterConfigItem(ImpPDFTabDialog* pParent)
     mxCbExportBookmarks->set_active( pParent->mbExportBookmarks );
 
     mxCbExportNotes->set_active( pParent->mbExportNotes );
-    mxCbViewPDF->set_active( pParent->mbViewPDF);
+    if (comphelper::LibreOfficeKit::isActive())
+    {
+        mxCbViewPDF->hide();
+        mxCbViewPDF->set_active(false);
+    }
+    else
+    {
+       mxCbViewPDF->set_active(pParent->mbViewPDF);
+    }
 
     if ( mbIsPresentation )
     {
@@ -861,10 +875,11 @@ IMPL_LINK_NOARG(ImpPDFTabGeneralPage, TogglePDFVersionOrUniversalAccessibilityHa
         // if a password was set, inform the user that this will not be used
         if (pSecPage && pSecPage->hasPassword())
         {
-            std::unique_ptr<weld::MessageDialog> xBox(Application::CreateMessageDialog(m_xContainer.get(),
+            mxPasswordUnusedWarnDialog =
+                std::shared_ptr<weld::MessageDialog>(Application::CreateMessageDialog(m_xContainer.get(),
                                                       VclMessageType::Warning, VclButtonsType::Ok,
                                                       PDFFilterResId(STR_WARN_PASSWORD_PDFA)));
-            xBox->run();
+            mxPasswordUnusedWarnDialog->runAsync(mxPasswordUnusedWarnDialog, [] (sal_uInt32){ });
         }
     }
     else
