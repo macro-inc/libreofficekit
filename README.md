@@ -35,7 +35,6 @@ cd /d %~dp0
 
 - For all development purposes, use this shortcut, otherwise things won't work as expected
 
-
 ## Linux
 
 - Install dependencies using apt:
@@ -51,12 +50,12 @@ sudo apt-get install git build-essential zip nasm python3 python3-dev \
 
 - [Download and install Xcode 13.4.1](https://developer.apple.com/services-account/download?path=/Developer_Tools/Xcode_13.4.1/Xcode_13.4.1.xip)
   - Open Xcode after installing and agree to the EULA
-- [Install brew](https://brew.sh)
-- Install dependencies using brew:
+- [Install MacPorts](https://www.macports.org/install.php)
+- Install dependencies using Mac ports:
 
-  ```shell
-  brew install nasm autoconf automake gperf
-  ```
+```shell
+port install nasm autoconf automake gperf gpatch
+```
 
 # Building
 
