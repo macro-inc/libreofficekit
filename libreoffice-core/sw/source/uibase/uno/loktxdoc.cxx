@@ -17,6 +17,10 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include "IDocumentOutlineNodes.hxx"
+#include "ndtxt.hxx"
+#include "txtfrm.hxx"
+#include "wrtsh.hxx"
 #include <unotxdoc.hxx>
 
 #include <map>
@@ -170,6 +174,68 @@ void GetBookmarks(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell,
         rJsonWriter.put("name", pMark->GetName());
     }
 }
+
+/// Implements getCommandValues(".uno:GetOutline").
+void GetOutline(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell)
+{
+    SwWrtShell* mrSh = pDocShell->GetWrtShell();
+
+    const SwOutlineNodes::size_type nOutlineCount
+        = mrSh->getIDocumentOutlineNodesAccess()->getOutlineNodesCount();
+
+    typedef std::pair<sal_Int8, sal_Int32> StackEntry;
+    std::stack<StackEntry> aOutlineStack;
+    aOutlineStack.push(StackEntry(-1, -1)); // push default value
+
+    tools::ScopedJsonWriterArray aOutline = rJsonWriter.startArray("outline");
+
+    int nOutlineId = 0;
+    for (SwOutlineNodes::size_type i = 0; i < nOutlineCount; ++i)
+    {
+        // Check if outline is hidden
+        const SwTextNode* pTNd = mrSh->GetNodes().GetOutLineNds()[i]->GetTextNode();
+
+        if (pTNd->IsHidden() || !sw::IsParaPropsNode(*mrSh->GetLayout(), *pTNd) ||
+            // Skip empty outlines:
+            pTNd->GetText().isEmpty())
+        {
+            continue;
+        }
+
+        // Get parent id from stack:
+        const sal_Int8 nLevel
+            = static_cast<sal_Int8>(mrSh->getIDocumentOutlineNodesAccess()->getOutlineLevel(i));
+
+        sal_Int8 nLevelOnTopOfStack = aOutlineStack.top().first;
+        while (nLevelOnTopOfStack >= nLevel && nLevelOnTopOfStack != -1)
+        {
+            aOutlineStack.pop();
+            nLevelOnTopOfStack = aOutlineStack.top().first;
+        }
+
+        const sal_Int32 nParent = aOutlineStack.top().second;
+
+        // TODO: This causes the cursor to move which is unideal
+        // We need to find a way to reset the cursor after this is done
+        // or do this without moving the cursor at all
+        // Destination rectangle
+        mrSh->GotoOutline(i);
+        const SwRect& rDestRect = mrSh->GetCharRect();
+
+        const OUString& rEntry = mrSh->getIDocumentOutlineNodesAccess()->getOutlineText(
+            i, mrSh->GetLayout(), true, false, false);
+
+        tools::ScopedJsonWriterStruct aProperty = rJsonWriter.startStruct();
+        rJsonWriter.put("id", nOutlineId);
+        rJsonWriter.put("parent", nParent);
+        rJsonWriter.put("text", rEntry);
+        rJsonWriter.put("position", rDestRect.SVRect().toString());
+
+        aOutlineStack.push(StackEntry(nLevel, nOutlineId));
+
+        nOutlineId++;
+    }
+}
 }
 
 void SwXTextDocument::getCommandValues(tools::JsonWriter& rJsonWriter, const OString& rCommand)
@@ -179,6 +245,7 @@ void SwXTextDocument::getCommandValues(tools::JsonWriter& rJsonWriter, const OSt
     static constexpr OStringLiteral aTextFormFields(".uno:TextFormFields");
     static constexpr OStringLiteral aSetDocumentProperties(".uno:SetDocumentProperties");
     static constexpr OStringLiteral aBookmarks(".uno:Bookmarks");
+    static constexpr OStringLiteral aGetOutline(".uno:GetOutline");
 
     INetURLObject aParser(OUString::fromUtf8(rCommand));
     OUString aArguments = aParser.GetParam();
@@ -213,6 +280,10 @@ void SwXTextDocument::getCommandValues(tools::JsonWriter& rJsonWriter, const OSt
     else if (o3tl::starts_with(rCommand, aBookmarks))
     {
         GetBookmarks(rJsonWriter, m_pDocShell, aMap);
+    }
+    else if (o3tl::starts_with(rCommand, aGetOutline))
+    {
+        GetOutline(rJsonWriter, m_pDocShell);
     }
 }
 

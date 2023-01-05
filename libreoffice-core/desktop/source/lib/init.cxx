@@ -5620,7 +5620,8 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
     static const std::initializer_list<std::u16string_view> vForward = {
         u"TextFormFields",
         u"SetDocumentProperties",
-        u"Bookmarks"
+        u"Bookmarks",
+        u"GetOutline"
     };
 
     if (!strcmp(pCommand, ".uno:LanguageStatus"))
