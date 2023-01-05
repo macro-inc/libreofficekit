@@ -21,6 +21,7 @@
 #include "ndtxt.hxx"
 #include "txtfrm.hxx"
 #include "wrtsh.hxx"
+#include <iostream>
 #include <unotxdoc.hxx>
 
 #include <map>
@@ -190,14 +191,15 @@ void GetOutline(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell)
     tools::ScopedJsonWriterArray aOutline = rJsonWriter.startArray("outline");
 
     int nOutlineId = 0;
+
     for (SwOutlineNodes::size_type i = 0; i < nOutlineCount; ++i)
     {
         // Check if outline is hidden
-        const SwTextNode* pTNd = mrSh->GetNodes().GetOutLineNds()[i]->GetTextNode();
+        const SwTextNode* textNode = mrSh->GetNodes().GetOutLineNds()[i]->GetTextNode();
 
-        if (pTNd->IsHidden() || !sw::IsParaPropsNode(*mrSh->GetLayout(), *pTNd) ||
+        if (textNode->IsHidden() || !sw::IsParaPropsNode(*mrSh->GetLayout(), *textNode) ||
             // Skip empty outlines:
-            pTNd->GetText().isEmpty())
+            textNode->GetText().isEmpty())
         {
             continue;
         }
@@ -215,21 +217,15 @@ void GetOutline(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell)
 
         const sal_Int32 nParent = aOutlineStack.top().second;
 
-        // TODO: This causes the cursor to move which is unideal
-        // We need to find a way to reset the cursor after this is done
-        // or do this without moving the cursor at all
-        // Destination rectangle
-        mrSh->GotoOutline(i);
-        const SwRect& rDestRect = mrSh->GetCharRect();
-
-        const OUString& rEntry = mrSh->getIDocumentOutlineNodesAccess()->getOutlineText(
+        const OUString& text = mrSh->getIDocumentOutlineNodesAccess()->getOutlineText(
             i, mrSh->GetLayout(), true, false, false);
 
         tools::ScopedJsonWriterStruct aProperty = rJsonWriter.startStruct();
+
         rJsonWriter.put("id", nOutlineId);
         rJsonWriter.put("parent", nParent);
-        rJsonWriter.put("text", rEntry);
-        rJsonWriter.put("position", rDestRect.SVRect().toString());
+        rJsonWriter.put("text", textNode->GetText());
+        rJsonWriter.put("text2", text);
 
         aOutlineStack.push(StackEntry(nLevel, nOutlineId));
 
@@ -285,6 +281,17 @@ void SwXTextDocument::getCommandValues(tools::JsonWriter& rJsonWriter, const OSt
     {
         GetOutline(rJsonWriter, m_pDocShell);
     }
+}
+
+void SwXTextDocument::gotoOutline(tools::JsonWriter& rJsonWriter, int idx)
+{
+    SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
+
+    mrSh->GotoOutline(idx);
+
+    SwRect destRect = mrSh->GetCharRect();
+
+    rJsonWriter.put("destRect", destRect.SVRect().toString());
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
