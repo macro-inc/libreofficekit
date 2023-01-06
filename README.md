@@ -50,11 +50,18 @@ sudo apt-get install git build-essential zip nasm python3 python3-dev \
 
 - [Download and install Xcode 13.4.1](https://developer.apple.com/services-account/download?path=/Developer_Tools/Xcode_13.4.1/Xcode_13.4.1.xip)
   - Open Xcode after installing and agree to the EULA
-- [Install MacPorts](https://www.macports.org/install.php)
-- Install dependencies using Mac ports:
+  - If you are on MacOS Ventura or later you will be unable to launch this version of Xcode normally and will need to launch it via the terminal and update your `DEVELOPER_DIR` accordingly
 
 ```shell
-port install nasm autoconf automake gperf gpatch
+open /Applications/Xcode13.4.1.app/Contents/MacOS/Xcode
+export DEVELOPER_DIR=/Applications/Xcode13.4.1.app/Contents/Developer
+```
+
+- [Install MacPorts](https://www.macports.org/install.php)
+- Install dependencies using MacPorts:
+
+```shell
+sudo port install nasm autoconf automake gperf gpatch
 ```
 
 # Building
