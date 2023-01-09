@@ -18,6 +18,7 @@
  */
 
 #include "IDocumentOutlineNodes.hxx"
+#include "itabenum.hxx"
 #include "ndtxt.hxx"
 #include "txtfrm.hxx"
 #include "wrtsh.hxx"
@@ -288,6 +289,15 @@ void SwXTextDocument::gotoOutline(tools::JsonWriter& rJsonWriter, int idx)
     SwRect destRect = mrSh->GetCharRect();
 
     rJsonWriter.put("destRect", destRect.SVRect().toString());
+}
+
+void SwXTextDocument::createTable(int row, int col)
+{
+    SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
+
+    const SwInsertTableOptions aInsertTableOptions(SwInsertTableFlags::DefaultBorder,/*nRowsToRepeat=*/0);
+
+    mrSh->InsertTable(aInsertTableOptions, row, col);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

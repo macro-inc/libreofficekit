@@ -380,6 +380,11 @@ public:
     virtual void gotoOutline(tools::JsonWriter& /*rJsonWriter*/, int /*idx*/)
     {
     }
+
+    /// Used to create tables
+    virtual void createTable(int /*row*/, int /*col*/)
+    {
+    }
 };
 } // namespace vcl
 

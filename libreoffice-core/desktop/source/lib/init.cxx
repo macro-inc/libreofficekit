@@ -4482,6 +4482,45 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     if (nView < 0)
         return;
 
+    if (gImpl && aCommand == ".uno:CreateTable")
+    {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        if (!pDoc)
+        {
+            SetLastExceptionMsg("Document doesn't support tiled rendering");
+            return;
+        }
+
+        int row = 0;
+        int col = 0;
+
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "Row")
+            {
+                row = rPropValue.Value.get<long>();
+            }
+            if (rPropValue.Name == "Col")
+            {
+                col = rPropValue.Value.get<long>();
+            }
+        }
+
+        if (row == 0) {
+            SetLastExceptionMsg("Missing Row value in pArguments");
+            return;
+        }
+
+        if (col == 0) {
+            SetLastExceptionMsg("Missing Col value in pArguments");
+            return;
+        }
+
+        pDoc->createTable(row, col);
+
+        return;
+    }
+
     if (gImpl && aCommand == ".uno:ToggleOrientation")
     {
         ExecuteOrientationChange();
