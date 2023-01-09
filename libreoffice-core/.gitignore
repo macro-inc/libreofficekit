@@ -195,3 +195,5 @@ LibreOffice.VC.VC.opendb
 # Dictionaries
 /dictionaries/*
 !/dictionaries/Module_dictionaries.mk
+
+.clangd
