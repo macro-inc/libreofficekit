@@ -217,15 +217,11 @@ void GetOutline(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell)
 
         const sal_Int32 nParent = aOutlineStack.top().second;
 
-        const OUString& text = mrSh->getIDocumentOutlineNodesAccess()->getOutlineText(
-            i, mrSh->GetLayout(), true, false, false);
-
         tools::ScopedJsonWriterStruct aProperty = rJsonWriter.startStruct();
 
         rJsonWriter.put("id", nOutlineId);
         rJsonWriter.put("parent", nParent);
         rJsonWriter.put("text", textNode->GetText());
-        rJsonWriter.put("text2", text);
 
         aOutlineStack.push(StackEntry(nLevel, nOutlineId));
 
