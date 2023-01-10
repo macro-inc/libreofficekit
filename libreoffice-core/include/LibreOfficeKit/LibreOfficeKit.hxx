@@ -487,6 +487,16 @@ public:
     }
 
     /**
+     * Forces your cursor to a given outline
+     * @param idx the id of the outline you want to navigate to
+     * @return {destRect: ""} The rect of the outline
+    */
+    char* gotoOutline(int idx)
+    {
+        return mpDoc->pClass->gotoOutline(mpDoc,idx);
+    }
+
+    /**
      * Save the client's view so that we can compute the right zoom level
      * for the mouse events. This only affects CALC.
      * @param nTilePixelWidth - tile width in pixels

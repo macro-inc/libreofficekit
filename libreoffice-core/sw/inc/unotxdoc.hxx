@@ -461,6 +461,12 @@ public:
     /// @see vcl::ITiledRenderable::getCommandValues().
     void getCommandValues(tools::JsonWriter& rJsonWriter, const OString& rCommand) override;
 
+    /// @see vcl::ITiledRenderable::gotoOutline().
+    void gotoOutline(tools::JsonWriter& rJsonWriter, int idx) override;
+
+    /// @see vcl::ITiledRenderable::createTable().
+    void createTable(int row, int col) override;
+
     void                        Invalidate();
     void                        Reactivate(SwDocShell* pNewDocShell);
     SwXDocumentPropertyHelper * GetPropertyHelper ();

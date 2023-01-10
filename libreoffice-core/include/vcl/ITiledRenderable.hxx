@@ -11,6 +11,7 @@
 #ifndef INCLUDED_VCL_ITILEDRENDERABLE_HXX
 #define INCLUDED_VCL_ITILEDRENDERABLE_HXX
 
+#include "i18nutil/widthfolding.hxx"
 #include <tools/gen.hxx>
 #include <rtl/ustring.hxx>
 #include <vcl/dllapi.h>
@@ -372,6 +373,16 @@ public:
 
     /// Returns a json mapping of the possible values for the given command.
     virtual void getCommandValues(tools::JsonWriter& /*rJsonWriter*/, const OString& /*rCommand*/)
+    {
+    }
+
+    /// Used to force the cursor to given element in the document outline
+    virtual void gotoOutline(tools::JsonWriter& /*rJsonWriter*/, int /*idx*/)
+    {
+    }
+
+    /// Used to create tables
+    virtual void createTable(int /*row*/, int /*col*/)
     {
     }
 };

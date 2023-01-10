@@ -17,6 +17,12 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include "IDocumentOutlineNodes.hxx"
+#include "itabenum.hxx"
+#include "ndtxt.hxx"
+#include "txtfrm.hxx"
+#include "wrtsh.hxx"
+#include <iostream>
 #include <unotxdoc.hxx>
 
 #include <map>
@@ -170,6 +176,59 @@ void GetBookmarks(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell,
         rJsonWriter.put("name", pMark->GetName());
     }
 }
+
+/// Implements getCommandValues(".uno:GetOutline").
+void GetOutline(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell)
+{
+    SwWrtShell* mrSh = pDocShell->GetWrtShell();
+
+    const SwOutlineNodes::size_type nOutlineCount
+        = mrSh->getIDocumentOutlineNodesAccess()->getOutlineNodesCount();
+
+    typedef std::pair<sal_Int8, sal_Int32> StackEntry;
+    std::stack<StackEntry> aOutlineStack;
+    aOutlineStack.push(StackEntry(-1, -1)); // push default value
+
+    tools::ScopedJsonWriterArray aOutline = rJsonWriter.startArray("outline");
+
+    int nOutlineId = 0;
+
+    for (SwOutlineNodes::size_type i = 0; i < nOutlineCount; ++i)
+    {
+        // Check if outline is hidden
+        const SwTextNode* textNode = mrSh->GetNodes().GetOutLineNds()[i]->GetTextNode();
+
+        if (textNode->IsHidden() || !sw::IsParaPropsNode(*mrSh->GetLayout(), *textNode) ||
+            // Skip empty outlines:
+            textNode->GetText().isEmpty())
+        {
+            continue;
+        }
+
+        // Get parent id from stack:
+        const sal_Int8 nLevel
+            = static_cast<sal_Int8>(mrSh->getIDocumentOutlineNodesAccess()->getOutlineLevel(i));
+
+        sal_Int8 nLevelOnTopOfStack = aOutlineStack.top().first;
+        while (nLevelOnTopOfStack >= nLevel && nLevelOnTopOfStack != -1)
+        {
+            aOutlineStack.pop();
+            nLevelOnTopOfStack = aOutlineStack.top().first;
+        }
+
+        const sal_Int32 nParent = aOutlineStack.top().second;
+
+        tools::ScopedJsonWriterStruct aProperty = rJsonWriter.startStruct();
+
+        rJsonWriter.put("id", nOutlineId);
+        rJsonWriter.put("parent", nParent);
+        rJsonWriter.put("text", textNode->GetText());
+
+        aOutlineStack.push(StackEntry(nLevel, nOutlineId));
+
+        nOutlineId++;
+    }
+}
 }
 
 void SwXTextDocument::getCommandValues(tools::JsonWriter& rJsonWriter, const OString& rCommand)
@@ -179,6 +238,7 @@ void SwXTextDocument::getCommandValues(tools::JsonWriter& rJsonWriter, const OSt
     static constexpr OStringLiteral aTextFormFields(".uno:TextFormFields");
     static constexpr OStringLiteral aSetDocumentProperties(".uno:SetDocumentProperties");
     static constexpr OStringLiteral aBookmarks(".uno:Bookmarks");
+    static constexpr OStringLiteral aGetOutline(".uno:GetOutline");
 
     INetURLObject aParser(OUString::fromUtf8(rCommand));
     OUString aArguments = aParser.GetParam();
@@ -214,6 +274,30 @@ void SwXTextDocument::getCommandValues(tools::JsonWriter& rJsonWriter, const OSt
     {
         GetBookmarks(rJsonWriter, m_pDocShell, aMap);
     }
+    else if (o3tl::starts_with(rCommand, aGetOutline))
+    {
+        GetOutline(rJsonWriter, m_pDocShell);
+    }
+}
+
+void SwXTextDocument::gotoOutline(tools::JsonWriter& rJsonWriter, int idx)
+{
+    SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
+
+    mrSh->GotoOutline(idx);
+
+    SwRect destRect = mrSh->GetCharRect();
+
+    rJsonWriter.put("destRect", destRect.SVRect().toString());
+}
+
+void SwXTextDocument::createTable(int row, int col)
+{
+    SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
+
+    const SwInsertTableOptions aInsertTableOptions(SwInsertTableFlags::DefaultBorder,/*nRowsToRepeat=*/0);
+
+    mrSh->InsertTable(aInsertTableOptions, row, col);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

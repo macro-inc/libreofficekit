@@ -1118,6 +1118,7 @@ static void doc_setGraphicSelection (LibreOfficeKitDocument* pThis,
                                   int nY);
 static void doc_resetSelection (LibreOfficeKitDocument* pThis);
 static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCommand);
+static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx);
 static void doc_setClientZoom(LibreOfficeKitDocument* pThis,
                                     int nTilePixelWidth,
                                     int nTilePixelHeight,
@@ -1299,6 +1300,7 @@ LibLODocument_Impl::LibLODocument_Impl(const uno::Reference <css::lang::XCompone
         m_pDocumentClass->setGraphicSelection = doc_setGraphicSelection;
         m_pDocumentClass->resetSelection = doc_resetSelection;
         m_pDocumentClass->getCommandValues = doc_getCommandValues;
+        m_pDocumentClass->gotoOutline = doc_gotoOutline;
         m_pDocumentClass->setClientZoom = doc_setClientZoom;
         m_pDocumentClass->setClientVisibleArea = doc_setClientVisibleArea;
         m_pDocumentClass->setOutlineState = doc_setOutlineState;
@@ -4480,6 +4482,45 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     if (nView < 0)
         return;
 
+    if (gImpl && aCommand == ".uno:CreateTable")
+    {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        if (!pDoc)
+        {
+            SetLastExceptionMsg("Document doesn't support tiled rendering");
+            return;
+        }
+
+        int row = 0;
+        int col = 0;
+
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "Row")
+            {
+                row = rPropValue.Value.get<long>();
+            }
+            if (rPropValue.Name == "Col")
+            {
+                col = rPropValue.Value.get<long>();
+            }
+        }
+
+        if (row == 0) {
+            SetLastExceptionMsg("Missing Row value in pArguments");
+            return;
+        }
+
+        if (col == 0) {
+            SetLastExceptionMsg("Missing Col value in pArguments");
+            return;
+        }
+
+        pDoc->createTable(row, col);
+
+        return;
+    }
+
     if (gImpl && aCommand == ".uno:ToggleOrientation")
     {
         ExecuteOrientationChange();
@@ -5620,7 +5661,8 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
     static const std::initializer_list<std::u16string_view> vForward = {
         u"TextFormFields",
         u"SetDocumentProperties",
-        u"Bookmarks"
+        u"Bookmarks",
+        u"GetOutline"
     };
 
     if (!strcmp(pCommand, ".uno:LanguageStatus"))
@@ -5822,6 +5864,27 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
         SetLastExceptionMsg("Unknown command, no values returned");
         return nullptr;
     }
+}
+
+static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx)
+{
+    comphelper::ProfileZone aZone("doc_gotoOutline");
+
+    SolarMutexGuard aGuard;
+    SetLastExceptionMsg();
+
+    ITiledRenderable* pDoc = getTiledRenderable(pThis);
+    if (!pDoc)
+    {
+        SetLastExceptionMsg("Document doesn't support tiled rendering");
+        return nullptr;
+    }
+
+    tools::JsonWriter aJsonWriter;
+
+    pDoc->gotoOutline(aJsonWriter, idx);
+
+    return aJsonWriter.extractData();
 }
 
 static void doc_setClientZoom(LibreOfficeKitDocument* pThis, int nTilePixelWidth, int nTilePixelHeight,
