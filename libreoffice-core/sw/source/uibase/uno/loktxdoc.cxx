@@ -191,7 +191,8 @@ void GetOutline(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell)
 
     tools::ScopedJsonWriterArray aOutline = rJsonWriter.startArray("outline");
 
-    int nOutlineId = 0;
+    // Allows for 65535 nodes in the outline
+    sal_uInt16 nOutlineId = 0;
 
     for (SwOutlineNodes::size_type i = 0; i < nOutlineCount; ++i)
     {
