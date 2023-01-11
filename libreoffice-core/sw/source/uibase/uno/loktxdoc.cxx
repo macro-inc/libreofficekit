@@ -221,9 +221,13 @@ void GetOutline(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell)
 
         tools::ScopedJsonWriterStruct aProperty = rJsonWriter.startStruct();
 
+        // We need to explicitly get the text here in case there are special characters
+        // Using textNode->GetText() will result in a failure to convert the result to JSON in the DocumentClient::GetCommandValues in electron-libreoffice
+        const OUString& rEntry = mrSh->getIDocumentOutlineNodesAccess()->getOutlineText(i, mrSh->GetLayout(), true, false, false );
+
         rJsonWriter.put("id", nOutlineId);
         rJsonWriter.put("parent", nParent);
-        rJsonWriter.put("text", textNode->GetText());
+        rJsonWriter.put("text", rEntry);
 
         aOutlineStack.push(StackEntry(nLevel, nOutlineId));
 
