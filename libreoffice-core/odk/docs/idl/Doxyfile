@@ -23,6 +23,19 @@ WARNINGS = YES
 WARN_IF_DOC_ERROR = YES
 WARN_FORMAT = "$file:$line: $text"
 
+# Doxygen Awesome
+GENERATE_TREEVIEW = YES
+DISABLE_INDEX = NO
+FULL_SIDEBAR = NO
+HTML_EXTRA_FILES = %odksrc%/doxygen-awesome-css-2.1.0/doxygen-awesome-darkmode-toggle.js \
+  %odksrc%/doxygen-awesome-css-2.1.0/doxygen-awesome-fragment-copy-button.js \
+  %odksrc%/doxygen-awesome-css-2.1.0/doxygen-awesome-paragraph-link.js \
+  %odksrc%/doxygen-awesome-css-2.1.0/doxygen-awesome-interactive-toc.js
+HTML_EXTRA_STYLESHEET = %odksrc%/doxygen-awesome-css-2.1.0/doxygen-awesome.css \
+                        %odksrc%/doxygen-awesome-css-2.1.0/doxygen-awesome-sidebar-only.css \
+                        %odksrc%/doxygen-awesome-css-2.1.0/doxygen-awesome-sidebar-only-darkmode-toggle.css
+HTML_HEADER = %odksrc%/header.html
+
 # Do this only on Windows - the MSI has some ridiculous path name length
 # restrictions - but not other platforms because short names are pretty random
 SHORT_NAMES = %
@@ -46,3 +59,7 @@ ALWAYS_DETAILED_SEC = YES
 # name which looks like overkill/clutter
 HIDE_SCOPE_NAMES = YES
 
+GENERATE_TODOLIST = NO
+GENERATE_DEPRECATEDLIST= NO
+TOC_EXPAND = YES
+OPTIMIZE_OUTPUT_JAVA = YES

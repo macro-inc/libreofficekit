@@ -12,7 +12,7 @@ $(eval $(call gb_CustomTarget_CustomTarget,odk/unoapi))
 $(call gb_CustomTarget_get_target,odk/unoapi) : \
 	$(WORKDIR)/UnoBindings.done
 
-odk_uno_api := offapi udkapi cppuhelper scaddins 
+odk_uno_api := offapi udkapi
 $(eval $(call gb_LinkTarget_use_internal_comprehensive_api,odk/unoapi,$(odk_uno_api)))
 
 $(WORKDIR)/UnoBindings.done : $(foreach rdb,$(odk_uno_api),$(call gb_UnoApiTarget_get_target,$(rdb))) \
