@@ -385,6 +385,11 @@ public:
     virtual void createTable(int /*row*/, int /*col*/)
     {
     }
+
+    /// Used to insert images
+    virtual void insertImage(const OUString& /*sFilePath*/)
+    {
+    }
 };
 } // namespace vcl
 

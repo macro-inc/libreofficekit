@@ -21,6 +21,7 @@
 #include "itabenum.hxx"
 #include "ndtxt.hxx"
 #include "txtfrm.hxx"
+#include "vcl/graph.hxx"
 #include "wrtsh.hxx"
 #include <iostream>
 #include <unotxdoc.hxx>
@@ -303,6 +304,15 @@ void SwXTextDocument::createTable(int row, int col)
     const SwInsertTableOptions aInsertTableOptions(SwInsertTableFlags::DefaultBorder,/*nRowsToRepeat=*/0);
 
     mrSh->InsertTable(aInsertTableOptions, row, col);
+}
+
+void SwXTextDocument::insertImage(const OUString& sFilePath)
+{
+    SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
+
+    Graphic aGraphic;
+
+    mrSh->InsertGraphic(sFilePath, OUString(), aGraphic);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

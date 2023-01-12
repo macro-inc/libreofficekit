@@ -4482,6 +4482,36 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     if (nView < 0)
         return;
 
+    if (gImpl && aCommand == ".uno:InsertImage")
+    {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        if (!pDoc)
+        {
+            SetLastExceptionMsg("Document doesn't support tiled rendering");
+            return;
+        }
+
+        OUString filePath;
+
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "FilePath")
+            {
+                filePath = rPropValue.Value.get<OUString>();
+            }
+        }
+
+        if (filePath.isEmpty()) {
+            SetLastExceptionMsg("Missing FilePath in pArguments");
+            return;
+        }
+
+
+        pDoc->insertImage(filePath);
+
+        return;
+    }
+
     if (gImpl && aCommand == ".uno:CreateTable")
     {
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
