@@ -26,31 +26,31 @@ namespace unoidl {
 
 class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL NoSuchFileException final {
 public:
-    SAL_DLLPRIVATE NoSuchFileException(OUString const & uri): uri_(uri) {}
+    SAL_DLLPRIVATE NoSuchFileException(OUString const& uri)
+        : uri_(uri) {}
 
-    SAL_DLLPRIVATE NoSuchFileException(NoSuchFileException const & other):
-        uri_(other.uri_) {}
+    SAL_DLLPRIVATE NoSuchFileException(NoSuchFileException const& other)
+        : uri_(other.uri_) {}
 
     SAL_DLLPRIVATE ~NoSuchFileException() noexcept;
 
     const OUString& getUri() const { return uri_; }
 
 private:
-    NoSuchFileException& operator =(NoSuchFileException const &) = delete;
+    NoSuchFileException& operator=(NoSuchFileException const&) = delete;
 
     OUString uri_;
 };
 
 class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL FileFormatException final {
 public:
-    SAL_DLLPRIVATE FileFormatException(
-        OUString const & uri, OUString const & detail):
-        uri_(uri), detail_(detail)
-    {}
+    SAL_DLLPRIVATE FileFormatException(OUString const& uri, OUString const& detail)
+        : uri_(uri)
+        , detail_(detail) {}
 
-    SAL_DLLPRIVATE FileFormatException(FileFormatException const & other):
-        uri_(other.uri_), detail_(other.detail_)
-    {}
+    SAL_DLLPRIVATE FileFormatException(FileFormatException const& other)
+        : uri_(other.uri_)
+        , detail_(other.detail_) {}
 
     SAL_DLLPRIVATE ~FileFormatException() noexcept;
 
@@ -59,49 +59,72 @@ public:
     const OUString& getDetail() const { return detail_; }
 
 private:
-    FileFormatException& operator =(FileFormatException const &) = delete;
+    FileFormatException& operator=(FileFormatException const&) = delete;
 
     OUString uri_;
     OUString detail_;
 };
 
 struct AnnotatedReference {
-    AnnotatedReference(
-        OUString const & theName,
-        std::vector< OUString > && theAnnotations):
-        name(theName), annotations(std::move(theAnnotations))
-    {}
+    AnnotatedReference(OUString const& theName, std::vector<OUString>&& theAnnotations)
+        : name(theName)
+        , annotations(std::move(theAnnotations))
+        , doc() {}
+
+    AnnotatedReference(OUString const& theName, std::vector<OUString>&& theAnnotations,
+                       OUString const& theDoc)
+        : name(theName)
+        , annotations(std::move(theAnnotations))
+        , doc(theDoc) {}
 
     OUString name;
 
-    std::vector< OUString > annotations;
+    std::vector<OUString> annotations;
+
+    OUString doc;
 };
 
-class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL Entity: public salhelper::SimpleReferenceObject {
+class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL Entity : public salhelper::SimpleReferenceObject {
 public:
     enum Sort {
-        SORT_MODULE, SORT_ENUM_TYPE, SORT_PLAIN_STRUCT_TYPE,
-        SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE, SORT_EXCEPTION_TYPE,
-        SORT_INTERFACE_TYPE, SORT_TYPEDEF, SORT_CONSTANT_GROUP,
-        SORT_SINGLE_INTERFACE_BASED_SERVICE, SORT_ACCUMULATION_BASED_SERVICE,
-        SORT_INTERFACE_BASED_SINGLETON, SORT_SERVICE_BASED_SINGLETON
+        SORT_MODULE,
+        SORT_ENUM_TYPE,
+        SORT_PLAIN_STRUCT_TYPE,
+        SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE,
+        SORT_EXCEPTION_TYPE,
+        SORT_INTERFACE_TYPE,
+        SORT_TYPEDEF,
+        SORT_CONSTANT_GROUP,
+        SORT_SINGLE_INTERFACE_BASED_SERVICE,
+        SORT_ACCUMULATION_BASED_SERVICE,
+        SORT_INTERFACE_BASED_SINGLETON,
+        SORT_SERVICE_BASED_SINGLETON
     };
 
     Sort getSort() const { return sort_; }
+    const OUString& getDoc() const { return doc_; }
 
 protected:
-    explicit SAL_DLLPRIVATE Entity(Sort sort): sort_(sort) {}
+    explicit SAL_DLLPRIVATE Entity(Sort sort)
+        : doc_()
+        , sort_(sort) {}
+
+    SAL_DLLPRIVATE Entity(Sort sort, const OUString& doc)
+        : doc_(doc)
+        , sort_(sort) {}
 
     virtual SAL_DLLPRIVATE ~Entity() noexcept override;
+
+    OUString doc_;
 
 private:
     Sort sort_;
 };
 
-class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL MapCursor: public salhelper::SimpleReferenceObject {
+class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL MapCursor : public salhelper::SimpleReferenceObject {
 public:
     // throws FileFormatException:
-    virtual rtl::Reference< Entity > getNext(OUString * name) = 0;
+    virtual rtl::Reference<Entity> getNext(OUString* name) = 0;
 
 protected:
     SAL_DLLPRIVATE MapCursor() {}
@@ -109,120 +132,164 @@ protected:
     virtual SAL_DLLPRIVATE ~MapCursor() noexcept override;
 };
 
-class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL ModuleEntity: public Entity {
+class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL ModuleEntity : public Entity {
 public:
     // throws FileFormatException:
-    virtual std::vector< OUString > getMemberNames() const = 0;
+    virtual std::vector<OUString> getMemberNames() const = 0;
 
     // throws FileFormatException:
-    virtual rtl::Reference< MapCursor > createCursor() const = 0;
+    virtual rtl::Reference<MapCursor> createCursor() const = 0;
 
 protected:
-    SAL_DLLPRIVATE ModuleEntity(): Entity(SORT_MODULE) {}
+    SAL_DLLPRIVATE ModuleEntity()
+        : Entity(SORT_MODULE) {}
 
     virtual SAL_DLLPRIVATE ~ModuleEntity() noexcept override;
 };
 
-class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL PublishableEntity: public Entity {
+class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL PublishableEntity : public Entity {
 public:
     bool isPublished() const { return published_; }
 
-    std::vector< OUString > const & getAnnotations() const
-    { return annotations_; }
+    std::vector<OUString> const& getAnnotations() const { return annotations_; }
 
 protected:
-    SAL_DLLPRIVATE PublishableEntity(
-        Sort sort, bool published,
-        std::vector< OUString >&& annotations):
-        Entity(sort), published_(published), annotations_(std::move(annotations))
-    {}
+    SAL_DLLPRIVATE PublishableEntity(Sort sort, bool published, std::vector<OUString>&& annotations)
+        : Entity(sort)
+        , published_(published)
+        , annotations_(std::move(annotations)) {}
+
+    SAL_DLLPRIVATE PublishableEntity(Sort sort, bool published, std::vector<OUString>&& annotations,
+                                     const OUString& doc)
+        : Entity(sort, doc)
+        , published_(published)
+        , annotations_(std::move(annotations)) {}
 
     virtual SAL_DLLPRIVATE ~PublishableEntity() noexcept override;
 
 private:
     bool published_;
 
-    std::vector< OUString > annotations_;
+    std::vector<OUString> annotations_;
 };
 
 class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL EnumTypeEntity final : public PublishableEntity {
 public:
     struct Member {
-        Member(
-            OUString const & theName, sal_Int32 theValue,
-            std::vector< OUString >&& theAnnotations):
-            name(theName), value(theValue), annotations(std::move(theAnnotations))
-        {}
+        Member(OUString const& theName, sal_Int32 theValue, std::vector<OUString>&& theAnnotations)
+            : name(theName)
+            , value(theValue)
+            , annotations(std::move(theAnnotations))
+            , doc() {}
+
+        Member(OUString const& theName, sal_Int32 theValue, std::vector<OUString>&& theAnnotations,
+               OUString const& theDoc)
+            : name(theName)
+            , value(theValue)
+            , annotations(std::move(theAnnotations))
+            , doc(theDoc) {}
 
         OUString name;
 
         sal_Int32 value;
 
-        std::vector< OUString > annotations;
+        std::vector<OUString> annotations;
+
+        OUString doc;
     };
 
-    SAL_DLLPRIVATE EnumTypeEntity(
-        bool published, std::vector< Member >&& members,
-        std::vector< OUString >&& annotations):
-        PublishableEntity(SORT_ENUM_TYPE, published, std::move(annotations)),
-        members_(std::move(members))
-    { assert(!members_.empty()); }
+    SAL_DLLPRIVATE EnumTypeEntity(bool published, std::vector<Member>&& members,
+                                  std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_ENUM_TYPE, published, std::move(annotations))
+        , members_(std::move(members)) {
+        assert(!members_.empty());
+    }
 
-    std::vector< Member > const & getMembers() const { return members_; }
+    SAL_DLLPRIVATE EnumTypeEntity(bool published, std::vector<Member>&& members,
+                                  std::vector<OUString>&& annotations, OUString const& doc)
+        : PublishableEntity(SORT_ENUM_TYPE, published, std::move(annotations), doc)
+        , members_(std::move(members)) {
+        assert(!members_.empty());
+    }
+
+    std::vector<Member> const& getMembers() const { return members_; }
 
 private:
     virtual SAL_DLLPRIVATE ~EnumTypeEntity() noexcept override;
 
-    std::vector< Member > members_;
+    std::vector<Member> members_;
 };
 
 class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL PlainStructTypeEntity final : public PublishableEntity {
 public:
     struct Member {
-        Member(OUString const & theName, OUString const & theType,
-               std::vector< OUString >&& theAnnotations):
-            name(theName), type(theType), annotations(std::move(theAnnotations))
-        {}
+        Member(OUString const& theName, OUString const& theType,
+               std::vector<OUString>&& theAnnotations)
+            : name(theName)
+            , type(theType)
+            , annotations(std::move(theAnnotations))
+            , doc() {}
+
+        Member(OUString const& theName, OUString const& theType,
+               std::vector<OUString>&& theAnnotations, OUString const& theDoc)
+            : name(theName)
+            , type(theType)
+            , annotations(std::move(theAnnotations))
+            , doc(theDoc) {}
 
         OUString name;
 
         OUString type;
 
-        std::vector< OUString > annotations;
+        std::vector<OUString> annotations;
+
+        OUString doc;
     };
 
-    SAL_DLLPRIVATE PlainStructTypeEntity(
-        bool published, OUString const & directBase,
-        std::vector< Member >&& directMembers,
-        std::vector< OUString > && annotations):
-        PublishableEntity(SORT_PLAIN_STRUCT_TYPE, published, std::move(annotations)),
-        directBase_(directBase), directMembers_(std::move(directMembers))
-    {}
+    SAL_DLLPRIVATE PlainStructTypeEntity(bool published, OUString const& directBase,
+                                         std::vector<Member>&& directMembers,
+                                         std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_PLAIN_STRUCT_TYPE, published, std::move(annotations))
+        , directBase_(directBase)
+        , directMembers_(std::move(directMembers)) {}
+
+    SAL_DLLPRIVATE PlainStructTypeEntity(bool published, OUString const& directBase,
+                                         std::vector<Member>&& directMembers,
+                                         std::vector<OUString>&& annotations, OUString const& doc)
+        : PublishableEntity(SORT_PLAIN_STRUCT_TYPE, published, std::move(annotations), doc)
+        , directBase_(directBase)
+        , directMembers_(std::move(directMembers)) {}
 
     const OUString& getDirectBase() const { return directBase_; }
 
-    std::vector< Member > const & getDirectMembers() const
-    { return directMembers_; }
+    std::vector<Member> const& getDirectMembers() const { return directMembers_; }
 
 private:
     virtual SAL_DLLPRIVATE ~PlainStructTypeEntity() noexcept override;
 
     OUString directBase_;
-    std::vector< Member > directMembers_;
+    std::vector<Member> directMembers_;
 };
 
-class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL PolymorphicStructTypeTemplateEntity final :
-    public PublishableEntity
-{
+class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL PolymorphicStructTypeTemplateEntity final
+    : public PublishableEntity {
 public:
     struct Member {
-        Member(
-            OUString const & theName, OUString const & theType,
-            bool theParameterized,
-            std::vector< OUString >&& theAnnotations):
-            name(theName), type(theType), parameterized(theParameterized),
-            annotations(std::move(theAnnotations))
-        {}
+        Member(OUString const& theName, OUString const& theType, bool theParameterized,
+               std::vector<OUString>&& theAnnotations)
+            : name(theName)
+            , type(theType)
+            , parameterized(theParameterized)
+            , annotations(std::move(theAnnotations))
+            , doc() {}
+
+        Member(OUString const& theName, OUString const& theType, bool theParameterized,
+               std::vector<OUString>&& theAnnotations, OUString const& theDoc)
+            : name(theName)
+            , type(theType)
+            , parameterized(theParameterized)
+            , annotations(std::move(theAnnotations))
+            , doc(theDoc) {}
 
         OUString name;
 
@@ -230,79 +297,122 @@ public:
 
         bool parameterized;
 
-        std::vector< OUString > annotations;
+        std::vector<OUString> annotations;
+
+        OUString doc;
     };
 
-    SAL_DLLPRIVATE PolymorphicStructTypeTemplateEntity(
-        bool published, std::vector< OUString >&& typeParameters,
-        std::vector< Member >&& members,
-        std::vector< OUString >&& annotations):
-        PublishableEntity(
-            SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE, published, std::move(annotations)),
-        typeParameters_(std::move(typeParameters)), members_(std::move(members))
-    {}
+    SAL_DLLPRIVATE PolymorphicStructTypeTemplateEntity(bool published,
+                                                       std::vector<OUString>&& typeParameters,
+                                                       std::vector<Member>&& members,
+                                                       std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE, published,
+                            std::move(annotations))
+        , typeParameters_(std::move(typeParameters))
+        , members_(std::move(members)) {}
 
-    std::vector< OUString > const & getTypeParameters() const
-    { return typeParameters_; }
+    SAL_DLLPRIVATE
+    PolymorphicStructTypeTemplateEntity(bool published, std::vector<OUString>&& typeParameters,
+                                        std::vector<Member>&& members,
+                                        std::vector<OUString>&& annotations, OUString const& doc)
+        : PublishableEntity(SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE, published,
+                            std::move(annotations), doc)
+        , typeParameters_(std::move(typeParameters))
+        , members_(std::move(members)) {}
 
-    std::vector< Member > const & getMembers() const { return members_; }
+    std::vector<OUString> const& getTypeParameters() const { return typeParameters_; }
+
+    std::vector<Member> const& getMembers() const { return members_; }
 
 private:
     virtual SAL_DLLPRIVATE ~PolymorphicStructTypeTemplateEntity() noexcept override;
 
-    std::vector< OUString > typeParameters_;
-    std::vector< Member > members_;
+    std::vector<OUString> typeParameters_;
+    std::vector<Member> members_;
 };
 
 class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL ExceptionTypeEntity final : public PublishableEntity {
 public:
     struct Member {
-        Member(
-            OUString const & theName, OUString const & theType,
-            std::vector< OUString >&& theAnnotations):
-            name(theName), type(theType), annotations(std::move(theAnnotations))
-        {}
+        Member(OUString const& theName, OUString const& theType,
+               std::vector<OUString>&& theAnnotations)
+            : name(theName)
+            , type(theType)
+            , annotations(std::move(theAnnotations))
+            , doc() {}
+
+        Member(OUString const& theName, OUString const& theType,
+               std::vector<OUString>&& theAnnotations, OUString const& theDoc)
+            : name(theName)
+            , type(theType)
+            , annotations(std::move(theAnnotations))
+            , doc(theDoc) {}
 
         OUString name;
 
         OUString type;
 
-        std::vector< OUString > annotations;
+        std::vector<OUString> annotations;
+
+        OUString doc;
     };
 
-    SAL_DLLPRIVATE ExceptionTypeEntity(
-        bool published, OUString const & directBase,
-        std::vector< Member >&& directMembers,
-        std::vector< OUString >&& annotations):
-        PublishableEntity(SORT_EXCEPTION_TYPE, published, std::move(annotations)),
-        directBase_(directBase), directMembers_(std::move(directMembers))
-    {}
+    SAL_DLLPRIVATE ExceptionTypeEntity(bool published, OUString const& directBase,
+                                       std::vector<Member>&& directMembers,
+                                       std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_EXCEPTION_TYPE, published, std::move(annotations))
+        , directBase_(directBase)
+        , directMembers_(std::move(directMembers)) {}
+
+    SAL_DLLPRIVATE ExceptionTypeEntity(bool published, OUString const& directBase,
+                                       std::vector<Member>&& directMembers,
+                                       std::vector<OUString>&& annotations, OUString const& doc)
+        : PublishableEntity(SORT_EXCEPTION_TYPE, published, std::move(annotations), doc)
+        , directBase_(directBase)
+        , directMembers_(std::move(directMembers)) {}
 
     const OUString& getDirectBase() const { return directBase_; }
 
-    std::vector< Member > const & getDirectMembers() const
-    { return directMembers_; }
+    std::vector<Member> const& getDirectMembers() const { return directMembers_; }
 
 private:
     virtual SAL_DLLPRIVATE ~ExceptionTypeEntity() noexcept override;
 
     OUString directBase_;
-    std::vector< Member > directMembers_;
+    std::vector<Member> directMembers_;
 };
 
 class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL InterfaceTypeEntity final : public PublishableEntity {
 public:
     struct Attribute {
-        Attribute(
-            OUString const & theName, OUString const & theType,
-            bool theBound, bool theReadOnly,
-            std::vector< OUString >&& theGetExceptions,
-            std::vector< OUString >&& theSetExceptions,
-            std::vector< OUString >&& theAnnotations):
-            name(theName), type(theType), bound(theBound),
-            readOnly(theReadOnly), getExceptions(std::move(theGetExceptions)),
-            setExceptions(std::move(theSetExceptions)), annotations(std::move(theAnnotations))
-        { assert(!theReadOnly || setExceptions.empty()); }
+        Attribute(OUString const& theName, OUString const& theType, bool theBound, bool theReadOnly,
+                  std::vector<OUString>&& theGetExceptions,
+                  std::vector<OUString>&& theSetExceptions, std::vector<OUString>&& theAnnotations)
+            : name(theName)
+            , type(theType)
+            , bound(theBound)
+            , readOnly(theReadOnly)
+            , getExceptions(std::move(theGetExceptions))
+            , setExceptions(std::move(theSetExceptions))
+            , annotations(std::move(theAnnotations))
+            , doc() {
+            assert(!theReadOnly || setExceptions.empty());
+        }
+
+        Attribute(OUString const& theName, OUString const& theType, bool theBound, bool theReadOnly,
+                  std::vector<OUString>&& theGetExceptions,
+                  std::vector<OUString>&& theSetExceptions, std::vector<OUString>&& theAnnotations,
+                  OUString const& theDoc)
+            : name(theName)
+            , type(theType)
+            , bound(theBound)
+            , readOnly(theReadOnly)
+            , getExceptions(std::move(theGetExceptions))
+            , setExceptions(std::move(theSetExceptions))
+            , annotations(std::move(theAnnotations))
+            , doc(theDoc) {
+            assert(!theReadOnly || setExceptions.empty());
+        }
 
         OUString name;
 
@@ -312,22 +422,23 @@ public:
 
         bool readOnly;
 
-        std::vector< OUString > getExceptions;
+        std::vector<OUString> getExceptions;
 
-        std::vector< OUString > setExceptions;
+        std::vector<OUString> setExceptions;
 
-        std::vector< OUString > annotations;
+        std::vector<OUString> annotations;
+
+        OUString doc;
     };
 
     struct Method {
         struct Parameter {
             enum Direction { DIRECTION_IN, DIRECTION_OUT, DIRECTION_IN_OUT };
 
-            Parameter(
-                OUString const & theName, OUString const & theType,
-                Direction theDirection):
-                name(theName), type(theType), direction(theDirection)
-            {}
+            Parameter(OUString const& theName, OUString const& theType, Direction theDirection)
+                : name(theName)
+                , type(theType)
+                , direction(theDirection) {}
 
             OUString name;
 
@@ -336,68 +447,94 @@ public:
             Direction direction;
         };
 
-        Method(
-            OUString const & theName, OUString const & theReturnType,
-            std::vector< Parameter >&& theParameters,
-            std::vector< OUString >&& theExceptions,
-            std::vector< OUString >&& theAnnotations):
-            name(theName), returnType(theReturnType), parameters(std::move(theParameters)),
-            exceptions(std::move(theExceptions)), annotations(std::move(theAnnotations))
-        {}
+        Method(OUString const& theName, OUString const& theReturnType,
+               std::vector<Parameter>&& theParameters, std::vector<OUString>&& theExceptions,
+               std::vector<OUString>&& theAnnotations)
+            : name(theName)
+            , returnType(theReturnType)
+            , parameters(std::move(theParameters))
+            , exceptions(std::move(theExceptions))
+            , annotations(std::move(theAnnotations))
+            , doc() {}
+
+        Method(OUString const& theName, OUString const& theReturnType,
+               std::vector<Parameter>&& theParameters, std::vector<OUString>&& theExceptions,
+               std::vector<OUString>&& theAnnotations, OUString const& theDoc)
+            : name(theName)
+            , returnType(theReturnType)
+            , parameters(std::move(theParameters))
+            , exceptions(std::move(theExceptions))
+            , annotations(std::move(theAnnotations))
+            , doc(theDoc) {}
 
         OUString name;
 
         OUString returnType;
 
-        std::vector< Parameter > parameters;
+        std::vector<Parameter> parameters;
 
-        std::vector< OUString > exceptions;
+        std::vector<OUString> exceptions;
 
-        std::vector< OUString > annotations;
+        std::vector<OUString> annotations;
+
+        OUString doc;
     };
 
-    SAL_DLLPRIVATE InterfaceTypeEntity(
-        bool published,
-        std::vector< AnnotatedReference >&& directMandatoryBases,
-        std::vector< AnnotatedReference >&& directOptionalBases,
-        std::vector< Attribute >&& directAttributes,
-        std::vector< Method >&& directMethods,
-        std::vector< OUString >&& annotations):
-        PublishableEntity(SORT_INTERFACE_TYPE, published, std::move(annotations)),
-        directMandatoryBases_(std::move(directMandatoryBases)),
-        directOptionalBases_(std::move(directOptionalBases)),
-        directAttributes_(std::move(directAttributes)),
-        directMethods_(std::move(directMethods))
-    {}
+    SAL_DLLPRIVATE
+    InterfaceTypeEntity(bool published, std::vector<AnnotatedReference>&& directMandatoryBases,
+                        std::vector<AnnotatedReference>&& directOptionalBases,
+                        std::vector<Attribute>&& directAttributes,
+                        std::vector<Method>&& directMethods, std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_INTERFACE_TYPE, published, std::move(annotations))
+        , directMandatoryBases_(std::move(directMandatoryBases))
+        , directOptionalBases_(std::move(directOptionalBases))
+        , directAttributes_(std::move(directAttributes))
+        , directMethods_(std::move(directMethods)) {}
 
-    std::vector< AnnotatedReference > const & getDirectMandatoryBases() const
-    { return directMandatoryBases_; }
+    SAL_DLLPRIVATE
+    InterfaceTypeEntity(bool published, std::vector<AnnotatedReference>&& directMandatoryBases,
+                        std::vector<AnnotatedReference>&& directOptionalBases,
+                        std::vector<Attribute>&& directAttributes,
+                        std::vector<Method>&& directMethods, std::vector<OUString>&& annotations,
+                        OUString const& doc)
+        : PublishableEntity(SORT_INTERFACE_TYPE, published, std::move(annotations), doc)
+        , directMandatoryBases_(std::move(directMandatoryBases))
+        , directOptionalBases_(std::move(directOptionalBases))
+        , directAttributes_(std::move(directAttributes))
+        , directMethods_(std::move(directMethods)) {}
 
-    std::vector< AnnotatedReference > const & getDirectOptionalBases() const
-    { return directOptionalBases_; }
+    std::vector<AnnotatedReference> const& getDirectMandatoryBases() const {
+        return directMandatoryBases_;
+    }
 
-    std::vector< Attribute > const & getDirectAttributes() const
-    { return directAttributes_; }
+    std::vector<AnnotatedReference> const& getDirectOptionalBases() const {
+        return directOptionalBases_;
+    }
 
-    std::vector< Method > const & getDirectMethods() const
-    { return directMethods_; }
+    std::vector<Attribute> const& getDirectAttributes() const { return directAttributes_; }
+
+    std::vector<Method> const& getDirectMethods() const { return directMethods_; }
 
 private:
     virtual SAL_DLLPRIVATE ~InterfaceTypeEntity() noexcept override;
 
-    std::vector< AnnotatedReference > directMandatoryBases_;
-    std::vector< AnnotatedReference > directOptionalBases_;
-    std::vector< Attribute > directAttributes_;
-    std::vector< Method > directMethods_;
+    std::vector<AnnotatedReference> directMandatoryBases_;
+    std::vector<AnnotatedReference> directOptionalBases_;
+    std::vector<Attribute> directAttributes_;
+    std::vector<Method> directMethods_;
 };
 
 class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL TypedefEntity final : public PublishableEntity {
 public:
-    SAL_DLLPRIVATE TypedefEntity(
-        bool published, OUString const & type,
-        std::vector< OUString >&& annotations):
-        PublishableEntity(SORT_TYPEDEF, published, std::move(annotations)), type_(type)
-    {}
+    SAL_DLLPRIVATE TypedefEntity(bool published, OUString const& type,
+                                 std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_TYPEDEF, published, std::move(annotations))
+        , type_(type) {}
+
+    SAL_DLLPRIVATE TypedefEntity(bool published, OUString const& type,
+                                 std::vector<OUString>&& annotations, OUString const& doc)
+        : PublishableEntity(SORT_TYPEDEF, published, std::move(annotations), doc)
+        , type_(type) {}
 
     const OUString& getType() const { return type_; }
 
@@ -409,35 +546,57 @@ private:
 
 struct SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL ConstantValue {
     enum Type {
-        TYPE_BOOLEAN, TYPE_BYTE, TYPE_SHORT, TYPE_UNSIGNED_SHORT, TYPE_LONG,
-        TYPE_UNSIGNED_LONG, TYPE_HYPER, TYPE_UNSIGNED_HYPER, TYPE_FLOAT,
-        TYPE_DOUBLE };
+        TYPE_BOOLEAN,
+        TYPE_BYTE,
+        TYPE_SHORT,
+        TYPE_UNSIGNED_SHORT,
+        TYPE_LONG,
+        TYPE_UNSIGNED_LONG,
+        TYPE_HYPER,
+        TYPE_UNSIGNED_HYPER,
+        TYPE_FLOAT,
+        TYPE_DOUBLE
+    };
 
-    ConstantValue(bool value): type(TYPE_BOOLEAN), booleanValue(value) {}
+    ConstantValue(bool value)
+        : type(TYPE_BOOLEAN)
+        , booleanValue(value) {}
 
-    ConstantValue(sal_Int8 value): type(TYPE_BYTE), byteValue(value) {}
+    ConstantValue(sal_Int8 value)
+        : type(TYPE_BYTE)
+        , byteValue(value) {}
 
-    ConstantValue(sal_Int16 value): type(TYPE_SHORT), shortValue(value) {}
+    ConstantValue(sal_Int16 value)
+        : type(TYPE_SHORT)
+        , shortValue(value) {}
 
-    ConstantValue(sal_uInt16 value):
-        type(TYPE_UNSIGNED_SHORT), unsignedShortValue(value)
-    {}
+    ConstantValue(sal_uInt16 value)
+        : type(TYPE_UNSIGNED_SHORT)
+        , unsignedShortValue(value) {}
 
-    ConstantValue(sal_Int32 value): type(TYPE_LONG), longValue(value) {}
+    ConstantValue(sal_Int32 value)
+        : type(TYPE_LONG)
+        , longValue(value) {}
 
-    ConstantValue(sal_uInt32 value):
-        type(TYPE_UNSIGNED_LONG), unsignedLongValue(value)
-    {}
+    ConstantValue(sal_uInt32 value)
+        : type(TYPE_UNSIGNED_LONG)
+        , unsignedLongValue(value) {}
 
-    ConstantValue(sal_Int64 value): type(TYPE_HYPER), hyperValue(value) {}
+    ConstantValue(sal_Int64 value)
+        : type(TYPE_HYPER)
+        , hyperValue(value) {}
 
-    ConstantValue(sal_uInt64 value):
-        type(TYPE_UNSIGNED_HYPER), unsignedHyperValue(value)
-    {}
+    ConstantValue(sal_uInt64 value)
+        : type(TYPE_UNSIGNED_HYPER)
+        , unsignedHyperValue(value) {}
 
-    ConstantValue(float value): type(TYPE_FLOAT), floatValue(value) {}
+    ConstantValue(float value)
+        : type(TYPE_FLOAT)
+        , floatValue(value) {}
 
-    ConstantValue(double value): type(TYPE_DOUBLE), doubleValue(value) {}
+    ConstantValue(double value)
+        : type(TYPE_DOUBLE)
+        , doubleValue(value) {}
 
     Type type;
 
@@ -458,45 +617,56 @@ struct SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL ConstantValue {
 class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL ConstantGroupEntity final : public PublishableEntity {
 public:
     struct Member {
-        Member(
-            OUString const & theName, ConstantValue const & theValue,
-            std::vector< OUString >&& theAnnotations):
-            name(theName), value(theValue), annotations(std::move(theAnnotations))
-        {}
+        Member(OUString const& theName, ConstantValue const& theValue,
+               std::vector<OUString>&& theAnnotations)
+            : name(theName)
+            , value(theValue)
+            , annotations(std::move(theAnnotations))
+            , doc() {}
+
+        Member(OUString const& theName, ConstantValue const& theValue,
+               std::vector<OUString>&& theAnnotations, OUString const& theDoc)
+            : name(theName)
+            , value(theValue)
+            , annotations(std::move(theAnnotations))
+            , doc(theDoc) {}
 
         OUString name;
 
         ConstantValue value;
 
-        std::vector< OUString > annotations;
+        std::vector<OUString> annotations;
+
+        OUString doc;
     };
 
-    SAL_DLLPRIVATE ConstantGroupEntity(
-        bool published, std::vector< Member >&& members,
-        std::vector< OUString >&& annotations):
-        PublishableEntity(SORT_CONSTANT_GROUP, published, std::move(annotations)),
-        members_(std::move(members))
-    {}
+    SAL_DLLPRIVATE ConstantGroupEntity(bool published, std::vector<Member>&& members,
+                                       std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_CONSTANT_GROUP, published, std::move(annotations))
+        , members_(std::move(members)) {}
 
-    std::vector< Member > const & getMembers() const { return members_; }
+    SAL_DLLPRIVATE ConstantGroupEntity(bool published, std::vector<Member>&& members,
+                                       std::vector<OUString>&& annotations, OUString const& doc)
+        : PublishableEntity(SORT_CONSTANT_GROUP, published, std::move(annotations), doc)
+        , members_(std::move(members)) {}
+
+    std::vector<Member> const& getMembers() const { return members_; }
 
 private:
     virtual SAL_DLLPRIVATE ~ConstantGroupEntity() noexcept override;
 
-    std::vector< Member > members_;
+    std::vector<Member> members_;
 };
 
-class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL SingleInterfaceBasedServiceEntity final :
-    public PublishableEntity
-{
+class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL SingleInterfaceBasedServiceEntity final
+    : public PublishableEntity {
 public:
     struct Constructor {
         struct Parameter {
-            Parameter(
-                OUString const & theName, OUString const & theType,
-                bool theRest):
-                name(theName), type(theType), rest(theRest)
-            {}
+            Parameter(OUString const& theName, OUString const& theType, bool theRest)
+                : name(theName)
+                , type(theType)
+                , rest(theRest) {}
 
             OUString name;
 
@@ -505,55 +675,70 @@ public:
             bool rest;
         };
 
-        Constructor():
-            defaultConstructor(true) {}
+        Constructor()
+            : defaultConstructor(true) {}
 
-        Constructor(
-            OUString const & theName,
-            std::vector< Parameter >&& theParameters,
-            std::vector< OUString >&& theExceptions,
-            std::vector< OUString >&& theAnnotations):
-            name(theName), parameters(std::move(theParameters)),
-            exceptions(std::move(theExceptions)),
-            annotations(std::move(theAnnotations)),
-            defaultConstructor(false)
-        {}
+        Constructor(OUString const& theName, std::vector<Parameter>&& theParameters,
+                    std::vector<OUString>&& theExceptions, std::vector<OUString>&& theAnnotations)
+            : name(theName)
+            , parameters(std::move(theParameters))
+            , exceptions(std::move(theExceptions))
+            , annotations(std::move(theAnnotations))
+            , defaultConstructor(false)
+            , doc() {}
+
+        Constructor(OUString const& theName, std::vector<Parameter>&& theParameters,
+                    std::vector<OUString>&& theExceptions, std::vector<OUString>&& theAnnotations,
+                    OUString const& theDoc)
+            : name(theName)
+            , parameters(std::move(theParameters))
+            , exceptions(std::move(theExceptions))
+            , annotations(std::move(theAnnotations))
+            , defaultConstructor(false)
+            , doc(theDoc) {}
 
         OUString name;
 
-        std::vector< Parameter > parameters;
+        std::vector<Parameter> parameters;
 
-        std::vector< OUString > exceptions;
+        std::vector<OUString> exceptions;
 
-        std::vector< OUString > annotations;
+        std::vector<OUString> annotations;
 
         bool defaultConstructor;
+
+        OUString doc;
     };
 
-    SAL_DLLPRIVATE SingleInterfaceBasedServiceEntity(
-        bool published, OUString const & base,
-        std::vector< Constructor >&& constructors,
-        std::vector< OUString >&& annotations):
-        PublishableEntity(
-            SORT_SINGLE_INTERFACE_BASED_SERVICE, published, std::move(annotations)),
-        base_(base), constructors_(std::move(constructors))
-    {}
+    SAL_DLLPRIVATE SingleInterfaceBasedServiceEntity(bool published, OUString const& base,
+                                                     std::vector<Constructor>&& constructors,
+                                                     std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_SINGLE_INTERFACE_BASED_SERVICE, published, std::move(annotations))
+        , base_(base)
+        , constructors_(std::move(constructors)) {}
+
+    SAL_DLLPRIVATE SingleInterfaceBasedServiceEntity(bool published, OUString const& base,
+                                                     std::vector<Constructor>&& constructors,
+                                                     std::vector<OUString>&& annotations,
+                                                     OUString const& doc)
+        : PublishableEntity(SORT_SINGLE_INTERFACE_BASED_SERVICE, published, std::move(annotations),
+                            doc)
+        , base_(base)
+        , constructors_(std::move(constructors)) {}
 
     const OUString& getBase() const { return base_; }
 
-    std::vector< Constructor > const & getConstructors() const
-    { return constructors_; }
+    std::vector<Constructor> const& getConstructors() const { return constructors_; }
 
 private:
     virtual SAL_DLLPRIVATE ~SingleInterfaceBasedServiceEntity() noexcept override;
 
     OUString base_;
-    std::vector< Constructor > constructors_;
+    std::vector<Constructor> constructors_;
 };
 
-class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL AccumulationBasedServiceEntity final :
-    public PublishableEntity
-{
+class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL AccumulationBasedServiceEntity final
+    : public PublishableEntity {
 public:
     struct Property {
         enum Attributes {
@@ -568,13 +753,21 @@ public:
             ATTRIBUTE_OPTIONAL = 0x100
         };
 
-        Property(
-            OUString const & theName, OUString const & theType,
-            Attributes theAttributes,
-            std::vector< OUString >&& theAnnotations):
-            name(theName), type(theType), attributes(theAttributes),
-            annotations(std::move(theAnnotations))
-        {}
+        Property(OUString const& theName, OUString const& theType, Attributes theAttributes,
+                 std::vector<OUString>&& theAnnotations)
+            : name(theName)
+            , type(theType)
+            , attributes(theAttributes)
+            , annotations(std::move(theAnnotations))
+            , doc() {}
+
+        Property(OUString const& theName, OUString const& theType, Attributes theAttributes,
+                 std::vector<OUString>&& theAnnotations, OUString const& theDoc)
+            : name(theName)
+            , type(theType)
+            , attributes(theAttributes)
+            , annotations(std::move(theAnnotations))
+            , doc(theDoc) {}
 
         OUString name;
 
@@ -582,66 +775,79 @@ public:
 
         Attributes attributes;
 
-        std::vector< OUString > annotations;
+        std::vector<OUString> annotations;
+
+        OUString doc;
     };
 
     SAL_DLLPRIVATE AccumulationBasedServiceEntity(
-        bool published,
-        std::vector< AnnotatedReference >&& directMandatoryBaseServices,
-        std::vector< AnnotatedReference >&& directOptionalBaseServices,
-        std::vector< AnnotatedReference >&& directMandatoryBaseInterfaces,
-        std::vector< AnnotatedReference >&& directOptionalBaseInterfaces,
-        std::vector< Property >&& directProperties,
-        std::vector< OUString >&& annotations):
-        PublishableEntity(
-            SORT_ACCUMULATION_BASED_SERVICE, published, std::move(annotations)),
-        directMandatoryBaseServices_(std::move(directMandatoryBaseServices)),
-        directOptionalBaseServices_(std::move(directOptionalBaseServices)),
-        directMandatoryBaseInterfaces_(std::move(directMandatoryBaseInterfaces)),
-        directOptionalBaseInterfaces_(std::move(directOptionalBaseInterfaces)),
-        directProperties_(std::move(directProperties))
-        {}
+        bool published, std::vector<AnnotatedReference>&& directMandatoryBaseServices,
+        std::vector<AnnotatedReference>&& directOptionalBaseServices,
+        std::vector<AnnotatedReference>&& directMandatoryBaseInterfaces,
+        std::vector<AnnotatedReference>&& directOptionalBaseInterfaces,
+        std::vector<Property>&& directProperties, std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_ACCUMULATION_BASED_SERVICE, published, std::move(annotations))
+        , directMandatoryBaseServices_(std::move(directMandatoryBaseServices))
+        , directOptionalBaseServices_(std::move(directOptionalBaseServices))
+        , directMandatoryBaseInterfaces_(std::move(directMandatoryBaseInterfaces))
+        , directOptionalBaseInterfaces_(std::move(directOptionalBaseInterfaces))
+        , directProperties_(std::move(directProperties)) {}
 
-    std::vector< AnnotatedReference > const & getDirectMandatoryBaseServices()
-        const
-    { return directMandatoryBaseServices_; }
+    SAL_DLLPRIVATE
+    AccumulationBasedServiceEntity(bool published,
+                                   std::vector<AnnotatedReference>&& directMandatoryBaseServices,
+                                   std::vector<AnnotatedReference>&& directOptionalBaseServices,
+                                   std::vector<AnnotatedReference>&& directMandatoryBaseInterfaces,
+                                   std::vector<AnnotatedReference>&& directOptionalBaseInterfaces,
+                                   std::vector<Property>&& directProperties,
+                                   std::vector<OUString>&& annotations, OUString const& doc)
+        : PublishableEntity(SORT_ACCUMULATION_BASED_SERVICE, published, std::move(annotations), doc)
+        , directMandatoryBaseServices_(std::move(directMandatoryBaseServices))
+        , directOptionalBaseServices_(std::move(directOptionalBaseServices))
+        , directMandatoryBaseInterfaces_(std::move(directMandatoryBaseInterfaces))
+        , directOptionalBaseInterfaces_(std::move(directOptionalBaseInterfaces))
+        , directProperties_(std::move(directProperties)) {}
 
-    std::vector< AnnotatedReference > const & getDirectOptionalBaseServices()
-        const
-    { return directOptionalBaseServices_; }
+    std::vector<AnnotatedReference> const& getDirectMandatoryBaseServices() const {
+        return directMandatoryBaseServices_;
+    }
 
-    std::vector< AnnotatedReference > const & getDirectMandatoryBaseInterfaces()
-        const
-    { return directMandatoryBaseInterfaces_; }
+    std::vector<AnnotatedReference> const& getDirectOptionalBaseServices() const {
+        return directOptionalBaseServices_;
+    }
 
-    std::vector< AnnotatedReference > const & getDirectOptionalBaseInterfaces()
-        const
-    { return directOptionalBaseInterfaces_; }
+    std::vector<AnnotatedReference> const& getDirectMandatoryBaseInterfaces() const {
+        return directMandatoryBaseInterfaces_;
+    }
 
-    std::vector< Property > const & getDirectProperties() const
-    { return directProperties_; }
+    std::vector<AnnotatedReference> const& getDirectOptionalBaseInterfaces() const {
+        return directOptionalBaseInterfaces_;
+    }
+
+    std::vector<Property> const& getDirectProperties() const { return directProperties_; }
 
 private:
     virtual SAL_DLLPRIVATE ~AccumulationBasedServiceEntity() noexcept override;
 
-    std::vector< AnnotatedReference > directMandatoryBaseServices_;
-    std::vector< AnnotatedReference > directOptionalBaseServices_;
-    std::vector< AnnotatedReference > directMandatoryBaseInterfaces_;
-    std::vector< AnnotatedReference > directOptionalBaseInterfaces_;
-    std::vector< Property > directProperties_;
+    std::vector<AnnotatedReference> directMandatoryBaseServices_;
+    std::vector<AnnotatedReference> directOptionalBaseServices_;
+    std::vector<AnnotatedReference> directMandatoryBaseInterfaces_;
+    std::vector<AnnotatedReference> directOptionalBaseInterfaces_;
+    std::vector<Property> directProperties_;
 };
 
-class LO_DLLPUBLIC_UNOIDL InterfaceBasedSingletonEntity final :
-    public PublishableEntity
-{
+class LO_DLLPUBLIC_UNOIDL InterfaceBasedSingletonEntity final : public PublishableEntity {
 public:
-    SAL_DLLPRIVATE InterfaceBasedSingletonEntity(
-        bool published, OUString const & base,
-        std::vector< OUString >&& annotations):
-        PublishableEntity(
-            SORT_INTERFACE_BASED_SINGLETON, published, std::move(annotations)),
-        base_(base)
-    {}
+    SAL_DLLPRIVATE InterfaceBasedSingletonEntity(bool published, OUString const& base,
+                                                 std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_INTERFACE_BASED_SINGLETON, published, std::move(annotations))
+        , base_(base) {}
+
+    SAL_DLLPRIVATE InterfaceBasedSingletonEntity(bool published, OUString const& base,
+                                                 std::vector<OUString>&& annotations,
+                                                 OUString const& doc)
+        : PublishableEntity(SORT_INTERFACE_BASED_SINGLETON, published, std::move(annotations), doc)
+        , base_(base) {}
 
     const OUString& getBase() const { return base_; }
 
@@ -651,15 +857,19 @@ private:
     OUString base_;
 };
 
-class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL ServiceBasedSingletonEntity final : public PublishableEntity
-{
+class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL ServiceBasedSingletonEntity final
+    : public PublishableEntity {
 public:
-    SAL_DLLPRIVATE ServiceBasedSingletonEntity(
-        bool published, OUString const & base,
-        std::vector< OUString >&& annotations):
-        PublishableEntity(SORT_SERVICE_BASED_SINGLETON, published, std::move(annotations)),
-        base_(base)
-    {}
+    SAL_DLLPRIVATE ServiceBasedSingletonEntity(bool published, OUString const& base,
+                                               std::vector<OUString>&& annotations)
+        : PublishableEntity(SORT_SERVICE_BASED_SINGLETON, published, std::move(annotations))
+        , base_(base) {}
+
+    SAL_DLLPRIVATE ServiceBasedSingletonEntity(bool published, OUString const& base,
+                                               std::vector<OUString>&& annotations,
+                                               OUString const& doc)
+        : PublishableEntity(SORT_SERVICE_BASED_SINGLETON, published, std::move(annotations), doc)
+        , base_(base) {}
 
     const OUString& getBase() const { return base_; }
 
@@ -669,14 +879,13 @@ private:
     OUString base_;
 };
 
-class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL Provider: public salhelper::SimpleReferenceObject {
+class SAL_WARN_UNUSED LO_DLLPUBLIC_UNOIDL Provider : public salhelper::SimpleReferenceObject {
 public:
     // throws FileFormatException:
-    virtual rtl::Reference< MapCursor > createRootCursor() const = 0;
+    virtual rtl::Reference<MapCursor> createRootCursor() const = 0;
 
     // throws FileFormatException:
-    virtual rtl::Reference< Entity > findEntity(OUString const & name)
-        const = 0;
+    virtual rtl::Reference<Entity> findEntity(OUString const& name) const = 0;
 
 protected:
     SAL_DLLPRIVATE Provider() {}
@@ -689,22 +898,21 @@ public:
     Manager() {}
 
     // throws FileFormatException, NoSuchFileException:
-    rtl::Reference< Provider > addProvider(OUString const & uri);
+    rtl::Reference<Provider> addProvider(OUString const& uri);
 
     // throws FileFormatException:
-    rtl::Reference< Entity > findEntity(OUString const & name) const;
+    rtl::Reference<Entity> findEntity(OUString const& name) const;
 
     // throws FileFormatException:
-    rtl::Reference< MapCursor > createCursor(OUString const & name) const;
+    rtl::Reference<MapCursor> createCursor(OUString const& name) const;
 
 private:
     virtual SAL_DLLPRIVATE ~Manager() noexcept override;
 
-    SAL_DLLPRIVATE rtl::Reference< Provider > loadProvider(
-        OUString const & uri);
+    SAL_DLLPRIVATE rtl::Reference<Provider> loadProvider(OUString const& uri);
 
     mutable osl::Mutex mutex_;
-    std::vector< rtl::Reference< Provider > > providers_;
+    std::vector<rtl::Reference<Provider>> providers_;
 };
 
 }

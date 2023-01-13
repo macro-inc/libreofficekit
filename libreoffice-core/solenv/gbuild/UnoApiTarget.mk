@@ -25,6 +25,9 @@ gb_UnoApiTarget_UNOIDLWRITECOMMAND := $(call gb_Executable_get_command,unoidl-wr
 gb_UnoApiTarget_UNOIDLCHECKDEPS := $(call gb_Executable_get_runtime_dependencies,unoidl-check)
 gb_UnoApiTarget_UNOIDLCHECKCOMMAND := $(call gb_Executable_get_command,unoidl-check)
 
+gb_UnoApiTarget_UNOIDLV8DEPS := $(call gb_Executable_get_runtime_dependencies,unoidl-v8)
+gb_UnoApiTarget_UNOIDLV8COMMAND := $(call gb_Executable_get_command,unoidl-v8)
+
 define gb_UnoApiTarget__command
 mkdir -p $(dir $(1)) \
 $(if $(UNOAPI_ENTITIES), \
@@ -32,7 +35,6 @@ $(if $(UNOAPI_ENTITIES), \
 && $(gb_UnoApiTarget_UNOIDLWRITECOMMAND) \
 	$(foreach rdb,$(UNOAPI_DEPRDBS),$(call gb_UnoApiTarget_get_target,$(rdb))) \
 	$(SRCDIR)/$(gb_UnoApiTarget_REG_$(2)) $(if $(UNOAPI_ENTITIES),@$${RESPONSEFILE}) $(1) \
-$(if $(UNOAPI_ENTITIES),&& rm -f $${RESPONSEFILE}) \
 $(if $(UNOAPI_REFERENCE), \
 	$(call gb_Output_announce,$(2),$(true),DBc,3) \
 	&& $(gb_UnoApiTarget_UNOIDLCHECKCOMMAND) $(UNOAPI_REFERENCE) -- \
@@ -58,6 +60,7 @@ $(call gb_UnoApiTarget_get_target,$(1)) : UNOAPI_ENTITIES :=
 $(call gb_UnoApiTarget_get_target,$(1)) : UNOAPI_REFERENCE :=
 $(call gb_UnoApiTarget_get_target,$(1)) : UNOAPI_DEPRDBS :=
 $(call gb_UnoApiTarget_get_target,$(1)) : $(gb_UnoApiTarget_UNOIDLWRITEDEPS)
+$(call gb_UnoApiTarget_get_target,$(1)) : $(gb_UnoApiTarget_UNOIDLV8DEPS)
 $(call gb_UnoApiTarget_get_target,$(1)) : $(SRCDIR)/$(2) # may be dir, though
 
 endef
