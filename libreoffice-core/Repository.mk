@@ -63,6 +63,7 @@ $(eval $(call gb_Helper_register_executables,NONE, \
 	ulfex \
 	unoidl-read \
 	unoidl-write \
+	unoidl-v8 \
 	xrmex \
 	$(if $(filter-out ANDROID iOS WNT,$(OS)), \
         svdemo \
