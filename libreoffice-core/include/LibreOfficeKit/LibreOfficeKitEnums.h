@@ -1055,9 +1055,10 @@ static inline const char* lokCallbackTypeToString(int nType)
         return "LOK_CALLBACK_MEDIA_SHAPE";
     case LOK_CALLBACK_EXPORT_FILE:
         return "LOK_CALLBACK_EXPORT_FILE";
+    default:
+        return "LOK_CALLBACK_UNKNOWN";
     }
 
-    assert(!"Unknown LibreOfficeKitCallbackType type.");
     return nullptr;
 }
 
