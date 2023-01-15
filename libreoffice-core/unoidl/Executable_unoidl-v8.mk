@@ -10,6 +10,10 @@
 $(eval $(call gb_Executable_Executable,unoidl-v8))
 
 $(eval $(call gb_Executable_add_exception_objects,unoidl-v8, \
+    unoidl/source/v8/writer-map-entities \
+    unoidl/source/v8/writer \
+    unoidl/source/v8/writer-v8 \
+    unoidl/source/v8/writer-typescript \
     unoidl/source/unoidl-v8 \
 ))
 
