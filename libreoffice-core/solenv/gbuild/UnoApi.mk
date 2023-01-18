@@ -36,28 +36,8 @@ $(call gb_Helper_make_userfriendly_targets,$(1),UnoApi)
 
 endef
 
-ifneq ($(gb_UnoApi_ENABLE_INSTALL),)
-
-# Create a package of IDL files for putting into SDK.
-#
-# gb_UnoApi_package_idlfiles api
-define gb_UnoApi_package_idlfiles
-$(call gb_UnoApi_get_target,$(1)) :| $(call gb_Package_get_target,$(1)_idl)
-$(call gb_UnoApi_get_clean_target,$(1)) : $(call gb_Package_get_clean_target,$(1)_idl)
-
-endef
-
-define gb_UnoApi__add_idlfile
-$(call gb_Package_add_file,$(1)_idl,$(patsubst $(1)/%,$(SDKDIRNAME)/idl/%,$(2).idl),$(2).idl)
-
-endef
-
-else # !gb_UnoApi_ENABLE_INSTALL
-
 gb_UnoApi_package_idlfiles :=
 gb_UnoApi__add_idlfile :=
-
-endif
 
 # For enum types, plain struct types, polymorphic struct type templates,
 # exception types, interface types, typedefs, and constant groups:
