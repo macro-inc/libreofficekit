@@ -7,7 +7,7 @@ namespace writer {
 
 void BaseWriter::writeDoc(OUString const& doc) {
     if (!doc.isEmpty())
-        out("/** " + doc + " */");
+        out("/** " + doc + " */\n");
 }
 
 void BaseWriter::writeDoc(rtl::Reference<unoidl::Entity> const& entity) {
@@ -15,19 +15,52 @@ void BaseWriter::writeDoc(rtl::Reference<unoidl::Entity> const& entity) {
     writeDoc(entity->getDoc());
 }
 
+void BaseWriter::close() { file_->close(); }
+
 void BaseWriter::writeEntity(OUString const& name) {
     std::map<OUString, Entity*>::iterator i(entities_.find(name));
     if (i == entities_.end() || !i->second->relevant)
         return;
 
+    currentEntity_ = name;
+
     assert(i->second.written != Entity::Written::DEFINITION);
     i->second->written = Entity::Written::DEFINITION;
 
-    createEntityFile(name);
+    for (auto& j : i->second->dependencies) {
+        std::map<OUString, Entity*>::iterator k(entities_.find(j));
+        if (k == entities_.end()) {
+            writeInterfaceDependency(name, j, false);
+            continue;
+        }
+        if (k->second->entity->getSort() != unoidl::Entity::SORT_EXCEPTION_TYPE
+            && k->second->entity->getSort() != unoidl::Entity::SORT_SINGLE_INTERFACE_BASED_SERVICE
+            && k->second->entity->getSort() != unoidl::Entity::SORT_SERVICE_BASED_SINGLETON
+            && k->second->entity->getSort() != unoidl::Entity::SORT_INTERFACE_BASED_SINGLETON
+            && k->second->entity->getSort() != unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE) {
+            k->second->written = Entity::Written::DECLARATION;
 
+            if (k->second->entity->getSort() != unoidl::Entity::SORT_ENUM_TYPE
+                && k->second->entity->getSort() != unoidl::Entity::SORT_PLAIN_STRUCT_TYPE
+                && k->second->entity->getSort()
+                       != unoidl::Entity::SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE
+                && k->second->entity->getSort() != unoidl::Entity::SORT_CONSTANT_GROUP
+                && k->second->entity->getSort() != unoidl::Entity::SORT_TYPEDEF
+                && k->second->entity->getSort() != unoidl::Entity::SORT_INTERFACE_TYPE) {
+                std::cerr << "Entity " << j
+                          << " is an unexpected type: " << k->second->entity->getSort()
+                          << std::endl;
+                std::exit(EXIT_FAILURE);
+            }
+
+            writeInterfaceDependency(
+                name, j,
+                static_cast<unoidl::PublishableEntity*>(k->second->entity.get())->isPublished());
+        }
+    }
     for (auto& j : i->second->interfaceDependencies) {
         std::map<OUString, Entity*>::iterator k(entities_.find(j));
-        if (k != entities_.end() && k->second->written == Entity::Written::NO) {
+        if (k != entities_.end()) {
             k->second->written = Entity::Written::DECLARATION;
 
             if (k->second->entity->getSort() != unoidl::Entity::SORT_INTERFACE_TYPE) {
@@ -38,11 +71,15 @@ void BaseWriter::writeEntity(OUString const& name) {
             writeInterfaceDependency(
                 name, j,
                 static_cast<unoidl::PublishableEntity*>(k->second->entity.get())->isPublished());
+        } else {
+            writeInterfaceDependency(name, j, false);
         }
     }
 
     rtl::Reference<unoidl::PublishableEntity> ent(
         static_cast<unoidl::PublishableEntity*>(i->second->entity.get()));
+
+    // write the entity doc
     writeDoc(ent);
 
     switch (ent->getSort()) {
@@ -118,15 +155,11 @@ void BaseWriter::out(OUString const& text) {
     }
 }
 
-OUString simplifyNamespace(OUString const& name) {
-    return name.replaceFirst("com.sun.star.", "api.");
-}
+OUString simplifyNamespace(OUString const& name) { return name.replaceFirst("com.sun.star.", ""); }
 
-void BaseWriter::createEntityFile(OUString const& entityName) {
-    if (file_)
-        file_->close();
-
-    OUString fileUrl(outDirectoryUrl_ + "/" + simplifyNamespace(entityName).replaceAll(".", "/"));
+void BaseWriter::createEntityFile(OUString const& entityName, OUString const& suffix) {
+    OUString fileUrl(outDirectoryUrl_ + "/" + simplifyNamespace(entityName).replaceAll(".", "/")
+                     + suffix);
 
     OUString dir(fileUrl.subView(0, fileUrl.lastIndexOf('/')));
 
@@ -216,6 +249,14 @@ OUString entityName(OUString const& name) {
         return name;
 
     return OUString(name.subView(idx + 1));
+}
+
+OUString entityNamespace(OUString const& name) {
+    sal_Int32 idx = name.lastIndexOf('.');
+    if (idx == -1)
+        return name;
+
+    return OUString(name.subView(0, idx));
 }
 
 }

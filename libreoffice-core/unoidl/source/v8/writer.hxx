@@ -39,6 +39,7 @@ void mapEntities(rtl::Reference<unoidl::Manager> const& manager, OUString const&
                  std::map<OUString, writer::Entity*>& flatMap);
 
 OUString entityName(OUString const& name);
+OUString entityNamespace(OUString const& name);
 OUString simplifyNamespace(OUString const& name);
 
 class BaseWriter {
@@ -48,17 +49,20 @@ public:
         , outDirectoryUrl_(outDirectoryUrl){};
     virtual void writeEntity(OUString const& name);
     virtual ~BaseWriter() = default;
+    void createEntityFile(OUString const& entityName, OUString const& suffix);
+    void close();
 
 protected:
     std::map<OUString, Entity*> entities_;
     OUString outDirectoryUrl_;
-    void createEntityFile(OUString const& entityName);
+    OUString currentEntity_;
     void out(OUString const& text);
 
     virtual void writeDoc(rtl::Reference<unoidl::Entity> const& entity);
     virtual void writeDoc(OUString const& doc);
 
     virtual void writeName(OUString const& name) = 0;
+    virtual OUString translateSimpleType(OUString const& name) = 0;
     virtual void writeType(OUString const& name) = 0;
     /** Declares interface dependencies/imports/includes */
     virtual void writeInterfaceDependency(OUString const& dependentName,
@@ -110,6 +114,7 @@ public:
 
 private:
     void writeName(OUString const& name);
+    OUString translateSimpleType(OUString const& name);
     void writeType(OUString const& name);
     void writeInterfaceDependency(OUString const& dependentName, OUString const& dependencyName,
                                   bool published);
@@ -138,9 +143,11 @@ class TypeScriptWriter : public BaseWriter {
 public:
     TypeScriptWriter(std::map<OUString, Entity*> entities, OUString const& outDirectoryUrl)
         : BaseWriter(entities, outDirectoryUrl) {}
+    void writeTSIndex(OUString const& name, Entity* moduleEntity);
 
 private:
     void writeName(OUString const& name);
+    OUString translateSimpleType(OUString const& name);
     void writeType(OUString const& name);
     void writeInterfaceDependency(OUString const& dependentName, OUString const& dependencyName,
                                   bool published);
@@ -163,6 +170,8 @@ private:
                                  rtl::Reference<unoidl::InterfaceBasedSingletonEntity> entity);
     void writeServiceSingleton(OUString const& name,
                                rtl::Reference<unoidl::ServiceBasedSingletonEntity> entity);
+
+    std::map<OUString, int> dependentNamespace{};
 };
 }
 

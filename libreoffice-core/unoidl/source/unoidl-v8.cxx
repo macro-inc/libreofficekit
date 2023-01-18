@@ -167,6 +167,23 @@ std::vector<OUString> sort(std::map<OUString, writer::Entity*>& entities) {
     return res;
 }
 
+void writeTSModuleMap(std::map<OUString, writer::Entity*>& entities,
+                      writer::TypeScriptWriter* writer, OUString const& prefix = "") {
+    for (auto& i : entities) {
+        if (i.second->entity->getSort() != unoidl::Entity::SORT_MODULE) {
+            continue;
+        }
+
+        writeTSModuleMap(i.second->module, writer, prefix + i.first + ".");
+
+        if (i.first == "com" || (i.first == "sun" && prefix == "com.")) {
+            continue;
+        }
+
+        writer->writeTSIndex(prefix + i.first, i.second);
+    }
+}
+
 } // namespace
 
 SAL_IMPLEMENT_MAIN() {
@@ -203,10 +220,22 @@ SAL_IMPLEMENT_MAIN() {
 
         std::vector<OUString> sorted(sort(flatMap));
         std::vector<OUString> mods;
-        writer::BaseWriter* w = new writer::V8Writer(flatMap, getArgumentUri(args - 1, nullptr));
+        auto* w = new writer::TypeScriptWriter(flatMap, getArgumentUri(args - 1, nullptr));
+        std::cerr << "Writing " << sorted.size() << " published entities" << std::endl;
+
         for (const auto& i : sorted) {
+            std::map<OUString, writer::Entity*>::iterator j(flatMap.find(i));
+            // skip irrelevant entities and those without bindings in JS/C++
+            if (j == flatMap.end() || !j->second->relevant
+                || j->second->entity->getSort() == unoidl::Entity::SORT_EXCEPTION_TYPE)
+                continue;
+
+            w->createEntityFile(i, ".d.ts");
             w->writeEntity(i);
+            w->close();
         }
+
+        writeTSModuleMap(nestedMap, w);
 
         return EXIT_SUCCESS;
     } catch (unoidl::FileFormatException& e1) {
