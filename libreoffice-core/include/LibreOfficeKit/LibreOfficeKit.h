@@ -122,6 +122,8 @@ struct _LibreOfficeKitClass
     /// @see lok::Document::dumpState
     /// @since LibreOffice 7.5
     void (*dumpState) (LibreOfficeKit* pThis, const char* pOptions, char** pState);
+
+    void* (*getXComponentContext) (LibreOfficeKit* pThis);
 };
 
 #define LIBREOFFICEKIT_DOCUMENT_HAS(pDoc,member) LIBREOFFICEKIT_HAS_MEMBER(LibreOfficeKitDocumentClass,member,(pDoc)->pClass->nSize)
@@ -248,7 +250,6 @@ struct _LibreOfficeKitDocumentClass
 
     /// @see lok::Document::gotoOutline().
     char* (*gotoOutline) (LibreOfficeKitDocument* pThis, int idx);
-
 
     /// @see lok::Document::setClientZoom().
     void (*setClientZoom) (LibreOfficeKitDocument* pThis,
@@ -492,6 +493,8 @@ struct _LibreOfficeKitDocumentClass
                          long nPart,
                          long* pCol,
                          long* pRow);
+
+    void* (*getXComponent) (LibreOfficeKitDocument* pThis);
 
 #endif // defined LOK_USE_UNSTABLE_API || defined LIBO_INTERNAL_ONLY
 };
