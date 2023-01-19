@@ -33,25 +33,8 @@ void BaseWriter::writeEntity(OUString const& name) {
             writeInterfaceDependency(name, j, false);
             continue;
         }
-        if (k->second->entity->getSort() != unoidl::Entity::SORT_EXCEPTION_TYPE
-            && k->second->entity->getSort() != unoidl::Entity::SORT_SINGLE_INTERFACE_BASED_SERVICE
-            && k->second->entity->getSort() != unoidl::Entity::SORT_SERVICE_BASED_SINGLETON
-            && k->second->entity->getSort() != unoidl::Entity::SORT_INTERFACE_BASED_SINGLETON
-            && k->second->entity->getSort() != unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE) {
+        if (k->second->entity->getSort() != unoidl::Entity::SORT_EXCEPTION_TYPE) {
             k->second->written = Entity::Written::DECLARATION;
-
-            if (k->second->entity->getSort() != unoidl::Entity::SORT_ENUM_TYPE
-                && k->second->entity->getSort() != unoidl::Entity::SORT_PLAIN_STRUCT_TYPE
-                && k->second->entity->getSort()
-                       != unoidl::Entity::SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE
-                && k->second->entity->getSort() != unoidl::Entity::SORT_CONSTANT_GROUP
-                && k->second->entity->getSort() != unoidl::Entity::SORT_TYPEDEF
-                && k->second->entity->getSort() != unoidl::Entity::SORT_INTERFACE_TYPE) {
-                std::cerr << "Entity " << j
-                          << " is an unexpected type: " << k->second->entity->getSort()
-                          << std::endl;
-                std::exit(EXIT_FAILURE);
-            }
 
             writeInterfaceDependency(
                 name, j,
