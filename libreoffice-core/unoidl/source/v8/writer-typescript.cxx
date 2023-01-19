@@ -209,21 +209,6 @@ void TypeScriptWriter::writeException(OUString const& name,
 void TypeScriptWriter::writeInterface(OUString const& name,
                                       rtl::Reference<unoidl::InterfaceTypeEntity> entity) {
     out("export interface " + entityName(name) + "{");
-    out(R"(/**
- * Cast this object as `interface_`
- *
- * @param interface_ The type symbol for the interface type
- * @returns This object cast as the interface type of `interface_`
- */
-as<K extends keyof DirectBase, R extends DirectBase[K]>(interface_: K): R;
-/**
- * Attempts to cast this object as `interface_`
- *
- * @param interface_ The type symbol for the interface type
- * @returns This object cast as the interface type of `interface_` if the object supports it, otherwise undefined
- */
-as<K extends keyof OptionalBase, R extends OptionalBase[K]>(interface_: K): R | undefined;
-)");
 
     for (auto& i : entity->getDirectAttributes()) {
         writeDoc(i.doc);
@@ -286,28 +271,43 @@ as<K extends keyof OptionalBase, R extends OptionalBase[K]>(interface_: K): R | 
         }
         out(";\n");
     }
-
+    out(" as: DirectBase['as'] & OptionalBase['as']");
+    for (auto& i : entity->getDirectMandatoryBases()) {
+        out(" & ");
+        writeName(i.name);
+        out("['as']");
+    }
+    out(";\n");
     out("}\n");
 
     out("type DirectBase = {");
     for (auto& i : entity->getDirectMandatoryBases()) {
-        out("[");
-        writeName(i.name);
-        out("]: ");
+        out("/** Cast this object as `" + simplifyNamespace(i.name) + "` */\n");
+        out("as(type: '");
+        out(simplifyNamespace(i.name));
+        out("'): ");
         writeName(i.name);
         out(",\n");
     }
+    out("as(type: never): never;\n");
     out("};\n");
     out("type OptionalBase = {");
     for (auto& i : entity->getDirectOptionalBases()) {
-        out("[");
-        writeName(i.name);
-        out("]: ");
+        out("/** Attempts to cast this object as `" + simplifyNamespace(i.name)
+            + "`, otherwise returns undefined */\n");
+        out("as(type: '");
+        out(simplifyNamespace(i.name));
+        out("'): ");
         writeName(i.name);
         out(",\n");
+        out("'");
+        out(simplifyNamespace(i.name));
+        out("': ");
+        writeName(i.name);
+        out(" | undefined,\n");
     }
+    out("as(type: never): never;\n");
     out("};\n");
-    out("export declare const " + entityName(name) + ": unique symbol;\n");
 }
 
 void TypeScriptWriter::writeTypedef(OUString const& name,
@@ -472,7 +472,7 @@ export interface XInterface {
    * @param interface_ The constructor function for the interface type
    * @returns This object cast as `interface_` if the object supports it, otherwise undefined
    */
-  as<T extends XInterface>(interface_: symbol): T | undefined;
+  as<T extends XInterface>(interface_: string): T | undefined;
 }
 export declare const XInterface: unique symbol;
 
@@ -484,7 +484,8 @@ export type Primitive =
   | bigint
   | string
   | Type
-  | XInterface;
+  | XInterface
+  | Record<string, any>;
 
 type ToSequence<T extends Primitive> = T extends NonNullable<Primitive>
   ? T extends boolean
