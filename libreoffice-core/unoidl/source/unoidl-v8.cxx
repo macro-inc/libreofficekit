@@ -220,7 +220,7 @@ SAL_IMPLEMENT_MAIN() {
 
         std::vector<OUString> sorted(sort(flatMap));
         std::vector<OUString> mods;
-        auto* w = new writer::TypeScriptWriter(flatMap, getArgumentUri(args - 1, nullptr));
+        auto* w = new writer::TypeScriptWriter(flatMap, getArgumentUri(args - 1, nullptr) + "/typescript");
         std::cerr << "Writing " << sorted.size() << " published entities" << std::endl;
 
         for (const auto& i : sorted) {

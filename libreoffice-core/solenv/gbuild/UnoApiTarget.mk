@@ -24,9 +24,9 @@ gb_UnoApiTarget_UNOIDLWRITECOMMAND := $(call gb_Executable_get_command,unoidl-wr
 
 gb_UnoApiTarget_UNOIDLCHECKDEPS := $(call gb_Executable_get_runtime_dependencies,unoidl-check)
 gb_UnoApiTarget_UNOIDLCHECKCOMMAND := $(call gb_Executable_get_command,unoidl-check)
-
-gb_UnoApiTarget_UNOIDLV8DEPS := $(call gb_Executable_get_runtime_dependencies,unoidl-v8)
 gb_UnoApiTarget_UNOIDLV8COMMAND := $(call gb_Executable_get_command,unoidl-v8)
+
+gb_UnoApiTarget_UNOBINDING_ENTITIES :=
 
 define gb_UnoApiTarget__command
 mkdir -p $(dir $(1)) \
@@ -68,6 +68,8 @@ endef
 define gb_UnoApiTarget_add_idlfile
 $(call gb_UnoApiTarget_get_target,$(1)) : UNOAPI_ENTITIES += $(subst /,.,$(2))$(if $(2),.)$(3)
 $(call gb_UnoApiTarget_get_target,$(1)) : $(SRCDIR)/$(gb_UnoApiTarget_REG_$(1))/$(2)/$(3).idl
+$(if $(filter udkapi offapi,$(1)),\
+	$(WORKDIR)/uno-bindings-v8.done : gb_UnoApiTarget_UNOBINDING_ENTITIES += $(subst /,.,$(2))$(if $(2),.)$(3))
 
 endef
 
