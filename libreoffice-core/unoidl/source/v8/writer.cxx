@@ -1,13 +1,41 @@
 #include <iostream>
 #include <sal/types.h>
+#include <regex>
 
 #include "writer.hxx"
 
 namespace writer {
 
 void BaseWriter::writeDoc(OUString const& doc) {
-    if (!doc.isEmpty())
-        out("/** " + doc + " */\n");
+    static std::regex starting_space("(^|\\n)[ \\t]*");
+    static std::regex wrapped_text("([^\\n.]+)[\\n\\r]([^\\n.]+)");
+    static std::regex unused_tags("</?(p|ol|ul)>(\\n?)");
+    static std::regex triple_line("\\n\\n\\n");
+    static std::regex list_tag("<li>([^<]+)</li>");
+    static std::regex code_tag("<code>([^<]+)</code>");
+    static std::regex var_tag("<var>([^<]+)</var>");
+    static std::regex em_tag("<em>([^<]+)</em>");
+    static std::regex br_tag("<(br|BR)>");
+    static std::regex ending_space("[ \\t\\n]*$");
+    if (doc.isEmpty())
+        return;
+
+    auto doc_str = std::basic_string<char>(doc.toUtf8().getStr());
+    doc_str = std::regex_replace(doc_str, starting_space, "$1");
+    doc_str = std::regex_replace(doc_str, unused_tags, "$2\n");
+    doc_str = std::regex_replace(doc_str, wrapped_text, "$1 $2");
+    doc_str = std::regex_replace(doc_str, list_tag, "- $1\n\n");
+    doc_str = std::regex_replace(doc_str, code_tag, "`$1`");
+    doc_str = std::regex_replace(doc_str, var_tag, "`$1`");
+    doc_str = std::regex_replace(doc_str, em_tag, "_$1_");
+    doc_str = std::regex_replace(doc_str, starting_space, "$1");
+    doc_str = std::regex_replace(doc_str, wrapped_text, "$1 $2");
+    doc_str = std::regex_replace(doc_str, br_tag, "  \n");
+    for (int i = 0; i < 10; i++)
+        doc_str = std::regex_replace(doc_str, triple_line, "\n\n");
+    doc_str = std::regex_replace(doc_str, ending_space, "");
+
+    out("/**\n" + OUString::fromUtf8(doc_str) + "\n */\n");
 }
 
 void BaseWriter::writeDoc(rtl::Reference<unoidl::Entity> const& entity) {
