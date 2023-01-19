@@ -319,7 +319,7 @@ void TypeScriptWriter::writeTypedef(OUString const& name,
 
 void TypeScriptWriter::writeConstantGroup(OUString const& name,
                                           rtl::Reference<unoidl::ConstantGroupEntity> entity) {
-    out("export declare const " + entityName(name) + ": Readonly<{");
+    out("export declare const " + entityName(name) + ": Readonly<{\n");
     for (auto& i : entity->getMembers()) {
         writeDoc(i.doc);
         out(i.name + ": ");
@@ -341,9 +341,9 @@ void TypeScriptWriter::writeConstantGroup(OUString const& name,
                 out("bigint");
                 break;
         }
-        out(",");
+        out(",\n");
     }
-    out("}>;");
+    out("\n}>;");
 }
 
 void TypeScriptWriter::writeSingleInterfaceService(
