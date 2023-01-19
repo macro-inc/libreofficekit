@@ -16,14 +16,9 @@ $(eval $(call gb_Module_add_targets,odk,\
 		CustomTarget_doxygen \
 		GeneratedPackage_odk_doxygen \
 	) \
-	CustomTarget_settings \
 	CustomTarget_unoapi \
 	Package_odk_headers \
 	Package_odk_headers_generated \
-	Package_settings \
-	Package_settings_generated \
-	Package_share_readme \
-	Package_share_readme_generated \
 ))
 
 # vim: set noet sw=4 ts=4:
