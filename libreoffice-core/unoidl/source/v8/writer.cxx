@@ -16,6 +16,10 @@ void BaseWriter::writeDoc(OUString const& doc) {
     static std::regex var_tag("<var>([^<]+)</var>");
     static std::regex em_tag("<em>([^<]+)</em>");
     static std::regex br_tag("<(br|BR)>");
+    static std::regex fused_annotation("[.](@see+)");
+    static std::regex cpp_namespace("com::sun::star");
+    static std::regex cpp_namespace_sep("::(\\w+)");
+    static std::regex ts_without_see("( ?)(@see )?(LibreOffice.\\w+)");
     static std::regex ending_space("[ \\t\\n]*$");
     if (doc.isEmpty())
         return;
@@ -30,6 +34,10 @@ void BaseWriter::writeDoc(OUString const& doc) {
     doc_str = std::regex_replace(doc_str, em_tag, "_$1_");
     doc_str = std::regex_replace(doc_str, starting_space, "$1");
     doc_str = std::regex_replace(doc_str, wrapped_text, "$1 $2");
+    doc_str = std::regex_replace(doc_str, fused_annotation, "\n$1");
+    doc_str = std::regex_replace(doc_str, cpp_namespace, "LibreOffice");
+    doc_str = std::regex_replace(doc_str, cpp_namespace_sep, ".$1");
+    doc_str = std::regex_replace(doc_str, ts_without_see, "$1@see $3");
     doc_str = std::regex_replace(doc_str, br_tag, "  \n");
     for (int i = 0; i < 10; i++)
         doc_str = std::regex_replace(doc_str, triple_line, "\n\n");
