@@ -92,6 +92,10 @@ void TypeScriptWriter::writeType(OUString const& name) {
 
 void TypeScriptWriter::writeInterfaceDependency(OUString const& dependentName,
                                                 OUString const& dependencyName, bool published) {
+    // adjacent interfaces can cause to a self-referencing import that should be avoided
+    if (dependencyName == dependentName)
+        return;
+
     // calculate the relative path for the dependency from the dependent
     OUString dependent_ = simplifyNamespace(dependentName);
     OUString dependency_ = simplifyNamespace(dependencyName);
@@ -152,7 +156,7 @@ void TypeScriptWriter::writeEnum(OUString const& name,
         writeDoc(m.doc);
         out(m.name + ",\n");
     }
-    out("}");
+    out("};\n");
 }
 
 void TypeScriptWriter::writePlainStruct(OUString const& name,
@@ -164,7 +168,7 @@ void TypeScriptWriter::writePlainStruct(OUString const& name,
         writeName(base);
     }
 
-    out("{");
+    out("{\n");
 
     for (auto& m : entity->getDirectMembers()) {
         writeDoc(m.doc);
@@ -172,7 +176,7 @@ void TypeScriptWriter::writePlainStruct(OUString const& name,
         writeType(m.type);
         out(",");
     }
-    out("}");
+    out("}\n");
 }
 
 void TypeScriptWriter::writePolymorphicStruct(
@@ -185,7 +189,7 @@ void TypeScriptWriter::writePolymorphicStruct(
         }
         out(*i);
     }
-    out("> = {");
+    out("> = {\n");
 
     for (auto& j : entity->getMembers()) {
         writeDoc(j.doc);
@@ -196,9 +200,9 @@ void TypeScriptWriter::writePolymorphicStruct(
         } else {
             writeType(j.type);
         }
-        out(";");
+        out(";\n");
     }
-    out("};");
+    out("}");
 }
 
 void TypeScriptWriter::writeException(OUString const& name,
@@ -208,7 +212,7 @@ void TypeScriptWriter::writeException(OUString const& name,
 
 void TypeScriptWriter::writeInterface(OUString const& name,
                                       rtl::Reference<unoidl::InterfaceTypeEntity> entity) {
-    out("export interface " + entityName(name) + "{");
+    out("export interface " + entityName(name) + " extends BaseType {");
 
     for (auto& i : entity->getDirectAttributes()) {
         writeDoc(i.doc);
@@ -271,43 +275,52 @@ void TypeScriptWriter::writeInterface(OUString const& name,
         }
         out(";\n");
     }
-    out(" as: DirectBase['as'] & OptionalBase['as']");
-    for (auto& i : entity->getDirectMandatoryBases()) {
-        out(" & ");
-        writeName(i.name);
-        out("['as']");
-    }
-    out(";\n");
     out("}\n");
 
-    out("type DirectBase = {");
+    if (!entity->getDirectOptionalBases().empty()) {
+        out("type OptionalBase = {");
+        for (auto& i : entity->getDirectOptionalBases()) {
+            out("/** Attempts to cast this object as `" + simplifyNamespace(i.name)
+                + "`, otherwise returns undefined */\n");
+            out("as(type: '");
+            out(simplifyNamespace(i.name));
+            out("'): ");
+            writeName(i.name);
+            out(" | undefined,\n");
+        }
+        out("};\n");
+    }
+
+    auto& adjacent = entities_[name]->adjacentInterfaces;
+
+    if (!adjacent.empty()) {
+        out("type AdjacentBase = {\n");
+        for (auto& i : adjacent) {
+            out("/** Attempts to cast this object as `" + simplifyNamespace(i)
+                + "`, otherwise returns undefined */\n");
+            out("as(type: '");
+            out(simplifyNamespace(i));
+            out("'): ");
+            writeName(i);
+            out(" | undefined,\n");
+        }
+        out("};\n");
+    }
+
+    out("type BaseType = {}");
+
     for (auto& i : entity->getDirectMandatoryBases()) {
-        out("/** Cast this object as `" + simplifyNamespace(i.name) + "` */\n");
-        out("as(type: '");
-        out(simplifyNamespace(i.name));
-        out("'): ");
+        out("\n & ");
         writeName(i.name);
-        out(",\n");
     }
-    out("as(type: never): never;\n");
-    out("};\n");
-    out("type OptionalBase = {");
-    for (auto& i : entity->getDirectOptionalBases()) {
-        out("/** Attempts to cast this object as `" + simplifyNamespace(i.name)
-            + "`, otherwise returns undefined */\n");
-        out("as(type: '");
-        out(simplifyNamespace(i.name));
-        out("'): ");
-        writeName(i.name);
-        out(",\n");
-        out("'");
-        out(simplifyNamespace(i.name));
-        out("': ");
-        writeName(i.name);
-        out(" | undefined,\n");
-    }
-    out("as(type: never): never;\n");
-    out("};\n");
+
+    if (!entity->getDirectOptionalBases().empty())
+        out("\n & OptionalBase");
+
+    if (!adjacent.empty())
+        out("\n & AdjacentBase");
+
+    out(";");
 }
 
 void TypeScriptWriter::writeTypedef(OUString const& name,
@@ -455,6 +468,12 @@ void TypeScriptWriter::writeTSIndex(OUString const& name, Entity* moduleEntity) 
     }
     createEntityFile(name + ".index", ".d.ts");
     out(indexBuffer.makeStringAndClear());
+
+    // write the namespace export at the end of the top-level index.d.ts to expose the types
+    if (name == "com.sun.star") {
+        out("\n"
+            "export as namespace LibreOffice;\n");
+    }
 
     // write the bootstrap in uno/index.d.ts
     if (name == "com.sun.star.uno") {

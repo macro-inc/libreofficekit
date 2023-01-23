@@ -21,6 +21,7 @@ struct Entity {
     std::set<OUString> dependencies;
     std::set<OUString> interfaceDependencies;
     std::map<OUString, Entity*> module;
+    std::set<OUString> adjacentInterfaces;
     bool relevant;
     Sorted sorted;
     Written written;

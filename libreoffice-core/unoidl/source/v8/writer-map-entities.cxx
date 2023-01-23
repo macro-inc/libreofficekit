@@ -52,6 +52,8 @@ void insertEntityDependency(rtl::Reference<unoidl::Manager> const& manager,
             std::exit(EXIT_FAILURE);
         }
         ifc = ent->getSort() == unoidl::Entity::SORT_INTERFACE_TYPE;
+
+        // exception types aren't used, skip
         if (ent->getSort() == unoidl::Entity::SORT_EXCEPTION_TYPE)
             return;
     }
@@ -209,6 +211,56 @@ void insertDependency(rtl::Reference<unoidl::Entity> ent,
     }
 }
 
+void mapAdjacentInterfacesInService(std::map<OUString, writer::Entity*>& flatMap,
+                                    std::set<OUString>& interfaces,
+                                    unoidl::AccumulationBasedServiceEntity* ent) {
+    for (auto& j : ent->getDirectMandatoryBaseServices()) {
+        auto& svc = flatMap[j.name];
+        if (svc->entity->getSort() == unoidl::Entity::SORT_SINGLE_INTERFACE_BASED_SERVICE) {
+            auto* ent2 = static_cast<unoidl::SingleInterfaceBasedServiceEntity*>(svc->entity.get());
+            interfaces.emplace(ent2->getBase());
+        } else if (svc->entity->getSort() == unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE) {
+            auto* ent2 = static_cast<unoidl::AccumulationBasedServiceEntity*>(svc->entity.get());
+            mapAdjacentInterfacesInService(flatMap, interfaces, ent2);
+        }
+    }
+    for (auto& j : ent->getDirectOptionalBaseServices()) {
+        auto& svc = flatMap[j.name];
+        if (svc->entity->getSort() == unoidl::Entity::SORT_SINGLE_INTERFACE_BASED_SERVICE) {
+            auto* ent2 = static_cast<unoidl::SingleInterfaceBasedServiceEntity*>(svc->entity.get());
+            interfaces.emplace(ent2->getBase());
+        } else if (svc->entity->getSort() == unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE) {
+            auto* ent2 = static_cast<unoidl::AccumulationBasedServiceEntity*>(svc->entity.get());
+            mapAdjacentInterfacesInService(flatMap, interfaces, ent2);
+        }
+    }
+
+    for (auto& j : ent->getDirectMandatoryBaseInterfaces()) {
+        interfaces.emplace(j.name);
+    }
+    for (auto& j : ent->getDirectOptionalBaseInterfaces()) {
+        interfaces.emplace(j.name);
+    }
+}
+
+void mapAdjacentInterfaces(std::map<OUString, writer::Entity*>& flatMap) {
+    for (auto& i : flatMap) {
+        if (i.second->entity->getSort() != unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE) {
+            continue;
+        }
+        auto* ent = static_cast<unoidl::AccumulationBasedServiceEntity*>(i.second->entity.get());
+        std::set<OUString> interfaces;
+        mapAdjacentInterfacesInService(flatMap, interfaces, ent);
+
+        for (auto& j : interfaces) {
+            auto& ifc = flatMap[j];
+            ifc->adjacentInterfaces.insert(interfaces.begin(), interfaces.end());
+            ifc->interfaceDependencies.insert(interfaces.begin(), interfaces.end());
+            ifc->relevant = true;
+        }
+    }
+}
+
 void mapEntities(rtl::Reference<unoidl::Manager> const& manager, OUString const& uri,
                  std::map<OUString, writer::Entity*>& map,
                  std::map<OUString, writer::Entity*>& flatMap) {
@@ -301,5 +353,7 @@ void mapEntities(rtl::Reference<unoidl::Manager> const& manager, OUString const&
                   << std::endl;
         std::exit(EXIT_FAILURE);
     }
+
+    mapAdjacentInterfaces(flatMap);
 }
 }
