@@ -451,7 +451,11 @@ public:
         pData = NULL;
         rtl_string2UString( &pData, value, length, encoding, convertFlags );
         if (pData == NULL) {
+#if defined SAL_NO_EXCEPT
+            std::abort();
+#else
             throw std::bad_alloc();
+#endif // SAL_NO_EXCEPT
         }
     }
 
@@ -477,7 +481,11 @@ public:
     {
         rtl_uString_newFromCodePoints(&pData, codePoints, codePointCount);
         if (pData == NULL) {
+#if defined SAL_NO_EXCEPT
+            std::abort();
+#else
             throw std::bad_alloc();
+#endif // SAL_NO_EXCEPT
         }
     }
 
@@ -512,7 +520,11 @@ public:
 #if defined LIBO_INTERNAL_ONLY
     explicit OUString(std::u16string_view sv) {
         if (sv.size() > sal_uInt32(std::numeric_limits<sal_Int32>::max())) {
+#if defined SAL_NO_EXCEPT
+            std::abort();
+#else
             throw std::bad_alloc();
+#endif // SAL_NO_EXCEPT
         }
         pData = nullptr;
         rtl_uString_newFromStr_WithLength(&pData, sv.data(), sv.size());
@@ -724,7 +736,11 @@ public:
 
     OUString & operator +=(std::u16string_view sv) & {
         if (sv.size() > sal_uInt32(std::numeric_limits<sal_Int32>::max())) {
+#if defined SAL_NO_EXCEPT
+            std::abort();
+#else
             throw std::bad_alloc();
+#endif // SAL_NO_EXCEPT
         }
         rtl_uString_newConcatUtf16L(&pData, pData, sv.data(), sv.size());
         return *this;
@@ -2832,7 +2848,11 @@ public:
         rtl_uString * pNew = NULL;
         rtl_uString_intern( &pNew, pData );
         if (pNew == NULL) {
+#if defined SAL_NO_EXCEPT
+            std::abort();
+#else
             throw std::bad_alloc();
+#endif // SAL_NO_EXCEPT
         }
         return OUString( pNew, SAL_NO_ACQUIRE );
     }
@@ -2871,7 +2891,11 @@ public:
         rtl_uString_internConvert( &pNew, value, length, encoding,
                                    convertFlags, pInfo );
         if (pNew == NULL) {
+#if defined SAL_NO_EXCEPT
+            std::abort();
+#else
             throw std::bad_alloc();
+#endif // SAL_NO_EXCEPT
         }
         return OUString( pNew, SAL_NO_ACQUIRE );
     }
@@ -3307,7 +3331,11 @@ private:
         rtl_uString* pNewData = NULL;
         rtl_uString_newConcat( &pNewData, pData, pOtherData );
         if (pNewData == NULL) {
+#if defined SAL_NO_EXCEPT
+            std::abort();
+#else
             throw std::bad_alloc();
+#endif // SAL_NO_EXCEPT
         }
         rtl_uString_assign(&pData, pNewData);
         rtl_uString_release(pNewData);
