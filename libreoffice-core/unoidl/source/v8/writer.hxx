@@ -57,6 +57,7 @@ protected:
     std::map<OUString, Entity*> entities_;
     OUString outDirectoryUrl_;
     OUString currentEntity_;
+    std::map<OUString, int> dependentNamespace_{};
     void out(OUString const& text);
 
     virtual void writeDoc(rtl::Reference<unoidl::Entity> const& entity);
@@ -112,6 +113,8 @@ class V8Writer : public BaseWriter {
 public:
     V8Writer(std::map<OUString, Entity*> entities, OUString const& outDirectoryUrl)
         : BaseWriter(entities, outDirectoryUrl) {}
+    void writeAsUtility();
+    void writeBuildFile();
 
 private:
     void writeName(OUString const& name);
@@ -171,8 +174,6 @@ private:
                                  rtl::Reference<unoidl::InterfaceBasedSingletonEntity> entity);
     void writeServiceSingleton(OUString const& name,
                                rtl::Reference<unoidl::ServiceBasedSingletonEntity> entity);
-
-    std::map<OUString, int> dependentNamespace{};
 };
 }
 

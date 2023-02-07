@@ -341,11 +341,11 @@ public:
 #if defined LIBO_INTERNAL_ONLY
     explicit OString(std::string_view sv) {
         if (sv.size() > sal_uInt32(std::numeric_limits<sal_Int32>::max())) {
-#if defined SAL_NO_EXCEPT
+#if defined SAL_NO_EXCEPTIONS
             std::abort();
 #else
             throw std::bad_alloc();
-#endif // SAL_NO_EXCEPT
+#endif // SAL_NO_EXCEPTIONS
         }
         pData = nullptr;
         rtl_string_newFromStr_WithLength(&pData, sv.data(), sv.size());
@@ -373,11 +373,11 @@ public:
         pData = NULL;
         rtl_uString2String( &pData, value, length, encoding, convertFlags );
         if (pData == NULL) {
-#if defined SAL_NO_EXCEPT
+#if defined SAL_NO_EXCEPTIONS
             std::abort();
 #else
             throw std::bad_alloc();
-#endif // SAL_NO_EXCEPT
+#endif // SAL_NO_EXCEPTIONS
         }
     }
 
@@ -522,11 +522,11 @@ public:
             return *this;
         }
         if (sv.size() > sal_uInt32(std::numeric_limits<sal_Int32>::max() - pData->length)) {
-#if defined SAL_NO_EXCEPT
+#if defined SAL_NO_EXCEPTIONS
             std::abort();
 #else
             throw std::bad_alloc();
-#endif // SAL_NO_EXCEPT
+#endif // SAL_NO_EXCEPTIONS
         }
         auto const l = pData->length + sv.size();
         rtl_string_ensureCapacity(&pData, l);

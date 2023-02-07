@@ -38,7 +38,9 @@
 #include "com/sun/star/uno/Type.hxx"
 #include "com/sun/star/uno/Reference.h"
 #include "com/sun/star/uno/genfunc.hxx"
+#if !defined SAL_NO_EXCEPTIONS
 #include "com/sun/star/uno/RuntimeException.hpp"
+#endif
 #include "cppu/cppudllapi.h"
 #include "cppu/unotype.hxx"
 
@@ -677,12 +679,16 @@ T Any::get() const
 {
     T value = T();
     if (! (*this >>= value)) {
+#if defined SAL_NO_EXCEPTIONS
+        value = T();
+#else
         throw RuntimeException(
             ::rtl::OUString(
                 cppu_Any_extraction_failure_msg(
                     this,
                     ::cppu::getTypeFavourUnsigned(&value).getTypeLibType() ),
                 SAL_NO_ACQUIRE ) );
+#endif
     }
     return value;
 }

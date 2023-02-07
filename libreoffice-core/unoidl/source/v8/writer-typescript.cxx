@@ -119,7 +119,7 @@ void TypeScriptWriter::writeInterfaceDependency(OUString const& dependentName,
                    && entityName_ != "Type" && entityName_ != "XInterface";
 
     auto importedDependency
-        = dependentNamespace[dependent_ + "_"
+        = dependentNamespace_[dependent_ + "_"
                              + (sameDir ? entityName(dependencyName) : dependencyNS)]++;
 
     if (importedDependency != 0)

@@ -219,23 +219,32 @@ SAL_IMPLEMENT_MAIN() {
         }
 
         std::vector<OUString> sorted(sort(flatMap));
-        auto* w = new writer::TypeScriptWriter(flatMap,
-                                               getArgumentUri(args - 1, nullptr) + "/typescript");
         std::cerr << "Writing " << sorted.size() << " published entities" << std::endl;
 
-        for (const auto& i : sorted) {
-            std::map<OUString, writer::Entity*>::iterator j(flatMap.find(i));
-            // skip irrelevant entities and those without bindings in JS/C++
-            if (j == flatMap.end() || !j->second->relevant
-                || j->second->entity->getSort() == unoidl::Entity::SORT_EXCEPTION_TYPE)
-                continue;
+        {
+            auto* w = new writer::TypeScriptWriter(flatMap, getArgumentUri(args - 1, nullptr)
+                                                                + "/typescript");
 
-            w->createEntityFile(i, ".d.ts");
-            w->writeEntity(i);
-            w->close();
+            for (const auto& i : sorted) {
+                std::map<OUString, writer::Entity*>::iterator j(flatMap.find(i));
+                // skip irrelevant entities and those without bindings in JS/C++
+                if (j == flatMap.end() || !j->second->relevant
+                    || j->second->entity->getSort() == unoidl::Entity::SORT_EXCEPTION_TYPE)
+                    continue;
+
+                w->createEntityFile(i, ".d.ts");
+                w->writeEntity(i);
+                w->close();
+            }
+
+            writeTSModuleMap(nestedMap, w);
         }
 
-        writeTSModuleMap(nestedMap, w);
+        {
+            auto* w = new writer::V8Writer(flatMap, getArgumentUri(args - 1, nullptr) + "/v8");
+            w->writeAsUtility();
+            w->writeBuildFile();
+        }
 
         return EXIT_SUCCESS;
     } catch (unoidl::FileFormatException& e1) {
