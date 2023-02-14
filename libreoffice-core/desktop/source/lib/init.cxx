@@ -7,6 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "lib/unov8.hxx"
 #include <config_buildconfig.h>
 #include <config_features.h>
 
@@ -2449,6 +2450,7 @@ LibLibreOffice_Impl::LibLibreOffice_Impl()
         m_pOfficeClass->setOption = lo_setOption;
         m_pOfficeClass->dumpState = lo_dumpState;
         m_pOfficeClass->getXComponentContext = lo_getXComponentContext;
+        unov8_init(m_pOfficeClass->uno_v8);
 
         gOfficeClass = m_pOfficeClass;
     }
@@ -4448,6 +4450,7 @@ static void lo_dumpState (LibreOfficeKit* pThis, const char* /* pOptions */, cha
 
 static void* lo_getXComponentContext(LibreOfficeKit* pThis)
 {
+    (void)pThis; // avoid unused warning on class method
     return xContext.is() ? xContext.get() : nullptr;
 }
 

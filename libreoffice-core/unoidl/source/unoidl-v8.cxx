@@ -40,7 +40,7 @@ namespace {
 void badUsage() {
     std::cerr << "Usage:" << std::endl
               << std::endl
-              << "  unoidl-v8 [<registries>] [@<entities file>] <out dir>" << std::endl
+              << "  unoidl-v8 [internal] [<registries>] [@<entities file>] <out dir>" << std::endl
               << std::endl
               << "where each <registry> is either a new- or legacy-format .rdb file, a single .idl"
               << std::endl
@@ -50,13 +50,19 @@ void badUsage() {
               << std::endl
               << "include in the output, and, if omitted, defaults to the complete content of the"
               << std::endl
-              << "last <registry>, if any. The generated files will be " << std::endl;
+              << "last <registry>, if any. The generated files will be placed in <out dir>. If"
+              << std::endl
+              << "the internal option is set, the functions used by the generated bindings will be"
+              << std::endl
+              << "produced instead.";
     std::exit(EXIT_FAILURE);
 }
 
 OUString getArgumentUri(sal_uInt32 argument, bool* entities) {
     OUString arg;
     rtl_getAppCommandArg(argument, &arg.pData);
+    if (arg.equals("internal"))
+        return arg;
     if (arg.startsWith("@", &arg)) {
         if (entities == nullptr) {
             badUsage();
@@ -194,12 +200,19 @@ SAL_IMPLEMENT_MAIN() {
         }
         rtl::Reference<unoidl::Manager> mgr(new unoidl::Manager);
         bool entities = false;
+        bool internal = false;
         rtl::Reference<unoidl::Provider> prov;
         std::map<OUString, writer::Entity*> nestedMap;
         std::map<OUString, writer::Entity*> flatMap;
+
         for (sal_uInt32 i = 0; i != args - 1; ++i) {
             assert(args > 1);
-            OUString uri(getArgumentUri(i, i == args - 2 ? &entities : nullptr));
+            OUString arg = getArgumentUri(i, i == args - 2 ? &entities : nullptr);
+            if (i == 0 && arg.equals("internal")) {
+                internal = true;
+                continue;
+            }
+            OUString uri(arg);
             if (entities) {
                 std::cerr << "ENTITIES MAPPED: " << uri << std::endl;
                 mapEntities(mgr, uri, nestedMap, flatMap);
@@ -220,6 +233,13 @@ SAL_IMPLEMENT_MAIN() {
 
         std::vector<OUString> sorted(sort(flatMap));
         std::cerr << "Writing " << sorted.size() << " published entities" << std::endl;
+
+        if (internal) {
+            std::cerr << "Writing internal bindings..." << std::endl;
+            auto* w = new writer::V8WriterInternal(flatMap, getArgumentUri(args - 1, nullptr), sorted);
+            w->writeHeader();
+            return EXIT_SUCCESS;
+        }
 
         {
             auto* w = new writer::TypeScriptWriter(flatMap, getArgumentUri(args - 1, nullptr)

@@ -32,13 +32,16 @@ $(eval $(call gb_Library_use_externals,sofficeapp, \
         orcus )\
 ))
 
-$(eval $(call gb_Library_use_custom_headers,sofficeapp,\
-	officecfg/registry \
-))
-
 $(eval $(call gb_Library_use_api,sofficeapp,\
 	udkapi \
 	offapi \
+))
+
+$(eval $(call gb_Library_use_custom_headers,sofficeapp,\
+	officecfg/registry \
+    $(if $(DISABLE_GUI), \
+        desktop/unov8_internal \
+    ) \
 ))
 
 $(eval $(call gb_Library_add_defs,sofficeapp,\
@@ -136,6 +139,7 @@ $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 		desktop/source/lib/lokclipboard) \
 	$(if $(filter $(OS),ANDROID), \
 		desktop/source/lib/lokandroid) \
+    desktop/source/lib/unov8 \
 ))
 $(if $(filter-out $(OS),IOS), \
     $(eval $(call gb_Library_set_componentfile,sofficeapp,desktop/lokclipboard)))
@@ -145,6 +149,7 @@ $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 	desktop/source/lib/init \
 	desktop/source/lib/lokinteractionhandler \
 	desktop/source/lib/lokclipboard \
+    desktop/source/lib/unov8 \
 ))
 $(eval $(call gb_Library_set_componentfile,sofficeapp,desktop/lokclipboard))
 endif
@@ -153,6 +158,7 @@ $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
     desktop/source/lib/init \
     desktop/source/lib/lokinteractionhandler \
     desktop/source/lib/lokclipboard \
+    desktop/source/lib/unov8 \
 ))
 $(eval $(call gb_Library_set_componentfile,sofficeapp,desktop/lokclipboard))
 endif

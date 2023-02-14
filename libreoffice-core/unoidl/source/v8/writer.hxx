@@ -175,6 +175,41 @@ private:
     void writeServiceSingleton(OUString const& name,
                                rtl::Reference<unoidl::ServiceBasedSingletonEntity> entity);
 };
+
+class V8WriterInternal : public BaseWriter {
+public:
+    V8WriterInternal(std::map<OUString, Entity*> entities, OUString const& outDirectoryUrl, std::vector<OUString> sorted)
+        : BaseWriter(entities, outDirectoryUrl), sorted_(sorted) {}
+    void writeHeader();
+
+private:
+    void writeName(OUString const& name);
+    OUString translateSimpleType(OUString const& name);
+    void writeType(OUString const& name);
+    void writeInterfaceDependency(OUString const& dependentName, OUString const& dependencyName,
+                                  bool published);
+    void writeEnum(OUString const& name, rtl::Reference<unoidl::EnumTypeEntity> entity);
+    void writePlainStruct(OUString const& name,
+                          rtl::Reference<unoidl::PlainStructTypeEntity> entity);
+    void writePolymorphicStruct(OUString const& name,
+                                rtl::Reference<unoidl::PolymorphicStructTypeTemplateEntity> entity);
+    void writeException(OUString const& name, rtl::Reference<unoidl::ExceptionTypeEntity> entity);
+    void writeInterface(OUString const& name, rtl::Reference<unoidl::InterfaceTypeEntity> entity);
+    void writeTypedef(OUString const& name, rtl::Reference<unoidl::TypedefEntity> entity);
+    void writeConstantGroup(OUString const& name,
+                            rtl::Reference<unoidl::ConstantGroupEntity> entity);
+    void
+    writeSingleInterfaceService(OUString const& name,
+                                rtl::Reference<unoidl::SingleInterfaceBasedServiceEntity> entity);
+    void writeAccumulationService(OUString const& name,
+                                  rtl::Reference<unoidl::AccumulationBasedServiceEntity> entity);
+    void writeInterfaceSingleton(OUString const& name,
+                                 rtl::Reference<unoidl::InterfaceBasedSingletonEntity> entity);
+    void writeServiceSingleton(OUString const& name,
+                               rtl::Reference<unoidl::ServiceBasedSingletonEntity> entity);
+
+    std::vector<OUString> sorted_;
+};
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
