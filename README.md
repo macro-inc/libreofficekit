@@ -3,15 +3,17 @@
 ## Windows
 
 - Install [Visual Studio 2019 Community Edition](https://aka.ms/vs/16/release/vs_Community.exe)
+  - Select the `Windows Development with C++` workload
+  - Add the following Individual Components:
+    - .NET Framework 4.8 SDK
+    - Windows Universal C Runtime 
 - Install cygwin with MSVC make and nasm using PowerShell:
 
   ```powershell
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+  
   Invoke-WebRequest https://cygwin.com/setup-x86_64.exe -OutFile C:\setup.exe
-  & C:\setup.exe -BNqdDLXgnO -s http://mirrors.kernel.org/sourceware/cygwin/ -l C:\cygwin-packages -R C:\cygwin -P `
-    autoconf,automake,bison,cabextract,doxygen,flex,gettext-devel,`
-    git,gnupg,gperf,libxml2-devel,libpng12-devel,make,mintty,openssh,`
-    openssl,patch,perl,pkg-config,readline,rsync,unzip,wget,`
-    zip,perl-Archive-Zip,perl-Font-TTF,perl-IO-String,python,python3
+  & C:\setup.exe -BNqdDLXgnO -s http://mirrors.kernel.org/sourceware/cygwin/ -l C:\cygwin-packages -R C:\cygwin -P autoconf,automake,bison,cabextract,doxygen,flex,gettext-devel,gnupg,gperf,libxml2-devel,libpng12-devel,make,mintty,openssh,openssl,patch,perl,pkg-config,readline,rsync,unzip,wget,zip,perl-Archive-Zip,perl-Font-TTF,perl-IO-String,python,python3
 
   Invoke-WebRequest https://dev-www.libreoffice.org/bin/cygwin/make-4.2.1-msvc.exe -OutFile C:\cygwin\usr\local\bin\make.exe
   Invoke-WebRequest https://www.nasm.us/pub/nasm/releasebuilds/2.11.06/win32/nasm-2.11.06-win32.zip -OutFile C:\cygwin\nasm.zip
@@ -71,7 +73,7 @@ sudo port install nasm autoconf automake gperf gpatch
   - Windows
 
 ```shell
-./autogen.sh --with-distro=LOKit-Windows
+./autogen.sh --with-distro=LOKit-Win64
 ```
 
 - Linux
