@@ -961,7 +961,6 @@ darwin*|macos*) # macOS
     enable_lotuswordpro=no
     disable_database_connectivity_dependencies
     with_ppds=no
-    enable_odk=no
     enable_firebird_sdbc=no
     DISABLE_GUI=TRUE
     DISABLE_PYTHON=TRUE
