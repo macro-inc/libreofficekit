@@ -54,7 +54,7 @@ void V8Writer::writeType(OUString const& name) {
     }
     if (entity) {
         writeName(nucl);
-        out("&");
+        if (rank > 0) out("&");
     } else {
         out(translateSimpleType(nucl));
     }

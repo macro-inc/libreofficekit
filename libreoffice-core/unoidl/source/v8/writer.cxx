@@ -207,6 +207,11 @@ void BaseWriter::createEntityFile(OUString const& entityName, OUString const& su
     }
 }
 
+bool BaseWriter::isEntityOfSort(OUString const& entityName, unoidl::Entity::Sort sort) {
+    auto entity = entities_.find(entityName);
+    return entity != entities_.end() && entity->second->entity->getSort() == sort;
+}
+
 OUString decomposeType(OUString const& type, std::size_t* rank,
                        std::vector<OUString>* typeArguments, bool* entity) {
     assert(rank != nullptr);
@@ -276,6 +281,10 @@ OUString entityNamespace(OUString const& name) {
         return name;
 
     return OUString(name.subView(0, idx));
+}
+
+OUString cStructName(const OUString& name) {
+    return "_unov8_" + simplifyNamespace(name).replaceAll(".", "_");
 }
 
 }

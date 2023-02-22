@@ -851,6 +851,7 @@ $(eval $(call gb_Helper_register_packages_for_install,sdk,\
 	odk_examples \
 	odk_headers \
 	odk_headers_generated \
+	unov8_headers_generated \
 	odk_html \
 	odk_settings \
 	odk_settings_generated \

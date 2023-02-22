@@ -237,7 +237,8 @@ SAL_IMPLEMENT_MAIN() {
         if (internal) {
             std::cerr << "Writing internal bindings..." << std::endl;
             auto* w = new writer::V8WriterInternal(flatMap, getArgumentUri(args - 1, nullptr), sorted);
-            w->writeHeader();
+            w->writeInternalHeader();
+            w->writeSharedHeader();
             return EXIT_SUCCESS;
         }
 

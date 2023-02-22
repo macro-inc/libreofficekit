@@ -1,3 +1,4 @@
+
 # -*- Mode: makefile-gmake; tab-width: 4; indent-tabs-mode: t -*-
 #
 # This file is part of the LibreOffice project.
@@ -7,19 +8,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
-include $(SRCDIR)/odk/build-examples_common.mk
+$(eval $(call gb_Package_Package,unov8_headers_generated,$(WORKDIR)/CustomTarget/desktop/unov8_internal))
 
-$(eval $(call gb_Module_Module,odk))
+$(eval $(call gb_Package_set_outdir,unov8_headers_generated,$(INSTDIR)))
 
-$(eval $(call gb_Module_add_targets,odk,\
-	$(if $(DOXYGEN),\
-		CustomTarget_doxygen \
-		GeneratedPackage_odk_doxygen \
-	) \
-	CustomTarget_unoapi \
-	Package_odk_headers \
-	Package_odk_headers_generated \
-	Package_unov8_headers_generated \
-))
+$(eval $(call gb_Package_add_file,unov8_headers_generated,$(SDKDIRNAME)/include/unov8/unov8.h,unov8.h))
 
 # vim: set noet sw=4 ts=4:
