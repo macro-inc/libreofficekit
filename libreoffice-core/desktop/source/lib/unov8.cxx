@@ -88,6 +88,10 @@ static typelib_TypeDescriptionReference* sequenceType(typelib_TypeDescriptionRef
 
 void unov8_init(UnoV8& uno_v8)
 {
+    if (uno_v8.initialized)
+        return;
+
+    uno_v8.initialized = 1;
     uno_v8.rtl = {
         .uStringFromUtf8 = uStringFromUtf8,
         .uStringToUtf8 = uStringToUtf8,
@@ -111,6 +115,7 @@ void unov8_init(UnoV8& uno_v8)
     };
     uno_v8.sequence = { .construct = sequence_construct };
     uno_v8.any = { .construct = any_construct };
+    ::unov8::methods::_init(&uno_v8.methods);
 }
 
 } // namespace desktop

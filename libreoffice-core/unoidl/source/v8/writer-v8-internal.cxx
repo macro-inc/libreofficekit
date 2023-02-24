@@ -439,6 +439,20 @@ namespace methods {
         auto* entity = static_cast<unoidl::InterfaceTypeEntity*>(j->second->entity.get());
         writeInterfaceMethods(i, entity, false);
     }
+    out("inline void _init(struct _UnoV8Methods* methods) {\n"
+        "*methods = {\n");
+    for (const auto& i : interfaces) {
+        std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
+        auto* entity = static_cast<unoidl::InterfaceTypeEntity*>(j->second->entity.get());
+
+        for (const auto& m : entity->getDirectMethods()) {
+            if (shouldSkipMethod(m))
+                continue;
+            out("." + cName(i) + "_" + m.name + " = " + cName(i) + "_" + m.name + ",\n");
+        }
+    }
+    out("};\n"
+        "}\n");
 
     out(R"(
 } // namespace methods
@@ -499,15 +513,15 @@ void V8WriterInternal::writeSharedHeader() {
         out("};\n");
     }
 
-    out("struct _unov8_methods {\n");
+    out("struct _UnoV8Methods {\n");
     for (const auto& i : interfaces) {
         std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
         auto* entity = static_cast<unoidl::InterfaceTypeEntity*>(j->second->entity.get());
         writeInterfaceMethods(i, entity, true);
     }
-    out(R"(
-};
+    out("\n};\n");
 
+    out(R"(
 #endif
 )");
     close();

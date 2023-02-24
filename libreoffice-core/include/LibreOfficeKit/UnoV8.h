@@ -15,6 +15,7 @@
 #include <sal/types.h>
 #include <rtl/string.h>
 #include <rtl/ustring.h>
+#include <unov8.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -86,11 +87,13 @@ extern "C"
 
     struct _UnoV8
     {
+        int initialized;
         struct _UnoV8Rtl rtl;
         struct _UnoV8Type type;
         struct _UnoV8Interface interface;
         struct _UnoV8Sequence sequence;
         struct _UnoV8Any any;
+        struct _UnoV8Methods methods; 
     };
 
 #ifdef __cplusplus
