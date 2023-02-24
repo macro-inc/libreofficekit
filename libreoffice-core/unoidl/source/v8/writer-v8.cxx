@@ -519,4 +519,7 @@ void *as(void *interface, const std::string_view type);
     close();
 }
 
+void V8Writer::writeMethodParams(const unoidl::InterfaceTypeEntity::Method& method)
+{
+}
 }

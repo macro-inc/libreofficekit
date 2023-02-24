@@ -225,37 +225,12 @@ void TypeScriptWriter::writeInterface(OUString const& name,
     }
 
     for (auto& i : entity->getDirectMethods()) {
-        bool hasOutParam = false;
-        std::size_t rank;
-        std::vector<OUString> args;
-        bool entity;
-        decomposeType(i.returnType, &rank, &args, &entity);
-        bool hasPolystruct = args.size() != 0;
-
-        // TODO: instead of skipping methods with polystruct, add proper support
-        if (hasPolystruct)
-            continue;
-
-        // TODO: instead of skipping methods with out/inout params, add proper support
-        // TODO: instead of skipping methods with polystruct type, add proper support
-        for (auto k(i.parameters.begin()); k != i.parameters.end(); ++k) {
-            if (k->direction != unoidl::InterfaceTypeEntity::Method::Parameter::DIRECTION_IN) {
-                hasOutParam = true;
-                break;
-            }
-
-            decomposeType(i.returnType, &rank, &args, &entity);
-            if (args.size() != 0) {
-                hasPolystruct = true;
-                break;
-            }
-        }
-
-        if (hasOutParam || hasPolystruct)
+        if (shouldSkipMethod(i))
             continue;
 
         writeDoc(i.doc);
         out(i.name + "(");
+        bool hasOutParam = false;
         bool hasNonOutParam = false;
         for (auto k(i.parameters.begin()); k != i.parameters.end(); ++k) {
             if (k != i.parameters.begin()) {

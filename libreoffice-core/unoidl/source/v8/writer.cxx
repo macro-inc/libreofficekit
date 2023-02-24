@@ -283,8 +283,35 @@ OUString entityNamespace(OUString const& name) {
     return OUString(name.subView(0, idx));
 }
 
-OUString cStructName(const OUString& name) {
-    return "_unov8_" + simplifyNamespace(name).replaceAll(".", "_");
+OUString cName(const OUString& name) { return simplifyNamespace(name).replaceAll(".", "_"); }
+
+OUString cStructName(const OUString& name) { return "_unov8_" + cName(name); }
+
+bool shouldSkipMethod(const unoidl::InterfaceTypeEntity::Method& method) {
+    std::size_t rank;
+    std::vector<OUString> args;
+    bool entity;
+    decomposeType(method.returnType, &rank, &args, &entity);
+    bool hasPolystruct = args.size() != 0;
+
+    // TODO: instead of skipping methods with polystruct, add proper support
+    if (hasPolystruct)
+        return true;
+
+    // TODO: instead of skipping methods with out/inout params, add proper support
+    // TODO: instead of skipping methods with polystruct type, add proper support
+    for (auto k(method.parameters.begin()); k != method.parameters.end(); ++k) {
+        if (k->direction != unoidl::InterfaceTypeEntity::Method::Parameter::DIRECTION_IN) {
+            return true;
+        }
+
+        decomposeType(method.returnType, &rank, &args, &entity);
+        if (args.size() != 0) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 }

@@ -42,7 +42,9 @@ void mapEntities(rtl::Reference<unoidl::Manager> const& manager, OUString const&
 OUString entityName(OUString const& name);
 OUString entityNamespace(OUString const& name);
 OUString simplifyNamespace(OUString const& name);
+OUString cName(OUString const& name);
 OUString cStructName(OUString const& name);
+bool shouldSkipMethod(const unoidl::InterfaceTypeEntity::Method& method);
 
 class BaseWriter {
 public:
@@ -143,6 +145,7 @@ protected:
                                  rtl::Reference<unoidl::InterfaceBasedSingletonEntity> entity);
     void writeServiceSingleton(OUString const& name,
                                rtl::Reference<unoidl::ServiceBasedSingletonEntity> entity);
+    void writeMethodParams(const unoidl::InterfaceTypeEntity::Method& method);
 };
 
 class TypeScriptWriter : public BaseWriter {
@@ -180,8 +183,10 @@ private:
 
 class V8WriterInternal : public V8Writer {
 public:
-    V8WriterInternal(std::map<OUString, Entity*> entities, OUString const& outDirectoryUrl, std::vector<OUString> sorted)
-        : V8Writer(entities, outDirectoryUrl), sorted_(sorted) {}
+    V8WriterInternal(std::map<OUString, Entity*> entities, OUString const& outDirectoryUrl,
+                     std::vector<OUString> sorted)
+        : V8Writer(entities, outDirectoryUrl)
+        , sorted_(sorted) {}
     void writeInternalHeader();
     void writeSharedHeader();
 
@@ -189,18 +194,12 @@ private:
     void writeName(OUString const& name);
     OUString translateSimpleType(OUString const& name);
     void writeType(OUString const& name);
-    void writeInterfaceDependency(OUString const& dependentName, OUString const& dependencyName,
-                                  bool published);
-    void writeEnum(OUString const& name, rtl::Reference<unoidl::EnumTypeEntity> entity);
-    void writePlainStruct(OUString const& name,
-                          rtl::Reference<unoidl::PlainStructTypeEntity> entity);
-    void writePolymorphicStruct(OUString const& name,
-                                rtl::Reference<unoidl::PolymorphicStructTypeTemplateEntity> entity);
-    void writeInterface(OUString const& name, rtl::Reference<unoidl::InterfaceTypeEntity> entity);
+    void writeInterfaceMethods(OUString const& name, rtl::Reference<unoidl::InterfaceTypeEntity> entity, bool isRef);
     void writeCStructToCpp(OUString const& name);
     void writeCppStructToC(OUString const& name);
     void writeCToCpp(OUString const& type, OUString const& name);
     void writeCppToC(OUString const& type, OUString const& name);
+    void writeMethodParams(const unoidl::InterfaceTypeEntity::Method& method);
 
     std::vector<OUString> sorted_;
 };

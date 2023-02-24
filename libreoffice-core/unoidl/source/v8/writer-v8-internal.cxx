@@ -77,130 +77,70 @@ void V8WriterInternal::writeType(OUString const& name) {
     }
 }
 
-void V8WriterInternal::writeInterfaceDependency(OUString const& dependentName,
-                                                OUString const& dependencyName, bool published) {
-    (void)published;
-
-    // adjacent interfaces can cause to a self-referencing import that should be avoided
-    if (dependencyName == dependentName)
-        return;
-
-    // calculate the relative path for the dependency from the dependent
-    OUString dependent_ = simplifyNamespace(dependentName);
-    OUString dependency_ = simplifyNamespace(dependencyName);
-
-    sal_Int32 i = 0, j = 0;
-    OUString dependencyNS;
-    // skip namespace components that are the same
-    for (;;) {
-        OUString dependentNS(dependent_.getToken(0, '.', j));
-        if (j == -1)
-            break;
-        dependencyNS = dependency_.getToken(0, '.', i);
-        if (i == -1)
-            break;
-
-        if (dependencyNS != dependentNS)
-            break;
+void V8WriterInternal::writeMethodParams(const unoidl::InterfaceTypeEntity::Method& method) {
+    out("void* this_");
+    if (method.returnType != "void") {
+        out(", ");
+        writeType(method.returnType);
+        out("* result");
     }
-    OUString entityName_ = entityName(dependencyName);
-    bool sameDir = j == -1 && entityName_ != "Any" && entityName_ != "Sequence"
-                   && entityName_ != "Type" && entityName_ != "XInterface";
-
-    auto importedDependency
-        = dependentNamespace_[dependent_ + "_"
-                              + (sameDir ? entityName(dependencyName) : dependencyNS)]++;
-
-    if (importedDependency != 0)
-        return;
-
-    if (sameDir) {
-        out("import { " + entityName(dependencyName) + " } from './");
-        out(entityName(dependencyName));
-        out("';\n");
-        return;
+    out(", rtl_uString **error");
+    for (auto& a : method.parameters) {
+        out(", ");
+        writeType(a.type);
+        out(" " + a.name);
     }
-
-    out("import *  as " + dependencyNS + " from '");
-
-    // uno special case
-    if (entityNamespace(dependencyName) == entityNamespace(dependentName)) {
-        out("./';\n");
-        return;
-    }
-
-    // for every differing component of the namespace, go up a directory
-    while (j != -1) {
-        dependent_.getToken(0, '.', j);
-        out("../");
-    }
-    out(dependencyNS);
-    out("';\n");
 }
 
-void V8WriterInternal::writeEnum(OUString const& name,
-                                 rtl::Reference<unoidl::EnumTypeEntity> entity) {
-    out("export declare enum " + entityName(name) + "{\n");
-    for (auto& m : entity->getMembers()) {
-        writeDoc(m.doc);
-        out(m.name + ",\n");
-    }
-    out("};\n");
-}
+void V8WriterInternal::writeInterfaceMethods(OUString const& name,
+                                             rtl::Reference<unoidl::InterfaceTypeEntity> entity,
+                                             bool isRef) {
+    auto cpp_class = translateNamespace(name);
+    for (auto& m : entity->getDirectMethods()) {
+        if (shouldSkipMethod(m))
+            continue;
+        if (!isRef)
+            out("inline ");
+        out("void ");
+        if (isRef)
+            out("(*");
+        out(cName(name) + "_" + m.name);
+        if (isRef)
+            out(")");
+        out("(");
+        writeMethodParams(m);
+        out(")");
 
-void V8WriterInternal::writePlainStruct(OUString const& name,
-                                        rtl::Reference<unoidl::PlainStructTypeEntity> entity) {
-    auto base = entity->getDirectBase();
-    out("export interface " + entityName(name));
-    if (!base.isEmpty()) {
-        out(" extends ");
-        writeName(base);
-    }
-
-    out("{\n");
-
-    for (auto& m : entity->getDirectMembers()) {
-        writeDoc(m.doc);
-        out(m.name + ": ");
-        writeType(m.type);
-        out(",");
-    }
-    out("}\n");
-}
-
-void V8WriterInternal::writePolymorphicStruct(
-    OUString const& name, rtl::Reference<unoidl::PolymorphicStructTypeTemplateEntity> entity) {
-    out("export type " + entityName(name) + "<");
-    auto& typeParams = entity->getTypeParameters();
-    for (auto i(typeParams.begin()); i != typeParams.end(); ++i) {
-        if (i != typeParams.begin()) {
-            out(",");
+        if (isRef) {
+            out(";\n");
+            continue;
         }
-        out(*i);
-    }
-    out("> = {\n");
+        out("{\n");
+        bool isVoid = m.returnType == "void";
+        out("*error = nullptr;\n");
 
-    for (auto& j : entity->getMembers()) {
-        writeDoc(j.doc);
-        out(j.name + ": ");
-
-        if (j.parameterized) {
-            out(j.type);
-        } else {
-            writeType(j.type);
+        out("try {\n");
+        if (!isVoid) {
+            out("auto tmp_result = ");
         }
-        out(";\n");
+        out("static_cast<" + cpp_class + "*>(this_)->" + m.name + "(");
+        for (auto& a : m.parameters) {
+            writeCToCpp(a.type, a.name);
+            if (&a != &m.parameters.back())
+                out(", ");
+        }
+        out(");\n");
+        if (!isVoid) {
+            out("*result = ");
+            writeCppToC(m.returnType, "tmp_result");
+            out(";\n");
+        }
+        out("} catch (const ::css::uno::Exception& e) {\n");
+        out("*error = e.Message.pData;\n");
+        out("}\n");
+
+        out("}\n");
     }
-    out("}");
-}
-
-void V8WriterInternal::writeInterface(OUString const& name,
-                                      rtl::Reference<unoidl::InterfaceTypeEntity> entity) {}
-
-namespace {
-OUString structMethodName(OUString const& name) {
-    return simplifyNamespace(name).replaceAll(".", "_");
-}
 }
 
 void V8WriterInternal::writeCToCpp(OUString const& type, OUString const& name) {
@@ -214,7 +154,23 @@ void V8WriterInternal::writeCToCpp(OUString const& type, OUString const& name) {
             out("::css::uno::Sequence<");
         }
         if (isEntity) {
-            out(translateNamespace(nucl));
+            auto entity = entities_.find(nucl);
+            if (entity == entities_.end()) {
+                out(translateNamespace(nucl));
+            }
+            auto sort = entity->second->entity->getSort();
+            switch (sort) {
+                case unoidl::Entity::SORT_INTERFACE_TYPE:
+                    out("::css::uno::Reference<" + translateNamespace(nucl) + ">");
+                    break;
+                case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
+                case unoidl::Entity::SORT_TYPEDEF:
+                case unoidl::Entity::SORT_ENUM_TYPE:
+                    out(translateNamespace(nucl));
+                    break;
+                default:
+                    break;
+            }
         } else {
             out(V8Writer::translateSimpleType(nucl));
         }
@@ -237,8 +193,7 @@ void V8WriterInternal::writeCToCpp(OUString const& type, OUString const& name) {
                 return out("::css::uno::Reference<" + translateNamespace(nucl) + ">(static_cast<"
                            + translateNamespace(nucl) + "*>(" + name + "), SAL_NO_ACQUIRE)");
             case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
-                return out("::unov8::c_struct_to_cpp::" + structMethodName(nucl) + "(" + name
-                           + ")");
+                return out("::unov8::c_struct_to_cpp::" + cName(nucl) + "(" + name + ")");
             case unoidl::Entity::SORT_TYPEDEF:
                 return writeCToCpp(
                     static_cast<unoidl::TypedefEntity*>(entity->second->entity.get())->getType(),
@@ -282,8 +237,7 @@ void V8WriterInternal::writeCppToC(OUString const& type, OUString const& name) {
             case unoidl::Entity::SORT_INTERFACE_TYPE:
                 return out("static_cast<void*>(" + name + ".get())");
             case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
-                return out("::unov8::cpp_struct_to_c::" + structMethodName(nucl) + "(" + name
-                           + ")");
+                return out("::unov8::cpp_struct_to_c::" + cName(nucl) + "(" + name + ")");
             case unoidl::Entity::SORT_TYPEDEF:
                 return writeCppToC(
                     static_cast<unoidl::TypedefEntity*>(entity->second->entity.get())->getType(),
@@ -313,14 +267,14 @@ void V8WriterInternal::writeCStructToCpp(OUString const& name) {
         return;
     auto* entity = static_cast<unoidl::PlainStructTypeEntity*>(i->second->entity.get());
     auto cpp_struct = translateNamespace(name);
-    out("inline " + cpp_struct + " " + structMethodName(name) + "(struct " + cStructName(name)
+    out("inline " + cpp_struct + " " + cName(name) + "(struct " + cStructName(name)
         + " c_struct) {\n");
     out(cpp_struct + " result;\n");
 
     // re-using the c-struct to cpp-struct method for the base should reduce complexity in the generator code
     auto base = entity->getDirectBase();
     if (!base.isEmpty()) {
-        auto base_method = structMethodName(base);
+        auto base_method = cName(base);
         out("(" + translateNamespace(base) + "&)result = " + base_method + "(c_struct.base);\n");
     }
     for (auto& m : entity->getDirectMembers()) {
@@ -340,13 +294,12 @@ void V8WriterInternal::writeCppStructToC(OUString const& name) {
     auto* entity = static_cast<unoidl::PlainStructTypeEntity*>(i->second->entity.get());
     auto cpp_struct = translateNamespace(name);
     OUString c_struct = "struct " + cStructName(name);
-    out("inline " + c_struct + " " + structMethodName(name) + "(" + cpp_struct
-        + " cpp_struct) {\n");
+    out("inline " + c_struct + " " + cName(name) + "(" + cpp_struct + " cpp_struct) {\n");
     out(c_struct + " result;\n");
 
     auto base = entity->getDirectBase();
     if (!base.isEmpty()) {
-        auto base_method = structMethodName(base);
+        auto base_method = cName(base);
         out("result.base = " + base_method + "(cpp_struct);\n");
     }
     for (auto& m : entity->getDirectMembers()) {
@@ -478,6 +431,18 @@ namespace cpp_struct_to_c {
     out(R"(
 } // namespace cpp_struct_to_c
 
+namespace methods {
+)");
+
+    for (const auto& i : interfaces) {
+        std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
+        auto* entity = static_cast<unoidl::InterfaceTypeEntity*>(j->second->entity.get());
+        writeInterfaceMethods(i, entity, false);
+    }
+
+    out(R"(
+} // namespace methods
+
 } // namespace unov8
 #endif
 )");
@@ -497,13 +462,30 @@ void V8WriterInternal::writeSharedHeader() {
 #include <uno/sequence2.h>
 )");
 
+    std::vector<OUString> interfaces;
+    std::vector<OUString> structs;
     for (const auto& i : sorted_) {
         std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
         // skip irrelevant entities and those without bindings in JS/C++
-        if (j == entities_.end() || !j->second->relevant
-            || j->second->entity->getSort() != unoidl::Entity::SORT_PLAIN_STRUCT_TYPE)
+        if (j == entities_.end() || !j->second->relevant)
             continue;
 
+        switch (j->second->entity->getSort()) {
+            case unoidl::Entity::SORT_INTERFACE_TYPE:
+                interfaces.emplace_back(j->first);
+                break;
+            case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
+                structs.emplace_back(j->first);
+                break;
+            default:
+                continue;
+        }
+
+        out("#include <" + i.replaceAll(".", "/") + ".hpp>\n");
+    }
+
+    for (const auto& i : structs) {
+        std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
         auto* entity = static_cast<unoidl::PlainStructTypeEntity*>(j->second->entity.get());
         out("struct " + cStructName(i) + " {\n");
         auto base = entity->getDirectBase();
@@ -517,7 +499,15 @@ void V8WriterInternal::writeSharedHeader() {
         out("};\n");
     }
 
+    out("struct _unov8_methods {\n");
+    for (const auto& i : interfaces) {
+        std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
+        auto* entity = static_cast<unoidl::InterfaceTypeEntity*>(j->second->entity.get());
+        writeInterfaceMethods(i, entity, true);
+    }
     out(R"(
+};
+
 #endif
 )");
     close();
