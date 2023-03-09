@@ -907,6 +907,18 @@ typedef enum
      * "file:///tmp/hello-world.pdf"
      */
     LOK_CALLBACK_EXPORT_FILE = 59,
+
+    /** Document Events Section **/
+    LOK_DOC_CALLBACK_ON_NEW = 61,
+    LOK_DOC_CALLBACK_ON_LOAD= 62,
+    LOK_DOC_CALLBACK_ON_SAVE= 63,
+    LOK_DOC_CALLBACK_ON_SAVE_DONE= 64,
+    LOK_DOC_CALLBACK_ON_SAVE_AS= 65,
+    LOK_DOC_CALLBACK_ON_SAVE_AS_DONE= 66,
+    LOK_DOC_CALLBACK_ON_UNLOAD= 67,
+    LOK_DOC_CALLBACK_ON_TITLE_CHANGED= 68,
+    LOK_DOC_CALLBACK_ON_MODE_CHANGED= 69,
+    /** End Document Events Section **/
 }
 LibreOfficeKitCallbackType;
 
@@ -1055,6 +1067,24 @@ static inline const char* lokCallbackTypeToString(int nType)
         return "LOK_CALLBACK_MEDIA_SHAPE";
     case LOK_CALLBACK_EXPORT_FILE:
         return "LOK_CALLBACK_EXPORT_FILE";
+    case LOK_DOC_CALLBACK_ON_NEW:
+        return "LOK_DOC_CALLBACK_ON_NEW";
+    case LOK_DOC_CALLBACK_ON_LOAD:
+        return "LOK_DOC_CALLBACK_ON_LOAD";
+    case LOK_DOC_CALLBACK_ON_SAVE:
+        return "LOK_DOC_CALLBACK_ON_SAVE";
+    case LOK_DOC_CALLBACK_ON_SAVE_DONE:
+        return "LOK_DOC_CALLBACK_ON_SAVE_DONE";
+    case LOK_DOC_CALLBACK_ON_SAVE_AS:
+        return "LOK_DOC_CALLBACK_ON_SAVE_AS";
+    case LOK_DOC_CALLBACK_ON_SAVE_AS_DONE:
+        return "LOK_DOC_CALLBACK_ON_SAVE_AS_DONE";
+    case LOK_DOC_CALLBACK_ON_UNLOAD:
+        return "LOK_DOC_CALLBACK_ON_UNLOAD";
+    case LOK_DOC_CALLBACK_ON_TITLE_CHANGED:
+        return "LOK_DOC_CALLBACK_ON_TITLE_CHANGED";
+    case LOK_DOC_CALLBACK_ON_MODE_CHANGED:
+        return "LOK_DOC_CALLBACK_ON_MODE_CHANGED";
     }
 
     assert(!"Unknown LibreOfficeKitCallbackType type.");

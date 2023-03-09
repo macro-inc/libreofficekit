@@ -1986,7 +1986,7 @@ void SwContentNode::ChkCondColl(const SwTextFormatColl* pColl)
 {
     if(pColl != GetRegisteredIn())
     {
-        SAL_WARN("sw.core", "Wrong cond collection, skipping check of Cond Colls.");
+        /* SAL_WARN("sw.core", "Wrong cond collection, skipping check of Cond Colls."); */
         return;
     }
     if(&GetNodes() != &GetDoc().GetNodes())
