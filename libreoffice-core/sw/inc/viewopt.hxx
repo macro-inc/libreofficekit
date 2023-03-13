@@ -662,9 +662,9 @@ public:
 
     static bool     IsAppearanceFlag(ViewOptFlags nFlag);
 
-    static bool     IsDocBoundaries()     {return IsAppearanceFlag(ViewOptFlags::DocBoundaries);}
+    static bool     IsDocBoundaries()     {return false;/*IsAppearanceFlag(ViewOptFlags::DocBoundaries);*/}
     static bool     IsObjectBoundaries()  {return IsAppearanceFlag(ViewOptFlags::ObjectBoundaries);}
-    static bool     IsTableBoundaries()   {return IsAppearanceFlag(ViewOptFlags::TableBoundaries );}
+    static bool     IsTableBoundaries()   {return false;/*return IsAppearanceFlag(ViewOptFlags::TableBoundaries );*/}
     static bool     IsIndexShadings()     {return IsAppearanceFlag(ViewOptFlags::IndexShadings   );}
     static bool     IsLinks()             {return IsAppearanceFlag(ViewOptFlags::Links            );}
     static bool     IsVisitedLinks()      {return IsAppearanceFlag(ViewOptFlags::VisitedLinks    );}
