@@ -203,6 +203,7 @@ void GetOutline(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell)
             // Skip empty outlines:
             textNode->GetText().isEmpty())
         {
+            nOutlineId++;
             continue;
         }
 
