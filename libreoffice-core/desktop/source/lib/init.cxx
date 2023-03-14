@@ -3951,6 +3951,7 @@ static void doc_initializeForRendering(LibreOfficeKitDocument* pThis,
         doc_iniUnoCommands();
         pDoc->initializeForTiledRendering(
                 comphelper::containerToSequence(jsonToPropertyValuesVector(pArguments)));
+        pDoc->initializeAppearanceFlags();
     }
 }
 

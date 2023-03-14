@@ -305,4 +305,10 @@ void SwXTextDocument::createTable(int row, int col)
     mrSh->InsertTable(aInsertTableOptions, row, col);
 }
 
+void SwXTextDocument::initializeAppearanceFlags()
+{
+    SwViewOption::SetAppearanceFlag(ViewOptFlags::DocBoundaries, false, false);
+    SwViewOption::SetAppearanceFlag(ViewOptFlags::TableBoundaries, false, false);
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
