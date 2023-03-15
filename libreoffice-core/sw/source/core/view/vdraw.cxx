@@ -245,7 +245,7 @@ void SwViewShellImp::NotifySizeChg( const Size &rNewSz )
                 // This should be turned into a DBG_ASSERT, once layouting is fixed!
                 const SwPageFrame *pPageFrame = pAnchor->FindPageFrame();
                 if (!pPageFrame || pPageFrame->IsInvalid() ) {
-                    /* SAL_WARN( "sw.core", "Trying to move anchor from invalid page - fix layouting!" ); */
+                    SAL_WARN( "sw.core", "Trying to move anchor from invalid page - fix layouting!" );
                     continue;
                 }
             }
