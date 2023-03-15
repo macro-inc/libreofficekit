@@ -131,6 +131,7 @@ $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 ifneq ($(filter $(OS),ANDROID iOS MACOSX WNT),)
 $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 	desktop/source/lib/init \
+	desktop/source/lib/lokdocumenteventnotifier \
 	desktop/source/lib/lokinteractionhandler \
 	$(if $(filter-out $(OS),iOS), \
 		desktop/source/lib/lokclipboard) \

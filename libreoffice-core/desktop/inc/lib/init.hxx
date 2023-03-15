@@ -33,6 +33,7 @@
 #include <sfx2/lokhelper.hxx>
 
 #include <desktop/dllapi.h>
+#include "../source/lib/lokdocumenteventnotifier.hxx"
 
 class LOKInteractionHandler;
 
@@ -248,6 +249,7 @@ namespace desktop {
     {
         css::uno::Reference<css::lang::XComponent> mxComponent;
         std::shared_ptr< LibreOfficeKitDocumentClass > m_pDocumentClass;
+        doceventnotifier::LokDocumentEventNotifier* m_lokDocEventNotifier;
         std::map<size_t, std::shared_ptr<CallbackFlushHandler>> mpCallbackFlushHandlers;
         const int mnDocumentId;
         std::set<OUString> maFontsMissing;
