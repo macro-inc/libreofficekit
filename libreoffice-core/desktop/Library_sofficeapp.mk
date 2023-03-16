@@ -144,6 +144,7 @@ else
 ifeq ($(USING_X11),TRUE)
 $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 	desktop/source/lib/init \
+	desktop/source/lib/lokdocumenteventnotifier \
 	desktop/source/lib/lokinteractionhandler \
 	desktop/source/lib/lokclipboard \
 ))
@@ -152,6 +153,7 @@ endif
 ifeq ($(DISABLE_GUI),TRUE)
 $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
     desktop/source/lib/init \
+	desktop/source/lib/lokdocumenteventnotifier \
     desktop/source/lib/lokinteractionhandler \
     desktop/source/lib/lokclipboard \
 ))
