@@ -12,7 +12,6 @@
 #include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/weakref.hxx>
 #include <cppuhelper/implbase.hxx>
-#include <framework/fwkdllapi.h>
 
 using namespace css;
 using namespace css::uno;
@@ -26,7 +25,7 @@ namespace com { namespace sun { namespace star { namespace uno { class XInterfac
 
 namespace doceventnotifier
 {
-class FWK_DLLPUBLIC LokDocumentEventNotifier final
+class LokDocumentEventNotifier final
     : private ::cppu::BaseMutex,
       public ::cppu::WeakImplHelper<css::document::XDocumentEventListener>
 {
