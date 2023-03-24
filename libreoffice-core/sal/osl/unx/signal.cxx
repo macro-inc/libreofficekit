@@ -175,7 +175,7 @@ bool onInitSignal()
 
     struct sigaction act;
     act.sa_sigaction = signalHandlerFunction;
-    act.sa_flags = SA_RESTART | SA_SIGINFO;
+    act.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
 
     sigfillset(&(act.sa_mask));
 
