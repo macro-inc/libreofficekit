@@ -14,6 +14,13 @@ $(eval $(call gb_Executable_set_include,tilebench,\
     -I$(SRCDIR)/desktop/inc \
 ))
 
+$(eval $(call gb_Executable_use_custom_headers,tilebench,\
+	officecfg/registry \
+    $(if $(DISABLE_GUI), \
+        desktop/unov8_internal \
+    ) \
+))
+
 $(eval $(call gb_Executable_use_externals,tilebench,\
     boost_headers \
 ))

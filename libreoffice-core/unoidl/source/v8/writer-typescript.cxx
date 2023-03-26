@@ -92,6 +92,8 @@ void TypeScriptWriter::writeType(OUString const& name) {
 
 void TypeScriptWriter::writeInterfaceDependency(OUString const& dependentName,
                                                 OUString const& dependencyName, bool published) {
+    (void)published; // unused
+
     // adjacent interfaces can cause to a self-referencing import that should be avoided
     if (dependencyName == dependentName)
         return;
@@ -212,16 +214,21 @@ void TypeScriptWriter::writeException(OUString const& name,
 
 void TypeScriptWriter::writeInterface(OUString const& name,
                                       rtl::Reference<unoidl::InterfaceTypeEntity> entity) {
-    out("export interface " + entityName(name) + " extends BaseType {");
+    out("export interface " + entityName(name) + " extends BaseType {\n");
+    bool hasProperties = entity->getDirectAttributes().size() > 0;
 
-    for (auto& i : entity->getDirectAttributes()) {
-        writeDoc(i.doc);
-        if (i.readOnly)
-            out("readonly ");
+    if (hasProperties) {
+        out("properties: {\n");
+        for (auto& i : entity->getDirectAttributes()) {
+            writeDoc(i.doc);
+            if (i.readOnly)
+                out("readonly ");
 
-        out(" " + i.name + ": ");
-        writeType(i.type);
-        out(";\n");
+            out(" " + i.name + ": ");
+            writeType(i.type);
+            out(";\n");
+        }
+        out("},\n");
     }
 
     for (auto& i : entity->getDirectMethods()) {
@@ -229,7 +236,24 @@ void TypeScriptWriter::writeInterface(OUString const& name,
             continue;
 
         writeDoc(i.doc);
-        out(i.name + "(");
+        // Override XPropertySet type params
+        if (name == "com.sun.star.beans.XPropertySet") {
+            if (i.name == "setPropertyValue") {
+              out("setPropertyValue<T extends {properties: Record<string, any>} = {properties: Record<string, any>}>(k: keyof T['properties'], v: T['properties'][typeof k]): void;\n");
+
+              continue;
+            } else if (i.name == "getPropertyValue") {
+              out("getPropertyValue<T extends {properties: Record<string, any>} = {properties: Record<string, any>}>(k: keyof T['properties']): T['properties'][typeof k];\n");
+              continue;
+            }
+        }
+
+        out(i.name);
+        if (i.returnType == "any") {
+            out("<T extends uno.Any = uno.Any>");
+        }
+        out("(");
+
         bool hasOutParam = false;
         bool hasNonOutParam = false;
         for (auto k(i.parameters.begin()); k != i.parameters.end(); ++k) {
@@ -273,6 +297,8 @@ void TypeScriptWriter::writeInterface(OUString const& name,
         out("): ");
         if (i.returnType == "void") {
             out("void");
+        } else if (i.returnType == "any") {
+            out("T");
         } else {
             writeType(i.returnType);
         }
@@ -411,7 +437,7 @@ void TypeScriptWriter::writeAccumulationService(
     for (auto& i : entity->getDirectProperties()) {
         directAttributes.emplace_back(i.name, i.type, i.attributes & i.ATTRIBUTE_BOUND,
                                       i.attributes & i.ATTRIBUTE_READ_ONLY, std::vector<OUString>(),
-                                      std::vector<OUString>(), std::vector<OUString>());
+                                      std::vector<OUString>(), std::vector<OUString>(), i.doc);
     }
     std::vector<unoidl::InterfaceTypeEntity::Method> directMethods;
     std::vector<OUString> ann(entity->getAnnotations());

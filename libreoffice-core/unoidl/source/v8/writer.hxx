@@ -5,6 +5,7 @@
 #include <unoidl/unoidl.hxx>
 #include <map>
 #include <set>
+#include <unordered_set>
 
 namespace writer {
 struct Entity {
@@ -63,6 +64,7 @@ protected:
     OUString currentEntity_;
     std::map<OUString, int> dependentNamespace_{};
     void out(OUString const& text);
+    OUString resolveTypedef(OUString const& type);
 
     virtual void writeDoc(rtl::Reference<unoidl::Entity> const& entity);
     virtual void writeDoc(OUString const& doc);
@@ -115,10 +117,20 @@ private:
 
 class V8Writer : public BaseWriter {
 public:
-    V8Writer(std::map<OUString, Entity*> entities, OUString const& outDirectoryUrl)
-        : BaseWriter(entities, outDirectoryUrl) {}
+    V8Writer(std::map<OUString, Entity*> entities, OUString const& outDirectoryUrl,
+             std::vector<OUString> sorted)
+        : BaseWriter(entities, outDirectoryUrl)
+        , sorted_(sorted) {}
     void writeAsUtility();
     void writeBuildFile();
+    // really used like sort entity to organize in specific namespaces
+    void writeEntity(OUString const& name);
+    void writeDeclarations();
+    void writeSimpleTypeConverter();
+    void writeAnyTypeConverter();
+    void writeHeaderIncludes();
+    // call after iterating with writeEntity on sorted
+    void writeOrganizedEntities();
 
 protected:
     void writeName(OUString const& name);
@@ -145,7 +157,22 @@ protected:
                                  rtl::Reference<unoidl::InterfaceBasedSingletonEntity> entity);
     void writeServiceSingleton(OUString const& name,
                                rtl::Reference<unoidl::ServiceBasedSingletonEntity> entity);
-    void writeMethodParams(const unoidl::InterfaceTypeEntity::Method& method);
+    void writeMethodParamsConstructors(const unoidl::InterfaceTypeEntity::Method& method);
+    void writeMethodParamsDestructors(const unoidl::InterfaceTypeEntity::Method& method);
+    void writeInterfaceMethodBuilder(OUString const& name, unoidl::InterfaceTypeEntity* entity);
+    void writeInterfaceMethods(OUString const& name, OUString const& className, unoidl::InterfaceTypeEntity* entity,
+                               std::unordered_set<int>& declared);
+    void writeMethodReturn(OUString const& type);
+    void writeInterfaceDeclaration(OUString const& name, unoidl::InterfaceTypeEntity* entity);
+    void writeInterfaceMethodsDeclaration(unoidl::InterfaceTypeEntity* entity,
+                                          std::unordered_set<int>& declared);
+    void writeStructDeclaration(OUString const& name);
+
+    std::vector<OUString> sorted_;
+    std::map<OUString, unoidl::InterfaceTypeEntity*> interfaces_;
+    std::map<OUString, unoidl::EnumTypeEntity*> enums_;
+    std::map<OUString, unoidl::ConstantGroupEntity*> constgroups_;
+    std::map<OUString, unoidl::PlainStructTypeEntity*> structs_;
 };
 
 class TypeScriptWriter : public BaseWriter {
@@ -185,23 +212,23 @@ class V8WriterInternal : public V8Writer {
 public:
     V8WriterInternal(std::map<OUString, Entity*> entities, OUString const& outDirectoryUrl,
                      std::vector<OUString> sorted)
-        : V8Writer(entities, outDirectoryUrl)
-        , sorted_(sorted) {}
+        : V8Writer(entities, outDirectoryUrl, sorted) {}
     void writeInternalHeader();
     void writeSharedHeader();
 
 private:
     void writeName(OUString const& name);
-    OUString translateSimpleType(OUString const& name);
-    void writeType(OUString const& name);
-    void writeInterfaceMethods(OUString const& name, rtl::Reference<unoidl::InterfaceTypeEntity> entity, bool isRef);
+    void writeInterfaceMethods(OUString const& name,
+                               rtl::Reference<unoidl::InterfaceTypeEntity> entity, bool isRef,
+                               std::unordered_set<int>& declared);
+    void writeInterfaceMethodsInit(OUString const& name,
+                               rtl::Reference<unoidl::InterfaceTypeEntity> entity, bool isRef,
+                               std::unordered_set<int>& declared);
     void writeCStructToCpp(OUString const& name);
     void writeCppStructToC(OUString const& name);
     void writeCToCpp(OUString const& type, OUString const& name);
     void writeCppToC(OUString const& type, OUString const& name);
     void writeMethodParams(const unoidl::InterfaceTypeEntity::Method& method);
-
-    std::vector<OUString> sorted_;
 };
 }
 

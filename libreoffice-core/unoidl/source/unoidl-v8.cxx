@@ -137,9 +137,34 @@ void propagateRelevant(std::map<OUString, writer::Entity*>& entities, writer::En
     }
 }
 
+void markRelevantStruct(std::map<OUString, writer::Entity*>& entities,
+                        unoidl::PlainStructTypeEntity* entity) {
+    for (auto& k : entity->getDirectMembers()) {
+        std::map<OUString, writer::Entity*>::iterator j(entities.find(k.type));
+        if (j != entities.end()) {
+            j->second->relevant = true;
+        }
+    }
+
+    if (!entity->getDirectBase().isEmpty()) {
+        std::map<OUString, writer::Entity*>::iterator j(entities.find(entity->getDirectBase()));
+        if (j != entities.end()) {
+            j->second->relevant = true;
+            markRelevantStruct(
+                entities, static_cast<unoidl::PlainStructTypeEntity*>(j->second->entity.get()));
+        }
+    }
+}
+
 void visit(std::map<OUString, writer::Entity*>& entities,
            std::map<OUString, writer::Entity*>::iterator const& iterator,
            std::vector<OUString>& result) {
+    // polystructs are unsupported and this is pretty much the only use of it that's marked relevant
+    if (iterator->first.endsWith("awt.ItemListEvent")) {
+        iterator->second->relevant = false;
+        return;
+    }
+
     switch (iterator->second->sorted) {
         case writer::Entity::Sorted::NO:
             iterator->second->sorted = writer::Entity::Sorted::ACTIVE;
@@ -151,6 +176,34 @@ void visit(std::map<OUString, writer::Entity*>& entities,
                     }
                     visit(entities, j, result);
                 }
+            }
+
+            // fix missing dependencies on method types
+            if (iterator->second->entity->getSort() == unoidl::Entity::SORT_INTERFACE_TYPE) {
+                auto* intf
+                    = static_cast<unoidl::InterfaceTypeEntity*>(iterator->second->entity.get());
+
+                for (auto& k : intf->getDirectMethods()) {
+                    if (writer::shouldSkipMethod(k))
+                        continue;
+
+                    std::map<OUString, writer::Entity*>::iterator j(entities.find(k.returnType));
+                    if (j != entities.end()) {
+                        j->second->relevant = true;
+                    }
+
+                    for (auto& param : k.parameters) {
+                        j = entities.find(param.type);
+                        if (j != entities.end()) {
+                            j->second->relevant = true;
+                        }
+                    }
+                }
+            }
+
+            if (iterator->second->entity->getSort() == unoidl::Entity::SORT_PLAIN_STRUCT_TYPE) {
+                markRelevantStruct(entities, static_cast<unoidl::PlainStructTypeEntity*>(
+                                                 iterator->second->entity.get()));
             }
             iterator->second->sorted = writer::Entity::Sorted::YES;
             result.push_back(iterator->first);
@@ -236,7 +289,8 @@ SAL_IMPLEMENT_MAIN() {
 
         if (internal) {
             std::cerr << "Writing internal bindings..." << std::endl;
-            auto* w = new writer::V8WriterInternal(flatMap, getArgumentUri(args - 1, nullptr), sorted);
+            auto* w
+                = new writer::V8WriterInternal(flatMap, getArgumentUri(args - 1, nullptr), sorted);
             w->writeInternalHeader();
             w->writeSharedHeader();
             return EXIT_SUCCESS;
@@ -262,7 +316,34 @@ SAL_IMPLEMENT_MAIN() {
         }
 
         {
-            auto* w = new writer::V8Writer(flatMap, getArgumentUri(args - 1, nullptr) + "/v8");
+            auto* w = new writer::V8Writer(flatMap, getArgumentUri(args - 1, nullptr) + "/include",
+                                           sorted);
+            w->createEntityFile("unov8", ".hxx");
+
+            w->writeHeaderIncludes();
+            w->writeDeclarations();
+            w->writeSimpleTypeConverter();
+            w->writeAnyTypeConverter();
+
+            for (const auto& i : sorted) {
+                std::map<OUString, writer::Entity*>::iterator j(flatMap.find(i));
+                // skip irrelevant entities and those without bindings in JS/C++
+                if (j == flatMap.end() || !j->second->relevant
+                    || j->second->entity->getSort() == unoidl::Entity::SORT_EXCEPTION_TYPE)
+                    continue;
+
+                // not really writing, just sorting
+                w->writeEntity(i);
+            }
+
+            w->writeOrganizedEntities();
+
+            w->close();
+        }
+
+        {
+            auto* w
+                = new writer::V8Writer(flatMap, getArgumentUri(args - 1, nullptr) + "/v8", sorted);
             w->writeAsUtility();
             w->writeBuildFile();
         }

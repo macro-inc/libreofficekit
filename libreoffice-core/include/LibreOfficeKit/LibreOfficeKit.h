@@ -498,8 +498,6 @@ struct _LibreOfficeKitDocumentClass
                          long* pRow);
 
     void* (*getXComponent) (LibreOfficeKitDocument* pThis);
-
-    UnoV8 uno_v8;
 #endif // defined LOK_USE_UNSTABLE_API || defined LIBO_INTERNAL_ONLY
 };
 

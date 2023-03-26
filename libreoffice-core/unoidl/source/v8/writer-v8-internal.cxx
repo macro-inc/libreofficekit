@@ -1,4 +1,5 @@
 #include "writer.hxx"
+#include <iostream>
 
 namespace writer {
 
@@ -10,7 +11,114 @@ OUString translateNamespace(OUString const& name) {
 
 void V8WriterInternal::writeName(OUString const& name) { out(translateNamespace(name)); }
 
-OUString V8WriterInternal::translateSimpleType(OUString const& name) {
+void V8WriterInternal::writeMethodParams(const unoidl::InterfaceTypeEntity::Method& method) {
+    out("void* this_");
+    if (method.returnType != "void") {
+        out(", ");
+        writeType(method.returnType);
+        out("* result");
+    }
+    out(", rtl_uString **error");
+    for (auto& a : method.parameters) {
+        out(", ");
+        writeType(a.type);
+        out(" " + a.name);
+    }
+}
+
+void V8WriterInternal::writeInterfaceMethods(OUString const& name,
+                                             rtl::Reference<unoidl::InterfaceTypeEntity> entity,
+                                             bool isRef, std::unordered_set<int>& declared) {
+    auto cpp_class = translateNamespace(name);
+    for (auto& m : entity->getDirectMethods()) {
+        if (shouldSkipMethod(m)
+            || declared.find(name.hashCode() ^ m.name.hashCode()) != declared.end())
+            continue;
+        declared.emplace(name.hashCode() ^ m.name.hashCode());
+        if (!isRef)
+            out("inline ");
+        out("void ");
+        if (isRef)
+            out("(*");
+        out(cName(name) + "_" + m.name);
+        if (isRef)
+            out(")");
+        out("(");
+        writeMethodParams(m);
+        out(")");
+
+        if (isRef) {
+            out(";\n");
+            continue;
+        }
+        out("{\n");
+        auto returnType = resolveTypedef(m.returnType);
+        bool isVoid = returnType == "void";
+        out("*error = nullptr;\n");
+
+        out("try {\n");
+        if (!isVoid) {
+            out("auto tmp_result = ");
+        }
+        out("static_cast<" + cpp_class + "*>(this_)->" + m.name + "(");
+        for (auto& a : m.parameters) {
+            writeCToCpp(a.type, a.name);
+            if (&a != &m.parameters.back())
+                out(", ");
+        }
+        out(");\n");
+        if (!isVoid) {
+            // strings need to be acquired before they are returned on stack
+            if (returnType == "string") {
+                out("rtl_uString_acquire(tmp_result.pData);\n");
+            }
+            // interfaces passed by uno::Reference need to be acquired before they are returned on stack
+            auto entity__ = entities_.find(returnType);
+            if (entity__ != entities_.end() && entity__->second->entity->getSort() == unoidl::Entity::SORT_INTERFACE_TYPE) {
+                out("((::css::uno::Reference<::css::uno::XInterface>)tmp_result)->acquire();\n");
+            }
+            out("*result = ");
+            writeCppToC(returnType, "tmp_result");
+            out(";\n");
+        }
+        out("} catch (const ::css::uno::Exception& exception_) {\n");
+        out("*error = exception_.Message.pData;\n");
+        out("}\n");
+
+        out("}\n");
+    }
+    for (auto& i : entity->getDirectMandatoryBases()) {
+        // acquire/release are handled on object create/destroy
+        if (i.name == "com.sun.star.uno.XInterface")
+            continue;
+
+        auto* base_ent = static_cast<unoidl::InterfaceTypeEntity*>(entities_[i.name]->entity.get());
+        writeInterfaceMethods(i.name, base_ent, isRef, declared);
+    }
+}
+
+void V8WriterInternal::writeInterfaceMethodsInit(OUString const& name,
+                                                 rtl::Reference<unoidl::InterfaceTypeEntity> entity,
+                                                 bool isRef, std::unordered_set<int>& declared) {
+    for (const auto& m : entity->getDirectMethods()) {
+        if (shouldSkipMethod(m)
+            || declared.find(name.hashCode() ^ m.name.hashCode()) != declared.end())
+            continue;
+        declared.emplace(name.hashCode() ^ m.name.hashCode());
+        out("." + cName(name) + "_" + m.name + " = " + cName(name) + "_" + m.name + ",\n");
+    }
+    for (auto& i : entity->getDirectMandatoryBases()) {
+        // acquire/release are handled on object create/destroy
+        if (i.name == "com.sun.star.uno.XInterface")
+            continue;
+
+        auto* base_ent = static_cast<unoidl::InterfaceTypeEntity*>(entities_[i.name]->entity.get());
+        writeInterfaceMethodsInit(i.name, base_ent, isRef, declared);
+    }
+}
+
+namespace {
+OUString translateSimpleTypeCpp(OUString const& name) {
     if (name == "void")
         return "void";
     if (name == "boolean")
@@ -36,111 +144,13 @@ OUString V8WriterInternal::translateSimpleType(OUString const& name) {
     if (name == "char")
         return "sal_Unicode";
     if (name == "string")
-        return "rtl_uString*";
+        return "::rtl::OUString";
     if (name == "type")
-        return "typelib_TypeDescriptionReference*";
+        return "::css::uno::Type";
     if (name == "any")
-        return "uno_Any";
-
+        return "::css::uno::Any";
     return name;
 }
-
-void V8WriterInternal::writeType(OUString const& name) {
-    std::size_t rank;
-    std::vector<OUString> args;
-    bool isEntity;
-    OUString nucl(decomposeType(name, &rank, &args, &isEntity));
-
-    if (rank > 0) {
-        return out("uno_Sequence*");
-    }
-    if (!isEntity) {
-        return out(translateSimpleType(nucl));
-    }
-    auto entity = entities_.find(nucl);
-    if (entity == entities_.end()) {
-        return out(nucl);
-    }
-    auto sort = entity->second->entity->getSort();
-    switch (sort) {
-        case unoidl::Entity::SORT_INTERFACE_TYPE:
-            return out("void*");
-        case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
-            return out("struct " + cStructName(nucl));
-        case unoidl::Entity::SORT_TYPEDEF:
-            return writeType(
-                static_cast<unoidl::TypedefEntity*>(entity->second->entity.get())->getType());
-        case unoidl::Entity::SORT_ENUM_TYPE:
-            return out("unsigned int");
-        default:
-            break;
-    }
-}
-
-void V8WriterInternal::writeMethodParams(const unoidl::InterfaceTypeEntity::Method& method) {
-    out("void* this_");
-    if (method.returnType != "void") {
-        out(", ");
-        writeType(method.returnType);
-        out("* result");
-    }
-    out(", rtl_uString **error");
-    for (auto& a : method.parameters) {
-        out(", ");
-        writeType(a.type);
-        out(" " + a.name);
-    }
-}
-
-void V8WriterInternal::writeInterfaceMethods(OUString const& name,
-                                             rtl::Reference<unoidl::InterfaceTypeEntity> entity,
-                                             bool isRef) {
-    auto cpp_class = translateNamespace(name);
-    for (auto& m : entity->getDirectMethods()) {
-        if (shouldSkipMethod(m))
-            continue;
-        if (!isRef)
-            out("inline ");
-        out("void ");
-        if (isRef)
-            out("(*");
-        out(cName(name) + "_" + m.name);
-        if (isRef)
-            out(")");
-        out("(");
-        writeMethodParams(m);
-        out(")");
-
-        if (isRef) {
-            out(";\n");
-            continue;
-        }
-        out("{\n");
-        bool isVoid = m.returnType == "void";
-        out("*error = nullptr;\n");
-
-        out("try {\n");
-        if (!isVoid) {
-            out("auto tmp_result = ");
-        }
-        out("static_cast<" + cpp_class + "*>(this_)->" + m.name + "(");
-        for (auto& a : m.parameters) {
-            writeCToCpp(a.type, a.name);
-            if (&a != &m.parameters.back())
-                out(", ");
-        }
-        out(");\n");
-        if (!isVoid) {
-            out("*result = ");
-            writeCppToC(m.returnType, "tmp_result");
-            out(";\n");
-        }
-        out("} catch (const ::css::uno::Exception& e) {\n");
-        out("*error = e.Message.pData;\n");
-        out("}\n");
-
-        out("}\n");
-    }
 }
 
 void V8WriterInternal::writeCToCpp(OUString const& type, OUString const& name) {
@@ -172,7 +182,7 @@ void V8WriterInternal::writeCToCpp(OUString const& type, OUString const& name) {
                     break;
             }
         } else {
-            out(V8Writer::translateSimpleType(nucl));
+            out(translateSimpleTypeCpp(nucl));
         }
 
         for (std::size_t i = 0; i != rank; ++i) {
@@ -372,6 +382,34 @@ inline typelib_TypeDescriptionReference* interfaceType(uint32_t type_hash) {
     return nullptr;
 }
 
+inline typelib_TypeDescriptionReference* interfaceTypeFromFQN(const char *str, int len) {
+    switch (hash(std::string_view(str, len))) {
+)");
+
+    for (auto& i : interfaces) {
+        out("case hash(\"" + i + "\"): ");
+        out("return ::cppu::UnoType<" + translateNamespace(i) + ">::get().getTypeLibType();\n");
+    }
+
+    out(R"(
+    }
+    return nullptr;
+}
+
+inline typelib_TypeDescriptionReference* structTypeFromFQN(const char *str, int len) {
+    switch (hash(std::string_view(str, len))) {
+)");
+
+    for (auto& i : interfaces) {
+        out("case hash(\"" + i + "\"): ");
+        out("return ::cppu::UnoType<" + translateNamespace(i) + ">::get().getTypeLibType();\n");
+    }
+
+    out(R"(
+    }
+    return nullptr;
+}
+
 inline typelib_TypeDescriptionReference* interfaceType(const char *str, int len) {
     return interfaceType(hash(std::string_view(str, len)));
 }
@@ -434,22 +472,19 @@ namespace cpp_struct_to_c {
 namespace methods {
 )");
 
+    std::unordered_set<int> declared{};
     for (const auto& i : interfaces) {
         std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
         auto* entity = static_cast<unoidl::InterfaceTypeEntity*>(j->second->entity.get());
-        writeInterfaceMethods(i, entity, false);
+        writeInterfaceMethods(i, entity, false, declared);
     }
     out("inline void _init(struct _UnoV8Methods* methods) {\n"
         "*methods = {\n");
+    declared.clear();
     for (const auto& i : interfaces) {
         std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
         auto* entity = static_cast<unoidl::InterfaceTypeEntity*>(j->second->entity.get());
-
-        for (const auto& m : entity->getDirectMethods()) {
-            if (shouldSkipMethod(m))
-                continue;
-            out("." + cName(i) + "_" + m.name + " = " + cName(i) + "_" + m.name + ",\n");
-        }
+        writeInterfaceMethodsInit(i, entity, false, declared);
     }
     out("};\n"
         "}\n");
@@ -465,7 +500,13 @@ namespace methods {
 
 void V8WriterInternal::writeSharedHeader() {
     createEntityFile("unov8", ".h");
-    out(R"(
+    out(R"(/*
+ * This file is part of the LibreOffice project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 #ifndef UNOV8_H_
 #define UNOV8_H_
 #include <sal/config.h>
@@ -494,8 +535,6 @@ void V8WriterInternal::writeSharedHeader() {
             default:
                 continue;
         }
-
-        out("#include <" + i.replaceAll(".", "/") + ".hpp>\n");
     }
 
     for (const auto& i : structs) {
@@ -514,10 +553,11 @@ void V8WriterInternal::writeSharedHeader() {
     }
 
     out("struct _UnoV8Methods {\n");
+    std::unordered_set<int> declared{};
     for (const auto& i : interfaces) {
         std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
         auto* entity = static_cast<unoidl::InterfaceTypeEntity*>(j->second->entity.get());
-        writeInterfaceMethods(i, entity, true);
+        writeInterfaceMethods(i, entity, true, declared);
     }
     out("\n};\n");
 

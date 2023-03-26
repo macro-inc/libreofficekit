@@ -10,8 +10,10 @@
 
 $(eval $(call gb_Package_Package,unov8_headers_generated,$(WORKDIR)/CustomTarget/desktop/unov8_internal))
 
+$(call gb_Package_get_preparation_target,unov8_headers_generated) :| $(WORKDIR)/CustomTarget/desktop/unov8_internal.done
+
 $(eval $(call gb_Package_set_outdir,unov8_headers_generated,$(INSTDIR)))
 
-$(eval $(call gb_Package_add_file,unov8_headers_generated,$(SDKDIRNAME)/include/unov8/unov8.h,unov8.h))
+$(eval $(call gb_Package_add_file,unov8_headers_generated,$(SDKDIRNAME)/include/unov8.h,unov8.h))
 
 # vim: set noet sw=4 ts=4:

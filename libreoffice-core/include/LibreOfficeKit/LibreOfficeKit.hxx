@@ -1144,6 +1144,11 @@ public:
     {
         return mpThis->pClass->getXComponentContext(mpThis);
     }
+
+    ::UnoV8& getUnoV8()
+    {
+        return mpThis->pClass->uno_v8;
+    }
 };
 
 /// Factory method to create a lok::Office instance.

@@ -6596,6 +6596,8 @@ static void* doc_getXComponent(LibreOfficeKitDocument* pThis)
     SolarMutexGuard aGuard;
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
 
+    pDocument->mxComponent->acquire();
+
     return pDocument->mxComponent.get();
 }
 

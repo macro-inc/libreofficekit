@@ -173,6 +173,26 @@ void BaseWriter::out(OUString const& text) {
     }
 }
 
+OUString BaseWriter::resolveTypedef(OUString const& type)
+{
+    std::size_t rank;
+    std::vector<OUString> args;
+    bool isEntity;
+    OUString nucl(decomposeType(type, &rank, &args, &isEntity));
+    if (isEntity && entities_[nucl]->entity->getSort() == unoidl::Entity::SORT_TYPEDEF) {
+        OUString rank_str;
+        for (size_t i = 0; i < rank; i++) {
+            rank_str += "[]";
+        }
+        OUString fulltype
+            = rank_str
+              + static_cast<unoidl::TypedefEntity*>(entities_[nucl]->entity.get())->getType();
+        return resolveTypedef(fulltype);
+    }
+
+    return type;
+}
+
 OUString simplifyNamespace(OUString const& name) { return name.replaceFirst("com.sun.star.", ""); }
 
 void BaseWriter::createEntityFile(OUString const& entityName, OUString const& suffix) {
@@ -291,7 +311,7 @@ bool shouldSkipMethod(const unoidl::InterfaceTypeEntity::Method& method) {
     std::vector<OUString> args;
     bool entity;
     decomposeType(method.returnType, &rank, &args, &entity);
-    bool hasPolystruct = args.size() != 0;
+    bool hasPolystruct = args.size() != 0 || method.returnType.endsWith("awt.ItemListEvent");
 
     // TODO: instead of skipping methods with polystruct, add proper support
     if (hasPolystruct)
@@ -304,8 +324,8 @@ bool shouldSkipMethod(const unoidl::InterfaceTypeEntity::Method& method) {
             return true;
         }
 
-        decomposeType(method.returnType, &rank, &args, &entity);
-        if (args.size() != 0) {
+        decomposeType(k->type, &rank, &args, &entity);
+        if (args.size() != 0 || k->type.endsWith("awt.ItemListEvent")) {
             return true;
         }
     }

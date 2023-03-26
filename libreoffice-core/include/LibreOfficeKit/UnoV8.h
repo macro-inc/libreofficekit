@@ -35,6 +35,7 @@ extern "C"
         rtl_String* (*uStringToUtf8)(rtl_uString* str);
 
         // #see rtl/string.h and rtl/ustring.h
+        void (*uString_new_WithLength)( rtl_uString ** newStr, sal_Int32 nLen );
         void (*uString_acquire)(rtl_uString* str);
         void (*uString_release)(rtl_uString* str);
         void (*string_acquire)(rtl_String* str);
@@ -47,13 +48,24 @@ extern "C"
         typelib_TypeDescriptionReference* (*sequenceType)(typelib_TypeDescriptionReference* type);
         /** @returns the struct type corresponding to the provided type ID */
         typelib_TypeDescriptionReference* (*structType)(unsigned int type_id);
+        /** @returns the sequence type corresponding to the provided fully qualified type name */
+        typelib_TypeDescriptionReference* (*structTypeFromFQN)(const char* str, int str_len);
         /** @returns the struct type corresponding to the provided type ID */
         typelib_TypeDescriptionReference* (*enumType)(unsigned int type_id);
-        /** @returns the sequence type corresponding to the provided type name */
+        /** @returns the sequence type corresponding to the provided simplified type name */
         typelib_TypeDescriptionReference* (*interfaceType)(const char* str, int str_len);
+        /** @returns the sequence type corresponding to the provided fully qualified type name */
+        typelib_TypeDescriptionReference* (*interfaceTypeFromFQN)(const char* str, int str_len);
+        /** @returns the sequence type corresponding to the provided type id */
+        typelib_TypeDescriptionReference* (*interfaceTypeFromId)(unsigned int type_id);
 
         // @see typelib/typedescription.h
         typelib_TypeDescriptionReference** (*getByTypeClass)(typelib_TypeClass eTypeClass);
+
+        void (*acquire)(typelib_TypeDescriptionReference* ref);
+        void (*release)(typelib_TypeDescriptionReference* ref);
+        void (*dangerGet)(typelib_TypeDescription** ppMacroTypeDescr, typelib_TypeDescriptionReference* pMacroTypeRef);
+        void (*dangerRelease)(typelib_TypeDescription* pDescription);
     };
 
     struct _UnoV8Interface
@@ -75,6 +87,9 @@ extern "C"
          * @returns NULL if the sequence construction failed, otherwise returns a pointer to the new uno_Sequence
          **/
         uno_Sequence* (*construct)(typelib_TypeDescriptionReference* type, void* elements, int len);
+
+        /** destroys a provided sequence **/
+        void (*destroy)(uno_Sequence* value, typelib_TypeDescriptionReference* type);
     };
 
     struct _UnoV8Any
@@ -82,7 +97,10 @@ extern "C"
         /** provided a type, and a pointer to a value, constructs an uno_Any of that type
          * @returns NULL if the Any construction failed, otherwise returns a pointer to the new uno_Any
          **/
-        uno_Any* (*construct)(void* value, typelib_TypeDescriptionReference* type);
+        void (*construct)(uno_Any* dest, void* value, typelib_TypeDescriptionReference* type);
+
+        /** destroys a provided any **/
+        void (*destroy)(uno_Any* value);
     };
 
     struct _UnoV8
@@ -93,7 +111,7 @@ extern "C"
         struct _UnoV8Interface interface;
         struct _UnoV8Sequence sequence;
         struct _UnoV8Any any;
-        struct _UnoV8Methods methods; 
+        struct _UnoV8Methods methods;
     };
 
 #ifdef __cplusplus

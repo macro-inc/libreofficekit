@@ -58,30 +58,26 @@ static uno_Sequence* sequence_construct(typelib_TypeDescriptionReference* type, 
                : nullptr;
 }
 
-static uno_Any* any_construct(void* value, typelib_TypeDescriptionReference* type)
+static void sequence_destroy(uno_Sequence* sequence, typelib_TypeDescriptionReference* type)
 {
-    auto* result = new css::uno::Any(value, type);
-    return (uno_Any*)result;
+    if (osl_atomic_decrement(&sequence->nRefCount) == 0)
+    {
+        uno_type_sequence_destroy(sequence, type, css::uno::cpp_release);
+    }
 }
+
+static void any_construct(uno_Any* dest, void* value, typelib_TypeDescriptionReference* type)
+{
+    uno_type_any_construct(dest, value, type, css::uno::cpp_acquire);
+}
+
+static void any_destroy(uno_Any* value) { uno_any_destruct(value, css::uno::cpp_release); }
 
 static typelib_TypeDescriptionReference* sequenceType(typelib_TypeDescriptionReference* type)
 {
-    static std::map<typelib_TypeDescriptionReference*, typelib_TypeDescriptionReference*>
-        seqTypeMap;
-
-    auto result = seqTypeMap.find(type);
-    if (result == seqTypeMap.end())
-    {
-        typelib_TypeDescriptionReference* p = nullptr;
-        ::typelib_static_sequence_type_init(&p, type);
-        if (p == nullptr)
-        {
-            return nullptr;
-        }
-        seqTypeMap.emplace(type, p);
-        return p;
-    }
-    return result->second;
+    typelib_TypeDescriptionReference* p = nullptr;
+    ::typelib_static_sequence_type_init(&p, type);
+    return p;
 }
 
 } // namespace
@@ -95,6 +91,7 @@ void unov8_init(UnoV8& uno_v8)
     uno_v8.rtl = {
         .uStringFromUtf8 = uStringFromUtf8,
         .uStringToUtf8 = uStringToUtf8,
+        .uString_new_WithLength = rtl_uString_new_WithLength,
         .uString_acquire = rtl_uString_acquire,
         .uString_release = rtl_uString_release,
         .string_acquire = rtl_string_acquire,
@@ -109,12 +106,22 @@ void unov8_init(UnoV8& uno_v8)
     uno_v8.type = {
         .sequenceType = sequenceType,
         .structType = ::unov8::structType,
+        .structTypeFromFQN = ::unov8::structTypeFromFQN,
         .enumType = ::unov8::enumType,
         .interfaceType = ::unov8::interfaceType,
+        .interfaceTypeFromFQN = ::unov8::interfaceTypeFromFQN,
+        .interfaceTypeFromId = ::unov8::interfaceType,
         .getByTypeClass = typelib_static_type_getByTypeClass,
+        .acquire = typelib_typedescriptionreference_acquire,
+        .release = typelib_typedescriptionreference_release,
+        .dangerGet = TYPELIB_DANGER_GET,
+        .dangerRelease = TYPELIB_DANGER_RELEASE,
     };
-    uno_v8.sequence = { .construct = sequence_construct };
-    uno_v8.any = { .construct = any_construct };
+    uno_v8.sequence = {
+        .construct = sequence_construct,
+        .destroy = sequence_destroy,
+    };
+    uno_v8.any = { .construct = any_construct, .destroy = any_destroy };
     ::unov8::methods::_init(&uno_v8.methods);
 }
 
