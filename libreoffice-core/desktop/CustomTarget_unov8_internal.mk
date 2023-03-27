@@ -12,7 +12,7 @@ $(eval $(call gb_CustomTarget_CustomTarget,desktop/unov8_internal))
 odk_uno_api := offapi udkapi
 $(eval $(call gb_CustomTarget_use_internal_comprehensive_api,desktop/unov8_internal,$(odk_uno_api)))
 
-$(call gb_CustomTarget_get_target,desktop/unov8_internal) : $(foreach rdb,$(odk_uno_api),$(call gb_UnoApiTarget_get_target,$(rdb))) $(call gb_Executable_get_runtime_dependencies,unoidl-v8) $(call gb_CustomTarget_get_target,desktop/unov8_internal_entities)
+$(call gb_CustomTarget_get_target,desktop/unov8_internal) : $(foreach rdb,$(odk_uno_api),$(call gb_UnoApiTarget_get_target,$(rdb))) $(call gb_Executable_get_runtime_dependencies,unoidl-v8)
 	$(call gb_Output_announce,$^,$(true),V8-I,3)
 	$(call gb_Trace_StartRange,$^,V8-I)
 	$(if $(gb_UnoApiTarget_UNOBINDING_ENTITIES),RESPONSEFILE=$(call gb_var2file,$(shell $(gb_MKTEMP)),500,$(gb_UnoApiTarget_UNOBINDING_ENTITIES))) \
