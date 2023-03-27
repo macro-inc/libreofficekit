@@ -198,6 +198,7 @@
 #include <unotools/useroptions.hxx>
 #include <unotools/viewoptions.hxx>
 #include <vcl/settings.hxx>
+#include "lokdocumenteventnotifier.hxx"
 
 using namespace css;
 using namespace vcl;
@@ -1256,6 +1257,11 @@ LibLODocument_Impl::LibLODocument_Impl(const uno::Reference <css::lang::XCompone
     assert(nDocumentId != -1 && "Cannot set mnDocumentId to -1");
 
     m_pDocumentClass = gDocumentClass.lock();
+
+    // Setting LokDocumentEventNotifier for a given document
+    uno::Reference<css::lang::XComponent> mxOwner(mxComponent, uno::UNO_QUERY);
+    m_lokDocEventNotifier = nullptr;
+
     if (!m_pDocumentClass)
     {
         m_pDocumentClass = std::make_shared<LibreOfficeKitDocumentClass>();
@@ -3958,6 +3964,7 @@ static void doc_initializeForRendering(LibreOfficeKitDocument* pThis,
         doc_iniUnoCommands();
         pDoc->initializeForTiledRendering(
                 comphelper::containerToSequence(jsonToPropertyValuesVector(pArguments)));
+        pDoc->initializeAppearanceFlags();
     }
 }
 
@@ -4000,6 +4007,10 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
 
     if (pCallback != nullptr)
     {
+        uno::Reference<css::lang::XComponent> mxOwner(pDocument->mxComponent, uno::UNO_QUERY);
+
+        pDocument->m_lokDocEventNotifier = new doceventnotifier::LokDocumentEventNotifier(pDocument->mxComponent, mxOwner, pCallback, pData);
+
         for (const auto& pair : pDocument->mpCallbackFlushHandlers)
         {
             if (pair.first == nId)

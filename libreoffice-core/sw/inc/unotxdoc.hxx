@@ -467,6 +467,9 @@ public:
     /// @see vcl::ITiledRenderable::createTable().
     void createTable(int row, int col) override;
 
+    /// @see vcl::ITiledRenderable::initialzieAppearanceFlags().
+    void initializeAppearanceFlags() override;
+
     void                        Invalidate();
     void                        Reactivate(SwDocShell* pNewDocShell);
     SwXDocumentPropertyHelper * GetPropertyHelper ();

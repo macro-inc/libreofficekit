@@ -203,6 +203,7 @@ void GetOutline(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell)
             // Skip empty outlines:
             textNode->GetText().isEmpty())
         {
+            nOutlineId++;
             continue;
         }
 
@@ -303,6 +304,12 @@ void SwXTextDocument::createTable(int row, int col)
     const SwInsertTableOptions aInsertTableOptions(SwInsertTableFlags::DefaultBorder,/*nRowsToRepeat=*/0);
 
     mrSh->InsertTable(aInsertTableOptions, row, col);
+}
+
+void SwXTextDocument::initializeAppearanceFlags()
+{
+    SwViewOption::SetAppearanceFlag(ViewOptFlags::DocBoundaries, false, false);
+    SwViewOption::SetAppearanceFlag(ViewOptFlags::TableBoundaries, false, false);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

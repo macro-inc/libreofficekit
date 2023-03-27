@@ -134,6 +134,7 @@ $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 ifneq ($(filter $(OS),ANDROID iOS MACOSX WNT),)
 $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 	desktop/source/lib/init \
+	desktop/source/lib/lokdocumenteventnotifier \
 	desktop/source/lib/lokinteractionhandler \
 	$(if $(filter-out $(OS),iOS), \
 		desktop/source/lib/lokclipboard) \
@@ -147,6 +148,7 @@ else
 ifeq ($(USING_X11),TRUE)
 $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 	desktop/source/lib/init \
+	desktop/source/lib/lokdocumenteventnotifier \
 	desktop/source/lib/lokinteractionhandler \
 	desktop/source/lib/lokclipboard \
     desktop/source/lib/unov8 \
@@ -156,6 +158,7 @@ endif
 ifeq ($(DISABLE_GUI),TRUE)
 $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
     desktop/source/lib/init \
+	desktop/source/lib/lokdocumenteventnotifier \
     desktop/source/lib/lokinteractionhandler \
     desktop/source/lib/lokclipboard \
     desktop/source/lib/unov8 \

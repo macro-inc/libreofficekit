@@ -385,6 +385,11 @@ public:
     virtual void createTable(int /*row*/, int /*col*/)
     {
     }
+
+    /// Used to initialize appearance flags
+    virtual void initializeAppearanceFlags()
+    {
+    }
 };
 } // namespace vcl
 
