@@ -36,6 +36,8 @@ extern "C"
 
         // #see rtl/string.h and rtl/ustring.h
         void (*uString_new_WithLength)( rtl_uString ** newStr, sal_Int32 nLen );
+        // #see rtl/string.h and rtl/ustring.h
+        rtl_uString* (*uString_alloc)( sal_Int32 nLen );
         void (*uString_acquire)(rtl_uString* str);
         void (*uString_release)(rtl_uString* str);
         void (*string_acquire)(rtl_String* str);

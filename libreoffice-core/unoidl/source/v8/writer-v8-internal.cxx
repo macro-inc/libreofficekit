@@ -54,10 +54,15 @@ void V8WriterInternal::writeInterfaceMethods(OUString const& name,
         out("{\n");
         auto returnType = resolveTypedef(m.returnType);
         bool isVoid = returnType == "void";
+        auto entity__ = entities_.find(returnType);
+        bool isInterface = !isVoid && entity__ != entities_.end() && entity__->second->entity->getSort() == unoidl::Entity::SORT_INTERFACE_TYPE;
         out("*error = nullptr;\n");
 
         out("try {\n");
-        if (!isVoid) {
+        if (isInterface) {
+            // compiler will optimize out the result pointer with auto type and cause errors without this
+            out("::css::uno::Reference<"+ translateNamespace(returnType) +"> tmp_result = ");
+        } else if (!isVoid) {
             out("auto tmp_result = ");
         }
         out("static_cast<" + cpp_class + "*>(this_)->" + m.name + "(");
@@ -73,15 +78,15 @@ void V8WriterInternal::writeInterfaceMethods(OUString const& name,
                 out("rtl_uString_acquire(tmp_result.pData);\n");
             }
             // interfaces passed by uno::Reference need to be acquired before they are returned on stack
-            auto entity__ = entities_.find(returnType);
-            if (entity__ != entities_.end() && entity__->second->entity->getSort() == unoidl::Entity::SORT_INTERFACE_TYPE) {
-                out("((::css::uno::Reference<::css::uno::XInterface>)tmp_result)->acquire();\n");
+            if (isInterface) {
+                out("static_cast<::css::uno::XInterface*>(static_cast<void*>(tmp_result.get()))->acquire();\n");
             }
             out("*result = ");
             writeCppToC(returnType, "tmp_result");
             out(";\n");
         }
         out("} catch (const ::css::uno::Exception& exception_) {\n");
+        out("rtl_uString_acquire(exception_.Message.pData);\n");
         out("*error = exception_.Message.pData;\n");
         out("}\n");
 
@@ -217,7 +222,7 @@ void V8WriterInternal::writeCToCpp(OUString const& type, OUString const& name) {
     }
 
     if (nucl == "string") {
-        return out("OUString(" + name + ", SAL_NO_ACQUIRE)");
+        return out("OUString(" + name + ")");
     } else if (nucl == "type") {
         return out("*reinterpret_cast<::css::uno::Type*>(&" + name + ")");
     } else if (nucl == "any") {

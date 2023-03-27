@@ -353,12 +353,13 @@ inline v8::Local<v8::Value> UHyper(v8::Isolate* isolate, sal_uInt64 val) {
 }
 
 inline sal_Unicode Char(v8::Isolate* isolate, v8::Local<v8::Value> val) {
-    if (!val->IsString() || val.As<v8::String>()->Length() != 1) {
-        ThrowTypeError(isolate, "unexpected type, expected string with length 1");
+    if (!val->IsString()) {
+        ThrowTypeError(isolate, "unexpected type, expected string");
         return 0;
     }
-    sal_Unicode result;
-    val.As<v8::String>()->Write(isolate, &result, 0, 1);
+    v8::Local<v8::String> str = v8::Local<v8::String>::Cast(val);
+    sal_Unicode result = 0;
+    str->Write(isolate, &result, 0, 1);
     return result;
 }
 
@@ -369,11 +370,16 @@ inline v8::Local<v8::Value> Char(v8::Isolate* isolate, sal_Unicode val) {
 inline rtl_uString* String(v8::Isolate* isolate, v8::Local<v8::Value> val) {
     if (!val->IsString()) {
         ThrowTypeError(isolate, "unexpected type, expected string");
-        return 0;
+        return nullptr;
     }
-    rtl_uString* result;
-    electron::office::OfficeClient::GetUnoV8().rtl.uString_new_WithLength(&result, val.As<v8::String>()->Length());
-    val.As<v8::String>()->Write(isolate, result->buffer, 0);
+    v8::Local<v8::String> str = v8::Local<v8::String>::Cast(val);
+    rtl_uString* result = electron::office::OfficeClient::GetUnoV8().rtl.uString_alloc(str->Length());
+    if (!val->IsString()) {
+        ThrowTypeError(isolate, "unable to allocate UNO UString string");
+        return nullptr;
+    }
+
+    str->Write(isolate, result->buffer, 0, str->Length());
     return result;
 }
 
@@ -616,8 +622,23 @@ inline v8::Local<v8::Value> AnyInterfaceValue(v8::Isolate* isolate, void * val, 
     }
 }
 
+inline v8::Local<v8::Value> AnyInterfaceValueWithSimplifiedType(v8::Isolate* isolate, void * val, std::string_view typeName) {
+    switch (hash(typeName)) {
+)");
+
+    for (auto& i : interfaces) {
+        out("case hash(\"" + simplifyNamespace(i.first) + "\"): return unoclass::" + cName(i.first)
+            + "::Create(isolate, val).ToV8();\n");
+    }
+
+    out(R"(default: return v8::Undefined(isolate);
+    }
+}
+
 inline v8::Local<v8::Value> AnyInterfaceValue(v8::Isolate* isolate, void* val, rtl_uString* typeName) {
-    return AnyInterfaceValue(isolate, val, std::string_view(reinterpret_cast<char*>(typeName->buffer), typeName->length * sizeof(sal_Unicode)));
+    auto& unov8_ = electron::office::OfficeClient::GetUnoV8();
+    rtl_String* utf8Name = unov8_.rtl.uStringToUtf8(typeName);
+    return AnyInterfaceValue(isolate, val, std::string_view(utf8Name->buffer, utf8Name->length));
 }
 
 namespace {
@@ -832,12 +853,10 @@ inline v8::Local<v8::Value> As(v8::Isolate* isolate, void* inst, std::string_vie
     if (!type_ref) return v8::Undefined(isolate);
     void *new_inst = unov8_.interface.queryInterface(inst, type_ref);
     if (!new_inst) {
-        unov8_.type.release(type_ref);
         return v8::Undefined(isolate);
     }
 
-    unov8_.type.release(type_ref);
-    return convert::AnyInterfaceValue(isolate, new_inst, typeName);
+    return convert::AnyInterfaceValueWithSimplifiedType(isolate, new_inst, typeName);
 }
 }
 )");
@@ -992,7 +1011,8 @@ void V8Writer::writePlainStruct(OUString const& name,
     if (base.isEmpty()) {
         out("v8::Local<v8::Object> obj = v8::Object::New(isolate);\n");
     } else {
-        out("v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(to_v8_" + cName(base) + "(isolate, val.base));\n");
+        out("v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(to_v8_" + cName(base)
+            + "(isolate, val.base));\n");
     }
 
     std::size_t rank;
@@ -1075,8 +1095,6 @@ void V8Writer::writePlainStruct(OUString const& name,
             for (int i = (int)rank - 1; i >= 0; i--) {
                 out("unov8_.type.release(seq_types[" + OUString::number(i) + "]);\n");
             }
-            if (isEntity)
-                out("unov8_.type.release(base_type);\n");
             out("}\n");
         }
     }
@@ -1124,7 +1142,6 @@ void V8Writer::writePlainStruct(OUString const& name,
                               "\n");
                         out("result." + m.name
                             + " = convert::Sequence(isolate, v8val, el_type_ref_);\n");
-                        out("unov8_.type.release(el_type_ref_);\n");
                         out("}\n");
                         break;
                     case unoidl::Entity::SORT_ENUM_TYPE:
@@ -1134,7 +1151,6 @@ void V8Writer::writePlainStruct(OUString const& name,
                             + simplifyNamespace(nucl) + "\"));\n");
                         out("result." + m.name
                             + " = convert::Sequence(isolate, v8val, el_type_ref_);\n");
-                        out("unov8_.type.release(el_type_ref_);\n");
                         out("}\n");
                         break;
                     case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
@@ -1146,7 +1162,6 @@ void V8Writer::writePlainStruct(OUString const& name,
                               "\n");
                         out("result." + m.name
                             + " = convert::Sequence(isolate, v8val, el_type_ref_);\n");
-                        out("unov8_.type.release(el_type_ref_);\n");
                         out("}\n");
                         break;
                     default:
@@ -1306,8 +1321,6 @@ void V8Writer::writeMethodReturn(OUString const& type) {
         for (int i = (int)rank - 1; i >= 0; i--) {
             out("unov8_.type.release(seq_types[" + OUString::number(i) + "]);\n");
         }
-        if (isEntity)
-            out("unov8_.type.release(base_type);\n");
     }
 
     out("return v8_result;\n");
@@ -1376,8 +1389,12 @@ void V8Writer::writeInterface(OUString const& name,
     out("inline gin::Handle<" + cName(name) + "> " + cName(name)
         + "::Create(v8::Isolate* isolate, void *inst) {\n");
     out("auto *t = new " + cName(name) + "();\n");
-    out("t->inst_ = inst;\n");
-    out("electron::office::OfficeClient::GetUnoV8().interface.acquire(inst);\n");
+    out("auto& unov8_ = electron::office::OfficeClient::GetUnoV8();\n");
+    out("auto *type_ref = unov8_.type.interfaceTypeFromId(convert::hash(\""
+        + simplifyNamespace(name) + "\"));\n");
+    out("void *new_inst = unov8_.interface.queryInterface(inst, type_ref);\n");
+    out("t->inst_ = new_inst;\n");
+    out("unov8_.interface.acquire(new_inst);\n");
     out("return CreateHandle(isolate, t);\n");
     out("};\n");
 
@@ -1394,6 +1411,7 @@ void V8Writer::writeInterface(OUString const& name,
   }
   return gin::ObjectTemplateBuilder(isolate, GetTypeName(), constructor->InstanceTemplate()))");
     writeInterfaceMethodBuilder(name, entity.get());
+    out("\n.SetMethod(\"as\", &" + cName(name) + "::As)");
 
     out(";\n"
         "}\n");
@@ -1640,7 +1658,6 @@ void V8Writer::writeMethodParamsConstructors(const unoidl::InterfaceTypeEntity::
                               "\n");
                         out(a.name + " = convert::Sequence(isolate, v8_" + a.name
                             + ", el_type_ref_);\n");
-                        out("unov8_.type.release(el_type_ref_);\n");
                         out("}\n");
                         break;
                     case unoidl::Entity::SORT_ENUM_TYPE:
@@ -1650,7 +1667,6 @@ void V8Writer::writeMethodParamsConstructors(const unoidl::InterfaceTypeEntity::
                             + simplifyNamespace(nucl) + "\"));\n");
                         out(a.name + " = convert::Sequence(isolate, v8_" + a.name
                             + ", el_type_ref_);\n");
-                        out("unov8_.type.release(el_type_ref_);\n");
                         out("}\n");
                         break;
                     case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
@@ -1662,7 +1678,6 @@ void V8Writer::writeMethodParamsConstructors(const unoidl::InterfaceTypeEntity::
                               "\n");
                         out(a.name + " = convert::Sequence(isolate, v8_" + a.name
                             + ", el_type_ref_);\n");
-                        out("unov8_.type.release(el_type_ref_);\n");
                         out("}\n");
                         break;
                     default:
@@ -1723,8 +1738,6 @@ void V8Writer::writeMethodParamsDestructors(const unoidl::InterfaceTypeEntity::M
         OUString type = resolveTypedef(a.type);
         if (type == "string") {
             out("unov8_.rtl.uString_release(" + a.name + ");\n");
-        } else if (type == "type") {
-            out("unov8_.type.release(" + a.name + ");\n");
         }
     }
 }

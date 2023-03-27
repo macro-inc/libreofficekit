@@ -92,6 +92,7 @@ void unov8_init(UnoV8& uno_v8)
         .uStringFromUtf8 = uStringFromUtf8,
         .uStringToUtf8 = uStringToUtf8,
         .uString_new_WithLength = rtl_uString_new_WithLength,
+        .uString_alloc = rtl_uString_alloc,
         .uString_acquire = rtl_uString_acquire,
         .uString_release = rtl_uString_release,
         .string_acquire = rtl_string_acquire,
