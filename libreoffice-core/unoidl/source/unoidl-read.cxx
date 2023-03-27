@@ -30,23 +30,23 @@
 namespace {
 
 void badUsage() {
-    std::cerr
-        << "Usage:" << std::endl << std::endl
-        << "  unoidl-read [--published] [<extra registries>] <registry>"
-        << std::endl << std::endl
-        << ("where each <registry> is either a new- or legacy-format .rdb file,"
-            " a single .idl")
-        << std::endl
-        << ("file, or a root directory of an .idl file tree.  The complete"
-            " content of the")
-        << std::endl
-        << ("last <registry> is written to stdout; if --published is specified,"
-            " only the")
-        << std::endl
-        << ("published entities (plus any non-published entities referenced"
-            " from published")
-        << std::endl
-        << "via any unpublished optional bases) are written out." << std::endl;
+    std::cerr << "Usage:" << std::endl
+              << std::endl
+              << "  unoidl-read [--published] [<extra registries>] <registry>" << std::endl
+              << std::endl
+              << ("where each <registry> is either a new- or legacy-format .rdb file,"
+                  " a single .idl")
+              << std::endl
+              << ("file, or a root directory of an .idl file tree.  The complete"
+                  " content of the")
+              << std::endl
+              << ("last <registry> is written to stdout; if --published is specified,"
+                  " only the")
+              << std::endl
+              << ("published entities (plus any non-published entities referenced"
+                  " from published")
+              << std::endl
+              << "via any unpublished optional bases) are written out." << std::endl;
     std::exit(EXIT_FAILURE);
 }
 
@@ -56,34 +56,28 @@ OUString getArgumentUri(sal_uInt32 argument) {
     OUString url;
     osl::FileBase::RC e1 = osl::FileBase::getFileURLFromSystemPath(arg, url);
     if (e1 != osl::FileBase::E_None) {
-        std::cerr
-            << "Cannot convert \"" << arg << "\" to file URL, error code "
-            << +e1 << std::endl;
+        std::cerr << "Cannot convert \"" << arg << "\" to file URL, error code " << +e1
+                  << std::endl;
         std::exit(EXIT_FAILURE);
     }
     OUString cwd;
     oslProcessError e2 = osl_getProcessWorkingDir(&cwd.pData);
     if (e2 != osl_Process_E_None) {
-        std::cerr
-            << "Cannot obtain working directory, error code " << +e2
-            << std::endl;
+        std::cerr << "Cannot obtain working directory, error code " << +e2 << std::endl;
         std::exit(EXIT_FAILURE);
     }
     OUString abs;
     e1 = osl::FileBase::getAbsoluteFileURL(cwd, url, abs);
     if (e1 != osl::FileBase::E_None) {
-        std::cerr
-            << "Cannot make \"" << url
-            << "\" into an absolute file URL, error code " << +e1 << std::endl;
+        std::cerr << "Cannot make \"" << url << "\" into an absolute file URL, error code " << +e1
+                  << std::endl;
         std::exit(EXIT_FAILURE);
     }
     return abs;
 }
 
-OUString decomposeType(
-    OUString const & type, std::size_t * rank,
-    std::vector<OUString> * typeArguments, bool * entity)
-{
+OUString decomposeType(OUString const& type, std::size_t* rank,
+                       std::vector<OUString>* typeArguments, bool* entity) {
     assert(rank != nullptr);
     assert(typeArguments != nullptr);
     assert(entity != nullptr);
@@ -124,12 +118,10 @@ OUString decomposeType(
         nucl = tmpl;
     }
     assert(!nucl.isEmpty());
-    *entity = nucl != "void" && nucl != "boolean" && nucl != "byte"
-        && nucl != "short" && nucl != "unsigned short" && nucl != "long"
-        && nucl != "unsigned long" && nucl != "hyper"
-        && nucl != "unsigned hyper" && nucl != "float" && nucl != "double"
-        && nucl != "char" && nucl != "string" && nucl != "type"
-        && nucl != "any";
+    *entity = nucl != "void" && nucl != "boolean" && nucl != "byte" && nucl != "short"
+              && nucl != "unsigned short" && nucl != "long" && nucl != "unsigned long"
+              && nucl != "hyper" && nucl != "unsigned hyper" && nucl != "float" && nucl != "double"
+              && nucl != "char" && nucl != "string" && nucl != "type" && nucl != "any";
     assert(*entity || typeArguments->empty());
     return nucl;
 }
@@ -138,11 +130,11 @@ struct Entity {
     enum class Sorted { NO, ACTIVE, YES };
     enum class Written { NO, DECLARATION, DEFINITION };
 
-    explicit Entity(
-        rtl::Reference<unoidl::Entity> const & theEntity, bool theRelevant):
-        entity(theEntity), relevant(theRelevant), sorted(Sorted::NO),
-        written(Written::NO)
-    {}
+    explicit Entity(rtl::Reference<unoidl::Entity> const& theEntity, bool theRelevant)
+        : entity(theEntity)
+        , relevant(theRelevant)
+        , sorted(Sorted::NO)
+        , written(Written::NO) {}
 
     rtl::Reference<unoidl::Entity> const entity;
     std::set<OUString> dependencies;
@@ -152,11 +144,9 @@ struct Entity {
     Written written;
 };
 
-void insertEntityDependency(
-    rtl::Reference<unoidl::Manager> const & manager,
-    std::map<OUString, Entity>::iterator const & iterator,
-    OUString const & name, bool weakInterfaceDependency = false)
-{
+void insertEntityDependency(rtl::Reference<unoidl::Manager> const& manager,
+                            std::map<OUString, Entity>::iterator const& iterator,
+                            OUString const& name, bool weakInterfaceDependency = false) {
     assert(manager.is());
     if (name == iterator->first)
         return;
@@ -170,54 +160,43 @@ void insertEntityDependency(
         }
         ifc = ent->getSort() == unoidl::Entity::SORT_INTERFACE_TYPE;
     }
-    (ifc
-     ? iterator->second.interfaceDependencies
-     : iterator->second.dependencies)
-        .insert(name);
+    (ifc ? iterator->second.interfaceDependencies : iterator->second.dependencies).insert(name);
 }
 
-void insertEntityDependencies(
-    rtl::Reference<unoidl::Manager> const & manager,
-    std::map<OUString, Entity>::iterator const & iterator,
-    std::vector<OUString> const & names)
-{
-    for (auto & i: names) {
+void insertEntityDependencies(rtl::Reference<unoidl::Manager> const& manager,
+                              std::map<OUString, Entity>::iterator const& iterator,
+                              std::vector<OUString> const& names) {
+    for (auto& i : names) {
         insertEntityDependency(manager, iterator, i);
     }
 }
 
-void insertEntityDependencies(
-    rtl::Reference<unoidl::Manager> const & manager,
-    std::map<OUString, Entity>::iterator const & iterator,
-    std::vector<unoidl::AnnotatedReference> const & references)
-{
-    for (auto & i: references) {
+void insertEntityDependencies(rtl::Reference<unoidl::Manager> const& manager,
+                              std::map<OUString, Entity>::iterator const& iterator,
+                              std::vector<unoidl::AnnotatedReference> const& references) {
+    for (auto& i : references) {
         insertEntityDependency(manager, iterator, i.name);
     }
 }
 
-void insertTypeDependency(
-    rtl::Reference<unoidl::Manager> const & manager,
-    std::map<OUString, Entity>::iterator const & iterator,
-    OUString const & type)
-{
+void insertTypeDependency(rtl::Reference<unoidl::Manager> const& manager,
+                          std::map<OUString, Entity>::iterator const& iterator,
+                          OUString const& type) {
     std::size_t rank;
     std::vector<OUString> args;
     bool entity;
     OUString nucl(decomposeType(type, &rank, &args, &entity));
     if (entity) {
         insertEntityDependency(manager, iterator, nucl, true);
-        for (const auto & i: args) {
+        for (const auto& i : args) {
             insertTypeDependency(manager, iterator, i);
         }
     }
 }
 
-void scanMap(
-    rtl::Reference<unoidl::Manager> const & manager,
-    rtl::Reference<unoidl::MapCursor> const & cursor, bool published,
-    std::u16string_view prefix, std::map<OUString, Entity> & entities)
-{
+void scanMap(rtl::Reference<unoidl::Manager> const& manager,
+             rtl::Reference<unoidl::MapCursor> const& cursor, bool published,
+             std::u16string_view prefix, std::map<OUString, Entity>& entities) {
     assert(cursor.is());
     for (;;) {
         OUString id;
@@ -227,155 +206,123 @@ void scanMap(
         }
         OUString name(prefix + id);
         if (ent->getSort() == unoidl::Entity::SORT_MODULE) {
-            scanMap(
-                manager,
-                static_cast<unoidl::ModuleEntity *>(ent.get())->createCursor(),
-                published, OUStringConcatenation(name + "."), entities);
+            scanMap(manager, static_cast<unoidl::ModuleEntity*>(ent.get())->createCursor(),
+                    published, OUStringConcatenation(name + "."), entities);
         } else {
             std::map<OUString, Entity>::iterator i(
-                entities.insert(
-                    std::make_pair(
-                        name,
-                        Entity(
-                            ent,
-                            (!published
-                             || (static_cast<unoidl::PublishableEntity *>(
-                                     ent.get())
-                                 ->isPublished())))))
-                .first);
+                entities
+                    .insert(std::make_pair(
+                        name, Entity(ent, (!published
+                                           || (static_cast<unoidl::PublishableEntity*>(ent.get())
+                                                   ->isPublished())))))
+                    .first);
             switch (ent->getSort()) {
-            case unoidl::Entity::SORT_ENUM_TYPE:
-            case unoidl::Entity::SORT_CONSTANT_GROUP:
-                break;
-            case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
-                {
+                case unoidl::Entity::SORT_ENUM_TYPE:
+                case unoidl::Entity::SORT_CONSTANT_GROUP:
+                    break;
+                case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE: {
                     rtl::Reference<unoidl::PlainStructTypeEntity> ent2(
-                        static_cast<unoidl::PlainStructTypeEntity *>(
-                            ent.get()));
+                        static_cast<unoidl::PlainStructTypeEntity*>(ent.get()));
                     if (!ent2->getDirectBase().isEmpty()) {
-                        insertEntityDependency(
-                            manager, i, ent2->getDirectBase());
+                        insertEntityDependency(manager, i, ent2->getDirectBase());
                     }
-                    for (auto & j: ent2->getDirectMembers()) {
+                    for (auto& j : ent2->getDirectMembers()) {
                         insertTypeDependency(manager, i, j.type);
                     }
                     break;
                 }
-            case unoidl::Entity::SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE:
-                {
-                    rtl::Reference<unoidl::PolymorphicStructTypeTemplateEntity>
-                        ent2(
-                            static_cast<unoidl::PolymorphicStructTypeTemplateEntity *>(
-                                ent.get()));
-                    for (auto & j: ent2->getMembers()) {
+                case unoidl::Entity::SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE: {
+                    rtl::Reference<unoidl::PolymorphicStructTypeTemplateEntity> ent2(
+                        static_cast<unoidl::PolymorphicStructTypeTemplateEntity*>(ent.get()));
+                    for (auto& j : ent2->getMembers()) {
                         if (!j.parameterized) {
                             insertTypeDependency(manager, i, j.type);
                         }
                     }
                     break;
                 }
-            case unoidl::Entity::SORT_EXCEPTION_TYPE:
-                {
+                case unoidl::Entity::SORT_EXCEPTION_TYPE: {
                     rtl::Reference<unoidl::ExceptionTypeEntity> ent2(
-                        static_cast<unoidl::ExceptionTypeEntity *>(ent.get()));
+                        static_cast<unoidl::ExceptionTypeEntity*>(ent.get()));
                     if (!ent2->getDirectBase().isEmpty()) {
-                        insertEntityDependency(
-                            manager, i, ent2->getDirectBase());
+                        insertEntityDependency(manager, i, ent2->getDirectBase());
                     }
-                    for (auto & j: ent2->getDirectMembers()) {
+                    for (auto& j : ent2->getDirectMembers()) {
                         insertTypeDependency(manager, i, j.type);
                     }
                     break;
                 }
-            case unoidl::Entity::SORT_INTERFACE_TYPE:
-                {
+                case unoidl::Entity::SORT_INTERFACE_TYPE: {
                     rtl::Reference<unoidl::InterfaceTypeEntity> ent2(
-                        static_cast<unoidl::InterfaceTypeEntity *>(
-                            ent.get()));
-                    insertEntityDependencies(
-                        manager, i, ent2->getDirectMandatoryBases());
-                    insertEntityDependencies(
-                        manager, i, ent2->getDirectOptionalBases());
-                    for (auto & j: ent2->getDirectAttributes()) {
+                        static_cast<unoidl::InterfaceTypeEntity*>(ent.get()));
+                    insertEntityDependencies(manager, i, ent2->getDirectMandatoryBases());
+                    insertEntityDependencies(manager, i, ent2->getDirectOptionalBases());
+                    for (auto& j : ent2->getDirectAttributes()) {
                         insertTypeDependency(manager, i, j.type);
                     }
-                    for (auto & j: ent2->getDirectMethods()) {
+                    for (auto& j : ent2->getDirectMethods()) {
                         insertTypeDependency(manager, i, j.returnType);
-                        for (auto & k: j.parameters) {
+                        for (auto& k : j.parameters) {
                             insertTypeDependency(manager, i, k.type);
                         }
                         insertEntityDependencies(manager, i, j.exceptions);
                     }
                     break;
                 }
-            case unoidl::Entity::SORT_TYPEDEF:
-                {
+                case unoidl::Entity::SORT_TYPEDEF: {
                     rtl::Reference<unoidl::TypedefEntity> ent2(
-                        static_cast<unoidl::TypedefEntity *>(ent.get()));
+                        static_cast<unoidl::TypedefEntity*>(ent.get()));
                     insertTypeDependency(manager, i, ent2->getType());
                     break;
                 }
-            case unoidl::Entity::SORT_SINGLE_INTERFACE_BASED_SERVICE:
-                {
-                    rtl::Reference<unoidl::SingleInterfaceBasedServiceEntity>
-                        ent2(
-                            static_cast<unoidl::SingleInterfaceBasedServiceEntity *>(
-                                ent.get()));
+                case unoidl::Entity::SORT_SINGLE_INTERFACE_BASED_SERVICE: {
+                    rtl::Reference<unoidl::SingleInterfaceBasedServiceEntity> ent2(
+                        static_cast<unoidl::SingleInterfaceBasedServiceEntity*>(ent.get()));
                     insertEntityDependency(manager, i, ent2->getBase());
-                    for (auto & j: ent2->getConstructors()) {
-                        for (auto & k: j.parameters) {
+                    for (auto& j : ent2->getConstructors()) {
+                        for (auto& k : j.parameters) {
                             insertTypeDependency(manager, i, k.type);
                         }
                         insertEntityDependencies(manager, i, j.exceptions);
                     }
                     break;
                 }
-            case unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE:
-                {
+                case unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE: {
                     rtl::Reference<unoidl::AccumulationBasedServiceEntity> ent2(
-                        static_cast<unoidl::AccumulationBasedServiceEntity *>(
-                            ent.get()));
-                    insertEntityDependencies(
-                        manager, i, ent2->getDirectMandatoryBaseServices());
-                    insertEntityDependencies(
-                        manager, i, ent2->getDirectOptionalBaseServices());
-                    insertEntityDependencies(
-                        manager, i, ent2->getDirectMandatoryBaseInterfaces());
-                    insertEntityDependencies(
-                        manager, i, ent2->getDirectOptionalBaseInterfaces());
-                    for (auto & j: ent2->getDirectProperties()) {
+                        static_cast<unoidl::AccumulationBasedServiceEntity*>(ent.get()));
+                    insertEntityDependencies(manager, i, ent2->getDirectMandatoryBaseServices());
+                    insertEntityDependencies(manager, i, ent2->getDirectOptionalBaseServices());
+                    insertEntityDependencies(manager, i, ent2->getDirectMandatoryBaseInterfaces());
+                    insertEntityDependencies(manager, i, ent2->getDirectOptionalBaseInterfaces());
+                    for (auto& j : ent2->getDirectProperties()) {
                         insertTypeDependency(manager, i, j.type);
                     }
                     break;
                 }
-            case unoidl::Entity::SORT_INTERFACE_BASED_SINGLETON:
-                {
+                case unoidl::Entity::SORT_INTERFACE_BASED_SINGLETON: {
                     rtl::Reference<unoidl::InterfaceBasedSingletonEntity> ent2(
-                        static_cast<unoidl::InterfaceBasedSingletonEntity *>(
-                            ent.get()));
+                        static_cast<unoidl::InterfaceBasedSingletonEntity*>(ent.get()));
                     insertEntityDependency(manager, i, ent2->getBase());
                     break;
                 }
-            case unoidl::Entity::SORT_SERVICE_BASED_SINGLETON:
-                {
+                case unoidl::Entity::SORT_SERVICE_BASED_SINGLETON: {
                     rtl::Reference<unoidl::ServiceBasedSingletonEntity> ent2(
-                        static_cast<unoidl::ServiceBasedSingletonEntity *>(
-                            ent.get()));
+                        static_cast<unoidl::ServiceBasedSingletonEntity*>(ent.get()));
                     insertEntityDependency(manager, i, ent2->getBase());
                     break;
                 }
-            case unoidl::Entity::SORT_MODULE:
-                assert(false && "this cannot happen");
+                case unoidl::Entity::SORT_MODULE:
+                    assert(false && "this cannot happen");
             }
         }
     }
 }
 
-void propagateRelevant(std::map<OUString, Entity> & entities, Entity & entity) {
+void propagateRelevant(std::map<OUString, Entity>& entities, Entity& entity) {
     if (!entity.relevant) {
         entity.relevant = true;
         if (entity.sorted != Entity::Sorted::YES) {
-            for (auto & i: entity.dependencies) {
+            for (auto& i : entity.dependencies) {
                 std::map<OUString, Entity>::iterator j(entities.find(i));
                 if (j != entities.end()) {
                     propagateRelevant(entities, j->second);
@@ -385,38 +332,34 @@ void propagateRelevant(std::map<OUString, Entity> & entities, Entity & entity) {
     }
 }
 
-void visit(
-    std::map<OUString, Entity> & entities,
-    std::map<OUString, Entity>::iterator const & iterator,
-    std::vector<OUString> & result)
-{
+void visit(std::map<OUString, Entity>& entities,
+           std::map<OUString, Entity>::iterator const& iterator, std::vector<OUString>& result) {
     switch (iterator->second.sorted) {
-    case Entity::Sorted::NO:
-        iterator->second.sorted = Entity::Sorted::ACTIVE;
-        for (auto & i: iterator->second.dependencies) {
-            std::map<OUString, Entity>::iterator j(entities.find(i));
-            if (j != entities.end()) {
-                if (iterator->second.relevant) {
-                    propagateRelevant(entities, j->second);
+        case Entity::Sorted::NO:
+            iterator->second.sorted = Entity::Sorted::ACTIVE;
+            for (auto& i : iterator->second.dependencies) {
+                std::map<OUString, Entity>::iterator j(entities.find(i));
+                if (j != entities.end()) {
+                    if (iterator->second.relevant) {
+                        propagateRelevant(entities, j->second);
+                    }
+                    visit(entities, j, result);
                 }
-                visit(entities, j, result);
             }
-        }
-        iterator->second.sorted = Entity::Sorted::YES;
-        result.push_back(iterator->first);
-        break;
-    case Entity::Sorted::ACTIVE:
-        std::cerr
-            << "Entity " << iterator->first << " recursively depends on itself"
-            << std::endl;
-        std::exit(EXIT_FAILURE);
-        // fall-through avoids warnings
-    default:
-        break;
+            iterator->second.sorted = Entity::Sorted::YES;
+            result.push_back(iterator->first);
+            break;
+        case Entity::Sorted::ACTIVE:
+            std::cerr << "Entity " << iterator->first << " recursively depends on itself"
+                      << std::endl;
+            std::exit(EXIT_FAILURE);
+            // fall-through avoids warnings
+        default:
+            break;
     }
 }
 
-std::vector<OUString> sort(std::map<OUString, Entity> & entities) {
+std::vector<OUString> sort(std::map<OUString, Entity>& entities) {
     std::vector<OUString> res;
     for (auto i(entities.begin()); i != entities.end(); ++i) {
         visit(entities, i, res);
@@ -424,7 +367,7 @@ std::vector<OUString> sort(std::map<OUString, Entity> & entities) {
     return res;
 }
 
-void indent(std::vector<OUString> const & modules, unsigned int extra = 0) {
+void indent(std::vector<OUString> const& modules, unsigned int extra = 0) {
     for (std::vector<OUString>::size_type i = 0; i != modules.size(); ++i) {
         std::cout << ' ';
     }
@@ -433,9 +376,7 @@ void indent(std::vector<OUString> const & modules, unsigned int extra = 0) {
     }
 }
 
-void closeModules(
-    std::vector<OUString> & modules, std::vector<OUString>::size_type n)
-{
+void closeModules(std::vector<OUString>& modules, std::vector<OUString>::size_type n) {
     for (std::vector<OUString>::size_type i = 0; i != n; ++i) {
         assert(!modules.empty());
         modules.pop_back();
@@ -444,16 +385,12 @@ void closeModules(
     }
 }
 
-OUString openModulesFor(std::vector<OUString> & modules, OUString const & name)
-{
+OUString openModulesFor(std::vector<OUString>& modules, OUString const& name) {
     std::vector<OUString>::iterator i(modules.begin());
     for (sal_Int32 j = 0;;) {
         OUString id(name.getToken(0, '.', j));
         if (j == -1) {
-            closeModules(
-                modules,
-                static_cast< std::vector<OUString>::size_type >(
-                    modules.end() - i));
+            closeModules(modules, static_cast<std::vector<OUString>::size_type>(modules.end() - i));
             indent(modules);
             return id;
         }
@@ -462,10 +399,7 @@ OUString openModulesFor(std::vector<OUString> & modules, OUString const & name)
                 ++i;
                 continue;
             }
-            closeModules(
-                modules,
-                static_cast< std::vector<OUString>::size_type >(
-                    modules.end() - i));
+            closeModules(modules, static_cast<std::vector<OUString>::size_type>(modules.end() - i));
             i = modules.end();
         }
         indent(modules);
@@ -475,37 +409,30 @@ OUString openModulesFor(std::vector<OUString> & modules, OUString const & name)
     }
 }
 
-void writeName(OUString const & name) {
-    std::cout << "::" << name.replaceAll(".", "::");
-}
+void writeName(OUString const& name) { std::cout << "::" << name.replaceAll(".", "::"); }
 
-void writeAnnotations(std::vector<OUString> const & annotations) {
-    if (!annotations.empty()) {
+void writeDocs(rtl::Reference<unoidl::PublishableEntity> const& entity) {
+    if (!entity->getDoc().isEmpty()) {
         std::cout << "/**";
-        for (auto & i: annotations) {
-            //TODO: i.indexOf("*/") == -1
-            std::cout << " @" << i;
-        }
-        std::cout << " */ ";
+        std::cout << entity->getDoc();
+        std::cout << " */" << std::endl;
     }
 }
 
-void writePublished(rtl::Reference<unoidl::PublishableEntity> const & entity) {
+void writePublished(rtl::Reference<unoidl::PublishableEntity> const& entity) {
     assert(entity.is());
     if (entity->isPublished()) {
         std::cout << "published ";
     }
 }
 
-void writeAnnotationsPublished(
-    rtl::Reference<unoidl::PublishableEntity> const & entity)
-{
+void writeAnnotationsPublished(rtl::Reference<unoidl::PublishableEntity> const& entity) {
     assert(entity.is());
-    writeAnnotations(entity->getAnnotations());
+    writeDocs(entity);
     writePublished(entity);
 }
 
-void writeType(OUString const & type) {
+void writeType(OUString const& type) {
     std::size_t rank;
     std::vector<OUString> args;
     bool entity;
@@ -533,7 +460,7 @@ void writeType(OUString const & type) {
     }
 }
 
-void writeExceptionSpecification(std::vector<OUString> const & exceptions) {
+void writeExceptionSpecification(std::vector<OUString> const& exceptions) {
     if (!exceptions.empty()) {
         std::cout << " raises (";
         for (auto i(exceptions.begin()); i != exceptions.end(); ++i) {
@@ -546,50 +473,45 @@ void writeExceptionSpecification(std::vector<OUString> const & exceptions) {
     }
 }
 
-void writeEntity(
-    std::map<OUString, Entity> & entities, std::vector<OUString> & modules,
-    OUString const & name)
-{
+void writeEntity(std::map<OUString, Entity>& entities, std::vector<OUString>& modules,
+                 OUString const& name) {
     std::map<OUString, Entity>::iterator i(entities.find(name));
     if (i == entities.end() || !i->second.relevant)
         return;
 
     assert(i->second.written != Entity::Written::DEFINITION);
     i->second.written = Entity::Written::DEFINITION;
-    for (auto & j: i->second.interfaceDependencies) {
+    for (auto& j : i->second.interfaceDependencies) {
         std::map<OUString, Entity>::iterator k(entities.find(j));
         if (k != entities.end() && k->second.written == Entity::Written::NO) {
             k->second.written = Entity::Written::DECLARATION;
             OUString id(openModulesFor(modules, j));
-            if (k->second.entity->getSort()
-                != unoidl::Entity::SORT_INTERFACE_TYPE)
-            {
-                std::cerr
-                    << "Entity " << j << " should be an interface type"
-                    << std::endl;
+            if (k->second.entity->getSort() != unoidl::Entity::SORT_INTERFACE_TYPE) {
+                std::cerr << "Entity " << j << " should be an interface type" << std::endl;
                 std::exit(EXIT_FAILURE);
             }
-            writePublished(
-                static_cast<unoidl::PublishableEntity *>(
-                    k->second.entity.get()));
+            writePublished(static_cast<unoidl::PublishableEntity*>(k->second.entity.get()));
             std::cout << "interface " << id << ";\n";
         }
     }
     OUString id(openModulesFor(modules, name));
     rtl::Reference<unoidl::PublishableEntity> ent(
-        static_cast<unoidl::PublishableEntity *>(i->second.entity.get()));
+        static_cast<unoidl::PublishableEntity*>(i->second.entity.get()));
+    writeDocs(ent);
     switch (ent->getSort()) {
-    case unoidl::Entity::SORT_ENUM_TYPE:
-        {
+        case unoidl::Entity::SORT_ENUM_TYPE: {
             rtl::Reference<unoidl::EnumTypeEntity> ent2(
-                static_cast<unoidl::EnumTypeEntity *>(ent.get()));
+                static_cast<unoidl::EnumTypeEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "enum " << id << " {\n";
-            for (auto j(ent2->getMembers().begin());
-                 j != ent2->getMembers().end(); ++j)
-            {
+            for (auto j(ent2->getMembers().begin()); j != ent2->getMembers().end(); ++j) {
+                if (!j->doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j->doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j->annotations);
                 std::cout << j->name << " = " << j->value;
                 if (j + 1 != ent2->getMembers().end()) {
                     std::cout << ',';
@@ -600,10 +522,9 @@ void writeEntity(
             std::cout << "};\n";
             break;
         }
-    case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE:
-        {
+        case unoidl::Entity::SORT_PLAIN_STRUCT_TYPE: {
             rtl::Reference<unoidl::PlainStructTypeEntity> ent2(
-                static_cast<unoidl::PlainStructTypeEntity *>(ent.get()));
+                static_cast<unoidl::PlainStructTypeEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "struct " << id;
             if (!ent2->getDirectBase().isEmpty()) {
@@ -611,9 +532,14 @@ void writeEntity(
                 writeName(ent2->getDirectBase());
             }
             std::cout << " {\n";
-            for (auto & j: ent2->getDirectMembers()) {
+            for (auto& j : ent2->getDirectMembers()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 writeType(j.type);
                 std::cout << ' ' << j.name << ";\n";
             }
@@ -621,26 +547,27 @@ void writeEntity(
             std::cout << "};\n";
             break;
         }
-    case unoidl::Entity::SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE:
-        {
-            rtl::Reference<unoidl::PolymorphicStructTypeTemplateEntity>
-                ent2(
-                    static_cast<unoidl::PolymorphicStructTypeTemplateEntity *>(
-                        ent.get()));
+        case unoidl::Entity::SORT_POLYMORPHIC_STRUCT_TYPE_TEMPLATE: {
+            rtl::Reference<unoidl::PolymorphicStructTypeTemplateEntity> ent2(
+                static_cast<unoidl::PolymorphicStructTypeTemplateEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "struct " << id << '<';
-            for (auto j(ent2->getTypeParameters().begin());
-                 j != ent2->getTypeParameters().end(); ++j)
-            {
+            for (auto j(ent2->getTypeParameters().begin()); j != ent2->getTypeParameters().end();
+                 ++j) {
                 if (j != ent2->getTypeParameters().begin()) {
                     std::cout << ", ";
                 }
                 std::cout << *j;
             }
             std::cout << ">  {\n";
-            for (auto & j: ent2->getMembers()) {
+            for (auto& j : ent2->getMembers()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 if (j.parameterized) {
                     std::cout << j.type;
                 } else {
@@ -652,10 +579,9 @@ void writeEntity(
             std::cout << "};\n";
             break;
         }
-    case unoidl::Entity::SORT_EXCEPTION_TYPE:
-        {
+        case unoidl::Entity::SORT_EXCEPTION_TYPE: {
             rtl::Reference<unoidl::ExceptionTypeEntity> ent2(
-                static_cast<unoidl::ExceptionTypeEntity *>(ent.get()));
+                static_cast<unoidl::ExceptionTypeEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "exception " << id;
             if (!ent2->getDirectBase().isEmpty()) {
@@ -663,9 +589,14 @@ void writeEntity(
                 writeName(ent2->getDirectBase());
             }
             std::cout << " {\n";
-            for (auto & j: ent2->getDirectMembers()) {
+            for (auto& j : ent2->getDirectMembers()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 writeType(j.type);
                 std::cout << ' ' << j.name << ";\n";
             }
@@ -673,30 +604,43 @@ void writeEntity(
             std::cout << "};\n";
             break;
         }
-    case unoidl::Entity::SORT_INTERFACE_TYPE:
-        {
+        case unoidl::Entity::SORT_INTERFACE_TYPE: {
             rtl::Reference<unoidl::InterfaceTypeEntity> ent2(
-                static_cast<unoidl::InterfaceTypeEntity *>(
-                    ent.get()));
+                static_cast<unoidl::InterfaceTypeEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "interface " << id << " {\n";
-            for (auto & j: ent2->getDirectMandatoryBases()) {
+            for (auto& j : ent2->getDirectMandatoryBases()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 std::cout << "interface ";
                 writeName(j.name);
                 std::cout << ";\n";
             }
-            for (auto & j: ent2->getDirectOptionalBases()) {
+            for (auto& j : ent2->getDirectOptionalBases()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 std::cout << "[optional] interface ";
                 writeName(j.name);
                 std::cout << ";\n";
             }
-            for (auto & j: ent2->getDirectAttributes()) {
+            for (auto& j : ent2->getDirectAttributes()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 std::cout << "[attribute";
                 if (j.bound) {
                     std::cout << ", bound";
@@ -725,27 +669,30 @@ void writeEntity(
                 }
                 std::cout << ";\n";
             }
-            for (auto & j: ent2->getDirectMethods()) {
+            for (auto& j : ent2->getDirectMethods()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 writeType(j.returnType);
                 std::cout << ' ' << j.name << '(';
-                for (auto k(j.parameters.begin()); k != j.parameters.end();
-                     ++k)
-                {
+                for (auto k(j.parameters.begin()); k != j.parameters.end(); ++k) {
                     if (k != j.parameters.begin()) {
                         std::cout << ", ";
                     }
                     switch (k->direction) {
-                    case unoidl::InterfaceTypeEntity::Method::Parameter::DIRECTION_IN:
-                        std::cout << "[in] ";
-                        break;
-                    case unoidl::InterfaceTypeEntity::Method::Parameter::DIRECTION_OUT:
-                        std::cout << "[out] ";
-                        break;
-                    case unoidl::InterfaceTypeEntity::Method::Parameter::DIRECTION_IN_OUT:
-                        std::cout << "[inout] ";
-                        break;
+                        case unoidl::InterfaceTypeEntity::Method::Parameter::DIRECTION_IN:
+                            std::cout << "[in] ";
+                            break;
+                        case unoidl::InterfaceTypeEntity::Method::Parameter::DIRECTION_OUT:
+                            std::cout << "[out] ";
+                            break;
+                        case unoidl::InterfaceTypeEntity::Method::Parameter::DIRECTION_IN_OUT:
+                            std::cout << "[inout] ";
+                            break;
                     }
                     writeType(k->type);
                     std::cout << ' ' << k->name;
@@ -758,90 +705,93 @@ void writeEntity(
             std::cout << "};\n";
             break;
         }
-    case unoidl::Entity::SORT_TYPEDEF:
-        {
+        case unoidl::Entity::SORT_TYPEDEF: {
             rtl::Reference<unoidl::TypedefEntity> ent2(
-                static_cast<unoidl::TypedefEntity *>(ent.get()));
+                static_cast<unoidl::TypedefEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "typedef ";
             writeType(ent2->getType());
             std::cout << ' ' << id << ";\n";
             break;
         }
-    case unoidl::Entity::SORT_CONSTANT_GROUP:
-        {
+        case unoidl::Entity::SORT_CONSTANT_GROUP: {
             rtl::Reference<unoidl::ConstantGroupEntity> ent2(
-                static_cast<unoidl::ConstantGroupEntity *>(ent.get()));
+                static_cast<unoidl::ConstantGroupEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "constants " << id << " {\n";
-            for (auto & j: ent2->getMembers()) {
-                indent(modules, 1);
-                writeAnnotations(j.annotations);
+            for (auto& j : ent2->getMembers()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                    indent(modules, 1);
+                }
                 std::cout << "const ";
                 switch (j.value.type) {
-                case unoidl::ConstantValue::TYPE_BOOLEAN:
-                    std::cout << "boolean";
-                    break;
-                case unoidl::ConstantValue::TYPE_BYTE:
-                    std::cout << "byte";
-                    break;
-                case unoidl::ConstantValue::TYPE_SHORT:
-                    std::cout << "short";
-                    break;
-                case unoidl::ConstantValue::TYPE_UNSIGNED_SHORT:
-                    std::cout << "unsigned short";
-                    break;
-                case unoidl::ConstantValue::TYPE_LONG:
-                    std::cout << "long";
-                    break;
-                case unoidl::ConstantValue::TYPE_UNSIGNED_LONG:
-                    std::cout << "unsigned long";
-                    break;
-                case unoidl::ConstantValue::TYPE_HYPER:
-                    std::cout << "hyper";
-                    break;
-                case unoidl::ConstantValue::TYPE_UNSIGNED_HYPER:
-                    std::cout << "unsigned hyper";
-                    break;
-                case unoidl::ConstantValue::TYPE_FLOAT:
-                    std::cout << "float";
-                    break;
-                case unoidl::ConstantValue::TYPE_DOUBLE:
-                    std::cout << "double";
-                    break;
+                    case unoidl::ConstantValue::TYPE_BOOLEAN:
+                        std::cout << "boolean";
+                        break;
+                    case unoidl::ConstantValue::TYPE_BYTE:
+                        std::cout << "byte";
+                        break;
+                    case unoidl::ConstantValue::TYPE_SHORT:
+                        std::cout << "short";
+                        break;
+                    case unoidl::ConstantValue::TYPE_UNSIGNED_SHORT:
+                        std::cout << "unsigned short";
+                        break;
+                    case unoidl::ConstantValue::TYPE_LONG:
+                        std::cout << "long";
+                        break;
+                    case unoidl::ConstantValue::TYPE_UNSIGNED_LONG:
+                        std::cout << "unsigned long";
+                        break;
+                    case unoidl::ConstantValue::TYPE_HYPER:
+                        std::cout << "hyper";
+                        break;
+                    case unoidl::ConstantValue::TYPE_UNSIGNED_HYPER:
+                        std::cout << "unsigned hyper";
+                        break;
+                    case unoidl::ConstantValue::TYPE_FLOAT:
+                        std::cout << "float";
+                        break;
+                    case unoidl::ConstantValue::TYPE_DOUBLE:
+                        std::cout << "double";
+                        break;
                 }
                 std::cout << ' ' << j.name << " = ";
                 switch (j.value.type) {
-                case unoidl::ConstantValue::TYPE_BOOLEAN:
-                    std::cout << (j.value.booleanValue ? "TRUE" : "FALSE");
-                    break;
-                case unoidl::ConstantValue::TYPE_BYTE:
-                    std::cout << int(j.value.byteValue);
-                    break;
-                case unoidl::ConstantValue::TYPE_SHORT:
-                    std::cout << j.value.shortValue;
-                    break;
-                case unoidl::ConstantValue::TYPE_UNSIGNED_SHORT:
-                    std::cout << j.value.unsignedShortValue;
-                    break;
-                case unoidl::ConstantValue::TYPE_LONG:
-                    std::cout << j.value.longValue;
-                    break;
-                case unoidl::ConstantValue::TYPE_UNSIGNED_LONG:
-                    std::cout << j.value.unsignedLongValue;
-                    break;
-                case unoidl::ConstantValue::TYPE_HYPER:
-                    std::cout << j.value.hyperValue;
-                    break;
-                case unoidl::ConstantValue::TYPE_UNSIGNED_HYPER:
-                    std::cout << j.value.unsignedHyperValue;
-                    break;
-                case unoidl::ConstantValue::TYPE_FLOAT:
-                    std::cout << j.value.floatValue;
-                    break;
-                case unoidl::ConstantValue::TYPE_DOUBLE:
-                    std::cout << j.value.doubleValue;
-                    break;
+                    case unoidl::ConstantValue::TYPE_BOOLEAN:
+                        std::cout << (j.value.booleanValue ? "TRUE" : "FALSE");
+                        break;
+                    case unoidl::ConstantValue::TYPE_BYTE:
+                        std::cout << int(j.value.byteValue);
+                        break;
+                    case unoidl::ConstantValue::TYPE_SHORT:
+                        std::cout << j.value.shortValue;
+                        break;
+                    case unoidl::ConstantValue::TYPE_UNSIGNED_SHORT:
+                        std::cout << j.value.unsignedShortValue;
+                        break;
+                    case unoidl::ConstantValue::TYPE_LONG:
+                        std::cout << j.value.longValue;
+                        break;
+                    case unoidl::ConstantValue::TYPE_UNSIGNED_LONG:
+                        std::cout << j.value.unsignedLongValue;
+                        break;
+                    case unoidl::ConstantValue::TYPE_HYPER:
+                        std::cout << j.value.hyperValue;
+                        break;
+                    case unoidl::ConstantValue::TYPE_UNSIGNED_HYPER:
+                        std::cout << j.value.unsignedHyperValue;
+                        break;
+                    case unoidl::ConstantValue::TYPE_FLOAT:
+                        std::cout << j.value.floatValue;
+                        break;
+                    case unoidl::ConstantValue::TYPE_DOUBLE:
+                        std::cout << j.value.doubleValue;
+                        break;
                 }
                 std::cout << ";\n";
             }
@@ -849,25 +799,25 @@ void writeEntity(
             std::cout << "};\n";
             break;
         }
-    case unoidl::Entity::SORT_SINGLE_INTERFACE_BASED_SERVICE:
-        {
+        case unoidl::Entity::SORT_SINGLE_INTERFACE_BASED_SERVICE: {
             rtl::Reference<unoidl::SingleInterfaceBasedServiceEntity> ent2(
-                static_cast<unoidl::SingleInterfaceBasedServiceEntity *>(
-                    ent.get()));
+                static_cast<unoidl::SingleInterfaceBasedServiceEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "service " << id << ": ";
             writeName(ent2->getBase());
             if (ent2->getConstructors().size() != 1
-                || !ent2->getConstructors().front().defaultConstructor)
-            {
+                || !ent2->getConstructors().front().defaultConstructor) {
                 std::cout << " {\n";
-                for (auto & j: ent2->getConstructors()) {
+                for (auto& j : ent2->getConstructors()) {
+                    if (!j.doc.isEmpty()) {
+                        indent(modules, 1);
+                        std::cout << "/**";
+                        std::cout << j.doc;
+                        std::cout << " */" << std::endl;
+                    }
                     indent(modules, 1);
-                    writeAnnotations(j.annotations);
                     std::cout << j.name << '(';
-                    for (auto k(j.parameters.begin());
-                         k != j.parameters.end(); ++k)
-                    {
+                    for (auto k(j.parameters.begin()); k != j.parameters.end(); ++k) {
                         if (k != j.parameters.begin()) {
                             std::cout << ", ";
                         }
@@ -888,97 +838,111 @@ void writeEntity(
             std::cout << ";\n";
             break;
         }
-    case unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE:
-        {
+        case unoidl::Entity::SORT_ACCUMULATION_BASED_SERVICE: {
             rtl::Reference<unoidl::AccumulationBasedServiceEntity> ent2(
-                static_cast<unoidl::AccumulationBasedServiceEntity *>(
-                    ent.get()));
+                static_cast<unoidl::AccumulationBasedServiceEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "service " << id << " {\n";
-            for (auto & j: ent2->getDirectMandatoryBaseServices()) {
+            for (auto& j : ent2->getDirectMandatoryBaseServices()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 std::cout << "service ";
                 writeName(j.name);
                 std::cout << ";\n";
             }
-            for (auto & j: ent2->getDirectOptionalBaseServices()) {
+            for (auto& j : ent2->getDirectOptionalBaseServices()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 std::cout << "[optional] service ";
                 writeName(j.name);
                 std::cout << ";\n";
             }
-            for (auto & j: ent2->getDirectMandatoryBaseInterfaces()) {
+            for (auto& j : ent2->getDirectMandatoryBaseInterfaces()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 std::cout << "interface ";
                 writeName(j.name);
                 std::cout << ";\n";
             }
-            for (auto & j: ent2->getDirectOptionalBaseInterfaces()) {
+            for (auto& j : ent2->getDirectOptionalBaseInterfaces()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 std::cout << "[optional] interface ";
                 writeName(j.name);
                 std::cout << ";\n";
             }
-            for (auto & j: ent2->getDirectProperties()) {
+            for (auto& j : ent2->getDirectProperties()) {
+                if (!j.doc.isEmpty()) {
+                    indent(modules, 1);
+                    std::cout << "/**";
+                    std::cout << j.doc;
+                    std::cout << " */" << std::endl;
+                }
                 indent(modules, 1);
-                writeAnnotations(j.annotations);
                 std::cout << "[property";
                 if ((j.attributes
                      & unoidl::AccumulationBasedServiceEntity::Property::ATTRIBUTE_BOUND)
-                    != 0)
-                {
+                    != 0) {
                     std::cout << ", bound";
                 }
                 if ((j.attributes
                      & unoidl::AccumulationBasedServiceEntity::Property::ATTRIBUTE_CONSTRAINED)
-                    != 0)
-                {
+                    != 0) {
                     std::cout << ", constrained";
                 }
                 if ((j.attributes
                      & unoidl::AccumulationBasedServiceEntity::Property::ATTRIBUTE_MAYBE_AMBIGUOUS)
-                    != 0)
-                {
+                    != 0) {
                     std::cout << ", maybeambiguous";
                 }
                 if ((j.attributes
                      & unoidl::AccumulationBasedServiceEntity::Property::ATTRIBUTE_MAYBE_DEFAULT)
-                    != 0)
-                {
+                    != 0) {
                     std::cout << ", maybedefault";
                 }
                 if ((j.attributes
                      & unoidl::AccumulationBasedServiceEntity::Property::ATTRIBUTE_MAYBE_VOID)
-                    != 0)
-                {
+                    != 0) {
                     std::cout << ", maybevoid";
                 }
                 if ((j.attributes
                      & unoidl::AccumulationBasedServiceEntity::Property::ATTRIBUTE_OPTIONAL)
-                    != 0)
-                {
+                    != 0) {
                     std::cout << ", optional";
                 }
                 if ((j.attributes
                      & unoidl::AccumulationBasedServiceEntity::Property::ATTRIBUTE_READ_ONLY)
-                    != 0)
-                {
+                    != 0) {
                     std::cout << ", readonly";
                 }
                 if ((j.attributes
                      & unoidl::AccumulationBasedServiceEntity::Property::ATTRIBUTE_REMOVABLE)
-                    != 0)
-                {
+                    != 0) {
                     std::cout << ", removable";
                 }
                 if ((j.attributes
                      & unoidl::AccumulationBasedServiceEntity::Property::ATTRIBUTE_TRANSIENT)
-                    != 0)
-                {
+                    != 0) {
                     std::cout << ", transient";
                 }
                 std::cout << "] ";
@@ -989,30 +953,26 @@ void writeEntity(
             std::cout << "};\n";
             break;
         }
-    case unoidl::Entity::SORT_INTERFACE_BASED_SINGLETON:
-        {
+        case unoidl::Entity::SORT_INTERFACE_BASED_SINGLETON: {
             rtl::Reference<unoidl::InterfaceBasedSingletonEntity> ent2(
-                static_cast<unoidl::InterfaceBasedSingletonEntity *>(
-                    ent.get()));
+                static_cast<unoidl::InterfaceBasedSingletonEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "singleton " << id << ": ";
             writeName(ent2->getBase());
             std::cout << ";\n";
             break;
         }
-    case unoidl::Entity::SORT_SERVICE_BASED_SINGLETON:
-        {
+        case unoidl::Entity::SORT_SERVICE_BASED_SINGLETON: {
             rtl::Reference<unoidl::ServiceBasedSingletonEntity> ent2(
-                static_cast<unoidl::ServiceBasedSingletonEntity *>(
-                    ent.get()));
+                static_cast<unoidl::ServiceBasedSingletonEntity*>(ent.get()));
             writeAnnotationsPublished(ent);
             std::cout << "singleton " << id << " { service ";
             writeName(ent2->getBase());
             std::cout << "; };";
             break;
         }
-    case unoidl::Entity::SORT_MODULE:
-        assert(false && "this cannot happen");
+        case unoidl::Entity::SORT_MODULE:
+            assert(false && "this cannot happen");
     }
 }
 
@@ -1036,9 +996,8 @@ SAL_IMPLEMENT_MAIN() {
             OUString uri(getArgumentUri(i));
             try {
                 prov = mgr->addProvider(uri);
-            } catch (unoidl::NoSuchFileException &) {
-                std::cerr
-                    << "Input <" << uri << "> does not exist" << std::endl;
+            } catch (unoidl::NoSuchFileException&) {
+                std::cerr << "Input <" << uri << "> does not exist" << std::endl;
                 std::exit(EXIT_FAILURE);
             }
         }
@@ -1046,17 +1005,15 @@ SAL_IMPLEMENT_MAIN() {
         scanMap(mgr, prov->createRootCursor(), published, u"", ents);
         std::vector<OUString> sorted(sort(ents));
         std::vector<OUString> mods;
-        for (const auto & i: sorted) {
+        for (const auto& i : sorted) {
             writeEntity(ents, mods, i);
         }
         closeModules(mods, mods.size());
         return EXIT_SUCCESS;
-    } catch (unoidl::FileFormatException & e1) {
-        std::cerr
-            << "Bad input <" << e1.getUri() << ">: " << e1.getDetail()
-            << std::endl;
+    } catch (unoidl::FileFormatException& e1) {
+        std::cerr << "Bad input <" << e1.getUri() << ">: " << e1.getDetail() << std::endl;
         std::exit(EXIT_FAILURE);
-    } catch (std::exception & e1) {
+    } catch (std::exception& e1) {
         std::cerr << "Failure: " << e1.what() << std::endl;
         std::exit(EXIT_FAILURE);
     }

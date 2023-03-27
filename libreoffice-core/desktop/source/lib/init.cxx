@@ -7,6 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "lib/unov8.hxx"
 #include <config_buildconfig.h>
 #include <config_features.h>
 
@@ -1195,6 +1196,7 @@ static bool doc_renderSearchResult(LibreOfficeKitDocument* pThis,
                                  int* pWidth, int* pHeight, size_t* pByteSize);
 
 static void doc_sendContentControlEvent(LibreOfficeKitDocument* pThis, const char* pArguments);
+static void* doc_getXComponent(LibreOfficeKitDocument* pThis);
 
 } // extern "C"
 
@@ -1348,6 +1350,7 @@ LibLODocument_Impl::LibLODocument_Impl(const uno::Reference <css::lang::XCompone
         m_pDocumentClass->setBlockedCommandList = doc_setBlockedCommandList;
 
         m_pDocumentClass->sendContentControlEvent = doc_sendContentControlEvent;
+        m_pDocumentClass->getXComponent = doc_getXComponent;
 
         gDocumentClass = m_pDocumentClass;
     }
@@ -2423,6 +2426,8 @@ static void lo_setOption(LibreOfficeKit* pThis, const char* pOption, const char*
 
 static void lo_dumpState(LibreOfficeKit* pThis, const char* pOptions, char** pState);
 
+static void* lo_getXComponentContext(LibreOfficeKit* pThis);
+
 LibLibreOffice_Impl::LibLibreOffice_Impl()
     : m_pOfficeClass( gOfficeClass.lock() )
     , maThread(nullptr)
@@ -2450,6 +2455,8 @@ LibLibreOffice_Impl::LibLibreOffice_Impl()
         m_pOfficeClass->sendDialogEvent = lo_sendDialogEvent;
         m_pOfficeClass->setOption = lo_setOption;
         m_pOfficeClass->dumpState = lo_dumpState;
+        m_pOfficeClass->getXComponentContext = lo_getXComponentContext;
+        unov8_init(m_pOfficeClass->uno_v8);
 
         gOfficeClass = m_pOfficeClass;
     }
@@ -4450,6 +4457,12 @@ static void lo_dumpState (LibreOfficeKit* pThis, const char* /* pOptions */, cha
 
     OString aStr = aState.makeStringAndClear();
     *pState = strdup(aStr.getStr());
+}
+
+static void* lo_getXComponentContext(LibreOfficeKit* pThis)
+{
+    (void)pThis; // avoid unused warning on class method
+    return xContext.is() ? xContext.get() : nullptr;
 }
 
 void LibLibreOffice_Impl::dumpState(rtl::OStringBuffer &rState)
@@ -6587,6 +6600,16 @@ static void doc_sendContentControlEvent(LibreOfficeKitDocument* pThis, const cha
     }
 
     pDoc->executeContentControlEvent(aMap);
+}
+
+static void* doc_getXComponent(LibreOfficeKitDocument* pThis)
+{
+    SolarMutexGuard aGuard;
+    LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
+
+    pDocument->mxComponent->acquire();
+
+    return pDocument->mxComponent.get();
 }
 
 static char* lo_getError (LibreOfficeKit *pThis)

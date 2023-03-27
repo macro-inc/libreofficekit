@@ -1085,9 +1085,10 @@ static inline const char* lokCallbackTypeToString(int nType)
         return "LOK_DOC_CALLBACK_ON_TITLE_CHANGED";
     case LOK_DOC_CALLBACK_ON_MODE_CHANGED:
         return "LOK_DOC_CALLBACK_ON_MODE_CHANGED";
+    default:
+        return "LOK_CALLBACK_UNKNOWN";
     }
 
-    assert(!"Unknown LibreOfficeKitCallbackType type.");
     return nullptr;
 }
 

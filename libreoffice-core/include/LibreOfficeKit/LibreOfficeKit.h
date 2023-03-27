@@ -22,6 +22,7 @@
 #endif
 
 #include <LibreOfficeKit/LibreOfficeKitTypes.h>
+#include <LibreOfficeKit/UnoV8.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -122,6 +123,10 @@ struct _LibreOfficeKitClass
     /// @see lok::Document::dumpState
     /// @since LibreOffice 7.5
     void (*dumpState) (LibreOfficeKit* pThis, const char* pOptions, char** pState);
+
+    void* (*getXComponentContext) (LibreOfficeKit* pThis);
+
+    UnoV8 uno_v8;
 };
 
 #define LIBREOFFICEKIT_DOCUMENT_HAS(pDoc,member) LIBREOFFICEKIT_HAS_MEMBER(LibreOfficeKitDocumentClass,member,(pDoc)->pClass->nSize)
@@ -248,7 +253,6 @@ struct _LibreOfficeKitDocumentClass
 
     /// @see lok::Document::gotoOutline().
     char* (*gotoOutline) (LibreOfficeKitDocument* pThis, int idx);
-
 
     /// @see lok::Document::setClientZoom().
     void (*setClientZoom) (LibreOfficeKitDocument* pThis,
@@ -493,6 +497,7 @@ struct _LibreOfficeKitDocumentClass
                          long* pCol,
                          long* pRow);
 
+    void* (*getXComponent) (LibreOfficeKitDocument* pThis);
 #endif // defined LOK_USE_UNSTABLE_API || defined LIBO_INTERNAL_ONLY
 };
 

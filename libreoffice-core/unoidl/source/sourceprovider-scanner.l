@@ -98,7 +98,7 @@ int nonZeroIntegerLiteral(
 
 %}
 
-%x comment1 comment2 doc docdepr
+%x comment1 comment2 include1 doc doc1 docdepr
 
 DIGIT [0-9]
 UPPER [A-Z]
@@ -112,28 +112,40 @@ ALNUM {DIGIT}|{ALPHA}
 \n *yylloc = yylineno;
 
 "//" BEGIN comment1;
-"#" BEGIN comment1; //TODO: only at start of line
-<comment1>.
-<comment1>\n *yylloc = yylineno; BEGIN INITIAL;
+"///" BEGIN doc1;
+"#" BEGIN include1; //TODO: only at start of line
+<include1>.
+<comment1,doc1>. {
+    yyextra->buffer.append(OUString::fromUtf8(yytext));
+}
+<comment1,include1,doc1>\n *yylloc = yylineno; BEGIN INITIAL; {
+    yyextra->documentation = yyextra->buffer.makeStringAndClear();
+}
 
 "/*" BEGIN comment2;
 "/**" BEGIN doc;
 "/***" BEGIN comment2;
 
-<comment2,doc>"*/" BEGIN INITIAL;
+<comment2,doc>"*/" BEGIN INITIAL; {
+    yyextra->documentation = yyextra->buffer.makeStringAndClear();
+}
 <docdepr>"*/" BEGIN INITIAL; return TOK_DEPRECATED;
 
 <comment2,docdepr>.
-<comment2,doc,docdepr>\n *yylloc = yylineno;
+<doc>\n {
+    yyextra->buffer.append(OUString::fromUtf8(yytext));
+    *yylloc = yylineno;
+}
+<comment2,docdepr>\n *yylloc = yylineno;
 <comment2,doc,docdepr><<EOF>> {
     yyextra->errorMessage = "unterminated comment";
     return TOK_ERROR;
 }
 
-<doc>[ \t\r]
-<doc>"@deprecated" BEGIN docdepr;
-<doc>"*"
-<doc>[^ \t\r\n*]+
+<doc>[ \t\r] yyextra->buffer.append(OUString::fromUtf8(yytext));
+<doc>"@deprecated" BEGIN docdepr; yyextra->buffer.append(OUString::fromUtf8(yytext));
+<doc>"*" yyextra->buffer.append(OUString::fromUtf8(yytext));
+<doc>[^ \t\r\n*]+ yyextra->buffer.append(OUString::fromUtf8(yytext));
 
 [%&()*+,\-/:;<=>[\]^{|}~] return yytext[0];
 

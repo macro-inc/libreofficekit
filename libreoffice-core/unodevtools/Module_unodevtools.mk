@@ -9,12 +9,4 @@
 
 $(eval $(call gb_Module_Module,unodevtools))
 
-ifneq (,$(filter ODK,$(BUILD_TYPE)))
-
-$(eval $(call gb_Module_add_targets,unodevtools,\
-	Executable_uno-skeletonmaker \
-))
-
-endif
-
 # vim:set noet sw=4 ts=4:

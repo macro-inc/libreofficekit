@@ -879,6 +879,11 @@ public:
         mpDoc->pClass->sendContentControlEvent(mpDoc, pArguments);
     }
 
+    void* getXComponent()
+    {
+        return mpDoc->pClass->getXComponent(mpDoc);
+    }
+
 #endif // defined LOK_USE_UNSTABLE_API || defined LIBO_INTERNAL_ONLY
 };
 
@@ -1133,6 +1138,16 @@ public:
     void dumpState(const char* pOption, char** pState)
     {
         mpThis->pClass->dumpState(mpThis, pOption, pState);
+    }
+
+    void* getXComponentContext()
+    {
+        return mpThis->pClass->getXComponentContext(mpThis);
+    }
+
+    ::UnoV8& getUnoV8()
+    {
+        return mpThis->pClass->uno_v8;
     }
 };
 

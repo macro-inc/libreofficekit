@@ -88,7 +88,11 @@ inline Sequence< E >::Sequence( const E * pElements, sal_Int32 len )
         &_pSequence, rType.getTypeLibType(),
         const_cast< E * >( pElements ), len, cpp_acquire );
     if (! success)
+#if defined SAL_NO_EXCEPTIONS
+        std::abort();
+#else
         throw ::std::bad_alloc();
+#endif
 }
 
 template< class E >
@@ -100,7 +104,11 @@ inline Sequence< E >::Sequence( sal_Int32 len )
         &_pSequence, rType.getTypeLibType(),
         NULL, len, cpp_acquire );
     if (! success)
+#if defined SAL_NO_EXCEPTIONS
+        std::abort();
+#else
         throw ::std::bad_alloc();
+#endif
 }
 
 #if defined LIBO_INTERNAL_ONLY
@@ -109,7 +117,11 @@ template<typename E> Sequence<E>::Sequence(std::initializer_list<E> init) {
             &_pSequence, cppu::getTypeFavourUnsigned(this).getTypeLibType(),
             const_cast<E *>(init.begin()), init.size(), cpp_acquire))
     {
+#if defined SAL_NO_EXCEPTIONS
+        std::abort();
+#else
         throw std::bad_alloc();
+#endif
     }
 }
 #endif
@@ -164,7 +176,11 @@ inline E * Sequence< E >::getArray()
         &_pSequence, rType.getTypeLibType(),
         cpp_acquire, cpp_release );
     if (! success)
+#if defined SAL_NO_EXCEPTIONS
+        std::abort();
+#else
         throw ::std::bad_alloc();
+#endif
     return reinterpret_cast< E * >( _pSequence->elements );
 }
 
@@ -209,7 +225,11 @@ inline void Sequence< E >::realloc( sal_Int32 nSize )
         &_pSequence, rType.getTypeLibType(), nSize,
         cpp_acquire, cpp_release );
     if (!success)
+#if defined SAL_NO_EXCEPTIONS
+        std::abort();
+#else
         throw ::std::bad_alloc();
+#endif
 }
 
 #if defined LIBO_INTERNAL_ONLY

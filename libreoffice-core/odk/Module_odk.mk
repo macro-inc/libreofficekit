@@ -16,51 +16,10 @@ $(eval $(call gb_Module_add_targets,odk,\
 		CustomTarget_doxygen \
 		GeneratedPackage_odk_doxygen \
 	) \
-	CustomTarget_html \
-	CustomTarget_settings \
-	Executable_unoapploader \
-	Package_config \
-	Package_docs \
-	Package_html \
-	Package_examples \
+	CustomTarget_unoapi \
 	Package_odk_headers \
 	Package_odk_headers_generated \
-	Package_settings \
-	Package_settings_generated \
-	Package_share_readme \
-	Package_share_readme_generated \
+	Package_unov8_headers_generated \
 ))
-
-ifeq ($(OS),WNT)
-$(eval $(call gb_Module_add_targets,odk,\
-	$(if $(filter-out AARCH64,$(CPUNAME)),Package_cli) \
-	CustomTarget_config_win \
-	Package_config_win \
-))
-endif
-
-ifneq ($(ENABLE_JAVA),)
-$(eval $(call gb_Module_add_targets,odk,\
-	CustomTarget_classes \
-	CustomTarget_javadoc \
-	GeneratedPackage_odk_javadoc \
-	GeneratedPackage_uno_loader_classes \
-))
-endif
-
-$(eval $(call gb_Module_add_check_targets,odk,\
-	CppunitTest_odk_checkapi \
-	CustomTarget_allheaders \
-	CustomTarget_check \
-))
-
-ifneq ($(filter $(OS),LINUX MACOSX),)
-$(eval $(call gb_Module_add_subsequentcheck_targets,odk, \
-    CustomTarget_build-examples \
-    $(if $(ENABLE_JAVA),\
-        CustomTarget_build-examples_java \
-    ) \
-))
-endif
 
 # vim: set noet sw=4 ts=4:

@@ -23,6 +23,7 @@ $(eval $(call gb_Module_add_targets,unoidl, \
 
 $(eval $(call gb_Module_add_targets_for_build,unoidl, \
     Executable_unoidl-write \
+    Executable_unoidl-v8 \
 ))
 
 $(eval $(call gb_Module_add_check_targets,unoidl, \

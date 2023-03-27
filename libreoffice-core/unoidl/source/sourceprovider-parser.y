@@ -10,7 +10,7 @@
 /*TODO: check Exception, RuntimeException, XInterface defns */
 
 %locations
-%pure-parser
+%define api.pure
 
 %{
 
@@ -142,6 +142,9 @@ void clearCurrentState(unoidl::detail::SourceProviderScannerData * data) {
     assert(data != nullptr);
     data->currentName.clear();
     data->publishedContext = false;
+    data->documentation.clear();
+    std::ignore = data->buffer.makeStringAndClear();
+    data->deprecated = false;
 }
 
 unoidl::detail::SourceProviderEntity * getCurrentEntity(
@@ -926,12 +929,13 @@ std::vector<OUString> annotations(bool deprecated) {
 %token<ival> TOK_INTEGER
 %token<fval> TOK_FLOATING
 
+%token TOK_DOC
 %token TOK_DEPRECATED
 
 %token TOK_ERROR
 
 %type<sval> identifier name singleInheritance singleInheritance_opt
-%type<bval> ctors_opt deprecated_opt ellipsis_opt published_opt
+%type<bval> ctors_opt doc_opt ellipsis_opt published_opt
 %type<decls> attributeAccessDecl attributeAccessDecls
 %type<dir> direction
 %type<excns> exceptionSpec exceptionSpec_opt exceptions
@@ -976,20 +980,22 @@ moduleDecl:
           data->entities.emplace(
                   name,
                   unoidl::detail::SourceProviderEntity(
-                      unoidl::detail::SourceProviderEntity::KIND_MODULE)));
-      if (!p.second
-          && (p.first->second.kind
-              != unoidl::detail::SourceProviderEntity::KIND_MODULE))
-      {
-          error(@2, yyscanner, "multiple entities named " + name);
-          YYERROR;
+                      unoidl::detail::SourceProviderEntity::KIND_MODULE, data->documentation)));
+      if (!p.second) {
+          if (p.first->second.kind != unoidl::detail::SourceProviderEntity::KIND_MODULE) {
+              error(@2, yyscanner, "multiple entities named " + name);
+              YYERROR;
+          } else if (p.first->second.doc.isEmpty()) {
+              // there can be multiple modules, but only one likely has docs
+              p.first->second.doc = data->documentation;
+          }
       }
   }
   '{' definitions '}' ';' { yyget_extra(yyscanner)->modules.pop_back(); }
 ;
 
 enumDefn:
-  deprecated_opt published_opt TOK_ENUM identifier
+  doc_opt published_opt TOK_ENUM identifier
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -998,7 +1004,7 @@ enumDefn:
                   data->currentName,
                   unoidl::detail::SourceProviderEntity(
                       new unoidl::detail::SourceProviderEnumTypeEntityPad(
-                          $2))).
+                          $2, data->documentation))).
           second)
       {
           error(@4, yyscanner, "multiple entities named " + data->currentName);
@@ -1014,7 +1020,7 @@ enumDefn:
               ent->pad.get());
       assert(pad != nullptr);
       ent->entity = new unoidl::EnumTypeEntity(
-          pad->isPublished(), std::move(pad->members), annotations($1));
+          pad->isPublished(), std::move(pad->members), annotations($1), pad->doc());
       ent->pad.clear();
       clearCurrentState(data);
   }
@@ -1026,7 +1032,7 @@ enumMembers:
 ;
 
 enumMember:
-  deprecated_opt identifier
+  doc_opt identifier
   {
       OUString id(convertName($2));
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
@@ -1046,9 +1052,9 @@ enumMember:
           }
           ++v;
       }
-      pad->members.emplace_back(id, v, annotations($1));
+      pad->members.emplace_back(id, v, annotations($1), data->documentation);
   }
-| deprecated_opt identifier '=' expr
+| doc_opt identifier '=' expr
   {
       OUString id(convertName($2));
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
@@ -1084,12 +1090,12 @@ enumMember:
           YYERROR;
           break;
       }
-      pad->members.emplace_back(id, v, annotations($1));
+      pad->members.emplace_back(id, v, annotations($1), data->documentation);
   }
 ;
 
 plainStructDefn:
-  deprecated_opt published_opt TOK_STRUCT identifier singleInheritance_opt
+  doc_opt published_opt TOK_STRUCT identifier singleInheritance_opt
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -1129,7 +1135,7 @@ plainStructDefn:
                   data->currentName,
                   unoidl::detail::SourceProviderEntity(
                       new unoidl::detail::SourceProviderPlainStructTypeEntityPad(
-                          $2, baseName, baseEnt))).
+                          $2, baseName, baseEnt, data->documentation))).
           second)
       {
           error(@4, yyscanner, "multiple entities named " + data->currentName);
@@ -1146,14 +1152,14 @@ plainStructDefn:
                   ent->pad.get());
       assert(pad != nullptr);
       ent->entity = new unoidl::PlainStructTypeEntity(
-          pad->isPublished(), pad->baseName, std::move(pad->members), annotations($1));
+          pad->isPublished(), pad->baseName, std::move(pad->members), annotations($1), pad->doc());
       ent->pad.clear();
       clearCurrentState(data);
   }
 ;
 
 polymorphicStructTemplateDefn:
-  deprecated_opt published_opt TOK_STRUCT identifier '<'
+  doc_opt published_opt TOK_STRUCT identifier '<'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -1162,7 +1168,7 @@ polymorphicStructTemplateDefn:
                   data->currentName,
                   unoidl::detail::SourceProviderEntity(
                       new unoidl::detail::SourceProviderPolymorphicStructTypeTemplateEntityPad(
-                          $2))).
+                          $2, data->documentation))).
           second)
       {
           error(@4, yyscanner, "multiple entities named " + data->currentName);
@@ -1180,7 +1186,7 @@ polymorphicStructTemplateDefn:
       assert(pad != nullptr);
       ent->entity = new unoidl::PolymorphicStructTypeTemplateEntity(
           pad->isPublished(), std::move(pad->typeParameters), std::move(pad->members),
-          annotations($1));
+          annotations($1), pad->doc());
       ent->pad.clear();
       clearCurrentState(data);
   }
@@ -1219,7 +1225,7 @@ typeParameters:
 ;
 
 exceptionDefn:
-  deprecated_opt published_opt TOK_EXCEPTION identifier singleInheritance_opt
+  doc_opt published_opt TOK_EXCEPTION identifier singleInheritance_opt
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -1258,7 +1264,7 @@ exceptionDefn:
                   data->currentName,
                   unoidl::detail::SourceProviderEntity(
                       new unoidl::detail::SourceProviderExceptionTypeEntityPad(
-                          $2, baseName, baseEnt))).
+                          $2, baseName, baseEnt, data->documentation))).
           second)
       {
           error(@4, yyscanner, "multiple entities named " + data->currentName);
@@ -1274,7 +1280,7 @@ exceptionDefn:
               ent->pad.get());
       assert(pad != nullptr);
       ent->entity = new unoidl::ExceptionTypeEntity(
-          pad->isPublished(), pad->baseName, std::move(pad->members), annotations($1));
+          pad->isPublished(), pad->baseName, std::move(pad->members), annotations($1), pad->doc());
       ent->pad.clear();
       clearCurrentState(data);
   }
@@ -1286,7 +1292,7 @@ structMembers:
 ;
 
 structMember:
-  deprecated_opt type identifier ';'
+  doc_opt type identifier ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       unoidl::detail::SourceProviderType t(*$2);
@@ -1415,7 +1421,7 @@ structMember:
               p2->members.emplace_back(
                   id, t.getName(),
                   t.type == unoidl::detail::SourceProviderType::TYPE_PARAMETER,
-                  annotations($1));
+                  annotations($1), data->documentation);
           } else {
               unoidl::detail::SourceProviderExceptionTypeEntityPad * p3
                   = dynamic_cast<unoidl::detail::SourceProviderExceptionTypeEntityPad *>(
@@ -1482,14 +1488,14 @@ structMember:
                           p->entity.get());
                   }
               }
-              p3->members.emplace_back(id, t.getName(), annotations($1));
+              p3->members.emplace_back(id, t.getName(), annotations($1), data->documentation);
           }
       }
   }
 ;
 
 interfaceDefn:
-  deprecated_opt published_opt TOK_INTERFACE identifier singleInheritance_opt
+  doc_opt published_opt TOK_INTERFACE identifier singleInheritance_opt
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -1549,7 +1555,7 @@ interfaceDefn:
       }
       rtl::Reference<unoidl::detail::SourceProviderInterfaceTypeEntityPad> pad(
           new unoidl::detail::SourceProviderInterfaceTypeEntityPad(
-              $2, baseEnt.is()));
+              $2, baseEnt.is(), data->documentation));
       if (baseEnt.is()
           && !pad->addDirectBase(
               @4, yyscanner, data,
@@ -1612,7 +1618,7 @@ interfaceDefn:
       }
       ent->entity = new unoidl::InterfaceTypeEntity(
           pad->isPublished(), std::move(mbases), std::move(obases), std::move(pad->directAttributes),
-          std::move(pad->directMethods), annotations($1));
+          std::move(pad->directMethods), annotations($1), pad->doc());
       ent->pad.clear();
       clearCurrentState(data);
   }
@@ -1630,7 +1636,7 @@ interfaceMember:
 ;
 
 interfaceBase:
-  deprecated_opt flagSection_opt TOK_INTERFACE name ';'
+  doc_opt flagSection_opt TOK_INTERFACE name ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       OUString name(convertName($4));
@@ -1695,7 +1701,7 @@ interfaceBase:
 ;
 
 interfaceAttribute:
-  deprecated_opt flagSection type identifier
+  doc_opt flagSection type identifier
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       unoidl::detail::SourceProviderType t(*$3);
@@ -1739,7 +1745,7 @@ interfaceAttribute:
       pad->directAttributes.emplace_back(
           id, t.getName(), ($2 & unoidl::detail::FLAG_BOUND) != 0,
           ($2 & unoidl::detail::FLAG_READONLY) != 0,
-          std::vector<OUString>(), std::vector<OUString>(), annotations($1));
+          std::vector<OUString>(), std::vector<OUString>(), annotations($1), data->documentation);
   }
   attributeAccessDecls_opt ';'
 ;
@@ -1797,7 +1803,7 @@ attributeAccessDecl:
 ;
 
 interfaceMethod:
-  deprecated_opt type identifier
+  doc_opt type identifier
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       unoidl::detail::SourceProviderType t(*$2);
@@ -1819,7 +1825,7 @@ interfaceMethod:
       pad->directMethods.emplace_back(
           id, t.getName(),
           std::vector<unoidl::InterfaceTypeEntity::Method::Parameter>(),
-          std::vector<OUString>(), annotations($1));
+          std::vector<OUString>(), annotations($1), data->documentation);
   }
   '(' methodParams_opt ')' exceptionSpec_opt ';'
   {
@@ -1893,7 +1899,7 @@ direction:
 ;
 
 typedefDefn:
-  deprecated_opt published_opt TOK_TYPEDEF type identifier ';'
+  doc_opt published_opt TOK_TYPEDEF type identifier ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -1952,7 +1958,7 @@ typedefDefn:
                   unoidl::detail::SourceProviderEntity(
                       unoidl::detail::SourceProviderEntity::KIND_LOCAL,
                       new unoidl::TypedefEntity(
-                          $2, t.getName(), annotations($1)))).
+                          $2, t.getName(), annotations($1), data->documentation))).
           second)
       {
           error(@5, yyscanner, "multiple entities named " + name);
@@ -1963,7 +1969,7 @@ typedefDefn:
 ;
 
 constantGroupDefn:
-  deprecated_opt published_opt TOK_CONSTANTS identifier
+  doc_opt published_opt TOK_CONSTANTS identifier
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -1972,14 +1978,14 @@ constantGroupDefn:
                   data->currentName,
                   unoidl::detail::SourceProviderEntity(
                       new unoidl::detail::SourceProviderConstantGroupEntityPad(
-                          $2))).
+                          $2, data->documentation))).
           second)
       {
           error(@4, yyscanner, "multiple entities named " + data->currentName);
           YYERROR;
       }
   }
-  '{' constants '}' ';'
+  '{' constants doc_opt '}' ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       unoidl::detail::SourceProviderEntity * ent = getCurrentEntity(data);
@@ -1988,7 +1994,7 @@ constantGroupDefn:
               ent->pad.get());
       assert(pad != nullptr);
       ent->entity = new unoidl::ConstantGroupEntity(
-          pad->isPublished(), std::move(pad->members), annotations($1));
+          pad->isPublished(), std::move(pad->members), annotations($1), pad->doc());
       ent->pad.clear();
       clearCurrentState(data);
   }
@@ -2000,7 +2006,7 @@ constants:
 ;
 
 constant:
-  deprecated_opt TOK_CONST type identifier '=' expr ';'
+  doc_opt TOK_CONST type identifier '=' expr ';'
   {
       OUString id(convertName($4));
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
@@ -2276,12 +2282,12 @@ constant:
           YYERROR;
           break;
       }
-      pad->members.emplace_back(id, v, annotations($1));
+      pad->members.emplace_back(id, v, annotations($1), data->documentation);
   }
 ;
 
 singleInterfaceBasedServiceDefn:
-  deprecated_opt published_opt TOK_SERVICE identifier singleInheritance
+  doc_opt published_opt TOK_SERVICE identifier singleInheritance
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -2335,7 +2341,7 @@ singleInterfaceBasedServiceDefn:
                   data->currentName,
                   unoidl::detail::SourceProviderEntity(
                       new unoidl::detail::SourceProviderSingleInterfaceBasedServiceEntityPad(
-                          $2, base))).
+                          $2, base, data->documentation))).
           second)
       {
           error(@4, yyscanner, "multiple entities named " + data->currentName);
@@ -2367,7 +2373,7 @@ singleInterfaceBasedServiceDefn:
               unoidl::SingleInterfaceBasedServiceEntity::Constructor());
       }
       ent->entity = new unoidl::SingleInterfaceBasedServiceEntity(
-          pad->isPublished(), pad->base, std::move(ctors), annotations($1));
+          pad->isPublished(), pad->base, std::move(ctors), annotations($1), pad->doc());
       ent->pad.clear();
       clearCurrentState(data);
   }
@@ -2384,7 +2390,7 @@ ctors:
 ;
 
 ctor:
-  deprecated_opt identifier
+  doc_opt identifier
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       OUString id(convertName($2));
@@ -2403,7 +2409,7 @@ ctor:
       }
       pad->constructors.push_back(
           unoidl::detail::SourceProviderSingleInterfaceBasedServiceEntityPad::Constructor(
-              id, annotations($1)));
+              id, annotations($1), data->documentation));
   }
   '(' ctorParams_opt ')' exceptionSpec_opt ';'
   {
@@ -2539,7 +2545,7 @@ ellipsis_opt:
 | /* empty */ { $$ = false; }
 
 accumulationBasedServiceDefn:
-  deprecated_opt published_opt TOK_SERVICE identifier
+  doc_opt published_opt TOK_SERVICE identifier
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -2548,14 +2554,14 @@ accumulationBasedServiceDefn:
                   data->currentName,
                   unoidl::detail::SourceProviderEntity(
                       new unoidl::detail::SourceProviderAccumulationBasedServiceEntityPad(
-                          $2))).
+                          $2, data->documentation))).
           second)
       {
           error(@4, yyscanner, "multiple entities named " + data->currentName);
           YYERROR;
       }
   }
-  '{' serviceMembers '}' ';'
+  '{' serviceMembers doc_opt '}' ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       unoidl::detail::SourceProviderEntity * ent = getCurrentEntity(data);
@@ -2567,7 +2573,7 @@ accumulationBasedServiceDefn:
           pad->isPublished(), std::move(pad->directMandatoryBaseServices),
           std::move(pad->directOptionalBaseServices), std::move(pad->directMandatoryBaseInterfaces),
           std::move(pad->directOptionalBaseInterfaces), std::move(pad->directProperties),
-          annotations($1));
+          annotations($1), pad->doc());
       ent->pad.clear();
       clearCurrentState(data);
   }
@@ -2585,7 +2591,7 @@ serviceMember:
 ;
 
 serviceBase:
-  deprecated_opt flagSection_opt TOK_SERVICE name ';'
+  doc_opt flagSection_opt TOK_SERVICE name ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       OUString name(convertName($4));
@@ -2638,12 +2644,12 @@ serviceBase:
               YYERROR;
           }
       }
-      v.emplace_back(name, annotations($1));
+      v.emplace_back(name, annotations($1), data->documentation);
   }
 ;
 
 serviceInterfaceBase:
-  deprecated_opt flagSection_opt TOK_INTERFACE name ';'
+  doc_opt flagSection_opt TOK_INTERFACE name ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       OUString name(convertName($4));
@@ -2715,12 +2721,12 @@ serviceInterfaceBase:
               YYERROR;
           }
       }
-      v.emplace_back(name, annotations($1));
+      v.emplace_back(name, annotations($1), data->documentation);
   }
 ;
 
 serviceProperty:
-  deprecated_opt flagSection type identifier ';'
+  doc_opt flagSection type identifier ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       unoidl::detail::SourceProviderType t(*$3);
@@ -2805,12 +2811,12 @@ serviceProperty:
       pad->directProperties.emplace_back(
           id, t.getName(),
           unoidl::AccumulationBasedServiceEntity::Property::Attributes(att),
-          annotations($1));
+          annotations($1), data->documentation);
   }
 ;
 
 interfaceBasedSingletonDefn:
-  deprecated_opt published_opt TOK_SINGLETON identifier singleInheritance ';'
+  doc_opt published_opt TOK_SINGLETON identifier singleInheritance ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -2865,7 +2871,7 @@ interfaceBasedSingletonDefn:
                   unoidl::detail::SourceProviderEntity(
                       unoidl::detail::SourceProviderEntity::KIND_LOCAL,
                       new unoidl::InterfaceBasedSingletonEntity(
-                          $2, base, annotations($1)))).
+                          $2, base, annotations($1), data->documentation))).
           second)
       {
           error(@4, yyscanner, "multiple entities named " + name);
@@ -2876,7 +2882,7 @@ interfaceBasedSingletonDefn:
 ;
 
 serviceBasedSingletonDefn:
-  deprecated_opt published_opt TOK_SINGLETON identifier '{' TOK_SERVICE name ';'
+  doc_opt published_opt TOK_SINGLETON identifier '{' TOK_SERVICE name ';'
   '}' ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
@@ -2915,7 +2921,7 @@ serviceBasedSingletonDefn:
                   unoidl::detail::SourceProviderEntity(
                       unoidl::detail::SourceProviderEntity::KIND_LOCAL,
                       new unoidl::ServiceBasedSingletonEntity(
-                          $2, base, annotations($1)))).
+                          $2, base, annotations($1), data->documentation))).
           second)
       {
           error(@4, yyscanner, "multiple entities named " + name);
@@ -3015,7 +3021,7 @@ exceptions:
 ;
 
 interfaceDecl:
-  deprecated_opt/*ignored*/ published_opt TOK_INTERFACE identifier ';'
+  doc_opt published_opt TOK_INTERFACE identifier ';'
   {
       unoidl::detail::SourceProviderScannerData * data = yyget_extra(yyscanner);
       data->publishedContext = $2;
@@ -3026,7 +3032,7 @@ interfaceDecl:
                   unoidl::detail::SourceProviderEntity(
                       $2
                       ? unoidl::detail::SourceProviderEntity::KIND_PUBLISHED_INTERFACE_DECL
-                      : unoidl::detail::SourceProviderEntity::KIND_INTERFACE_DECL)));
+                      : unoidl::detail::SourceProviderEntity::KIND_INTERFACE_DECL, data->documentation)));
       if (!p.second) {
           switch (p.first->second.kind) {
           case unoidl::detail::SourceProviderEntity::KIND_INTERFACE_DECL:
@@ -3971,7 +3977,7 @@ identifier:
 | TOK_SET { $$ = new OString("set"); }
 ;
 
-deprecated_opt:
+doc_opt:
   TOK_DEPRECATED { $$ = true; }
 | /* empty */ { $$ = false; }
 ;

@@ -29,7 +29,9 @@
 #include <ostream>
 
 #include "com/sun/star/uno/Reference.h"
+#if !defined SAL_NO_EXCEPTIONS
 #include "com/sun/star/uno/RuntimeException.hpp"
+#endif
 #include "com/sun/star/uno/XInterface.hpp"
 #include "com/sun/star/uno/Any.hxx"
 #include "cppu/cppudllapi.h"
@@ -77,12 +79,16 @@ inline XInterface * Reference< interface_type >::iquery(
 inline XInterface * BaseReference::iquery_throw(
     XInterface * pInterface, const Type & rType )
 {
+#if defined SAL_NO_EXCEPTIONS
+    return iquery(pInterface, rType);
+#else
     XInterface * pQueried = iquery( pInterface, rType );
     if (pQueried)
         return pQueried;
     throw RuntimeException(
         ::rtl::OUString( cppu_unsatisfied_iquery_msg( rType.getTypeLibType() ), SAL_NO_ACQUIRE ),
         Reference< XInterface >( pInterface ) );
+#endif
 }
 
 template< class interface_type >
@@ -102,9 +108,13 @@ inline interface_type * Reference< interface_type >::iset_throw(
         castToXInterface(pInterface)->acquire();
         return pInterface;
     }
+#if defined SAL_NO_EXCEPTIONS
+    return pInterface;
+#else
     throw RuntimeException(
         ::rtl::OUString( cppu_unsatisfied_iset_msg( interface_type::static_type().getTypeLibType() ), SAL_NO_ACQUIRE ),
         NULL );
+#endif
 }
 
 template< class interface_type >
@@ -390,17 +400,21 @@ inline bool BaseReference::operator == ( XInterface * pInterface ) const
 {
     if (_pInterface == pInterface)
         return true;
+#if !defined SAL_NO_EXCEPTIONS
     try
     {
+#endif
         // only the query to XInterface must return the same pointer if they belong to same objects
         Reference< XInterface > x1( _pInterface, UNO_QUERY );
         Reference< XInterface > x2( pInterface, UNO_QUERY );
         return (x1._pInterface == x2._pInterface);
+#if !defined SAL_NO_EXCEPTIONS
     }
     catch (RuntimeException &)
     {
         return false;
     }
+#endif
 }
 
 
@@ -409,17 +423,21 @@ inline bool BaseReference::operator < (
 {
     if (_pInterface == rRef._pInterface)
         return false;
+#if !defined SAL_NO_EXCEPTIONS
     try
     {
+#endif
         // only the query to XInterface must return the same pointer:
         Reference< XInterface > x1( _pInterface, UNO_QUERY );
         Reference< XInterface > x2( rRef, UNO_QUERY );
         return (x1._pInterface < x2._pInterface);
+#if !defined SAL_NO_EXCEPTIONS
     }
     catch (RuntimeException &)
     {
         return false;
     }
+#endif
 }
 
 

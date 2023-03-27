@@ -63,6 +63,7 @@ $(eval $(call gb_Helper_register_executables,NONE, \
 	ulfex \
 	unoidl-read \
 	unoidl-write \
+	unoidl-v8 \
 	xrmex \
 	$(if $(filter-out ANDROID iOS WNT,$(OS)), \
         svdemo \
@@ -78,17 +79,15 @@ $(eval $(call gb_Helper_register_executables,NONE, \
     visualbackendtest \
 	$(if $(and $(ENABLE_GTK3), $(filter LINUX %BSD SOLARIS,$(OS))), gtktiledviewer) \
 	$(if $(and $(ENABLE_GTKTILEDVIEWER), $(filter WNT,$(OS))), gtktiledviewer) \
-))
-
-$(eval $(call gb_Helper_register_executables_for_install,SDK,sdk, \
 	$(if $(filter MSC,$(COM)),$(if $(filter-out AARCH64,$(CPUNAME)),climaker)) \
 	cppumaker \
 	idlc \
 	javamaker \
 	$(if $(filter UCPP,$(BUILD_TYPE)),ucpp) \
-	$(if $(filter ODK,$(BUILD_TYPE)),unoapploader) \
 	unoidl-check \
-	$(if $(filter ODK,$(BUILD_TYPE)),uno-skeletonmaker) \
+))
+
+$(eval $(call gb_Helper_register_executables_for_install,SDK,sdk, \
 ))
 
 $(eval $(call gb_Helper_register_executables_for_install,OOO,brand, \
@@ -852,6 +851,7 @@ $(eval $(call gb_Helper_register_packages_for_install,sdk,\
 	odk_examples \
 	odk_headers \
 	odk_headers_generated \
+	unov8_headers_generated \
 	odk_html \
 	odk_settings \
 	odk_settings_generated \
