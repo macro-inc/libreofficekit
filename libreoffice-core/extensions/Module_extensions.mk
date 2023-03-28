@@ -73,33 +73,6 @@ $(eval $(call gb_Module_add_check_targets,extensions,\
 endif
 endif
 
-ifeq ($(OS),WNT)
-
-ifeq ($(COM),MSC)
-$(eval $(call gb_Module_add_targets,extensions,\
-	WinResTarget_activex \
-	Library_so_activex \
-	CustomTarget_so_activex_idl \
-))
-
-ifeq ($(BUILD_X64),TRUE)
-$(eval $(call gb_Module_add_targets,extensions,\
-	CustomTarget_so_activex_x64 \
-	Library_so_activex_x64 \
-))
-endif # BUILD_X64
-endif # COM=MSC
-
-$(eval $(call gb_Module_add_targets,extensions,\
-	Library_oleautobridge \
-))
-
-# $(eval $(call gb_Module_add_subsequentcheck_targets,extensions,\
-# 	CustomTarget_automationtest \
-# ))
-
-endif # WNT
-
 # ifeq ($(OS),MACOSX)
 # $(eval $(call gb_Module_add_targets,extensions,\
 # 	Library_OOoSpotlightImporter \

@@ -20,22 +20,4 @@ $(eval $(call gb_Module_add_targets,setup_native,\
 	) \
 ))
 
-ifeq ($(OS),WNT)
-$(eval $(call gb_Module_add_targets,setup_native,\
-	Library_instooofiltmsi \
-	Library_inst_msu_msi \
-	Library_qslnkmsi \
-	Library_reg_dlls \
-	Library_reg4allmsdoc \
-	Library_regactivex \
-	Library_sdqsmsi \
-	Library_sellangmsi \
-	Library_shlxtmsi \
-	Library_sn_tools \
-	StaticLibrary_quickstarter \
-	StaticLibrary_seterror \
-))
-
-endif
-
 # vim: set noet sw=4 ts=4:
