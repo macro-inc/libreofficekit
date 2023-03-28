@@ -89,40 +89,40 @@ void unov8_init(UnoV8& uno_v8)
 
     uno_v8.initialized = 1;
     uno_v8.rtl = {
-        .uStringFromUtf8 = uStringFromUtf8,
-        .uStringToUtf8 = uStringToUtf8,
-        .uString_new_WithLength = rtl_uString_new_WithLength,
-        .uString_alloc = rtl_uString_alloc,
-        .uString_acquire = rtl_uString_acquire,
-        .uString_release = rtl_uString_release,
-        .string_acquire = rtl_string_acquire,
-        .string_release = rtl_string_release,
+        /* .uStringFromUtf8 = */ uStringFromUtf8,
+        /* .uStringToUtf8 = */ uStringToUtf8,
+        /* .uString_new_WithLength = */ rtl_uString_new_WithLength,
+        /* .uString_alloc = */ rtl_uString_alloc,
+        /* .uString_acquire = */ rtl_uString_acquire,
+        /* .uString_release = */ rtl_uString_release,
+        /* .string_acquire = */ rtl_string_acquire,
+        /* .string_release = */ rtl_string_release,
     };
     uno_v8.interface = {
-        .as = ::unov8::as,
-        .queryInterface = css::uno::cpp_queryInterface,
-        .acquire = css::uno::cpp_acquire,
-        .release = css::uno::cpp_release,
+        /* .as = */ ::unov8::as,
+        /* .queryInterface = */ css::uno::cpp_queryInterface,
+        /* .acquire = */ css::uno::cpp_acquire,
+        /* .release = */ css::uno::cpp_release,
     };
     uno_v8.type = {
-        .sequenceType = sequenceType,
-        .structType = ::unov8::structType,
-        .structTypeFromFQN = ::unov8::structTypeFromFQN,
-        .enumType = ::unov8::enumType,
-        .interfaceType = ::unov8::interfaceType,
-        .interfaceTypeFromFQN = ::unov8::interfaceTypeFromFQN,
-        .interfaceTypeFromId = ::unov8::interfaceType,
-        .getByTypeClass = typelib_static_type_getByTypeClass,
-        .acquire = typelib_typedescriptionreference_acquire,
-        .release = typelib_typedescriptionreference_release,
-        .dangerGet = TYPELIB_DANGER_GET,
-        .dangerRelease = TYPELIB_DANGER_RELEASE,
+        /* .sequenceType = */ sequenceType,
+        /* .structType = */ ::unov8::structType,
+        /* .structTypeFromFQN = */ ::unov8::structTypeFromFQN,
+        /* .enumType = */ ::unov8::enumType,
+        /* .interfaceType = */ ::unov8::interfaceType,
+        /* .interfaceTypeFromFQN = */ ::unov8::interfaceTypeFromFQN,
+        /* .interfaceTypeFromId = */ ::unov8::interfaceType,
+        /* .getByTypeClass = */ typelib_static_type_getByTypeClass,
+        /* .acquire = */ typelib_typedescriptionreference_acquire,
+        /* .release = */ typelib_typedescriptionreference_release,
+        /* .dangerGet = */ TYPELIB_DANGER_GET,
+        /* .dangerRelease = */ TYPELIB_DANGER_RELEASE,
     };
     uno_v8.sequence = {
-        .construct = sequence_construct,
-        .destroy = sequence_destroy,
+        /* .construct = */ sequence_construct,
+        /* .destroy = */ sequence_destroy,
     };
-    uno_v8.any = { .construct = any_construct, .destroy = any_destroy };
+    uno_v8.any = { /* .construct = */ any_construct, /* .destroy = */ any_destroy };
     ::unov8::methods::_init(&uno_v8.methods);
 }
 

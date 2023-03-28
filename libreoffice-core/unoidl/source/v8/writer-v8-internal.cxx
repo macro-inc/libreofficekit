@@ -110,7 +110,7 @@ void V8WriterInternal::writeInterfaceMethodsInit(OUString const& name,
             || declared.find(name.hashCode() ^ m.name.hashCode()) != declared.end())
             continue;
         declared.emplace(name.hashCode() ^ m.name.hashCode());
-        out("." + cName(name) + "_" + m.name + " = " + cName(name) + "_" + m.name + ",\n");
+        out(cName(name) + "_" + m.name + ",\n");
     }
     for (auto& i : entity->getDirectMandatoryBases()) {
         // acquire/release are handled on object create/destroy
