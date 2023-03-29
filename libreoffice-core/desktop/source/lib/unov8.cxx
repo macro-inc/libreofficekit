@@ -80,6 +80,21 @@ static typelib_TypeDescriptionReference* sequenceType(typelib_TypeDescriptionRef
     return p;
 }
 
+static uno_Any* writePropertyValue(const unsigned short* name, int name_len, void* element) {
+    rtl_uString* tmp_string;
+    rtl_uString_newFromStr_WithLength(&tmp_string, (sal_Unicode*)name, name_len);
+    rtl_uString_acquire(tmp_string);
+    css::beans::PropertyValue* prop_val = (css::beans::PropertyValue*)element;
+
+    prop_val->Name.pData = tmp_string;
+    prop_val->Value.pData = nullptr;
+    prop_val->Value.pReserved = nullptr;
+    prop_val->Value.pType = nullptr;
+    prop_val->State = css::beans::PropertyState_DIRECT_VALUE;
+
+    return &prop_val->Value;
+}
+
 } // namespace
 
 void unov8_init(UnoV8& uno_v8)
@@ -121,6 +136,7 @@ void unov8_init(UnoV8& uno_v8)
     uno_v8.sequence = {
         /* .construct = */ sequence_construct,
         /* .destroy = */ sequence_destroy,
+        writePropertyValue
     };
     uno_v8.any = { /* .construct = */ any_construct, /* .destroy = */ any_destroy };
     ::unov8::methods::_init(&uno_v8.methods);

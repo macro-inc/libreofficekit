@@ -92,6 +92,9 @@ extern "C"
 
         /** destroys a provided sequence **/
         void (*destroy)(uno_Sequence* value, typelib_TypeDescriptionReference* type);
+
+        /** writes a new beans.PropertyValue to (beans::PropertyValue*)element and returns the pointer to element.value */
+        uno_Any* (*writePropertyValue)(const unsigned short* name, int name_len, void* element);
     };
 
     struct _UnoV8Any

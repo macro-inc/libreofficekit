@@ -100,6 +100,7 @@
 #include <ndtxt.hxx>
 #include <strings.hrc>
 #include <bitmaps.hlst>
+#include "IDocumentUndoRedo.hxx"
 #include "unodefaults.hxx"
 #include "SwXDocumentSettings.hxx"
 #include <doc.hxx>
@@ -2432,6 +2433,80 @@ static void lcl_SavePrintUIOptionsToDocumentPrintData(
     aDocPrintData.SetPrintTextPlaceholder( rPrintUIOptions.IsPrintTextPlaceholders() );
 
     rDoc.getIDocumentDeviceAccess().setPrintData( aDocPrintData );
+}
+
+uno::Reference<text::XTextDocument> SAL_CALL SwXTextDocument::createHiddenClone() {
+    SolarMutexGuard aGuard;
+    if(!IsValid())
+    {
+        throw DisposedException( OUString(),
+                static_cast< XTextDocument* >(this) );
+    }
+
+    SfxObjectShellRef pShell = m_pDocShell->GetDoc()->CreateCopy(true, false);
+    SfxViewFrame* pWorkFrame = SfxViewFrame::LoadHiddenDocument(*pShell, SFX_INTERFACE_NONE);
+
+    uno::Reference< frame::XModel > xNewModel = pShell->GetModel();
+    // uno::Reference< embed::XStorage > xNewStorage = ::comphelper::OStorageHelper::GetTemporaryStorage( );
+    // uno::Sequence< beans::PropertyValue > aTempMediaDescriptor;
+    // storeToStorage( xNewStorage, aTempMediaDescriptor );
+    // uno::Reference< document::XStorageBasedDocument > xStorageDoc( xNewModel, uno::UNO_QUERY );
+    // xStorageDoc->loadFromStorage( xNewStorage, aTempMediaDescriptor );
+
+    SwView* pWorkView = static_cast<SwView*>(pWorkFrame->GetViewShell());
+    SwWrtShell* pWorkWrtShell = pWorkView->GetWrtShellPtr();
+    // pWorkWrtShell->GetViewOptions()->SetIdle( false );
+    // pWorkView->AttrChangedNotify(nullptr);
+    SwDoc* pWorkDoc = pWorkWrtShell->GetDoc();
+    pWorkDoc->GetIDocumentUndoRedo().DoUndo( false );
+
+    pWorkDoc->ReplaceDocumentProperties(*m_pDocShell->GetDoc());
+    pWorkWrtShell->SetLabelDoc(m_pDocShell->GetWrtShell()->IsLabelDoc());
+    pWorkDoc->getIDocumentState().ResetModified();
+
+    // pWorkWrtShell->GetViewOptions()->SetIdle( true );
+    pWorkDoc->GetIDocumentUndoRedo().DoUndo( true );
+
+    return uno::Reference< text::XTextDocument >( xNewModel, UNO_QUERY_THROW );
+}
+
+void SAL_CALL SwXTextDocument::startBatchUpdate() {
+    SolarMutexGuard aGuard;
+    if(!IsValid())
+    {
+        throw DisposedException( OUString(), static_cast< XTextDocument* >(this) );
+    }
+
+    SwView* pWorkView = static_cast<SwView*>(m_pDocShell->GetViewShell());
+    SwWrtShell* pWorkWrtShell = pWorkView->GetWrtShellPtr();
+    pWorkWrtShell->GetViewOptions()->SetIdle( false );
+    pWorkView->AttrChangedNotify(nullptr);
+    SwDoc* pWorkDoc = pWorkWrtShell->GetDoc();
+    pWorkDoc->GetIDocumentUndoRedo().DoUndo( false );
+    for ( auto aLayout : pWorkDoc->GetAllLayouts() )
+        aLayout->FreezeLayout(true);
+    RedlineFlags eOld = pWorkDoc->getIDocumentRedlineAccess().GetRedlineFlags();
+    pWorkDoc->getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld | RedlineFlags::Ignore );
+}
+
+void SAL_CALL SwXTextDocument::finishBatchUpdate() {
+    SwView* pWorkView = static_cast<SwView*>(m_pDocShell->GetViewShell());
+    SwWrtShell* pWorkWrtShell = pWorkView->GetWrtShellPtr();
+    SwDoc* pWorkDoc = pWorkWrtShell->GetDoc();
+
+    pWorkDoc->SetAllUniqueFlyNames();
+
+    // Unfreeze target document layouts and correct all PageDescs.
+    pWorkWrtShell->CalcLayout();
+    pWorkWrtShell->GetViewOptions()->SetIdle( true );
+    pWorkDoc->GetIDocumentUndoRedo().DoUndo( true );
+    for ( auto aLayout : pWorkWrtShell->GetDoc()->GetAllLayouts() )
+    {
+        aLayout->FreezeLayout(false);
+        aLayout->AllCheckPageDescs();
+    }
+    RedlineFlags eOld = pWorkDoc->getIDocumentRedlineAccess().GetRedlineFlags();
+    pWorkDoc->getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld & ~RedlineFlags::Ignore );
 }
 
 sal_Int32 SAL_CALL SwXTextDocument::getRendererCount(

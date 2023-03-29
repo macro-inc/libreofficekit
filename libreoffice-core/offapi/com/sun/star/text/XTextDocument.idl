@@ -45,6 +45,15 @@ published interface XTextDocument: com::sun::star::frame::XModel
      */
     void reformat();
 
+    /** @returns a copy of the document that is rendered, but not visible */
+    com::sun::star::text::XTextDocument createHiddenClone();
+
+    /** batch updates by manually triggering layout refresh and other events at the end of the batch */
+    void startBatchUpdate();
+
+    /** finishes a previous batch update and manually triggers a layout refresh */
+    void finishBatchUpdate();
+
 };
 
 

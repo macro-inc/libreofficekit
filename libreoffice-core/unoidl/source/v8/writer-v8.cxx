@@ -123,6 +123,7 @@ void V8Writer::writeHeaderIncludes() {
 #pragma once
 
 #include <tuple>
+#include <vector>
 #include "v8/include/v8-isolate.h"
 #include "v8/include/v8-local-handle.h"
 #include "v8/include/v8-primitive.h"
@@ -183,6 +184,7 @@ inline void AnySimpleValue(v8::Isolate* isolate, v8::Local<v8::Value> val, void*
 inline v8::Local<v8::Value> Any(v8::Isolate* isolate, uno_Any* val);
 inline void Any(v8::Isolate* isolate, v8::Local<v8::Value> val, uno_Any* dest);
 inline v8::Local<v8::Value> As(v8::Isolate* isolate, void* inst, std::string_view typeName);
+inline uno_Sequence* PropertyValueSequence(v8::Isolate* isolate, v8::Local<v8::Value> val);
     )");
 
     out("}\n");
@@ -197,6 +199,7 @@ if (err == nullptr) return;
 auto v8_err = v8::String::NewFromTwoByte(isolate, err->buffer, v8::NewStringType::kNormal, err->length).ToLocalChecked();
 electron::office::OfficeClient::GetUnoV8().rtl.uString_release(err);
 isolate->ThrowException(v8::Exception::Error(v8_err));
+// isolate->TerminateExecution();
 }
 
 class Type : public gin::Wrappable<Type> {
@@ -229,7 +232,8 @@ class Type : public gin::Wrappable<Type> {
 namespace convert {
 
 inline void ThrowTypeError(v8::Isolate* isolate, const char* message) {
-    isolate->ThrowException(v8::Exception::TypeError(gin::StringToV8(isolate, message)));
+    isolate->ThrowException(v8::Exception::Error(gin::StringToV8(isolate, message)));
+    // isolate->TerminateExecution();
 }
 
 inline sal_Bool Bool(v8::Isolate* isolate, v8::Local<v8::Value> val) {
@@ -359,7 +363,7 @@ inline sal_Unicode Char(v8::Isolate* isolate, v8::Local<v8::Value> val) {
     }
     v8::Local<v8::String> str = v8::Local<v8::String>::Cast(val);
     sal_Unicode result = 0;
-    str->Write(isolate, &result, 0, 1);
+    str->Write(isolate, (uint16_t*)(&result), 0, 1);
     return result;
 }
 
@@ -374,12 +378,12 @@ inline rtl_uString* String(v8::Isolate* isolate, v8::Local<v8::Value> val) {
     }
     v8::Local<v8::String> str = v8::Local<v8::String>::Cast(val);
     rtl_uString* result = electron::office::OfficeClient::GetUnoV8().rtl.uString_alloc(str->Length());
-    if (!val->IsString()) {
+    if (!result) {
         ThrowTypeError(isolate, "unable to allocate UNO UString string");
         return nullptr;
     }
 
-    str->Write(isolate, result->buffer, 0, str->Length());
+    str->Write(isolate, (uint16_t*)(result->buffer), 0, str->Length());
     return result;
 }
 
@@ -506,7 +510,8 @@ inline void Any(v8::Isolate* isolate, v8::Local<v8::Value> val, uno_Any* dest) {
     } else if (val->IsString()) {
         typeClass = typelib_TypeClass_STRING;
         c_type = *api.type.getByTypeClass(typeClass);
-        c_value = String(isolate, val);
+        c_value = new (rtl_uString*);
+        *static_cast<rtl_uString**>(c_value) = String(isolate, val);
     } else if (val->IsUint32()) {
         typeClass = typelib_TypeClass_UNSIGNED_LONG;
         c_type = *api.type.getByTypeClass(typeClass);
@@ -538,11 +543,13 @@ inline void Any(v8::Isolate* isolate, v8::Local<v8::Value> val, uno_Any* dest) {
             ThrowTypeError(isolate, "unable to convert value to uno_Any, invalid object: expected an UNO interface, TODO: support struct");
             return;
         }
+        typeClass = typelib_TypeClass_INTERFACE;
+        c_value = new (void**);
 )");
 
     for (auto& i : interfaces) {
         out("if (info == &unoclass::" + cName(i.first) + "::kWrapperInfo) {\n");
-        out("c_value = static_cast<unoclass::" + cName(i.first)
+        out("*static_cast<void**>(c_value) = static_cast<unoclass::" + cName(i.first)
             + "*>(obj->GetAlignedPointerFromInternalField(gin::kEncodedValueIndex))->Get();\n");
         out("c_type = "
             "electron::office::OfficeClient::GetUnoV8().type.interfaceTypeFromId(convert::hash(\""
@@ -577,6 +584,12 @@ inline void Any(v8::Isolate* isolate, v8::Local<v8::Value> val, uno_Any* dest) {
             break;
         case typelib_TypeClass_HYPER:
             delete static_cast<sal_Int64*>(c_value);
+            break;
+        case typelib_TypeClass_STRING:
+            delete static_cast<rtl_uString**>(c_value);
+            break;
+        case typelib_TypeClass_INTERFACE:
+            delete static_cast<void**>(c_value);
             break;
         default: break;
     }
@@ -682,7 +695,6 @@ inline uno_Sequence* Sequence(v8::Isolate* isolate, v8::Local<v8::Value> val, ty
     typelib_TypeClass typeClass = elTypeRef->eTypeClass;
     if (typeClass == typelib_TypeClass_INTERFACE || typeClass == typelib_TypeClass_STRUCT) {
         unov8_.type.release(typeRef);
-        unov8_.type.release(elTypeRef);
         convert::ThrowTypeError(isolate, "Converting an array to sequences of interfaces or structs at runtime is not supported");
         return nullptr;
     }
@@ -693,7 +705,6 @@ inline uno_Sequence* Sequence(v8::Isolate* isolate, v8::Local<v8::Value> val, ty
         if (!array->Get(isolate->GetCurrentContext(), i).ToLocal(&v8_item) || !IsValueClassType(isolate, v8_item, typeClass)) {
             delete[] elements;
             unov8_.type.release(typeRef);
-            unov8_.type.release(elTypeRef);
             convert::ThrowTypeError(isolate, "Unable to construct sequence from an array, elements must all be the same type in the sequence");
             return nullptr;
         }
@@ -704,7 +715,57 @@ inline uno_Sequence* Sequence(v8::Isolate* isolate, v8::Local<v8::Value> val, ty
 
     delete[] elements;
     unov8_.type.release(typeRef);
-    unov8_.type.release(elTypeRef);
+    return result;
+}
+
+inline uno_Sequence* PropertyValueSequence(v8::Isolate* isolate, v8::Local<v8::Value> val) {
+    auto& unov8_ = electron::office::OfficeClient::GetUnoV8();
+    if (!val->IsObject()) {
+        convert::ThrowTypeError(isolate, "Attempted to convert a non-array into a UNO sequence of property values");
+        return nullptr;
+    }
+    v8::Local<v8::Object> v8_object = val.As<v8::Object>();
+    typelib_TypeDescriptionReference* elTypeRef = unov8_.type.structType(convert::hash("beans.PropertyValue"));
+    typelib_TypeDescriptionReference* typeRef = unov8_.type.sequenceType(elTypeRef);
+    typelib_TypeDescription* elTypeDesc = nullptr;
+    unov8_.type.dangerGet(&elTypeDesc, elTypeRef);
+    int elSize = elTypeDesc->nSize;
+    unov8_.type.dangerRelease(elTypeDesc);
+
+    int valid_length = 0;
+
+    v8::Local<v8::Context> context = isolate->GetCurrentContext();
+    v8::Local<v8::Array> property_names(v8_object->GetOwnPropertyNames(context).ToLocalChecked());
+
+    char *elements = new char[elSize * property_names->Length()];
+    for (uint32_t i = 0; i < property_names->Length(); ++i) {
+        v8::Local<v8::Value> key(property_names->Get(context, i).ToLocalChecked());
+
+        if (!key->IsString()) {
+            continue;
+        }
+
+        v8::Local<v8::String> key_string = key->ToString(context).ToLocalChecked();
+        // Skip all callbacks
+        if (v8_object->HasRealNamedCallbackProperty(context, key_string).ToChecked()) {
+            continue;
+        }
+
+        v8::Local<v8::Value> child_v8;
+        if (!v8_object->Get(context, key).ToLocal(&child_v8))
+            continue;
+
+        v8::String::Value name(isolate, key_string);
+
+        void *el = elements + elSize * valid_length;
+        uno_Any* any_val = unov8_.sequence.writePropertyValue(*name, name.length(), el);
+        Any(isolate, child_v8, any_val);
+
+        valid_length++;
+    }
+    uno_Sequence* result = unov8_.sequence.construct(typeRef, elements, valid_length);
+    delete[] elements;
+    unov8_.type.release(typeRef);
     return result;
 }
 
@@ -1647,7 +1708,11 @@ void V8Writer::writeMethodParamsConstructors(const unoidl::InterfaceTypeEntity::
             if (rank > 1) {
                 out("convert::ThrowTypeError(isolate, \"TODO: Converting to a nested array "
                     "unsupported\");\n");
+            } else if (nucl == "com.sun.star.beans.PropertyValue") {
+                out(a.name + " = convert::PropertyValueSequence(isolate, v8_" + a.name + ");\n");
             } else if (isEntity) {
+                // special exception for PropertyValue sequences, read it as an object
+
                 switch (entities_[nucl]->entity->getSort()) {
                     case unoidl::Entity::SORT_INTERFACE_TYPE:
                         out("{\n");

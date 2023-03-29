@@ -229,6 +229,9 @@ public:
     //XTextDocument
     virtual css::uno::Reference< css::text::XText >  SAL_CALL getText() override;
     virtual void SAL_CALL reformat() override;
+    virtual css::uno::Reference< css::text::XTextDocument >  SAL_CALL createHiddenClone() override;
+    virtual void SAL_CALL startBatchUpdate() override;
+    virtual void SAL_CALL finishBatchUpdate() override;
 
     //XModel
     virtual sal_Bool SAL_CALL attachResource( const OUString& aURL, const css::uno::Sequence< css::beans::PropertyValue >& aArgs ) override;

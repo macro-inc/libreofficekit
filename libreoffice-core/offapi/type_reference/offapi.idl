@@ -14265,6 +14265,9 @@ module com {
      interface ::com::sun::star::frame::XModel;
      ::com::sun::star::text::XText getText();
      void reformat();
+     ::com::sun::star::text::XTextDocument createHiddenClone();
+     void startBatchUpdate();
+     void finishBatchUpdate();
     };
     published interface XTextEmbeddedObjectsSupplier {
      interface ::com::sun::star::uno::XInterface;
