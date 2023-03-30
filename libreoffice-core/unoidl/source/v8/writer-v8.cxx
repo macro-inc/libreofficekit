@@ -196,7 +196,7 @@ namespace unoclass {
 
 inline void MaybeThrowErr(v8::Isolate* isolate, rtl_uString* err) {
 if (err == nullptr) return;
-auto v8_err = v8::String::NewFromTwoByte(isolate, err->buffer, v8::NewStringType::kNormal, err->length).ToLocalChecked();
+auto v8_err = v8::String::NewFromTwoByte(isolate, (uint16_t*)(err->buffer), v8::NewStringType::kNormal, err->length).ToLocalChecked();
 electron::office::OfficeClient::GetUnoV8().rtl.uString_release(err);
 isolate->ThrowException(v8::Exception::Error(v8_err));
 // isolate->TerminateExecution();
@@ -368,7 +368,7 @@ inline sal_Unicode Char(v8::Isolate* isolate, v8::Local<v8::Value> val) {
 }
 
 inline v8::Local<v8::Value> Char(v8::Isolate* isolate, sal_Unicode val) {
-    return v8::String::NewFromTwoByte(isolate, &val, v8::NewStringType::kNormal, 1).ToLocalChecked().As<v8::Value>();
+    return v8::String::NewFromTwoByte(isolate, (uint16_t*)(&val), v8::NewStringType::kNormal, 1).ToLocalChecked().As<v8::Value>();
 }
 
 inline rtl_uString* String(v8::Isolate* isolate, v8::Local<v8::Value> val) {
@@ -388,7 +388,7 @@ inline rtl_uString* String(v8::Isolate* isolate, v8::Local<v8::Value> val) {
 }
 
 inline v8::Local<v8::Value> String(v8::Isolate* isolate, rtl_uString* val) {
-    auto result = v8::String::NewFromTwoByte(isolate, val->buffer, v8::NewStringType::kNormal, val->length).ToLocalChecked().As<v8::Value>();
+    auto result = v8::String::NewFromTwoByte(isolate, (uint16_t*)(val->buffer), v8::NewStringType::kNormal, val->length).ToLocalChecked().As<v8::Value>();
     electron::office::OfficeClient::GetUnoV8().rtl.uString_release(val);
     return result;
 }
