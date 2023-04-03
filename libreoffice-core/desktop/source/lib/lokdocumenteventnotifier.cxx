@@ -120,34 +120,34 @@ void SAL_CALL doceventnotifier::LokDocumentEventNotifier::documentEventOccured(
 
     if (aEvent.EventName.equalsIgnoreAsciiCase("OnNew"))
     {
-        m_pCallback(LOK_DOC_CALLBACK_ON_NEW, "done", m_pData);
+        m_pCallback(LOK_DOC_CALLBACK_ON_NEW, nullptr, m_pData);
     }
     else if (aEvent.EventName.equalsIgnoreAsciiCase("OnLoad"))
     {
-        m_pCallback(LOK_DOC_CALLBACK_ON_LOAD, "done", m_pData);
+        m_pCallback(LOK_DOC_CALLBACK_ON_LOAD, nullptr, m_pData);
     }
     else if (aEvent.EventName.equalsIgnoreAsciiCase("OnSave"))
     {
-        m_pCallback(LOK_DOC_CALLBACK_ON_SAVE, "done", m_pData);
+        m_pCallback(LOK_DOC_CALLBACK_ON_SAVE, nullptr, m_pData);
     }
     else if (aEvent.EventName.equalsIgnoreAsciiCase("OnSaveDone"))
     {
-        m_pCallback(LOK_DOC_CALLBACK_ON_SAVE_DONE, "done", m_pData);
+        m_pCallback(LOK_DOC_CALLBACK_ON_SAVE_DONE, nullptr, m_pData);
     }
     else if (aEvent.EventName.equalsIgnoreAsciiCase("OnSaveAs"))
     {
-        m_pCallback(LOK_DOC_CALLBACK_ON_SAVE_AS, "done", m_pData);
+        m_pCallback(LOK_DOC_CALLBACK_ON_SAVE_AS, nullptr, m_pData);
     }
     else if (aEvent.EventName.equalsIgnoreAsciiCase("OnSaveAsDone"))
     {
-        m_pCallback(LOK_DOC_CALLBACK_ON_SAVE_AS_DONE, "done", m_pData);
+        m_pCallback(LOK_DOC_CALLBACK_ON_SAVE_AS_DONE, nullptr, m_pData);
     }
     else if (aEvent.EventName.equalsIgnoreAsciiCase("OnTitleChanged"))
     {
-        m_pCallback(LOK_DOC_CALLBACK_ON_TITLE_CHANGED, "done", m_pData);
+        m_pCallback(LOK_DOC_CALLBACK_ON_TITLE_CHANGED, nullptr, m_pData);
     }
     else if (aEvent.EventName.equalsIgnoreAsciiCase("OnModeChanged"))
     {
-        m_pCallback(LOK_DOC_CALLBACK_ON_MODE_CHANGED, "done", m_pData);
+        m_pCallback(LOK_DOC_CALLBACK_ON_MODE_CHANGED, nullptr, m_pData);
     }
 }

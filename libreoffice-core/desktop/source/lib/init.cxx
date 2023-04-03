@@ -4009,7 +4009,7 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
     {
         uno::Reference<css::lang::XComponent> mxOwner(pDocument->mxComponent, uno::UNO_QUERY);
 
-        pDocument->m_lokDocEventNotifier = new doceventnotifier::LokDocumentEventNotifier(pDocument->mxComponent, mxOwner, pCallback, pData);
+        pDocument->m_lokDocEventNotifier = std::make_unique<doceventnotifier::LokDocumentEventNotifier>(pDocument->mxComponent, mxOwner, pCallback, pData);
 
         for (const auto& pair : pDocument->mpCallbackFlushHandlers)
         {
@@ -4044,6 +4044,9 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
     }
     else
     {
+        if (pDocument->m_lokDocEventNotifier) {
+            pDocument->m_lokDocEventNotifier.reset(nullptr);
+        }
         if (SfxViewShell* pViewShell = SfxViewShell::Current())
         {
             pViewShell->setLibreOfficeKitViewCallback(nullptr);
