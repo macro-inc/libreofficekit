@@ -502,16 +502,16 @@ inline void Any(v8::Isolate* isolate, v8::Local<v8::Value> val, uno_Any* dest) {
     typelib_TypeClass typeClass = typelib_TypeClass_VOID;
     if (val->IsNullOrUndefined()) {
         c_type = *api.type.getByTypeClass(typeClass);
-    } else if (val->IsBoolean()) {
-        typeClass = typelib_TypeClass_BOOLEAN;
-        c_type = *api.type.getByTypeClass(typeClass);
-        c_value = new sal_Bool;
-        *static_cast<sal_Bool*>(c_value) = val->IsTrue() ? sal_True : sal_False;
     } else if (val->IsString()) {
         typeClass = typelib_TypeClass_STRING;
         c_type = *api.type.getByTypeClass(typeClass);
         c_value = new (rtl_uString*);
         *static_cast<rtl_uString**>(c_value) = String(isolate, val);
+    } else if (val->IsBoolean()) {
+        typeClass = typelib_TypeClass_BOOLEAN;
+        c_type = *api.type.getByTypeClass(typeClass);
+        c_value = new sal_Bool;
+        *static_cast<sal_Bool*>(c_value) = val->IsTrue() ? sal_True : sal_False;
     } else if (val->IsUint32()) {
         typeClass = typelib_TypeClass_UNSIGNED_LONG;
         c_type = *api.type.getByTypeClass(typeClass);
@@ -759,6 +759,13 @@ inline uno_Sequence* PropertyValueSequence(v8::Isolate* isolate, v8::Local<v8::V
 
         void *el = elements + elSize * valid_length;
         uno_Any* any_val = unov8_.sequence.writePropertyValue(*name, name.length(), el);
+        // prevents child_v8's internal value from being optimized-out by the compiler, TODO: figure out why it is optimzed-out?
+        std::ignore = child_v8->IsNullOrUndefined() ||
+            child_v8->IsString() ||
+            child_v8->IsBoolean() ||
+            child_v8->IsNumber() ||
+            child_v8->IsArray() ||
+            child_v8->IsObject();
         Any(isolate, child_v8, any_val);
 
         valid_length++;
