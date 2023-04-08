@@ -175,7 +175,7 @@ private:
 
     css::uno::Reference< css::beans::XPropertySet >             mxXLineNumberingProperties;
     css::uno::Reference< css::container::XNameAccess >          mxLinkTargetSupplier;
-    css::uno::Reference< css::container::XEnumerationAccess >   mxXRedlines;
+    css::uno::Reference< css::document::XRedlines >   mxXRedlines;
 
     //temporary frame to enable PDF export if no valid view is available
     SfxViewFrame*                                   m_pHiddenViewFrame;
@@ -359,7 +359,7 @@ public:
     virtual css::uno::Reference< css::container::XNameAccess >  SAL_CALL getLinks() override;
 
     //XRedlinesSupplier
-    virtual css::uno::Reference< css::container::XEnumerationAccess > SAL_CALL getRedlines(  ) override;
+    virtual css::uno::Reference< css::document::XRedlines > SAL_CALL getRedlines(  ) override;
 
     // css::util::XRefreshable
     virtual void SAL_CALL refresh() override;

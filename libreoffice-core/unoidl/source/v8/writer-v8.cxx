@@ -1299,10 +1299,12 @@ void V8Writer::writeException(OUString const& name,
 }
 
 void V8Writer::writeInterfaceMethodBuilder(OUString const& name,
-                                           unoidl::InterfaceTypeEntity* entity) {
+                                           unoidl::InterfaceTypeEntity* entity,
+                                           std::unordered_set<int>& declared) {
     for (auto& i : entity->getDirectMethods()) {
-        if (shouldSkipMethod(i))
+        if (shouldSkipMethod(i) || declared.find(i.name.hashCode()) != declared.end())
             continue;
+        declared.emplace(i.name.hashCode());
         out("\n.SetMethod(\"" + i.name + "\", &" + cName(name) + "::" + i.name + ")");
     }
     for (auto& i : entity->getDirectMandatoryBases()) {
@@ -1311,7 +1313,7 @@ void V8Writer::writeInterfaceMethodBuilder(OUString const& name,
             continue;
 
         auto* base_ent = static_cast<unoidl::InterfaceTypeEntity*>(entities_[i.name]->entity.get());
-        writeInterfaceMethodBuilder(name, base_ent);
+        writeInterfaceMethodBuilder(name, base_ent, declared);
     }
 }
 
@@ -1478,13 +1480,14 @@ void V8Writer::writeInterface(OUString const& name,
     data->SetFunctionTemplate(&kWrapperInfo, constructor);
   }
   return gin::ObjectTemplateBuilder(isolate, GetTypeName(), constructor->InstanceTemplate()))");
-    writeInterfaceMethodBuilder(name, entity.get());
+    std::unordered_set<int> declared{};
+    writeInterfaceMethodBuilder(name, entity.get(), declared);
     out("\n.SetMethod(\"as\", &" + cName(name) + "::As)");
 
     out(";\n"
         "}\n");
 
-    std::unordered_set<int> declared{};
+    declared.clear();
     writeInterfaceMethods(name, name, entity.get(), declared);
 
     out("v8::Local<v8::Value> " + cName(name) + "::As(v8::Isolate* isolate, std::string typeName)");

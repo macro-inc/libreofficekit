@@ -159,7 +159,7 @@ protected:
                                rtl::Reference<unoidl::ServiceBasedSingletonEntity> entity);
     void writeMethodParamsConstructors(const unoidl::InterfaceTypeEntity::Method& method);
     void writeMethodParamsDestructors(const unoidl::InterfaceTypeEntity::Method& method);
-    void writeInterfaceMethodBuilder(OUString const& name, unoidl::InterfaceTypeEntity* entity);
+    void writeInterfaceMethodBuilder(OUString const& name, unoidl::InterfaceTypeEntity* entity, std::unordered_set<int>& declared);
     void writeInterfaceMethods(OUString const& name, OUString const& className, unoidl::InterfaceTypeEntity* entity,
                                std::unordered_set<int>& declared);
     void writeMethodReturn(OUString const& type);

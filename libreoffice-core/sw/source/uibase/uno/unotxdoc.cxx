@@ -2158,7 +2158,7 @@ Reference< XNameAccess >  SwXTextDocument::getLinks()
     return mxLinkTargetSupplier;
 }
 
-Reference< XEnumerationAccess > SwXTextDocument::getRedlines(  )
+Reference< document::XRedlines > SwXTextDocument::getRedlines(  )
 {
     if(!mxXRedlines.is())
     {

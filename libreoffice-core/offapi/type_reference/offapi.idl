@@ -4916,9 +4916,17 @@ module com {
      boolean supportsMimeType([in] string MimeTypeName);
      sequence< string > getSupportedMimeTypeNames();
     };
+    published interface XRedlines {
+     interface com::sun::star::container::XEnumerationAccess;
+     interface com::sun::star::container::XIndexAccess;
+     void accept([in] long Index ) raises( com::sun::star::lang::IndexOutOfBoundsException, com::sun::star::lang::WrappedTargetException );
+     void reject([in] long Index ) raises( com::sun::star::lang::IndexOutOfBoundsException, com::sun::star::lang::WrappedTargetException );
+     void acceptAll();
+     void rejectAll();
+    };
     published interface XRedlinesSupplier {
      interface ::com::sun::star::uno::XInterface;
-     ::com::sun::star::container::XEnumerationAccess getRedlines();
+     ::com::sun::star::document::XRedlines getRedlines();
     };
    };
    module frame {

@@ -27,16 +27,16 @@ module com {   module sun {   module star {   module document {
 
 /** provides access to a container of the redline objects of the document.
  */
-published interface XRedlinesSupplier: com::sun::star::uno::XInterface
+published interface XRedlinesSupplier
 {
     /** @returns
-            an enumeration access that provides access to the redline objects of the document.
+            provides access to the redline objects of the document.
 
             <p>The returned objects implement at least the interface
             com::sun::star::beans::XPropertySet.
             Specific objects may support other interfaces as well.</p>
      */
-    com::sun::star::container::XEnumerationAccess getRedlines();
+    com::sun::star::document::XRedlines getRedlines();
 };
 
 

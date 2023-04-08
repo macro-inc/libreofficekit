@@ -106,6 +106,33 @@ uno::Sequence< OUString > SwXRedlines::getSupportedServiceNames()
     return uno::Sequence< OUString >();
 }
 
+void SwXRedlines::accept(sal_Int32 Index)
+{
+    IDocumentRedlineAccess& rAccess = GetDoc()->getIDocumentRedlineAccess();
+    const SwRedlineTable& rRedTable = rAccess.GetRedlineTable();
+    const sal_uInt32 index = o3tl::make_unsigned(Index);
+    if ((Index < 0) || (rRedTable.size() <= index))
+        throw lang::IndexOutOfBoundsException();
+    GetDoc()->getIDocumentRedlineAccess().AcceptRedline(index, true);
+}
+void SwXRedlines::reject(sal_Int32 Index)
+{
+    IDocumentRedlineAccess& rAccess = GetDoc()->getIDocumentRedlineAccess();
+    const SwRedlineTable& rRedTable = rAccess.GetRedlineTable();
+    const sal_uInt32 index = o3tl::make_unsigned(Index);
+    if ((Index < 0) || (rRedTable.size() <= index))
+        throw lang::IndexOutOfBoundsException();
+    GetDoc()->getIDocumentRedlineAccess().RejectRedline(index, true);
+}
+void SwXRedlines::acceptAll()
+{
+    GetDoc()->getIDocumentRedlineAccess().AcceptAllRedline(true);
+}
+void SwXRedlines::rejectAll()
+{
+    GetDoc()->getIDocumentRedlineAccess().AcceptAllRedline(false);
+}
+
 beans::XPropertySet* SwXRedlines::GetObject( SwRangeRedline& rRedline, SwDoc& rDoc )
 {
     SwXRedline* pXRedline(nullptr);

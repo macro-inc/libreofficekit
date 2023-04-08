@@ -25,7 +25,7 @@
 #include "unocoll.hxx"
 #include "unobaseclass.hxx"
 #include <svl/listener.hxx>
-#include <com/sun/star/container/XEnumerationAccess.hpp>
+#include <com/sun/star/document/XRedlines.hpp>
 
 class SwRangeRedline;
 namespace com::sun::star::beans { class XPropertySet; }
@@ -33,8 +33,7 @@ namespace com::sun::star::beans { class XPropertySet; }
 typedef
 cppu::WeakImplHelper
 <
-    css::container::XIndexAccess,
-    css::container::XEnumerationAccess,
+    css::document::XRedlines,
     css::lang::XServiceInfo
 >
 SwRedlinesBaseClass;
@@ -61,7 +60,13 @@ public:
     virtual sal_Bool SAL_CALL supportsService(const OUString& ServiceName) override;
     virtual css::uno::Sequence< OUString > SAL_CALL getSupportedServiceNames() override;
 
-    static css::beans::XPropertySet*           GetObject( SwRangeRedline& rRedline, SwDoc& rDoc );
+    //XRedlines
+    virtual void SAL_CALL accept(sal_Int32 Index) override;
+    virtual void SAL_CALL reject(sal_Int32 Index) override;
+    virtual void SAL_CALL acceptAll() override;
+    virtual void SAL_CALL rejectAll() override;
+
+    static css::beans::XPropertySet* GetObject( SwRangeRedline& rRedline, SwDoc& rDoc );
 };
 
 class SwXRedlineEnumeration final
