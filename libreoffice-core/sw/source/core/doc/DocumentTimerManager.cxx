@@ -48,9 +48,6 @@ DocumentTimerManager::DocumentTimerManager(SwDoc& i_rSwdoc)
 {
     m_aDocIdle.SetPriority(TaskPriority::LOWEST);
     m_aDocIdle.SetInvokeHandler(LINK(this, DocumentTimerManager, DoIdleJobs));
-
-    m_aFireIdleJobsTimer.SetInvokeHandler(LINK(this, DocumentTimerManager, FireIdleJobsTimeout));
-    m_aFireIdleJobsTimer.SetTimeout(1000); // Enough time for LOK to render the first tiles.
 }
 
 void DocumentTimerManager::StartIdling()
@@ -60,7 +57,6 @@ void DocumentTimerManager::StartIdling()
         // Start the idle jobs only after a certain delay.
         m_bWaitForLokInit = false;
         StopIdling();
-        m_aFireIdleJobsTimer.Start();
         return;
     }
 
@@ -68,43 +64,40 @@ void DocumentTimerManager::StartIdling()
     m_bStartOnUnblock = true;
     if (0 == m_nIdleBlockCount)
     {
-        if (!m_aDocIdle.IsActive())
+        if (!m_aDocIdle.IsActive()) {
+            SAL_INFO("lok.load","START IDLE");
             m_aDocIdle.Start();
-        else
+        } else
             Scheduler::Wakeup();
     }
 }
 
 void DocumentTimerManager::StopIdling()
 {
+    // SAL_INFO("lok.load","STOP IDLE");
     m_bStartOnUnblock = false;
     m_aDocIdle.Stop();
 }
 
 void DocumentTimerManager::BlockIdling()
 {
+    // SAL_INFO("lok.load","BLOCK IDLE");
     assert(SAL_MAX_UINT32 != m_nIdleBlockCount);
-    ++m_nIdleBlockCount;
+    osl_atomic_increment(&m_nIdleBlockCount);
 }
 
 void DocumentTimerManager::UnblockIdling()
 {
+    // SAL_INFO("lok.load","UNBLOCK IDLE");
     assert(0 != m_nIdleBlockCount);
-    --m_nIdleBlockCount;
 
-    if ((0 == m_nIdleBlockCount) && m_bStartOnUnblock)
+    if (0 == osl_atomic_decrement(&m_nIdleBlockCount) && m_bStartOnUnblock)
     {
         if (!m_aDocIdle.IsActive())
             m_aDocIdle.Start();
         else
             Scheduler::Wakeup();
     }
-}
-
-IMPL_LINK(DocumentTimerManager, FireIdleJobsTimeout, Timer*, , void)
-{
-    // Now we can run the idle jobs, assuming we finished LOK initialization.
-    StartIdling();
 }
 
 DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
@@ -173,7 +166,9 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
         for ( auto pLayout : m_rDoc.GetAllLayouts() )
             if( pLayout->IsIdleFormat() )
             {
+                SAL_INFO("lok.load","Start Layout Idle");
                 pLayout->GetCurrShell()->LayoutIdle();
+                SAL_INFO("lok.load","Stop Layout Idle");
                 break;
             }
          break;
@@ -228,6 +223,11 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
 }
 
 DocumentTimerManager::~DocumentTimerManager() {}
+
+void DocumentTimerManager::MarkLOKInitialized()
+{
+    m_bWaitForLokInit = false;
+}
 
 }
 

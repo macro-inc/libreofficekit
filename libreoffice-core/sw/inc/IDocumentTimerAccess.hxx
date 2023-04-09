@@ -65,6 +65,7 @@ public:
      */
     virtual bool IsDocIdle() const = 0;
 
+    virtual void MarkLOKInitialized() = 0;
 protected:
     virtual ~IDocumentTimerAccess(){};
 };

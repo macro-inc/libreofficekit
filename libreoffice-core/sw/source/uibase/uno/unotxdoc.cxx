@@ -2479,12 +2479,23 @@ void SAL_CALL SwXTextDocument::startBatchUpdate() {
 
     SwView* pWorkView = static_cast<SwView*>(m_pDocShell->GetViewShell());
     SwWrtShell* pWorkWrtShell = pWorkView->GetWrtShellPtr();
+    auto* win = pWorkWrtShell->GetWin();
+    pWorkWrtShell->LockPaint();
+    pWorkWrtShell->LockView(true);
+    if (win) {
+        win->Hide();
+        win->Disable();
+    }
     pWorkWrtShell->GetViewOptions()->SetIdle( false );
     pWorkView->AttrChangedNotify(nullptr);
     SwDoc* pWorkDoc = pWorkWrtShell->GetDoc();
     pWorkDoc->GetIDocumentUndoRedo().DoUndo( false );
-    for ( auto aLayout : pWorkDoc->GetAllLayouts() )
+    pWorkDoc->getIDocumentTimerAccess().BlockIdling();
+    pWorkDoc->getIDocumentTimerAccess().StopIdling();
+    for ( auto aLayout : pWorkDoc->GetAllLayouts() ) {
+        aLayout->ResetIdleFormat();
         aLayout->FreezeLayout(true);
+    }
     RedlineFlags eOld = pWorkDoc->getIDocumentRedlineAccess().GetRedlineFlags();
     pWorkDoc->getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld | RedlineFlags::Ignore );
 }
@@ -2498,7 +2509,6 @@ void SAL_CALL SwXTextDocument::finishBatchUpdate() {
 
     // Unfreeze target document layouts and correct all PageDescs.
     pWorkWrtShell->CalcLayout();
-    pWorkWrtShell->GetViewOptions()->SetIdle( true );
     pWorkDoc->GetIDocumentUndoRedo().DoUndo( true );
     for ( auto aLayout : pWorkWrtShell->GetDoc()->GetAllLayouts() )
     {
@@ -2507,6 +2517,15 @@ void SAL_CALL SwXTextDocument::finishBatchUpdate() {
     }
     RedlineFlags eOld = pWorkDoc->getIDocumentRedlineAccess().GetRedlineFlags();
     pWorkDoc->getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld & ~RedlineFlags::Ignore );
+    auto* win = pWorkWrtShell->GetWin();
+    pWorkWrtShell->LockView(false);
+    pWorkWrtShell->UnlockPaint();
+    if (win) {
+        win->Enable();
+        win->Show();
+    }
+    pWorkWrtShell->GetViewOptions()->SetIdle( true );
+    pWorkDoc->getIDocumentTimerAccess().UnblockIdling();
 }
 
 sal_Int32 SAL_CALL SwXTextDocument::getRendererCount(
@@ -3111,6 +3130,7 @@ void SAL_CALL SwXTextDocument::render(
         m_pRenderData.reset();
         m_pPrintUIOptions.reset();
     }
+    m_pDocShell->GetDoc()->getIDocumentTimerAccess().MarkLOKInitialized();
 }
 
 // xforms::XFormsSupplier
@@ -3179,6 +3199,7 @@ void SwXTextDocument::paintTile( VirtualDevice &rDevice,
                                  tools::Long nTileWidth, tools::Long nTileHeight )
 {
     SwViewShell* pViewShell = m_pDocShell->GetWrtShell();
+    m_pDocShell->GetDoc()->getIDocumentTimerAccess().MarkLOKInitialized();
     pViewShell->PaintTile(rDevice, nOutputWidth, nOutputHeight,
                           nTilePosX, nTilePosY, nTileWidth, nTileHeight);
 
