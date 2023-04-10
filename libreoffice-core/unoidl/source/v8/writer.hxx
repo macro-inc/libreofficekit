@@ -121,7 +121,6 @@ public:
              std::vector<OUString> sorted)
         : BaseWriter(entities, outDirectoryUrl)
         , sorted_(sorted) {}
-    void writeAsUtility();
     void writeBuildFile();
     // really used like sort entity to organize in specific namespaces
     void writeEntity(OUString const& name);
@@ -129,6 +128,7 @@ public:
     void writeSimpleTypeConverter();
     void writeAnyTypeConverter();
     void writeHeaderIncludes();
+    void writeClassIncludes();
     // call after iterating with writeEntity on sorted
     void writeOrganizedEntities();
 

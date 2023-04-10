@@ -322,6 +322,13 @@ SAL_IMPLEMENT_MAIN() {
 
             w->writeHeaderIncludes();
             w->writeDeclarations();
+            w->close();
+
+            w = new writer::V8Writer(flatMap, getArgumentUri(args - 1, nullptr) + "/v8",
+                                           sorted);
+
+            w->createEntityFile("unov8", ".cxx");
+            w->writeClassIncludes();
             w->writeSimpleTypeConverter();
             w->writeAnyTypeConverter();
 
@@ -337,14 +344,8 @@ SAL_IMPLEMENT_MAIN() {
             }
 
             w->writeOrganizedEntities();
-
             w->close();
-        }
 
-        {
-            auto* w
-                = new writer::V8Writer(flatMap, getArgumentUri(args - 1, nullptr) + "/v8", sorted);
-            w->writeAsUtility();
             w->writeBuildFile();
         }
 
