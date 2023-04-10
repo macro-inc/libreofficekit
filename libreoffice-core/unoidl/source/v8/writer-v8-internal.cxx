@@ -55,13 +55,15 @@ void V8WriterInternal::writeInterfaceMethods(OUString const& name,
         auto returnType = resolveTypedef(m.returnType);
         bool isVoid = returnType == "void";
         auto entity__ = entities_.find(returnType);
-        bool isInterface = !isVoid && entity__ != entities_.end() && entity__->second->entity->getSort() == unoidl::Entity::SORT_INTERFACE_TYPE;
+        bool isInterface
+            = !isVoid && entity__ != entities_.end()
+              && entity__->second->entity->getSort() == unoidl::Entity::SORT_INTERFACE_TYPE;
         out("*error = nullptr;\n");
 
         out("try {\n");
         if (isInterface) {
             // compiler will optimize out the result pointer with auto type and cause errors without this
-            out("::css::uno::Reference<"+ translateNamespace(returnType) +"> tmp_result = ");
+            out("::css::uno::Reference<" + translateNamespace(returnType) + "> tmp_result = ");
         } else if (!isVoid) {
             out("auto tmp_result = ");
         }
@@ -72,7 +74,11 @@ void V8WriterInternal::writeInterfaceMethods(OUString const& name,
                 out(", ");
         }
         out(");\n");
-        if (!isVoid) {
+        if (returnType == "any") {
+            out(R"(
+                uno_type_any_construct(result, tmp_result.pData, tmp_result.pType, ::css::uno::cpp_acquire);
+            )");
+        } else if (!isVoid) {
             // strings need to be acquired before they are returned on stack
             if (returnType == "string") {
                 out("rtl_uString_acquire(tmp_result.pData);\n");

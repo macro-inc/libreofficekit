@@ -192,8 +192,8 @@ uno_Sequence* Sequence(v8::Isolate* isolate, v8::Local<v8::Value> val, typelib_T
 v8::Local<v8::Value> Sequence(v8::Isolate* isolate, uno_Sequence* val, typelib_TypeDescriptionReference *typeRef);
 v8::Local<v8::Value> AnyStructValue(v8::Isolate* isolate, void* val, rtl_uString* typeName);
 void AnyStructValue(v8::Isolate* isolate, v8::Local<v8::Value> val, void* out_val, unsigned int type_id);
-v8::Local<v8::Value> AnyInterfaceValue(v8::Isolate* isolate, void* val, rtl_uString* typeName);
-v8::Local<v8::Value> AnyInterfaceValue(v8::Isolate* isolate, void* val, std::string_view typeName);
+v8::Local<v8::Value> AnyInterfaceValue(v8::Isolate* isolate, void* const* val, rtl_uString* typeName);
+v8::Local<v8::Value> AnyInterfaceValue_(v8::Isolate* isolate, void* const* val, std::string_view typeName);
 v8::Local<v8::Value> AnyValue(v8::Isolate* isolate, void* val, typelib_TypeClass typeClass, rtl_uString* typeName);
 void AnySimpleValue(v8::Isolate* isolate, v8::Local<v8::Value> val, void* out_val, typelib_TypeClass typeClass);
 v8::Local<v8::Value> Any(v8::Isolate* isolate, uno_Any* val);
@@ -637,13 +637,13 @@ void AnyStructValue(v8::Isolate* isolate, v8::Local<v8::Value> val, void* out_va
     }
 }
 
-v8::Local<v8::Value> AnyInterfaceValue(v8::Isolate* isolate, void * val, std::string_view typeName) {
+v8::Local<v8::Value> AnyInterfaceValue_(v8::Isolate* isolate, void* const* val, std::string_view typeName) {
     switch (hash(typeName)) {
 )");
 
     for (auto& i : interfaces) {
         out("case hash(\"" + i.first + "\"): return unoclass::" + cName(i.first)
-            + "::Create(isolate, val).ToV8();\n");
+            + "::Create(isolate, *val).ToV8();\n");
     }
 
     out(R"(default: return v8::Undefined(isolate);
@@ -663,10 +663,10 @@ v8::Local<v8::Value> AnyInterfaceValueWithSimplifiedType(v8::Isolate* isolate, v
     }
 }
 
-v8::Local<v8::Value> AnyInterfaceValue(v8::Isolate* isolate, void* val, rtl_uString* typeName) {
+v8::Local<v8::Value> AnyInterfaceValue(v8::Isolate* isolate, void* const* val, rtl_uString* typeName) {
     auto& unov8_ = electron::office::OfficeClient::GetUnoV8();
     rtl_String* utf8Name = unov8_.rtl.uStringToUtf8(typeName);
-    return AnyInterfaceValue(isolate, val, std::string_view(utf8Name->buffer, utf8Name->length));
+    return AnyInterfaceValue_(isolate, val, std::string_view(utf8Name->buffer, utf8Name->length));
 }
 
 namespace {
@@ -914,7 +914,7 @@ v8::Local<v8::Value> AnyValue(v8::Isolate* isolate, void* val, typelib_TypeClass
         case typelib_TypeClass_TYPE:
             return unoclass::Type::Create(isolate, *static_cast<typelib_TypeDescriptionReference * const*>(val)).ToV8();
         case typelib_TypeClass_INTERFACE:
-            return AnyInterfaceValue(isolate, *static_cast<void* const*>(val), typeName);
+            return AnyInterfaceValue(isolate, static_cast<void* const*>(val), typeName);
         case typelib_TypeClass_STRUCT:
             return AnyStructValue(isolate, *static_cast<void* const*>(val), typeName);
         default: return v8::Undefined(isolate);
