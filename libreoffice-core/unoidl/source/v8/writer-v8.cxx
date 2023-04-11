@@ -132,7 +132,6 @@ void V8Writer::writeHeaderIncludes() {
 #include "gin/wrappable.h"
 #include "gin/per_isolate_data.h"
 #include "LibreOfficeKit/UnoV8.h"
-#include "sal/main.h"
 #include "office/office_client.h"
     )");
 }
