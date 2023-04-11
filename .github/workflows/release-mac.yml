@@ -35,6 +35,7 @@ jobs:
           ./autogen.sh --with-distro=LOKit-Mac --with-external-tar="$RUNNER_TOOL_CACHE/lokit-external"
           make build-nocheck
           tar -cJf ../libreofficekit-mac-${{ matrix.arch }}.tar.xz instdir
+          cd ..
           shasum -a 256 libreofficekit-mac-${{ matrix.arch }}.tar.xz > libreofficekit-mac-${{ matrix.arch }}.tar.xz.sha256sum
       - name: Create release
         uses: ncipollo/release-action@v1
