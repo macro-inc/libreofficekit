@@ -1901,6 +1901,16 @@ module com {
     };
     published singleton theMacroExpander: ::com::sun::star::util::XMacroExpander;
    };
+   module container {
+    published interface XStringKeyMap {
+     any getValue( [in] string aKey ) raises( com::sun::star::container::NoSuchElementException );
+     boolean hasValue( [in] string aKey );
+     void insertValue( [in] string aKey, [in] any aValue ) raises( com::sun::star::lang::IllegalArgumentException, com::sun::star::container::ElementExistException );
+     [attribute, readonly] long Count;
+     string getKeyByIndex( [in] long nIndex ) raises( com::sun::star::lang::IndexOutOfBoundsException );
+     any getValueByIndex( [in] long nIndex ) raises( com::sun::star::lang::IndexOutOfBoundsException );
+    };
+   };
   };
  };
 };

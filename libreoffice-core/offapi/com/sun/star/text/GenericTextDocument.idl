@@ -80,54 +80,76 @@ published service GenericTextDocument
     /** @since LibreOffice 5.0 */
     [optional] interface com::sun::star::tiledrendering::XTiledRenderable;
 
-    [optional] interface com::sun::star::text::XFootnotesSupplier;
+    interface com::sun::star::text::XFootnotesSupplier;
 
-    [optional] interface com::sun::star::text::XEndnotesSupplier;
+    interface com::sun::star::text::XEndnotesSupplier;
 
     /** @since LibreOffice 7.5 */
-    [optional] interface com::sun::star::text::XContentControlsSupplier;
+    interface com::sun::star::text::XContentControlsSupplier;
 
-    [optional] interface com::sun::star::util::XReplaceable;
+    interface com::sun::star::util::XReplaceable;
 
-    [optional] interface com::sun::star::text::XPagePrintable;
+    interface com::sun::star::text::XPagePrintable;
 
-    [optional] interface com::sun::star::text::XReferenceMarksSupplier;
+    interface com::sun::star::text::XReferenceMarksSupplier;
 
-    [optional] interface com::sun::star::text::XChapterNumberingSupplier;
+    interface com::sun::star::text::XChapterNumberingSupplier;
 
-    [optional] interface com::sun::star::beans::XPropertySet;
+    interface com::sun::star::beans::XPropertySet;
 
-    [optional] interface com::sun::star::text::XTextGraphicObjectsSupplier;
+    interface com::sun::star::text::XTextGraphicObjectsSupplier;
 
-    [optional] interface com::sun::star::text::XTextEmbeddedObjectsSupplier;
+    interface com::sun::star::text::XTextEmbeddedObjectsSupplier;
 
-    [optional] interface com::sun::star::text::XTextTablesSupplier;
+    interface com::sun::star::text::XTextTablesSupplier;
 
-    [optional] interface com::sun::star::style::XStyleFamiliesSupplier;
+    interface com::sun::star::style::XStyleFamiliesSupplier;
+
+    interface com::sun::star::document::XRedlinesSupplier;
+
+    interface com::sun::star::text::XLineNumberingProperties;
+
+    interface com::sun::star::text::XNumberingRulesSupplier;
+
+    interface com::sun::star::style::XAutoStylesSupplier;
+
+    interface com::sun::star::lang::XServiceInfo;
+
+    interface com::sun::star::drawing::XDrawPageSupplier;
+
+    interface com::sun::star::drawing::XDrawPagesSupplier;
+
+    interface com::sun::star::beans::XPropertyState;
+
+    interface com::sun::star::document::XLinkTargetSupplier;
+
+    interface com::sun::star::xforms::XFormsSupplier;
+
+    interface com::sun::star::text::XFlatParagraphIteratorProvider;
 
     /** @since OOo 1.1.2
      */
-    [optional] interface com::sun::star::text::XBookmarksSupplier;
+    interface com::sun::star::text::XBookmarksSupplier;
 
     /** @since OOo 1.1.2
      */
-    [optional] interface com::sun::star::text::XDocumentIndexesSupplier;
+    interface com::sun::star::text::XDocumentIndexesSupplier;
 
     /** @since OOo 1.1.2
      */
-    [optional] interface com::sun::star::text::XTextFieldsSupplier;
+    interface com::sun::star::text::XTextFieldsSupplier;
 
     /** @since OOo 1.1.2
      */
-    [optional] interface com::sun::star::text::XTextFramesSupplier;
+    interface com::sun::star::text::XTextFramesSupplier;
 
     /** @since OOo 1.1.2
      */
-    [optional] interface com::sun::star::text::XTextSectionsSupplier;
+    interface com::sun::star::text::XTextSectionsSupplier;
 
     /** @since OOo 1.1.2
      */
-    [optional] interface com::sun::star::util::XNumberFormatsSupplier;
+    interface com::sun::star::util::XNumberFormatsSupplier;
 
     /** contains the identifier of the default locale of the document.
      */

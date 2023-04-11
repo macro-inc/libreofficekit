@@ -228,7 +228,7 @@ void TypeScriptWriter::writeInterface(OUString const& name,
             writeType(i.type);
             out(";\n");
         }
-        out("},\n");
+        out("} & (BaseType extends { properties: any } ? BaseType['properties'] : {}),\n");
     }
 
     for (auto& i : entity->getDirectMethods()) {
@@ -484,7 +484,7 @@ void TypeScriptWriter::writeTSIndex(OUString const& name, Entity* moduleEntity) 
         auto x = entities_.find(name + "." + i);
         if (x != entities_.end() && x->second->relevant
             && x->second->entity->getSort() != unoidl::Entity::SORT_EXCEPTION_TYPE) {
-            indexBuffer.append("export { " + simplifyNamespace(i) + " } from './"
+            indexBuffer.append("export * from './"
                                + simplifyNamespace(i) + "';\n");
 
             stillRelevant = true;

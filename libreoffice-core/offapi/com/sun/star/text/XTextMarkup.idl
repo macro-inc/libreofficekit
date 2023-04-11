@@ -33,7 +33,7 @@ module com {  module sun {  module star {  module text {
     @since OOo 2.3
  */
 
-interface XTextMarkup
+published interface XTextMarkup
 {
     /** obtains a container to store additional user defined text markup
         information.

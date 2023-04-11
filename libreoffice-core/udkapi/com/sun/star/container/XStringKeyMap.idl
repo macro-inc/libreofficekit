@@ -35,7 +35,7 @@ module com {  module sun {  module star {  module container {
     @since OOo 2.3
  */
 
-interface XStringKeyMap
+published interface XStringKeyMap
 {
     /** reads data from the map.
 

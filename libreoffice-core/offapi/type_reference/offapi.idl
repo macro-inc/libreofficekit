@@ -5341,6 +5341,12 @@ module com {
      ::com::sun::star::container::XNameContainer getForms();
     };
    };
+   module xforms {
+    published interface XFormsSupplier {
+     interface ::com::sun::star::uno::XInterface;
+     ::com::sun::star::container::XNameContainer getXForms();
+    };
+   };
    module drawing {
     published service DrawPage {
      service ::com::sun::star::drawing::GenericDrawPage;
@@ -14304,7 +14310,59 @@ module com {
      void paintTile([in] any Parent, [in] long nOutputWidth, [in] long nOutputHeight, [in] long nTilePosX, [in] long nTilePosY, [in] long nTileWidth, [in] long nTileHeight);
     };
    };
+   module style {
+    published interface XAutoStyles {
+     interface com::sun::star::container::XNameAccess;
+     interface com::sun::star::container::XIndexAccess;
+    };
+    published interface XAutoStylesSupplier {
+     interface ::com::sun::star::uno::XInterface;
+     com::sun::star::style::XAutoStyles getAutoStyles();
+    };
+   };
    module text {
+    published interface XTextMarkup {
+     interface ::com::sun::star::uno::XInterface;
+     com::sun::star::container::XStringKeyMap getMarkupInfoContainer();
+     void commitStringMarkup( [in] long nType, [in] string aIdentifier, [in] long nStart, [in] long nLength, [in] com::sun::star::container::XStringKeyMap xMarkupInfoContainer );
+     void commitTextRangeMarkup( [in] long nType, [in] string aIdentifier, [in] com::sun::star::text::XTextRange xRange, [in] com::sun::star::container::XStringKeyMap xMarkupInfoContainer );
+    };
+    published interface XFlatParagraph {
+     interface com::sun::star::text::XTextMarkup;
+     string getText();
+     boolean isModified();
+     void setChecked( [in] long nType, [in] boolean bVal );
+     boolean isChecked( [in] long nType );
+     com::sun::star::lang::Locale getLanguageOfText( [in] long nPos, [in] long nLen ) raises( com::sun::star::lang::IllegalArgumentException );
+     com::sun::star::lang::Locale getPrimaryLanguageOfText( [in] long nPos, [in] long nLen ) raises( com::sun::star::lang::IllegalArgumentException );
+     void changeText( [in] long nPos, [in] long nLen, [in] string NewText, [in] sequence<::com::sun::star::beans::PropertyValue> aAttributes ) raises( com::sun::star::lang::IllegalArgumentException );
+     void changeAttributes( [in] long nPos, [in] long nLen, [in] sequence<::com::sun::star::beans::PropertyValue> aAttributes ) raises( com::sun::star::lang::IllegalArgumentException );
+     sequence< long > getLanguagePortions();
+    };
+    published interface XFlatParagraphIterator {
+     interface ::com::sun::star::uno::XInterface;
+     com::sun::star::text::XFlatParagraph getFirstPara();
+     com::sun::star::text::XFlatParagraph getNextPara();
+     com::sun::star::text::XFlatParagraph getLastPara();
+     com::sun::star::text::XFlatParagraph getParaBefore( [in] com::sun::star::text::XFlatParagraph xPara ) raises( com::sun::star::lang::IllegalArgumentException );
+     com::sun::star::text::XFlatParagraph getParaAfter( [in] com::sun::star::text::XFlatParagraph xPara ) raises( com::sun::star::lang::IllegalArgumentException );
+    };
+    published interface XFlatParagraphIteratorProvider {
+     interface com::sun::star::uno::XInterface;
+     com::sun::star::text::XFlatParagraphIterator getFlatParagraphIterator( [in] long nType, [in] boolean bAutomatic ) raises( com::sun::star::lang::IllegalArgumentException );
+    };
+    published interface XLineNumberingProperties {
+     interface ::com::sun::star::uno::XInterface;
+     ::com::sun::star::beans::XPropertySet getLineNumberingProperties();
+    };
+    published interface XNumberingRulesSupplier {
+     interface ::com::sun::star::uno::XInterface;
+     ::com::sun::star::container::XIndexAccess getNumberingRules();
+    };
+    published interface XContentControlsSupplier {
+     interface ::com::sun::star::uno::XInterface;
+     com::sun::star::container::XIndexAccess getContentControls();
+    };
     published service GenericTextDocument {
      service ::com::sun::star::document::OfficeDocument;
      interface ::com::sun::star::lang::XMultiServiceFactory;
@@ -14312,31 +14370,43 @@ module com {
      interface ::com::sun::star::util::XSearchable;
      interface ::com::sun::star::util::XRefreshable;
      [optional] interface ::com::sun::star::tiledrendering::XTiledRenderable;
-     [optional] interface ::com::sun::star::text::XFootnotesSupplier;
-     [optional] interface ::com::sun::star::text::XEndnotesSupplier;
-     [optional] interface ::com::sun::star::util::XReplaceable;
-     [optional] interface ::com::sun::star::text::XPagePrintable;
-     [optional] interface ::com::sun::star::text::XReferenceMarksSupplier;
-     [optional] interface ::com::sun::star::text::XChapterNumberingSupplier;
-     [optional] interface ::com::sun::star::beans::XPropertySet;
-     [optional] interface ::com::sun::star::text::XTextGraphicObjectsSupplier;
-     [optional] interface ::com::sun::star::text::XTextEmbeddedObjectsSupplier;
-     [optional] interface ::com::sun::star::text::XTextTablesSupplier;
-     [optional] interface ::com::sun::star::style::XStyleFamiliesSupplier;
-     [optional] interface ::com::sun::star::text::XBookmarksSupplier;
-     [optional] interface ::com::sun::star::text::XDocumentIndexesSupplier;
-     [optional] interface ::com::sun::star::text::XTextFieldsSupplier;
-     [optional] interface ::com::sun::star::text::XTextFramesSupplier;
-     [optional] interface ::com::sun::star::text::XTextSectionsSupplier;
-     [optional] interface ::com::sun::star::util::XNumberFormatsSupplier;
-     [property, optional] ::com::sun::star::lang::Locale CharLocale;
-     [property, optional, readonly] long CharacterCount;
-     [property, optional, readonly] long ParagraphCount;
-     [property, optional, readonly] long WordCount;
-     [property, optional] string WordSeparator;
-     [property, optional] string IndexAutoMarkFileURL;
-     [property, optional] boolean RecordChanges;
-     [property, optional] short TwoDigitYear;
+     interface ::com::sun::star::text::XFootnotesSupplier;
+     interface ::com::sun::star::text::XEndnotesSupplier;
+     interface ::com::sun::star::text::XContentControlsSupplier;
+     interface ::com::sun::star::util::XReplaceable;
+     interface ::com::sun::star::text::XPagePrintable;
+     interface ::com::sun::star::text::XReferenceMarksSupplier;
+     interface ::com::sun::star::text::XChapterNumberingSupplier;
+     interface ::com::sun::star::beans::XPropertySet;
+     interface ::com::sun::star::text::XTextGraphicObjectsSupplier;
+     interface ::com::sun::star::text::XTextEmbeddedObjectsSupplier;
+     interface ::com::sun::star::text::XTextTablesSupplier;
+     interface ::com::sun::star::style::XStyleFamiliesSupplier;
+     interface ::com::sun::star::document::XRedlinesSupplier;
+     interface ::com::sun::star::text::XLineNumberingProperties;
+     interface ::com::sun::star::text::XNumberingRulesSupplier;
+     interface ::com::sun::star::style::XAutoStylesSupplier;
+     interface ::com::sun::star::lang::XServiceInfo;
+     interface ::com::sun::star::drawing::XDrawPageSupplier;
+     interface ::com::sun::star::drawing::XDrawPagesSupplier;
+     interface ::com::sun::star::beans::XPropertyState;
+     interface ::com::sun::star::document::XLinkTargetSupplier;
+     interface ::com::sun::star::xforms::XFormsSupplier;
+     interface ::com::sun::star::text::XFlatParagraphIteratorProvider;
+     interface ::com::sun::star::text::XBookmarksSupplier;
+     interface ::com::sun::star::text::XDocumentIndexesSupplier;
+     interface ::com::sun::star::text::XTextFieldsSupplier;
+     interface ::com::sun::star::text::XTextFramesSupplier;
+     interface ::com::sun::star::text::XTextSectionsSupplier;
+     interface ::com::sun::star::util::XNumberFormatsSupplier;
+     [optional, property] ::com::sun::star::lang::Locale CharLocale;
+     [optional, readonly, property] long CharacterCount;
+     [optional, readonly, property] long ParagraphCount;
+     [optional, readonly, property] long WordCount;
+     [optional, property] string WordSeparator;
+     [optional, property] string IndexAutoMarkFileURL;
+     [optional, property] boolean RecordChanges;
+     [optional, property] short TwoDigitYear;
     };
    };
    module view {
@@ -15249,10 +15319,6 @@ module com {
      interface ::com::sun::star::uno::XInterface;
      ::com::sun::star::beans::XPropertySet getFootnotesSettings();
     };
-    published interface XLineNumberingProperties {
-     interface ::com::sun::star::uno::XInterface;
-     ::com::sun::star::beans::XPropertySet getLineNumberingProperties();
-    };
     published interface XMailMergeListener {
      interface ::com::sun::star::uno::XInterface;
      void notifyMailMergeEvent([in] ::com::sun::star::text::MailMergeEvent aEvent);
@@ -15260,10 +15326,6 @@ module com {
     published interface XNumberingFormatter {
      interface ::com::sun::star::uno::XInterface;
      string makeNumberingString([in] sequence< ::com::sun::star::beans::PropertyValue > aProperties, [in] ::com::sun::star::lang::Locale aLocale) raises (::com::sun::star::lang::IllegalArgumentException);
-    };
-    published interface XNumberingRulesSupplier {
-     interface ::com::sun::star::uno::XInterface;
-     ::com::sun::star::container::XIndexAccess getNumberingRules();
     };
     published interface XNumberingTypeInfo {
      interface ::com::sun::star::uno::XInterface;

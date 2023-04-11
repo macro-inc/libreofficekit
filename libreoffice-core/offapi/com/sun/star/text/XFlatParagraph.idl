@@ -35,7 +35,7 @@ module com {  module sun {  module star {  module text {
     @since OOo 3.0
  */
 
-interface XFlatParagraph: com::sun::star::text::XTextMarkup
+published interface XFlatParagraph: com::sun::star::text::XTextMarkup
 {
 
     /** get the content of the paragraph

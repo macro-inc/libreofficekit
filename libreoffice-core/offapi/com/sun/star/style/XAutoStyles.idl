@@ -31,10 +31,8 @@
 
 /** This service contains the collection of automatic style families within the
     container document.
-
  */
-interface XAutoStyles
-
+published interface XAutoStyles
 {
     interface com::sun::star::container::XNameAccess;
     interface com::sun::star::container::XIndexAccess;

@@ -24,7 +24,7 @@ module com {  module sun {  module star {  module text {
 
     @since LibreOffice 7.5
  */
-interface XContentControlsSupplier: com::sun::star::uno::XInterface
+published interface XContentControlsSupplier: com::sun::star::uno::XInterface
 {
     /** returns a collection of content controls.
      */

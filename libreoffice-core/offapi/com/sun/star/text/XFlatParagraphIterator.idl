@@ -33,7 +33,7 @@ module com {  module sun {  module star {  module text {
     @since OOo 3.0
  */
 
-interface XFlatParagraphIterator: com::sun::star::uno::XInterface
+published interface XFlatParagraphIterator: com::sun::star::uno::XInterface
 {
 
     /** get the first flat paragraph to be checked or an empty reference if
