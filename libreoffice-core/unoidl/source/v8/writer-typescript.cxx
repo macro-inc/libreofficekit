@@ -214,7 +214,13 @@ void TypeScriptWriter::writeException(OUString const& name,
 
 void TypeScriptWriter::writeInterface(OUString const& name,
                                       rtl::Reference<unoidl::InterfaceTypeEntity> entity) {
-    out("export interface " + entityName(name) + " extends BaseType {\n");
+    bool isXPropertySet = name == "com.sun.star.beans.XPropertySet";
+
+    if (isXPropertySet) {
+        out("type XPropertySet<T extends uno.Service = uno.Service> = BaseType & {\n");
+    } else {
+        out("export interface " + entityName(name) + " extends BaseType {\n");
+    }
     bool hasProperties = entity->getDirectAttributes().size() > 0;
 
     if (hasProperties) {
@@ -228,7 +234,7 @@ void TypeScriptWriter::writeInterface(OUString const& name,
             writeType(i.type);
             out(";\n");
         }
-        out("} & (BaseType extends { properties: any } ? BaseType['properties'] : {}),\n");
+        out("} & (BaseType extends uno.Service ? BaseType['properties'] : {}),\n");
     }
 
     for (auto& i : entity->getDirectMethods()) {
@@ -237,13 +243,13 @@ void TypeScriptWriter::writeInterface(OUString const& name,
 
         writeDoc(i.doc);
         // Override XPropertySet type params
-        if (name == "com.sun.star.beans.XPropertySet") {
+        if (isXPropertySet) {
             if (i.name == "setPropertyValue") {
-              out("setPropertyValue<T extends {properties: Record<string, any>} = {properties: Record<string, any>}>(k: keyof T['properties'], v: T['properties'][typeof k]): void;\n");
+              out("setPropertyValue<K extends keyof T['properties'] = keyof T['properties'], V extends T['properties'][K] = T['properties'][K]>(k: K, v: V): void;\n");
 
               continue;
             } else if (i.name == "getPropertyValue") {
-              out("getPropertyValue<T extends {properties: Record<string, any>} = {properties: Record<string, any>}>(k: keyof T['properties']): T['properties'][typeof k];\n");
+              out("getPropertyValue<K extends keyof T['properties'] = keyof T['properties'], V extends T['properties'][K] = T['properties'][K]>(k: K): V;\n");
               continue;
             }
         }
@@ -510,6 +516,10 @@ void TypeScriptWriter::writeTSIndex(OUString const& name, Entity* moduleEntity) 
 export interface Type {
   typeClass: import("./TypeClass").TypeClass;
   typeName: string;
+}
+
+export interface Service {
+    properties: Record<string, any>
 }
 
 /** base interface of all UNO interfaces */
