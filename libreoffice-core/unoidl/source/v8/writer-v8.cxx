@@ -610,7 +610,9 @@ void Any(v8::Isolate* isolate, v8::Local<v8::Value> val, uno_Any* dest) {
 }
 
 v8::Local<v8::Value> AnyStructValue(v8::Isolate* isolate, void* val, rtl_uString* typeName) {
-    switch (hash(std::string_view(reinterpret_cast<char*>(typeName->buffer), typeName->length * sizeof(sal_Unicode)))) {
+    auto& unov8_ = electron::office::OfficeClient::GetUnoV8();
+    rtl_String* utf8Name = unov8_.rtl.uStringToUtf8(typeName);
+    switch (hash(std::string_view(utf8Name->buffer, utf8Name->length))) {
 )");
 
     for (auto& i : structs) {
@@ -816,7 +818,7 @@ v8::Local<v8::Value> Sequence(v8::Isolate* isolate, uno_Sequence* val, typelib_T
         void *el = static_cast<void*>(elements + (elSize * i));
         result->CreateDataProperty(
             context, i, elTypeRef->eTypeClass == typelib_TypeClass_SEQUENCE ?
-                Sequence(isolate, static_cast<uno_Sequence*>(el), elTypeRef) : AnyValue(isolate, el, elTypeRef->eTypeClass, elTypeRef->pTypeName)
+                Sequence(isolate, static_cast<uno_Sequence*>(el), elTypeRef) : AnyValue(isolate, &el, elTypeRef->eTypeClass, elTypeRef->pTypeName)
             ).ToChecked();
     }
 

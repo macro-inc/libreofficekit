@@ -79,13 +79,19 @@ void V8WriterInternal::writeInterfaceMethods(OUString const& name,
                 uno_type_any_construct(result, tmp_result.pData, tmp_result.pType, ::css::uno::cpp_acquire);
             )");
         } else if (!isVoid) {
+            // sequences need be acquired before they are returned on stack
+            if (returnType.startsWith("[]")) {
+                out("osl_atomic_increment( &tmp_result.get()->nRefCount );\n");
+
+            }
             // strings need to be acquired before they are returned on stack
             if (returnType == "string") {
                 out("rtl_uString_acquire(tmp_result.pData);\n");
             }
             // interfaces passed by uno::Reference need to be acquired before they are returned on stack
             if (isInterface) {
-                out("static_cast<::css::uno::XInterface*>(static_cast<void*>(tmp_result.get()))->acquire();\n");
+                out("static_cast<::css::uno::XInterface*>(static_cast<void*>(tmp_result.get()))->"
+                    "acquire();\n");
             }
             out("*result = ");
             writeCppToC(returnType, "tmp_result");
