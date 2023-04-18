@@ -48,6 +48,7 @@ published service TextDocumentView
      */
     interface com::sun::star::text::XTextViewCursorSupplier;
 
+    interface com::sun::star::text::XTextViewLayoutSupplier;
 
     /** Gives access to the objects properties.
 
@@ -55,6 +56,7 @@ published service TextDocumentView
      */
     [optional] interface com::sun::star::beans::XPropertySet;
 
+    [optional] interface ::com::sun::star::view::XFormLayerAccess;
 
     /** returns the number of pages in the document
 

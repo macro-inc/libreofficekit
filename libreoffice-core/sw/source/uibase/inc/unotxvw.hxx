@@ -24,6 +24,7 @@
 #include <com/sun/star/text/XTextViewCursor.hpp>
 #include <com/sun/star/text/XTextViewCursorSupplier.hpp>
 #include <com/sun/star/text/XTextViewTextRangeSupplier.hpp>
+#include <com/sun/star/text/XTextViewLayoutSupplier.hpp>
 #include <com/sun/star/text/XRubySelection.hpp>
 #include <com/sun/star/view/XFormLayerAccess.hpp>
 #include <com/sun/star/view/XScreenCursor.hpp>
@@ -54,6 +55,7 @@ class SwXTextView final :
     public css::view::XFormLayerAccess,
     public css::text::XTextViewCursorSupplier,
     public css::text::XTextViewTextRangeSupplier,
+    public css::text::XTextViewLayoutSupplier,
     public css::text::XRubySelection,
     public css::view::XViewSettingsSupplier,
     public css::beans::XPropertySet,
@@ -138,6 +140,9 @@ public:
 
     // XTransferableTextSupplier
     virtual css::uno::Reference<css::datatransfer::XTransferable> SAL_CALL getTransferableForTextRange(css::uno::Reference<css::text::XTextRange> const& xTextRange) override;
+
+    // XTextViewLayoutSupplier
+    virtual css::uno::Sequence< ::css::awt::Rectangle > SAL_CALL getTextRangeRects( const ::css::uno::Reference< ::css::text::XTextRange >& xRange ) override;
 
     void                    NotifySelChanged();
     void                    NotifyDBChanged();

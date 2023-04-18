@@ -216,6 +216,11 @@ uno::Any SAL_CALL SwXTextView::queryInterface( const uno::Type& aType )
         uno::Reference<datatransfer::XTransferableTextSupplier> xRet = this;
         aRet <<= xRet;
     }
+    else if(aType == cppu::UnoType<text::XTextViewLayoutSupplier>::get())
+    {
+        uno::Reference<text::XTextViewLayoutSupplier> xRet = this;
+        aRet <<= xRet;
+    }
     else
         aRet = SfxBaseController::queryInterface(aType);
     return aRet;
@@ -1790,6 +1795,78 @@ void SAL_CALL SwXTextView::insertTransferable( const uno::Reference< datatransfe
             GetView()->AttrChangedNotify(nullptr);
         }
     }
+}
+
+css::uno::Sequence<::css::awt::Rectangle> SAL_CALL
+SwXTextView::getTextRangeRects(const ::css::uno::Reference<::css::text::XTextRange>& xRange)
+{
+    SolarMutexGuard aGuard;
+
+    uno::Reference<lang::XUnoTunnel> xRangeTunnel(xRange, uno::UNO_QUERY);
+    Sequence<::css::awt::Rectangle> aRet;
+
+    if (!xRangeTunnel.is())
+        return aRet;
+
+    SwWrtShell& rSh = GetView()->GetWrtShell();
+
+    const bool bLockedView = rSh.IsViewLocked();
+    rSh.LockView(true);
+
+    SwPosition* startPos = nullptr;
+    SwPosition* endPos = nullptr;
+    SwContentNode* node = nullptr;
+
+    if (auto pRange = comphelper::getFromUnoTunnel<SwXTextRange>(xRangeTunnel))
+    {
+        SwDoc& rDoc = pRange->GetDoc();
+
+        SwUnoInternalPaM aPam(rDoc);
+
+        ::sw::XTextRangeToSwPaM(aPam, xRange);
+
+        startPos = aPam.Start();
+        endPos = aPam.End();
+        node = aPam.GetContentNode();
+    }
+    else if (auto pCursor = comphelper::getFromUnoTunnel<OTextCursorHelper>(xRangeTunnel))
+    {
+        SwPaM& rPam(*pCursor->GetPaM());
+
+        startPos = rPam.Start();
+        endPos = rPam.End();
+        node = rPam.GetContentNode();
+    }
+
+    if (!startPos || !endPos || !node)
+        return aRet;
+
+    SwShellCursor aCursor(rSh, *startPos);
+    aCursor.SetMark();
+    aCursor.GetMark()->nNode = *node;
+    aCursor.GetMark()->nContent.Assign(node, endPos->nContent.GetIndex());
+
+    aCursor.FillRects();
+
+    SwRects* pRects(&aCursor);
+    aRet = Sequence<css::awt::Rectangle>(pRects->size());
+
+    sal_uInt32 i = 0;
+    css::awt::Rectangle* pOutRects = aRet.getArray();
+    for (const SwRect& rNextRect : *pRects)
+    {
+        const Point& pt = rNextRect.Pos();
+        const Size& size = rNextRect.SSize();
+        css::awt::Rectangle& rect = pOutRects[i++];
+        rect.X = pt.X();
+        rect.Y = pt.Y();
+        rect.Width = size.Width();
+        rect.Height = size.Height();
+    }
+
+    rSh.LockView(bLockedView);
+
+    return aRet;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

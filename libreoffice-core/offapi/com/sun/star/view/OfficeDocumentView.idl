@@ -41,6 +41,8 @@ published service OfficeDocumentView
      */
     interface com::sun::star::view::XSelectionSupplier;
 
+    interface com::sun::star::frame::XController;
+
 
     /** This optional interface gives access to the view properties within this
         control for an office document.
@@ -54,6 +56,8 @@ published service OfficeDocumentView
         access to the controls which belong to specified control models.
      */
     [optional] interface com::sun::star::view::XControlAccess;
+
+    [optional] interface ::com::sun::star::datatransfer::XTransferableSupplier;
 
 };
 

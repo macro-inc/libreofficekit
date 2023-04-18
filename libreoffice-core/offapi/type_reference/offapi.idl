@@ -14922,16 +14922,23 @@ module com {
    module view {
     published service OfficeDocumentView {
      interface ::com::sun::star::view::XSelectionSupplier;
+     interface ::com::sun::star::frame::XController;
      [optional] interface ::com::sun::star::view::XViewSettingsSupplier;
      [optional] interface ::com::sun::star::view::XControlAccess;
+     [optional] interface ::com::sun::star::datatransfer::XTransferableSupplier;
     };
    };
    module text {
+    published interface XTextViewLayoutSupplier {
+     sequence< ::com::sun::star::awt::Rectangle > getTextRangeRects( [in] ::com::sun::star::text::XTextRange xRange );
+    };
     published service TextDocumentView {
      service ::com::sun::star::view::OfficeDocumentView;
      interface ::com::sun::star::view::XViewSettingsSupplier;
      interface ::com::sun::star::text::XTextViewCursorSupplier;
+     interface ::com::sun::star::text::XTextViewLayoutSupplier;
      [optional] interface ::com::sun::star::beans::XPropertySet;
+     [optional] interface ::com::sun::star::view::XFormLayerAccess;
      [property, optional, readonly] long PageCount;
      [property, optional, readonly] long LineCount;
      [property, optional] boolean IsConstantSpellcheck;
