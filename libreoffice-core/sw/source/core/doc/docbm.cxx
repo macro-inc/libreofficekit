@@ -451,7 +451,7 @@ namespace
 
     void lcl_DebugMarks(MarkManager::container_t const& rMarks)
     {
-#if OSL_DEBUG_LEVEL > 0
+#if OSL_DEBUG_LEVEL > 1
         SAL_INFO("sw.core", rMarks.size() << " Marks");
         for (auto ppMark = rMarks.begin();
              ppMark != rMarks.end();

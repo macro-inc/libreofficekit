@@ -1825,12 +1825,11 @@ void CallbackFlushHandler::queue(const int type, CallbackData& aCallbackData)
     startTimer();
 }
 
-bool CallbackFlushHandler::processInvalidateTilesEvent(int type, CallbackData& aCallbackData)
+bool CallbackFlushHandler::processInvalidateTilesEvent(int /*type*/, CallbackData& aCallbackData)
 {
     RectangleAndPart rcNew = aCallbackData.getRectangleAndPart();
     if (rcNew.isEmpty())
     {
-        SAL_INFO("lok", "Skipping invalid event [" << type << "]: [" << aCallbackData.getPayload() << "].");
         return true;
     }
 
@@ -1845,8 +1844,6 @@ bool CallbackFlushHandler::processInvalidateTilesEvent(int type, CallbackData& a
         if (rcOld.isInfinite() && (rcOld.m_nPart == -1 || rcOld.m_nPart == rcNew.m_nPart) &&
             (rcOld.m_nMode == rcNew.m_nMode))
         {
-            SAL_INFO("lok", "Skipping queue [" << type << "]: [" << aCallbackData.getPayload()
-                                               << "] since all tiles need to be invalidated.");
             return true;
         }
 
@@ -1855,8 +1852,6 @@ bool CallbackFlushHandler::processInvalidateTilesEvent(int type, CallbackData& a
             // If fully overlapping.
             if (rcOld.m_aRectangle.Contains(rcNew.m_aRectangle))
             {
-                SAL_INFO("lok", "Skipping queue [" << type << "]: [" << aCallbackData.getPayload()
-                                                   << "] since overlaps existing all-parts.");
                 return true;
             }
         }
@@ -1864,8 +1859,6 @@ bool CallbackFlushHandler::processInvalidateTilesEvent(int type, CallbackData& a
 
     if (rcNew.isInfinite())
     {
-        SAL_INFO("lok", "Have Empty [" << type << "]: [" << aCallbackData.getPayload()
-                                       << "] so removing all with part " << rcNew.m_nPart << ".");
         removeAll(LOK_CALLBACK_INVALIDATE_TILES, [&rcNew](const CallbackData& elemData) {
             // Remove exiting if new is all-encompassing, or if of the same part.
             return ((rcNew.m_nPart == -1 || rcNew.m_nPart == elemData.getRectangleAndPart().m_nPart)
@@ -1876,38 +1869,27 @@ bool CallbackFlushHandler::processInvalidateTilesEvent(int type, CallbackData& a
     {
         const auto rcOrig = rcNew;
 
-        SAL_INFO("lok", "Have [" << type << "]: [" << aCallbackData.getPayload() << "] so merging overlapping.");
         removeAll(LOK_CALLBACK_INVALIDATE_TILES,[&rcNew](const CallbackData& elemData) {
             const RectangleAndPart& rcOld = elemData.getRectangleAndPart();
             if (rcNew.m_nPart != -1 && rcOld.m_nPart != -1 &&
                 (rcOld.m_nPart != rcNew.m_nPart || rcOld.m_nMode != rcNew.m_nMode))
             {
-                SAL_INFO("lok", "Nothing to merge between new: "
-                                    << rcNew.toString() << ", and old: " << rcOld.toString());
                 return false;
             }
 
             if (rcNew.m_nPart == -1)
             {
                 // Don't merge unless fully overlapped.
-                SAL_INFO("lok", "New " << rcNew.toString() << " has " << rcOld.toString()
-                                       << "?");
                 if (rcNew.m_aRectangle.Contains(rcOld.m_aRectangle) && rcOld.m_nMode == rcNew.m_nMode)
                 {
-                    SAL_INFO("lok", "New " << rcNew.toString() << " engulfs old "
-                                           << rcOld.toString() << ".");
                     return true;
                 }
             }
             else if (rcOld.m_nPart == -1)
             {
                 // Don't merge unless fully overlapped.
-                SAL_INFO("lok", "Old " << rcOld.toString() << " has " << rcNew.toString()
-                                       << "?");
                 if (rcOld.m_aRectangle.Contains(rcNew.m_aRectangle) && rcOld.m_nMode == rcNew.m_nMode)
                 {
-                    SAL_INFO("lok", "New " << rcNew.toString() << " engulfs old "
-                                           << rcOld.toString() << ".");
                     return true;
                 }
             }
@@ -1916,13 +1898,9 @@ bool CallbackFlushHandler::processInvalidateTilesEvent(int type, CallbackData& a
                 const tools::Rectangle rcOverlap
                     = rcNew.m_aRectangle.GetIntersection(rcOld.m_aRectangle);
                 const bool bOverlap = !rcOverlap.IsEmpty() && rcOld.m_nMode == rcNew.m_nMode;
-                SAL_INFO("lok", "Merging " << rcNew.toString() << " & " << rcOld.toString()
-                                           << " => " << rcOverlap.toString()
-                                           << " Overlap: " << bOverlap);
                 if (bOverlap)
                 {
                     rcNew.m_aRectangle.Union(rcOld.m_aRectangle);
-                    SAL_INFO("lok", "Merged: " << rcNew.toString());
                     return true;
                 }
             }
@@ -1933,7 +1911,6 @@ bool CallbackFlushHandler::processInvalidateTilesEvent(int type, CallbackData& a
 
         if (rcNew.m_aRectangle != rcOrig.m_aRectangle)
         {
-            SAL_INFO("lok", "Replacing: " << rcOrig.toString() << " by " << rcNew.toString());
             if (rcNew.m_aRectangle.GetWidth() < rcOrig.m_aRectangle.GetWidth()
                 || rcNew.m_aRectangle.GetHeight() < rcOrig.m_aRectangle.GetHeight())
             {
