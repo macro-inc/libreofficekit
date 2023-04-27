@@ -567,6 +567,16 @@ namespace
     {
         return nEntryId >> 16;
     }
+
+    OString optionalFcSysroot()
+    {
+        const char* sysroot =
+            reinterpret_cast<const char*>(FcConfigGetSysRoot(nullptr));
+        if (!sysroot) {
+            return "";
+        }
+        return OString(sysroot);
+    }
 }
 
 void PrintFontManager::countFontconfigFonts( std::unordered_map<OString, int>& o_rVisitedPaths )
@@ -610,7 +620,7 @@ void PrintFontManager::countFontconfigFonts( std::unordered_map<OString, int>& o
 
             SAL_INFO(
                 "vcl.fonts.detail",
-                "found font \"" << family << "\" in file " << file << ", weight = "
+                "found font \"" << family << "\" in file " << optionalFcSysroot() << file << ", weight = "
                 << (eWeightRes == FcResultMatch ? weight : -1) << ", slant = "
                 << (eSpacRes == FcResultMatch ? slant : -1) << ", style = \""
                 << (eStyleRes == FcResultMatch ? reinterpret_cast<const char*>(style) : "<nil>")
@@ -634,7 +644,9 @@ void PrintFontManager::countFontconfigFonts( std::unordered_map<OString, int>& o
 
             // see if this font is already cached
             // update attributes
-            OString aDir, aBase, aOrgPath( reinterpret_cast<char*>(file) );
+            OString aOrgPath( reinterpret_cast<char*>(file) );
+            aOrgPath = optionalFcSysroot() + aOrgPath;
+            OString aDir, aBase;
             splitPath( aOrgPath, aDir, aBase );
 
             o_rVisitedPaths[aDir] = 1;
@@ -1055,7 +1067,9 @@ void PrintFontManager::Substitute(vcl::font::FontSelectPattern &rPattern, OUStri
                 nEntryId = 0;
             if( eFileRes == FcResultMatch )
             {
-                OString aDir, aBase, aOrgPath( reinterpret_cast<char*>(file) );
+                OString aOrgPath( reinterpret_cast<char*>(file) );
+                aOrgPath = optionalFcSysroot() + aOrgPath;
+                OString aDir, aBase;
                 splitPath( aOrgPath, aDir, aBase );
                 int nDirID = getDirectoryAtom( aDir );
                 fontID aFont = findFontFileID(nDirID, aBase, GetCollectionIndex(nEntryId), GetVariationIndex(nEntryId));
@@ -1270,7 +1284,9 @@ void PrintFontManager::matchFont( FastPrintFontInfo& rInfo, const css::lang::Loc
                 nEntryId = 0;
             if( eFileRes == FcResultMatch )
             {
-                OString aDir, aBase, aOrgPath( reinterpret_cast<char*>(file) );
+                OString aOrgPath( reinterpret_cast<char*>(file) );
+                aOrgPath = optionalFcSysroot() + aOrgPath;
+                OString aDir, aBase;
                 splitPath( aOrgPath, aDir, aBase );
                 int nDirID = getDirectoryAtom( aDir );
                 fontID aFont = findFontFileID(nDirID, aBase,
