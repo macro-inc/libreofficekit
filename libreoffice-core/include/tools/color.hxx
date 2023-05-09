@@ -501,6 +501,9 @@ constexpr ::Color COL_AUTHOR9_NORMAL          ( 0xFF, 0xE2, 0xB9 );
 constexpr ::Color COL_AUTHOR9_LIGHT           ( 0xFF, 0xE7, 0xC7 );
 constexpr ::Color COL_AUTHOR_TABLE_INS        ( 0xE1, 0xF2, 0xFA );
 constexpr ::Color COL_AUTHOR_TABLE_DEL        ( 0xFC, 0xE6, 0xF4 );
+constexpr ::Color COL_PIP_TERM                ( 0x14, 0x46, 0xA3 );
+constexpr ::Color COL_PIP_TERM_REF            ( 0x14, 0x46, 0xA3 );
+constexpr ::Color COL_PIP_SECTION_REF         ( 0x4C, 0xAF, 0x50 );
 
 template<typename charT, typename traits>
 inline std::basic_ostream<charT, traits>& operator <<(std::basic_ostream<charT, traits>& rStream, const Color& rColor)

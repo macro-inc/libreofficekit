@@ -207,11 +207,21 @@ static bool lcl_ChgHyperLinkColor( const SwTextAttr& rAttr,
     if (rAttr.Which() == RES_TXTATR_INETFMT) {
         const SwFormatINetFormat& rINetFormat = static_cast<const SwFormatINetFormat&>(rAttr.GetAttr());
         OUString aDestinationURL = rINetFormat.GetValue();
-        OUString termUrlSplitter = "term://";
-        if(aDestinationURL.startsWith(termUrlSplitter)){
-            SAL_WARN("lcl_ChgHyperLinkColor", "term match found");
-            SAL_WARN("lcl_ChgHyperLinkColor", aDestinationURL);
-            *pColor = COL_RED;
+        OUString termUrl = "term://";
+        OUString termRefUrl = "termref://";
+        OUString sectionUrl = "section://";
+        OUString sectionRefUrl = "sectionref://";
+        if(aDestinationURL.startsWith(termUrl)){
+            *pColor = COL_PIP_TERM;
+            return true;
+        } else if (aDestinationURL.startsWith(termRefUrl)) {
+            *pColor = COL_PIP_TERM_REF;
+            return true;
+        } else if(aDestinationURL.startsWith(sectionUrl)){
+            // Sections are by default not highlighted a particular color
+            return false;
+        } else if (aDestinationURL.startsWith(sectionRefUrl)) {
+            *pColor = COL_PIP_SECTION_REF;
             return true;
         }
     }
