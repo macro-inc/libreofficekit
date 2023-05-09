@@ -203,6 +203,19 @@ static bool lcl_ChgHyperLinkColor( const SwTextAttr& rAttr,
          RES_CHRATR_COLOR != rItem.Which() )
         return false;
 
+    // Used for coloring pip items for Macro
+    if (rAttr.Which() == RES_TXTATR_INETFMT) {
+        const SwFormatINetFormat& rINetFormat = static_cast<const SwFormatINetFormat&>(rAttr.GetAttr());
+        OUString aDestinationURL = rINetFormat.GetValue();
+        OUString termUrlSplitter = "term://";
+        if(aDestinationURL.startsWith(termUrlSplitter)){
+            SAL_WARN("lcl_ChgHyperLinkColor", "term match found");
+            SAL_WARN("lcl_ChgHyperLinkColor", aDestinationURL);
+            *pColor = COL_RED;
+            return true;
+        }
+    }
+
     // #i15455#
     // 1. case:
     // We do not want to show visited links:
