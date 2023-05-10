@@ -225,7 +225,7 @@ DocumentTimerManager::~DocumentTimerManager() {}
 
 void DocumentTimerManager::MarkLOKInitialized()
 {
-    m_bWaitForLokInit = false;
+    // m_bWaitForLokInit = false;
 }
 
 }
