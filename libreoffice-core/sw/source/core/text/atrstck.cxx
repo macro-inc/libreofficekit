@@ -203,6 +203,29 @@ static bool lcl_ChgHyperLinkColor( const SwTextAttr& rAttr,
          RES_CHRATR_COLOR != rItem.Which() )
         return false;
 
+    // Used for coloring pip items for Macro
+    if (rAttr.Which() == RES_TXTATR_INETFMT) {
+        const SwFormatINetFormat& rINetFormat = static_cast<const SwFormatINetFormat&>(rAttr.GetAttr());
+        OUString aDestinationURL = rINetFormat.GetValue();
+        OUString termUrl = "term://";
+        OUString termRefUrl = "termref://";
+        OUString sectionUrl = "section://";
+        OUString sectionRefUrl = "sectionref://";
+        if(aDestinationURL.startsWith(termUrl)){
+            *pColor = COL_PIP_TERM;
+            return true;
+        } else if (aDestinationURL.startsWith(termRefUrl)) {
+            *pColor = COL_PIP_TERM_REF;
+            return true;
+        } else if(aDestinationURL.startsWith(sectionUrl)){
+            // Sections are by default not highlighted a particular color
+            return false;
+        } else if (aDestinationURL.startsWith(sectionRefUrl)) {
+            *pColor = COL_PIP_SECTION_REF;
+            return true;
+        }
+    }
+
     // #i15455#
     // 1. case:
     // We do not want to show visited links:
